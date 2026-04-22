@@ -205,27 +205,27 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <script>
-function t(score,changed,exam,diff){
+function t(score,changed,exam,diff,startWeek){
   var s=score,tr=[];
   if(s!==null){
     var d = diff || 0;
     tr = [Math.max(10,s-d-15), Math.max(10,s-d-8), Math.max(10,s-d), s];
   }
-  return{name:'Topic name',score:s,changed:changed,exam:exam,trend:tr};
+  return{name:'Topic name',score:s,changed:changed,exam:exam,trend:tr,startWeek:startWeek||1};
 }
 
 var mathChapters = [
-  { name: 'Chapter name', topics: [t(76,false,true,5),t(22,true,false,-3),t(61,false,false,4),t(94,false,true,3),t(35,false,false,-4),t(null,false,false),t(70,false,false,2),t(18,true,true,-5),t(85,false,false,-2)] },
-  { name: 'Chapter name', topics: [t(42,true,false,7),t(28,false,false,-2),t(15,false,false,0),t(58,false,false,3),t(null,false,false)] },
-  { name: 'Chapter name', topics: [t(73,false,false,4),t(88,true,false,4),t(25,false,false,-3),t(91,false,false,2),t(44,false,false,0),t(null,false,false)] },
-  { name: 'Chapter name', topics: [t(32,false,false,-4),t(79,true,false,6),t(55,false,false,3)] },
+  { name: 'Chapter name', topics: [t(76,false,true,5,1),t(22,true,false,-3,1),t(61,false,false,4,1),t(94,false,true,3,1),t(35,false,false,-4,2),t(null,false,false,0,1),t(70,false,false,2,2),t(18,true,true,-5,1),t(85,false,false,-2,1)] },
+  { name: 'Chapter name', topics: [t(42,true,false,7,3),t(28,false,false,-2,3),t(15,false,false,0,4),t(58,false,false,3,3),t(null,false,false,0,4)] },
+  { name: 'Chapter name', topics: [t(73,false,false,4,5),t(88,true,false,4,5),t(25,false,false,-3,6),t(91,false,false,2,5),t(44,false,false,0,6),t(null,false,false,0,6)] },
+  { name: 'Chapter name', topics: [t(32,false,false,-4,8),t(79,true,false,6,7),t(55,false,false,3,8)] },
 ];
 var mathTopics = [];
 mathChapters.forEach(function(c){c.topics.forEach(function(t){mathTopics.push(t)})});
 
 var readingTopics = [
-  t(82,true,true,3),t(30,false,false,-5),t(91,true,false,2),t(22,false,false,0),
-  t(67,false,true,6),
+  t(82,true,true,3,1),t(30,false,false,-5,2),t(91,true,false,2,1),t(22,false,false,0,4),
+  t(67,false,true,6,3),
 ];
 
 function scoreColor(s) {
@@ -341,14 +341,17 @@ function openDrill(t, section) {
   ch.style.display = 'flex';
   ch.style.flexDirection = 'column';
   ch.style.gap = '6px';
+  var isMastered = t.score >= 80;
   if (diff > 0) {
     ch.style.background = 'rgba(39,189,134,0.08)';
     ch.style.border = '1px solid rgba(39,189,134,0.2)';
-    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + upCaret + '<span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">Heading in the right direction — keep going</div>';
+    var upMsg = isMastered ? 'Still climbing — nice work' : 'Heading in the right direction — keep going';
+    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + upCaret + '<span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">' + upMsg + '</div>';
   } else if (diff < 0) {
     ch.style.background = 'rgba(240,61,61,0.06)';
     ch.style.border = '1px solid rgba(240,61,61,0.15)';
-    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + downCaret + '<span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">A practice session this week will help turn this around</div>';
+    var downMsg = isMastered ? 'Small dip — a quick session will steady this' : 'A practice session this week will help turn this around';
+    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + downCaret + '<span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">' + downMsg + '</div>';
   } else {
     ch.style.background = 'rgba(20,20,20,0.03)';
     ch.style.border = '1px solid rgba(20,20,20,0.08)';
@@ -390,9 +393,16 @@ function renderChart(data, labelTexts) {
   data.forEach(function(v, i) {
     var b = document.createElement('div');
     b.className = 'chart__bar';
-    b.style.height = v + '%';
-    b.style.background = chartBarColor(v);
-    b.dataset.val = v;
+    if (v === null) {
+      b.style.height = '4px';
+      b.style.background = 'var(--bg-disabled)';
+      b.style.borderRadius = '2px';
+      b.style.alignSelf = 'flex-end';
+    } else {
+      b.style.height = v + '%';
+      b.style.background = chartBarColor(v);
+      b.dataset.val = v;
+    }
     bars.appendChild(b);
     var l = document.createElement('span');
     l.style.cssText = 'font-family:var(--font-mono);font-size:10px;color:var(--fg-muted);flex:1;text-align:center';
@@ -418,12 +428,19 @@ function generateSemester(t) {
   var vals = [];
   var labels = [];
   var numWeeks = 10;
+  var start = t.startWeek || 1;
   for (var i = 0; i < numWeeks; i++) {
-    var progress = i / (numWeeks - 1);
-    var base = Math.round(15 + (s - 15) * progress);
-    var jitter = Math.round((Math.random() - 0.3) * 6);
-    vals.push(Math.max(5, Math.min(100, base + jitter)));
-    labels.push('W' + (i + 1));
+    var week = i + 1;
+    labels.push('W' + week);
+    if (week < start) {
+      vals.push(null);
+    } else {
+      var activeWeeks = numWeeks - start + 1;
+      var progress = (week - start) / Math.max(1, activeWeeks - 1);
+      var base = Math.round(15 + (s - 15) * progress);
+      var jitter = Math.round((Math.random() - 0.3) * 6);
+      vals.push(Math.max(5, Math.min(100, base + jitter)));
+    }
   }
   vals[numWeeks - 1] = s;
   return { values: vals, labels: labels };
