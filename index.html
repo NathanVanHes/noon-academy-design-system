@@ -375,7 +375,7 @@ P.typography = {
             ['H4','font-serif','var(--fs-18)','600','var(--lh-snug)','0','Todays passage'],
             ['Body','font-sans','var(--fs-16)','400','var(--lh-normal)','0','Sarah cleared this last Thursday. Three teammates are working it now.'],
             ['Small','font-sans','var(--fs-14)','400','var(--lh-normal)','0','On pace for 92. The difficult passages are real.'],
-            ['Label','font-sans','11px','600','1','var(--tr-caps)','ROUTE &middot; DAY 14/28'],
+            ['Label','font-sans','var(--fs-11)','600','1','var(--tr-caps)','ROUTE &middot; DAY 14/28'],
             ['Mono','font-mono','var(--fs-12)','400','1.4','0','ELEV 412M &middot; EST 22 MIN'],
           ].map(([role,font,size,weight,lh,ls,text])=>`<div style="display:grid;grid-template-columns:80px 1fr;gap:var(--sp-4);align-items:baseline;padding:var(--sp-2) 0;border-bottom:1px solid var(--divider)">
             <div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)">${role}</div>
@@ -415,9 +415,28 @@ P.typography = {
         </div>
       </div>
 
+      <div class="sect"><div class="sect__title">Size Scale</div>
+        <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Every font-size in the system references a token. No hardcoded pixel values in components.</p>
+        <div class="col gap-2">
+          ${[9,10,11,12,13,14,15,16,18,20,22,24,28,32,40,48,64,80].map(s=>`<div style="display:flex;align-items:baseline;gap:var(--sp-4);padding:var(--sp-1) 0;border-bottom:1px solid var(--divider)"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint);min-width:48px">--fs-${s}</span><span style="font-family:var(--font-sans);font-size:var(--fs-${s});color:var(--fg)">${s}px</span></div>`).join('')}
+        </div>
+      </div>
+
       <div class="sect"><div class="sect__title">Weight Scale</div>
         <div class="grid grid--auto">
-          ${[['300','Light'],['400','Regular'],['500','Medium'],['600','Semibold'],['700','Bold']].map(([w,n])=>`<div class="cell"><div class="cell__label">fw-${w} &middot; ${n}</div><div style="font-family:var(--font-sans);font-weight:${w};font-size:var(--fs-16);color:var(--fg)">Routes / المسارات</div></div>`).join('')}
+          ${[['300','Light'],['400','Regular'],['500','Medium'],['600','Semibold'],['700','Bold']].map(([w,n])=>`<div class="cell"><div class="cell__label">--fw-${w} &middot; ${n}</div><div style="font-family:var(--font-sans);font-weight:${w};font-size:var(--fs-16);color:var(--fg)">Routes / المسارات</div></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Tracking (Letter Spacing)</div>
+        <div class="col gap-3">
+          ${[['--tr-tight','-0.015em','Headings, display'],['--tr-snug','-0.005em','Buttons, actions'],['--tr-caps','0.14em','Uppercase labels'],['--tr-wide','0.08em','Tab bars, small caps']].map(([token,val,use])=>`<div style="display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-2) 0;border-bottom:1px solid var(--divider)"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint);min-width:80px">${token}</span><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-subtle);min-width:72px">${val}</span><span style="font-size:var(--fs-13);color:var(--fg-muted)">${use}</span></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Line Height</div>
+        <div class="col gap-3">
+          ${[['--lh-tight','1.05','Display, single-line headings'],['--lh-snug','1.2','Subheadings, cards'],['--lh-normal','1.5','Body text, paragraphs'],['--lh-loose','1.7','Arabic body text']].map(([token,val,use])=>`<div style="display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-2) 0;border-bottom:1px solid var(--divider)"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint);min-width:80px">${token}</span><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-subtle);min-width:40px">${val}</span><span style="font-size:var(--fs-13);color:var(--fg-muted)">${use}</span></div>`).join('')}
         </div>
       </div>
     </div>`;
