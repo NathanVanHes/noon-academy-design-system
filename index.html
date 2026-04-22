@@ -3547,12 +3547,15 @@ P.calendar = {
   },
   renderCanvas(k) {
     const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const fullDayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const now = new Date();
     const today = now.getDate();
     const month = now.getMonth();
     const year = now.getFullYear();
+    const todayDow = fullDayNames[now.getDay()];
     const monthName = months[month] + ' ' + year;
+    const weekTitle = todayDow + ', ' + months[month] + ' ' + today;
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrev = new Date(year, month, 0).getDate();
@@ -3585,9 +3588,9 @@ P.calendar = {
       return `<div class="cal__week-row" data-week="${wi}"${hide}>${cells}</div>`;
     }).join('');
 
-    return `<div class="cal cal--week" style="width:360px" data-active-week="${aw}">
+    return `<div class="cal cal--week" style="width:360px" data-active-week="${aw}" data-week-title="${weekTitle}" data-month-title="${monthName}">
       <div class="cal__header">
-        <span class="cal__month">${monthName}</span>
+        <span class="cal__month">${weekTitle}</span>
         <div class="cal__nav">
           <button class="btn btn--ghost btn--sm cal__today-btn">Today</button>
           <button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
@@ -3605,10 +3608,13 @@ P.calendar = {
     const rows = cal.querySelectorAll('.cal__week-row');
     const aw = cal.dataset.activeWeek || '3';
 
+    const titleEl = cal.querySelector('.cal__month');
+
     // Expand/collapse
     function expand() {
       cal.classList.remove('cal--week'); cal.classList.add('cal--month');
       rows.forEach(r => { r.style.maxHeight = '48px'; r.style.opacity = '1'; });
+      titleEl.textContent = cal.dataset.monthTitle;
     }
     function collapse() {
       cal.classList.remove('cal--month'); cal.classList.add('cal--week');
@@ -3616,6 +3622,7 @@ P.calendar = {
         if (r.dataset.week === aw) { r.style.maxHeight = '48px'; r.style.opacity = '1'; }
         else { r.style.maxHeight = '0'; r.style.opacity = '0'; }
       });
+      titleEl.textContent = cal.dataset.weekTitle;
     }
 
     // Handle click toggle
