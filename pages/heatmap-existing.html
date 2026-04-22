@@ -115,7 +115,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
     <span class="legend-row__label">Strong</span>
     <span class="legend-row__divider"></span>
     <span class="legend-row__changed" id="changedCount">
-      <svg width="18" height="10" viewBox="0 0 20 10" fill="none"><path d="M5 2L8 7H2Z" fill="#74716C"/><path d="M15 8L12 3H18Z" fill="#74716C"/></svg>
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M4 2L7 6H1Z" fill="#74716C"/><path d="M10 8L7 4H13Z" fill="#74716C"/></svg>
     </span>
   </div>
 
@@ -436,7 +436,7 @@ document.getElementById('examFilter').addEventListener('click', function() {
 renderGrid('mathGrid', mathTopics, 'Quantitative');
 renderGrid('readingGrid', readingTopics, 'Verbal');
 var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
-document.getElementById('changedCount').innerHTML += changedNum + ' changed';
+document.getElementById('changedCount').innerHTML += changedNum + ' changed since you last visited';
 </script>
 </body>
 </html>
