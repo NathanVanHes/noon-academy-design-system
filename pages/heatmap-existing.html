@@ -43,7 +43,7 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 .tile:hover{transform:scale(1.05);z-index:1}
 .tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.1;padding:0 4px}
 .tile__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.45)}
-.tile__changed{position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--fg);box-shadow:0 0 4px rgba(20,20,20,0.3)}
+.tile__changed{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#27BD86;box-shadow:0 0 0 2px rgba(39,189,134,0.25)}
 
 /* Drilldown panel */
 .drill{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1)}
@@ -93,7 +93,7 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
       <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#0084FF">12d</b> &middot; Quant in <b style="color:#0084FF">19d</b></span>
       <button class="btn-secondary" id="examFilter">Next exam</button>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><div style="width:5px;height:5px;border-radius:50%;background:var(--fg);box-shadow:0 0 4px rgba(20,20,20,0.25);flex:none"></div></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex:none"><circle cx="7" cy="7" r="3" fill="#27BD86" opacity="0.2"/><circle cx="7" cy="7" r="1.5" fill="#27BD86"/></svg></div>
     <div class="legend">
       <span class="legend__label">Weak</span>
       <div class="legend__bar"></div>
