@@ -3644,18 +3644,20 @@ P.calendar = {
             isWeek = true; slideDir = null;
           } else if (action === 'prev') {
             if (isWeek) {
+              const oldDay = selectedDate.getDay();
               selectedDate.setDate(selectedDate.getDate() - 1);
               viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear();
-              slideDir = 'right';
+              slideDir = selectedDate.getDay() === 6 ? 'right' : null; // crossed into prev week (Sat)
             } else {
               viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
               slideDir = null;
             }
           } else if (action === 'next') {
             if (isWeek) {
+              const oldDay = selectedDate.getDay();
               selectedDate.setDate(selectedDate.getDate() + 1);
               viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear();
-              slideDir = 'left';
+              slideDir = selectedDate.getDay() === 0 ? 'left' : null; // crossed into next week (Sun)
             } else {
               viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
               slideDir = null;
