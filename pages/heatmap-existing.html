@@ -390,27 +390,41 @@ function renderChart(data, labelTexts, mastered) {
   var cw = w - pad.left - pad.right;
   var ch = h - pad.top - pad.bottom;
 
-  // Build points
-  var points = [];
-  var greyIndices = [];
+  // Build all points — nulls sit at bottom
+  var allPoints = [];
   data.forEach(function(v, i) {
     var x = pad.left + (n > 1 ? (i / (n - 1)) * cw : cw / 2);
     if (v === null) {
-      greyIndices.push({x:x, i:i});
+      allPoints.push({x:x, y:pad.top + ch, v:null, i:i, grey:true});
     } else {
       var y = pad.top + ch - (v / 100) * ch;
-      points.push({x:x, y:y, v:v, i:i});
+      allPoints.push({x:x, y:y, v:v, i:i, grey:false});
     }
   });
+  var points = allPoints.filter(function(p){return !p.grey});
 
   var masteryY = pad.top + ch - (80 / 100) * ch;
 
   var svg = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" class="chart__svg" fill="none">';
 
-  // Grey dots for inactive weeks
-  greyIndices.forEach(function(g) {
-    svg += '<circle cx="' + g.x + '" cy="' + (pad.top + ch - 2) + '" r="2.5" fill="#EDEAE3"/>';
-  });
+  // Full connected line (grey segments + colored segments)
+  if (allPoints.length > 1) {
+    // Grey line for inactive portion
+    var greyPath = '';
+    var colorPath = '';
+    for (var k = 0; k < allPoints.length; k++) {
+      var p = allPoints[k];
+      var cmd = k === 0 ? 'M' : 'L';
+      if (p.grey) {
+        greyPath += (greyPath ? 'L' : 'M') + p.x + ',' + p.y;
+        // If next point is active, connect grey to it
+        if (k + 1 < allPoints.length && !allPoints[k+1].grey) {
+          greyPath += 'L' + allPoints[k+1].x + ',' + allPoints[k+1].y;
+        }
+      }
+    }
+    if (greyPath) svg += '<path d="' + greyPath + '" stroke="#EDEAE3" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  }
 
   // Mastery threshold line (full width)
   svg += '<line x1="' + pad.left + '" y1="' + masteryY + '" x2="' + (pad.left + cw) + '" y2="' + masteryY + '" stroke="rgba(20,20,20,0.1)" stroke-dasharray="4,3"/>';
@@ -436,7 +450,12 @@ function renderChart(data, labelTexts, mastered) {
     svg += '<path d="' + linePath + '" stroke="rgba(20,20,20,0.2)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>';
   }
 
-  // Dots with hover tooltips
+  // Grey dots at bottom for inactive weeks
+  allPoints.forEach(function(p) {
+    if (p.grey) svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="3.5" fill="#EDEAE3" stroke="#fff" stroke-width="1.5"/>';
+  });
+
+  // Active dots with hover tooltips
   points.forEach(function(p) {
     svg += '<g class="chart__dot">';
     svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="14" fill="transparent"/>';
