@@ -30,10 +30,7 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 .scroll{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .scroll::-webkit-scrollbar{display:none}
 
-/* Legend */
-.legend{display:flex;align-items:center;gap:12px;padding:12px 24px}
-.legend__bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
-.legend__label{font-family:var(--font-mono);font-size:9px;color:var(--fg-muted)}
+/* Legend — fully inline, no classes needed */
 
 /* Grid */
 .grid-section{padding:12px 24px 20px}
@@ -93,12 +90,12 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
       <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#0084FF">12d</b> &middot; Quant in <b style="color:#0084FF">19d</b></span>
       <button class="btn-secondary" id="examFilter">Next exam</button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 24px">
-      <span class="legend__label">Weak</span>
-      <div class="legend__bar" style="flex:1"></div>
-      <span class="legend__label">Strong</span>
-      <span style="width:1px;height:12px;background:rgba(20,20,20,0.1)"></span>
-      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--fg-secondary);white-space:nowrap;flex:none" id="changedCount"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1L9 5H3Z" fill="var(--fg-secondary)"/><path d="M6 11L3 7H9Z" fill="var(--fg-secondary)"/></svg></span>
+    <div style="display:flex;align-items:center;gap:8px;padding:12px 24px;flex-wrap:nowrap">
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:none">Weak</span>
+      <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);min-width:60px"></div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:none">Strong</span>
+      <span style="width:1px;height:12px;background:rgba(20,20,20,0.1);flex:none"></span>
+      <span id="changedCount" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--fg-secondary);white-space:nowrap;flex:none"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1L9 5H3Z" fill="#74716C"/><path d="M6 11L3 7H9Z" fill="#74716C"/></svg></span>
     </div>
 
     <!-- Math section -->
