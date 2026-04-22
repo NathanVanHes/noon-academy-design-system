@@ -3634,6 +3634,104 @@ P.leaderboard = {
     </div>`
 };
 
+// ──────── CALENDAR ────────
+P.calendar = {
+  title: 'Calendar', desc: 'Date picker with week strip (collapsed) and full month (expanded) views. Drag handle toggles between modes.',
+  tokens() {
+    return ['--accent','--accent-fg','--fg','--fg-faint','--fg-disabled','--hover-overlay','--r-1','--sp-1','--sp-2','--sp-3','--dur-1','--ease','--font-sans','--font-serif','--font-mono'];
+  },
+  knobs: {
+    view: { type:'select', options:['month','week'], default:'month', label:'View' },
+    selectedDay: { type:'text', default:'22', label:'Selected day' },
+    showEvents: { type:'toggle', default:true, label:'Show event dots' },
+  },
+  renderCanvas(k) {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const sel = parseInt(k.selectedDay) || 22;
+    const weekHeader = days.map(d => `<span class="cal__weekday">${d}</span>`).join('');
+
+    if (k.view === 'week') {
+      const weekDays = [19,20,21,22,23,24,25];
+      const dayBtns = weekDays.map(d => {
+        const cls = ['cal__day'];
+        if (d === sel) cls.push('is-selected');
+        if (d === 22) cls.push('is-today');
+        const dot = k.showEvents && (d === 20 || d === 22 || d === 24) ? '<span class="cal__day-dot"></span>' : '';
+        return `<button class="${cls.join(' ')}">${d}${dot}</button>`;
+      }).join('');
+      return `<div class="cal cal--week" style="width:340px">
+        <div class="cal__header"><span class="cal__month">April 2026</span><div class="cal__nav"><button class="cal__nav-btn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3L4 7l4 4"/></svg></button><button class="cal__nav-btn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l4 4-4 4"/></svg></button></div></div>
+        <div class="cal__weekdays">${weekHeader}</div>
+        <div class="cal__days">${dayBtns}</div>
+        <div class="cal__handle"><div class="cal__handle-bar"></div></div>
+      </div>`;
+    }
+
+    // Full month
+    const monthDays = [
+      {d:29,out:true},{d:30,out:true},{d:31,out:true},{d:1},{d:2},{d:3},{d:4},
+      {d:5},{d:6},{d:7},{d:8},{d:9},{d:10},{d:11},
+      {d:12},{d:13},{d:14},{d:15},{d:16},{d:17},{d:18},
+      {d:19},{d:20},{d:21},{d:22},{d:23},{d:24},{d:25},
+      {d:26},{d:27},{d:28},{d:29},{d:30},{d:1,out:true},{d:2,out:true}
+    ];
+    const evtDays = [2,8,10,15,20,22,24,28];
+    const dayBtns = monthDays.map(m => {
+      const cls = ['cal__day'];
+      if (m.out) cls.push('is-outside');
+      if (!m.out && m.d === sel) cls.push('is-selected');
+      if (!m.out && m.d === 22) cls.push('is-today');
+      const dot = k.showEvents && !m.out && evtDays.includes(m.d) ? '<span class="cal__day-dot"></span>' : '';
+      return `<button class="${cls.join(' ')}">${m.d}${dot}</button>`;
+    }).join('');
+
+    return `<div class="cal" style="width:340px">
+      <div class="cal__header"><span class="cal__month">April 2026</span><div class="cal__nav"><button class="cal__nav-btn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3L4 7l4 4"/></svg></button><button class="cal__nav-btn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l4 4-4 4"/></svg></button></div></div>
+      <div class="cal__weekdays">${weekHeader}</div>
+      <div class="cal__days">${dayBtns}</div>
+      <div class="cal__handle"><div class="cal__handle-bar"></div></div>
+    </div>`;
+  },
+  renderCode(k) {
+    return `<div class="cal${k.view==='week'?' cal--week':''}">
+  <div class="cal__header">
+    <span class="cal__month">April 2026</span>
+    <div class="cal__nav">...</div>
+  </div>
+  <div class="cal__weekdays">...</div>
+  <div class="cal__days">
+    <button class="cal__day is-selected">22</button>
+    ...
+  </div>
+  <div class="cal__handle"><div class="cal__handle-bar"></div></div>
+</div>`;
+  },
+  sections: `
+    <div class="sect"><div class="sect__title">Month View</div>
+      <div class="col gap-5">
+        <div class="cell"><div class="cell__label">Full month with selected day and event dots</div>
+          <div class="cal" style="width:340px" id="calMonth"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Week Strip</div>
+      <div class="col gap-5">
+        <div class="cell"><div class="cell__label">Collapsed week view — shows current week only</div>
+          <div class="cal cal--week" style="width:340px" id="calWeek"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">States</div>
+      <div class="grid grid--auto">
+        <div class="cell"><div class="cell__label">Today</div><button class="cal__day is-today" style="width:40px;height:40px">22</button></div>
+        <div class="cell"><div class="cell__label">Selected</div><button class="cal__day is-selected" style="width:40px;height:40px">22<span class="cal__day-dot"></span></button></div>
+        <div class="cell"><div class="cell__label">Outside month</div><button class="cal__day is-outside" style="width:40px;height:40px">29</button></div>
+        <div class="cell"><div class="cell__label">Disabled</div><button class="cal__day is-disabled" style="width:40px;height:40px">15</button></div>
+        <div class="cell"><div class="cell__label">With event dot</div><button class="cal__day" style="width:40px;height:40px">8<span class="cal__day-dot"></span></button></div>
+      </div>
+    </div>`
+};
+
 // NAVIGATION
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -3675,6 +3773,7 @@ const NAV = [
     { id:'chips', label:'Chips' },
     { id:'filterbar', label:'Filter Bar' },
     { id:'menu', label:'Menu' },
+    { id:'calendar', label:'Calendar' },
   ]},
   { group: 'Display', items: [
     { id:'cards', label:'Cards' },
