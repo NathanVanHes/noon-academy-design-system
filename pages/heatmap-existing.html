@@ -81,7 +81,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .chart{background:var(--bg);border-radius:var(--r);padding:24px;margin-bottom:20px}
 .chart__svg{width:100%;display:block}
 .chart__dot{cursor:pointer}
-.chart__dot:hover .chart__tooltip{display:block}
+.chart__tooltip{opacity:0;pointer-events:none;transition:opacity 0.1s}
+.chart__dot:hover .chart__tooltip{opacity:1}
 
 /* Practice CTA */
 .drill__cta{flex:none;padding:20px 28px 28px}
@@ -462,7 +463,7 @@ function renderChart(data, labelTexts, mastered) {
     svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="14" fill="transparent"/>';
     svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="5" fill="' + chartBarColor(p.v) + '" stroke="#fff" stroke-width="2"/>';
     var ty = p.y - 22;
-    svg += '<g class="chart__tooltip" style="display:none">';
+    svg += '<g class="chart__tooltip">';
     svg += '<rect x="' + (p.x - 15) + '" y="' + (ty - 7) + '" width="30" height="18" rx="4" fill="#141414"/>';
     svg += '<text x="' + p.x + '" y="' + (ty + 5) + '" text-anchor="middle" font-family="\'JetBrains Mono\',monospace" font-size="10" font-weight="600" fill="#fff">' + p.v + '</text>';
     svg += '</g>';
