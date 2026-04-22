@@ -526,10 +526,10 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   transition: max-height 0.3s cubic-bezier(0.22,0.61,0.36,1), opacity 0.2s ease;
 }
 .cal__day {
-  position: relative; display: flex; align-items: center; justify-content: center;
+  position: relative; display: grid; place-items: center;
   aspect-ratio: 1; border-radius: 50%; font-size: var(--fs-15); font-weight: var(--fw-500);
   color: var(--fg); cursor: pointer; border: 0; background: transparent;
-  font-family: var(--font-sans);
+  font-family: var(--font-sans); line-height: 1;
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .cal__day:hover { background: var(--hover-overlay); }
