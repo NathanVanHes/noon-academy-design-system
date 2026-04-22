@@ -3645,32 +3645,54 @@ P.calendar = {
       d.addEventListener('click', function() {
         cal.querySelectorAll('.cal__day').forEach(b => b.classList.remove('is-selected'));
         this.classList.add('is-selected');
+        updateTodayBtn();
       });
     });
 
-    // Today button
+    // Today button — hide when today is selected
     const todayBtnEl = cal.querySelector('.cal__today-btn');
+    function updateTodayBtn() {
+      const todayEl = cal.querySelector('.cal__day.is-today');
+      todayBtnEl.style.display = todayEl && todayEl.classList.contains('is-selected') ? 'none' : '';
+    }
+    updateTodayBtn();
     if (todayBtnEl) todayBtnEl.addEventListener('click', e => {
       e.stopPropagation();
       cal.querySelectorAll('.cal__day').forEach(b => b.classList.remove('is-selected'));
       const todayEl = cal.querySelector('.cal__day.is-today');
       if (todayEl) todayEl.classList.add('is-selected');
       collapse();
+      updateTodayBtn();
     });
 
-    // Arrow navigation — move selection prev/next day
+    // Arrow navigation — move selection, scroll weeks in week view
     const navBtns = cal.querySelectorAll('.icon-btn');
-    const allDays = Array.from(cal.querySelectorAll('.cal__day:not(.is-outside)'));
-    function getSelectedIdx() { return allDays.findIndex(d => d.classList.contains('is-selected')); }
+    const allDayBtns = Array.from(cal.querySelectorAll('.cal__day:not(.is-outside)'));
+    function getSelectedIdx() { return allDayBtns.findIndex(d => d.classList.contains('is-selected')); }
+    function showWeekForDay(dayEl) {
+      if (!cal.classList.contains('cal--week')) return;
+      const row = dayEl.closest('.cal__week-row');
+      if (!row) return;
+      rows.forEach(r => {
+        if (r === row) { r.style.maxHeight = '52px'; r.style.opacity = '1'; }
+        else { r.style.maxHeight = '0'; r.style.opacity = '0'; }
+      });
+    }
+    function selectDay(idx) {
+      allDayBtns.forEach(d => d.classList.remove('is-selected'));
+      allDayBtns[idx].classList.add('is-selected');
+      showWeekForDay(allDayBtns[idx]);
+      updateTodayBtn();
+    }
     if (navBtns[0]) navBtns[0].addEventListener('click', e => {
       e.stopPropagation();
       const idx = getSelectedIdx();
-      if (idx > 0) { allDays.forEach(d => d.classList.remove('is-selected')); allDays[idx-1].classList.add('is-selected'); }
+      if (idx > 0) selectDay(idx - 1);
     });
     if (navBtns[1]) navBtns[1].addEventListener('click', e => {
       e.stopPropagation();
       const idx = getSelectedIdx();
-      if (idx < allDays.length - 1) { allDays.forEach(d => d.classList.remove('is-selected')); allDays[idx+1].classList.add('is-selected'); }
+      if (idx < allDayBtns.length - 1) selectDay(idx + 1);
     });
   },
   renderCode() {
