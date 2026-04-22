@@ -1,22 +1,59 @@
-# CODING AGENTS: READ THIS FIRST
+# Proven Routes — Noon Academy Design System
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+A fully tokenised design system for Noon Academy, built for web and React Native.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+## Quick start
 
-## What you should do — IMPORTANT
+Open `index.html` for the interactive explorer with all components, tokens, and documentation.
 
-**Find the primary design file under `noon-academy-design-system/project/` and read it top to bottom.** Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Structure
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+```
+project/
+  tokens.css          — CSS custom properties (L1 primitives → L2 semantic → L3 component)
+  components.css      — Fully tokenised component library (0 hardcoded colours)
+tokens/
+  design-tokens.json  — JSON source of truth for all tokens
+dist/
+  tokens.css          — Generated CSS output
+  tokens.scss         — Generated SCSS output
+  tokens.js           — Generated JS output
+  tokens.native.ts    — Generated React Native TypeScript output
+scripts/
+  build-tokens.js     — Token build pipeline (JSON → CSS/SCSS/JS/RN)
+pages/
+  heatmap-existing.html  — Mastery heatmap (existing Noon palette)
+  heatmap.html           — Mastery heatmap (void/dark theme)
+  heatmap-paper.html     — Mastery heatmap (paper/light theme)
+  schedule.html          — Schedule page prototype
+  voice-tutor.html       — Voice tutor session prototype
+index.html            — Interactive design system explorer
+```
 
-## About the design files
+## Themes
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+- **Void** (dark) — default
+- **Paper** (light) — add `.paper` class to root element
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+Both themes are WCAG AA compliant.
 
-## Bundle contents
+## Tokens
 
-- `noon-academy-design-system/README.md` — this file
-- `noon-academy-design-system/project/` — the `Noon Academy Design System` project files (HTML prototypes, assets, components)
+Single source of truth in `tokens/design-tokens.json`. Run `npm run build` to generate outputs for CSS, SCSS, JS, and React Native TypeScript.
+
+## Typography
+
+- **Body (Arabic + Latin):** Vazirmatn
+- **Serif headings (Arabic):** Noto Naskh Arabic
+- **Serif headings (Latin):** Crimson Pro
+- **Monospace:** JetBrains Mono + Vazirmatn fallback
+
+## Components
+
+All components are interactive and production-ready. The explorer (`index.html`) documents every state, variant, and token used. Components include:
+
+Buttons, Icon Buttons, Button Groups, Text Inputs, Textareas, Steppers, Checkboxes, Radios, Switches, Segmented Controls, Chips, Filter Bars, Menus, Calendar, Cards, Card Grids, Avatars, Identity, Badges, Tables, Route Steps, Session Bars, Linear & Circular Progress, Tabs, Bottom Nav, Breadcrumbs, Pagination, Side Nav, Alerts, Toasts, Dialogs, Modals, Bottom Sheets, Tooltips, Popovers, Form Stacks, Empty States, Skeletons, Dropzones, Voice Tutor, Voice Chat, Crew Progress, Leaderboard.
+
+## React Native
+
+`dist/tokens.native.ts` exports all tokens with native font family names, iOS shadow objects, and theme objects (void + paper). Components are designed with RN portability in mind — clean state models, no DOM hacks.
