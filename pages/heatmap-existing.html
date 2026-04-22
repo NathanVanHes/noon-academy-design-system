@@ -59,11 +59,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
-.tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
+.tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px;z-index:2}
 .tile.is-mastered::after{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(135deg,rgba(0,0,0,0.08),rgba(0,0,0,0.08) 3px,transparent 3px,transparent 8px);pointer-events:none}
 @keyframes sparkle{0%{transform:scale(1);opacity:0.7}50%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:0.7}}
 .mastery-star{animation:sparkle 3s ease-in-out infinite}
-.tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.4)}
+.tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.4);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
 
@@ -215,17 +215,17 @@ function t(score,changed,exam,diff){
 }
 
 var mathChapters = [
-  { name: 'Chapter name', topics: [t(76,false,true,5),t(22,true,false,0),t(61,false,false,0),t(94,false,true,3),t(35,false,false,-4),t(null,false,false),t(70,false,false,0),t(18,true,true,0),t(85,false,false,-2)] },
-  { name: 'Chapter name', topics: [t(42,true,false,7),t(28,false,false,0),t(15,false,false,0),t(58,false,false,0),t(null,false,false)] },
-  { name: 'Chapter name', topics: [t(73,false,false,0),t(88,true,false,4),t(25,false,false,-3),t(91,false,false,0),t(44,false,false,0),t(null,false,false)] },
-  { name: 'Chapter name', topics: [t(32,false,false,0),t(79,true,false,6),t(55,false,false,0)] },
+  { name: 'Chapter name', topics: [t(76,false,true,5),t(22,true,false,-3),t(61,false,false,4),t(94,false,true,3),t(35,false,false,-4),t(null,false,false),t(70,false,false,2),t(18,true,true,-5),t(85,false,false,-2)] },
+  { name: 'Chapter name', topics: [t(42,true,false,7),t(28,false,false,-2),t(15,false,false,0),t(58,false,false,3),t(null,false,false)] },
+  { name: 'Chapter name', topics: [t(73,false,false,4),t(88,true,false,4),t(25,false,false,-3),t(91,false,false,2),t(44,false,false,0),t(null,false,false)] },
+  { name: 'Chapter name', topics: [t(32,false,false,-4),t(79,true,false,6),t(55,false,false,3)] },
 ];
 var mathTopics = [];
 mathChapters.forEach(function(c){c.topics.forEach(function(t){mathTopics.push(t)})});
 
 var readingTopics = [
-  t(82,true,true,0),t(30,false,false,-5),t(91,true,false,0),t(22,false,false,0),
-  t(67,false,true,0),
+  t(82,true,true,3),t(30,false,false,-5),t(91,true,false,2),t(22,false,false,0),
+  t(67,false,true,6),
 ];
 
 function scoreColor(s) {
@@ -350,9 +350,7 @@ function openDrill(t, section) {
     ch.style.border = '1px solid rgba(240,61,61,0.15)';
     ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + downCaret + '<span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">A practice session this week will help turn this around</div>';
   } else {
-    ch.style.background = 'rgba(20,20,20,0.03)';
-    ch.style.border = '1px solid rgba(20,20,20,0.08)';
-    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + flatCaret + '<span style="font-family:var(--font-mono);font-weight:600;color:var(--fg-secondary)">No change</span> <span style="color:var(--fg-secondary)">this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">Practice to get this moving</div>';
+    ch.style.display = 'none';
   }
 
   // Contextual nudge
@@ -485,7 +483,7 @@ document.getElementById('examFilter').addEventListener('click', function() {
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
 renderGrid('readingGrid', readingTopics, 'Verbal');
 var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
-document.getElementById('changedCount').innerHTML += changedNum + ' changed since last visit';
+document.getElementById('changedCount').innerHTML += ' Change this week';
 </script>
 </body>
 </html>
