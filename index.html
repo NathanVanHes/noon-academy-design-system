@@ -3611,7 +3611,7 @@ P.calendar = {
       slideDir = null;
 
       let html = '<div class="cal ' + (isWeek ? 'cal--week' : 'cal--month') + '">';
-      html += '<div class="cal__header"><span class="cal__month">' + title + '</span><div class="cal__nav">';
+      html += '<div class="cal__header"><h3 class="cal__month">' + title + '</h3><div class="cal__nav">';
       if (!isTodaySelected()) html += '<button class="btn btn--ghost btn--sm" data-action="today">Today</button>';
       html += '<button class="icon-btn icon-btn--ghost icon-btn--sm" data-action="prev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>';
       html += '<button class="icon-btn icon-btn--ghost icon-btn--sm" data-action="next"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>';
@@ -3722,7 +3722,7 @@ P.calendar = {
     return `<!-- Starts collapsed as week strip -->
 <div class="cal cal--week">
   <div class="cal__header">
-    <span class="cal__month">April 2026</span>
+    <h3 class="cal__month">April 2026</h3>
     <div class="cal__nav">
       <button class="btn btn--ghost btn--sm">Today</button>
       <button class="icon-btn icon-btn--ghost icon-btn--sm">‹</button>
