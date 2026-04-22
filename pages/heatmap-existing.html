@@ -128,7 +128,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
       <div class="legend-key__labels">
         <span>0</span>
         <span class="legend-key__mastery"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+</span>
-        <span>100</span>
       </div>
     </div>
     <span style="width:1px;height:20px;background:rgba(20,20,20,0.08);flex:none"></span>
@@ -319,7 +318,8 @@ function openDrill(t, section) {
   badge.style.fontFamily = 'var(--font-mono)';
 
   var weekData = generateThisWeek(t);
-  renderChart(weekData.values, weekData.labels);
+  window._currentMastered = t.score >= 80;
+  renderChart(weekData.values, weekData.labels, window._currentMastered);
 
   // Reset range tabs
   document.querySelectorAll('#rangeTabs button').forEach(function(b) { b.classList.remove('is-on'); });
@@ -377,7 +377,7 @@ function openDrill(t, section) {
   document.getElementById('drillOverlay').classList.add('is-open');
 }
 
-function renderChart(data, labelTexts) {
+function renderChart(data, labelTexts, mastered) {
   var container = document.getElementById('chartContainer');
   var labels = document.getElementById('chartLabels');
   labels.innerHTML = '';
@@ -417,6 +417,15 @@ function renderChart(data, labelTexts) {
 
   // Mastery label — top left above the line
   svg += '<text x="' + pad.left + '" y="' + (masteryY - 6) + '" font-family="\'JetBrains Mono\',monospace" font-size="8" font-weight="600" fill="#BBB8B1">★ 80+</text>';
+
+  // Area fill for mastered
+  if (mastered && points.length > 1) {
+    var areaPath = 'M' + points[0].x + ',' + points[0].y;
+    for (var j = 1; j < points.length; j++) areaPath += 'L' + points[j].x + ',' + points[j].y;
+    areaPath += 'L' + points[points.length-1].x + ',' + (pad.top + ch) + 'L' + points[0].x + ',' + (pad.top + ch) + 'Z';
+    svg += '<defs><linearGradient id="masteryFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#27BD86" stop-opacity="0.15"/><stop offset="100%" stop-color="#27BD86" stop-opacity="0.02"/></linearGradient></defs>';
+    svg += '<path d="' + areaPath + '" fill="url(#masteryFill)"/>';
+  }
 
   // Line — neutral colour
   if (points.length > 1) {
@@ -497,7 +506,7 @@ document.getElementById('rangeTabs').addEventListener('click', function(e) {
   if (!t) return;
   var range = btn.dataset.range;
   var d = range === 'week' ? generateThisWeek(t) : generateSemester(t);
-  renderChart(d.values, d.labels);
+  renderChart(d.values, d.labels, window._currentMastered);
 });
 
 function closeDrill() {
@@ -515,7 +524,7 @@ function openDrillGrey(t, section) {
   badge.style.background = 'var(--bg-disabled)';
   badge.style.color = 'var(--fg-muted)';
   badge.style.fontSize = '12px';
-  document.getElementById('chartBars').innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:13px;height:120px">No data yet</div>';
+  document.getElementById('chartContainer').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:13px;height:140px">No data yet</div>';
   document.getElementById('chartLabels').innerHTML = '';
   var ch = document.getElementById('drillChange');
   ch.style.display = 'flex';
