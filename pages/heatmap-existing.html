@@ -170,9 +170,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="drill__body">
     <!-- Date range tabs -->
     <div class="range-tabs" id="rangeTabs">
-      <button class="is-on" data-range="day">Day</button>
-      <button data-range="week">Week</button>
-      <button data-range="month">Month</button>
+      <button class="is-on" data-range="week">This week</button>
+      <button data-range="semester">This semester</button>
     </div>
 
     <div class="chart">
@@ -307,12 +306,12 @@ function openDrill(t, section) {
   badge.style.fontSize = '28px';
   badge.style.fontFamily = 'var(--font-mono)';
 
-  var dayData = generateDayData(t);
-  renderChart(dayData.values, dayData.labels);
+  var weekData = generateThisWeek(t);
+  renderChart(weekData.values, weekData.labels);
 
   // Reset range tabs
   document.querySelectorAll('#rangeTabs button').forEach(function(b) { b.classList.remove('is-on'); });
-  document.querySelector('#rangeTabs button[data-range="day"]').classList.add('is-on');
+  document.querySelector('#rangeTabs button[data-range="week"]').classList.add('is-on');
 
   var ch = document.getElementById('drillChange');
   var diff = t.trend[3] - t.trend[2];
@@ -382,38 +381,32 @@ function renderChart(data, labelTexts) {
   });
 }
 
-function generateDayData(t) {
-  var s = t.score, d = t.trend[3] - t.trend[2];
-  var dayNames = ['Wed','Thu','Fri','Sat','Sun','Mon','Tue'];
+function generateThisWeek(t) {
+  var s = t.score, d = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
+  var days = ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'];
   var vals = [];
   for (var i = 0; i < 7; i++) {
-    var jitter = Math.round((Math.random() - 0.4) * 6);
+    var jitter = Math.round((Math.random() - 0.4) * 5);
     vals.push(Math.max(5, Math.min(100, s - (6 - i) * Math.round(d / 3) + jitter)));
   }
   vals[6] = s;
-  return { values: vals, labels: dayNames };
+  return { values: vals, labels: days };
 }
 
-function generateWeekData(t) {
-  var s = t.score, d = t.trend[3] - t.trend[2];
-  var vals = [];
-  for (var i = 0; i < 4; i++) {
-    vals.push(Math.max(5, Math.min(100, s - (3 - i) * Math.round(d * 1.5) + Math.round((Math.random() - 0.3) * 4))));
-  }
-  vals[3] = s;
-  return { values: vals, labels: ['W1','W2','W3','W4'] };
-}
-
-function generateMonthData(t) {
+function generateSemester(t) {
   var s = t.score;
-  var months = ['Nov','Dec','Jan','Feb','Mar','Apr'];
   var vals = [];
-  for (var i = 0; i < 6; i++) {
-    var drift = Math.round((s - 30) * (i / 5)) + 30 + Math.round((Math.random() - 0.3) * 8);
-    vals.push(Math.max(5, Math.min(100, drift)));
+  var labels = [];
+  var numWeeks = 10;
+  for (var i = 0; i < numWeeks; i++) {
+    var progress = i / (numWeeks - 1);
+    var base = Math.round(15 + (s - 15) * progress);
+    var jitter = Math.round((Math.random() - 0.3) * 6);
+    vals.push(Math.max(5, Math.min(100, base + jitter)));
+    labels.push('W' + (i + 1));
   }
-  vals[5] = s;
-  return { values: vals, labels: months };
+  vals[numWeeks - 1] = s;
+  return { values: vals, labels: labels };
 }
 
 // Range tab switching
@@ -425,10 +418,7 @@ document.getElementById('rangeTabs').addEventListener('click', function(e) {
   var t = window._currentTopic;
   if (!t) return;
   var range = btn.dataset.range;
-  var d;
-  if (range === 'day') d = generateDayData(t);
-  else if (range === 'week') d = generateWeekData(t);
-  else d = generateMonthData(t);
+  var d = range === 'week' ? generateThisWeek(t) : generateSemester(t);
   renderChart(d.values, d.labels);
 });
 
