@@ -182,15 +182,19 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
     </div>
 
     <div class="chart">
-      <div style="position:relative">
-        <div style="position:absolute;bottom:80%;left:-8px;right:-8px;display:flex;align-items:center;gap:4px;pointer-events:none;z-index:3">
-          <div style="width:2px;height:12px;background:var(--fg-secondary);border-radius:1px;flex:none"></div>
-          <div style="flex:1;border-top:2px solid rgba(20,20,20,0.25)"></div>
-          <span style="display:flex;align-items:center;gap:3px;flex:none;background:var(--bg);padding:1px 6px 1px 4px;border-radius:4px"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-secondary);font-weight:600">80+</span></span>
+      <div style="position:relative;display:flex;gap:0">
+        <div style="flex:1;position:relative">
+          <div style="position:absolute;bottom:80%;left:0;right:0;border-top:2px solid rgba(20,20,20,0.2);pointer-events:none;z-index:3"></div>
+          <div class="chart__bars" id="chartBars"></div>
         </div>
-        <div class="chart__bars" id="chartBars"></div>
+        <div style="width:44px;flex:none;position:relative">
+          <div style="position:absolute;bottom:80%;transform:translateY(50%);left:8px;display:flex;align-items:center;gap:3px;white-space:nowrap">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-secondary);font-weight:600">80+</span>
+          </div>
+        </div>
       </div>
-      <div id="chartLabels" style="display:flex;gap:4px;margin-top:10px"></div>
+      <div id="chartLabels" style="display:flex;gap:4px;margin-top:10px;padding-right:44px"></div>
     </div>
 
     <div id="drillChange" style="display:flex;align-items:center;gap:8px;padding:14px 18px;border-radius:var(--r);font-size:13px;color:var(--fg)"></div>
