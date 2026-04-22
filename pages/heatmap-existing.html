@@ -98,7 +98,7 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
       <div class="legend__bar" style="flex:1"></div>
       <span class="legend__label">Strong</span>
       <span style="width:1px;height:12px;background:rgba(20,20,20,0.1)"></span>
-      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--fg-secondary)" id="changedCount"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1L9 5H3Z" fill="var(--fg-secondary)"/><path d="M6 11L3 7H9Z" fill="var(--fg-secondary)"/></svg></span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--fg-secondary);white-space:nowrap;flex:none" id="changedCount"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1L9 5H3Z" fill="var(--fg-secondary)"/><path d="M6 11L3 7H9Z" fill="var(--fg-secondary)"/></svg></span>
     </div>
 
     <!-- Math section -->
@@ -403,7 +403,7 @@ document.getElementById('examFilter').addEventListener('click', function() {
 renderGrid('mathGrid', mathTopics, 'Quantitative');
 renderGrid('readingGrid', readingTopics, 'Verbal');
 var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
-document.getElementById('changedCount').innerHTML += changedNum + ' changed since last visit';
+document.getElementById('changedCount').innerHTML += changedNum + ' changed';
 </script>
 </body>
 </html>
