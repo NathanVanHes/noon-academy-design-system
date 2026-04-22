@@ -81,7 +81,7 @@ body{background:var(--void-400);margin:0}
     <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6);background:var(--signal-soft);border-bottom:1px solid var(--signal-border)">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--signal)" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
       <span style="font-size:11px;color:var(--fg-muted);flex:1">Verbal in <b style="color:var(--signal)">12d</b> &middot; Quant in <b style="color:var(--signal)">19d</b></span>
-      <button class="btn btn--secondary btn--sm" id="examFilter" style="height:28px;padding:0 12px;font-size:11px">Exam only</button>
+      <button class="btn btn--secondary btn--sm" id="examFilter" style="height:28px;padding:0 12px;font-size:11px">Next exam</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;padding:14px 24px 8px;font-size:11px;color:var(--fg-subtle)" id="changedCount"><div style="width:5px;height:5px;border-radius:50%;background:var(--chalk-200);box-shadow:0 0 4px rgba(232,228,220,0.5);flex:none"></div></div>
     <div class="legend">
@@ -370,7 +370,7 @@ function openDrillGrey(t, section) {
 var examOn = false;
 document.getElementById('examFilter').addEventListener('click', function() {
   examOn = !examOn;
-  this.textContent = examOn ? 'Show all' : 'Exam only';
+  this.textContent = examOn ? 'Show all' : 'Next exam';
   this.className = 'btn btn--secondary btn--sm';
   this.style.cssText = 'height:28px;padding:0 12px;font-size:11px';
   renderGrid('mathGrid', examOn ? mathTopics.filter(function(t){return t.exam}) : mathTopics, 'Quantitative');
