@@ -33,10 +33,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 /* Layout */
 .page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
 
-/* Exam banner */
-.exam-banner{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#E9F4FF;border-radius:var(--r);margin-bottom:24px}
-.exam-banner__text{font-size:13px;color:var(--fg-secondary);flex:1}
-.exam-banner__text b{color:#0084FF}
+/* Exam context */
+.exam-context{display:flex;align-items:center;gap:10px;padding:12px 20px;background:#E9F4FF;border-radius:var(--r);margin-bottom:24px;font-size:13px;color:var(--fg-secondary);line-height:1.4}
+.exam-context b{color:#0084FF}
 
 /* Legend row */
 .legend-row{display:flex;align-items:center;gap:10px;margin-bottom:24px}
@@ -103,10 +102,10 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div class="page">
-  <!-- Exam banner -->
-  <div class="exam-banner">
+  <!-- Exam context (shown when filter is on) -->
+  <div class="exam-context" id="examContext" style="display:none">
     <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="#0084FF" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
-    <span class="exam-banner__text">Verbal in <b>12d</b> &middot; Quant in <b>19d</b></span>
+    <span>These topics will be on your next exam. Verbal in <b>12d</b>, Quant in <b>19d</b>.</span>
   </div>
 
   <!-- Legend -->
@@ -418,7 +417,17 @@ function openDrillGrey(t, section) {
 var examOn = false;
 document.getElementById('examFilter').addEventListener('click', function() {
   examOn = !examOn;
-  this.textContent = examOn ? 'Show all' : 'Next exam';
+  this.textContent = examOn ? 'Show all topics' : 'Next exam';
+  if (examOn) {
+    this.style.background = '#0084FF';
+    this.style.color = '#fff';
+    this.style.borderColor = '#0084FF';
+  } else {
+    this.style.background = '';
+    this.style.color = '';
+    this.style.borderColor = '';
+  }
+  document.getElementById('examContext').style.display = examOn ? 'flex' : 'none';
   renderGrid('mathGrid', examOn ? mathTopics.filter(function(t){return t.exam}) : mathTopics, 'Quantitative');
   renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal');
 });
