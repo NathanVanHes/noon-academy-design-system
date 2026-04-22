@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Mastery Heatmap (Existing) - Noon Academy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box}
+:root{
+  --bg:#F8F5EF;
+  --bg-raised:#FFFFFF;
+  --bg-disabled:#EDEAE3;
+  --fg:#141414;
+  --fg-secondary:#74716C;
+  --fg-muted:#BBB8B1;
+  --green:#27BD86;
+  --gold:#FFCB45;
+  --red:#F03D3D;
+  --btn:#64D8AE;
+  --font-sans:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Inter',monospace;
+  --r:8px;
+}
+body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
+.frame{width:375px;height:812px;margin:40px auto;background:var(--bg);border-radius:40px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 8px #EDEAE3,0 40px 80px -20px rgba(0,0,0,0.15);color:var(--fg);position:relative}
+.status-bar{height:44px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);flex:none}
+.hdr{padding:16px 24px 12px;flex:none}
+.hdr h1{font-size:22px;font-weight:700;color:var(--fg);margin:0}
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.scroll::-webkit-scrollbar{display:none}
+
+/* Legend */
+.legend{display:flex;align-items:center;gap:12px;padding:12px 24px}
+.legend__bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+.legend__label{font-family:var(--font-mono);font-size:9px;color:var(--fg-muted)}
+
+/* Grid */
+.grid-section{padding:12px 24px 20px}
+.grid-section__label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px}
+.tile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
+.tile:hover{transform:scale(1.05);z-index:1}
+.tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.1;padding:0 4px}
+.tile__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.45)}
+.tile__changed{position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--fg);box-shadow:0 0 4px rgba(20,20,20,0.3)}
+
+/* Drilldown panel */
+.drill{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1)}
+.drill.is-open{transform:translateY(0)}
+.drill__head{padding:20px 24px;flex:none;display:flex;align-items:flex-start;justify-content:space-between}
+.drill__back{background:none;border:0;color:var(--fg-secondary);cursor:pointer;padding:4px;display:flex}
+.drill__title{font-size:20px;font-weight:700;color:var(--fg);margin:0}
+.drill__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px}
+.drill__body{flex:1;overflow-y:auto;padding:0 24px 24px;scrollbar-width:none}
+.drill__body::-webkit-scrollbar{display:none}
+
+/* Chart area */
+.chart{background:var(--bg-raised);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,0.06);padding:20px;margin-bottom:20px}
+.chart__bars{display:flex;align-items:flex-end;gap:3px;height:80px}
+.chart__bar{flex:1;border-radius:3px 3px 0 0;transition:height 0.3s ease;position:relative}
+.chart__bar:hover::after{content:attr(data-val);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:9px;color:var(--fg)}
+
+/* Practice CTA */
+.drill__cta{flex:none;padding:16px 24px 24px}
+
+/* Buttons */
+.btn-primary{display:block;width:100%;height:48px;background:var(--btn);color:#fff;border:0;border-radius:var(--r);font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
+.btn-primary:hover{opacity:0.9}
+.btn-secondary{height:28px;padding:0 12px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:6px;font:inherit;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s}
+.btn-secondary:hover{border-color:rgba(20,20,20,0.25)}
+
+/* Tabbar */
+.tabbar{flex:none;display:flex;background:var(--bg-raised);border-top:1px solid rgba(20,20,20,0.08);padding:6px 0 2px}
+.tabbar__item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:4px 0;font:inherit;font-size:10px;color:var(--fg-muted);cursor:pointer}
+.tabbar__item.is-on{color:var(--green)}
+.tabbar__icon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+
+<div class="frame" id="frame">
+  <div class="status-bar"><span>9:41</span></div>
+
+  <div class="hdr">
+    <h1>Mastery</h1>
+  </div>
+
+  <div class="scroll" id="mainScroll">
+    <!-- Upcoming exams -->
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;background:rgba(255,203,69,0.08);border-bottom:1px solid rgba(255,203,69,0.15)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#b8930f" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
+      <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#b8930f">12d</b> &middot; Quant in <b style="color:#b8930f">19d</b></span>
+      <button class="btn-secondary" id="examFilter">Next exam</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><div style="width:5px;height:5px;border-radius:50%;background:var(--fg);box-shadow:0 0 4px rgba(20,20,20,0.25);flex:none"></div></div>
+    <div class="legend">
+      <span class="legend__label">Weak</span>
+      <div class="legend__bar"></div>
+      <span class="legend__label">Strong</span>
+    </div>
+
+    <!-- Math section -->
+    <div class="grid-section">
+      <div class="grid-section__label">Quantitative</div>
+      <div class="tile-grid" id="mathGrid"></div>
+    </div>
+
+    <!-- Reading section -->
+    <div class="grid-section">
+      <div class="grid-section__label">Verbal</div>
+      <div class="tile-grid" id="readingGrid"></div>
+    </div>
+  </div>
+
+  <!-- Drilldown -->
+  <div class="drill" id="drill">
+    <div class="status-bar"><span>9:41</span></div>
+    <div class="drill__head">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="drill__back" id="drillBack"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4l-5 5 5 5"/></svg></button>
+          <div>
+            <h2 class="drill__title" id="drillTitle">Topic</h2>
+            <div class="drill__sub" id="drillSub">Reading</div>
+          </div>
+        </div>
+      </div>
+      <div id="drillBadge" style="padding:4px 10px;border-radius:6px;font-family:var(--font-mono);font-size:13px;font-weight:600"></div>
+    </div>
+    <div class="drill__body">
+      <!-- Date range tabs -->
+      <div style="display:flex;gap:0;background:var(--bg-disabled);border-radius:6px;padding:2px;margin-bottom:16px" id="rangeTabs">
+        <button style="flex:1;background:var(--bg-raised);border:0;color:var(--fg);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:4px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.06)" data-range="day">Day</button>
+        <button style="flex:1;background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:4px;cursor:pointer" data-range="week">Week</button>
+        <button style="flex:1;background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:4px;cursor:pointer" data-range="month">Month</button>
+      </div>
+
+      <div class="chart">
+        <div style="position:relative">
+          <div class="chart__bars" id="chartBars"></div>
+        </div>
+        <div id="chartLabels" style="display:flex;gap:3px;margin-top:8px"></div>
+      </div>
+
+      <div id="drillChange" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r);font-size:13px;color:var(--fg)"></div>
+    </div>
+    <div class="drill__cta">
+      <button class="btn-primary">Practice this topic</button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8"/></svg>Page</button>
+    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><path d="M4 6h14M4 11h14M4 16h10"/></svg>Page</button>
+    <button class="tabbar__item is-on"><svg class="tabbar__icon" viewBox="0 0 22 22"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="12" y="3" width="7" height="7" rx="1"/><rect x="3" y="12" width="7" height="7" rx="1"/><rect x="12" y="12" width="7" height="7" rx="1"/></svg>Page</button>
+    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><rect x="4" y="4" width="14" height="14" rx="2"/></svg>Page</button>
+    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><circle cx="11" cy="8" r="4"/><path d="M4 19c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg>Page</button>
+  </div>
+</div>
+
+<script>
+function t(score,changed,exam,diff){
+  var s=score,tr=[];
+  if(s!==null){
+    var d = diff || 0;
+    tr = [Math.max(10,s-d-15), Math.max(10,s-d-8), Math.max(10,s-d), s];
+  }
+  return{name:'Topic name',score:s,changed:changed,exam:exam,trend:tr};
+}
+
+var mathTopics = [
+  t(76,false,true,5),t(22,true,false,-3),t(61,false,false,8),t(94,false,true,2),
+  t(35,false,false,-4),t(null,false,false),t(70,false,false,6),t(18,true,true,-5),
+  t(85,false,false,3),t(42,true,false,7),t(28,false,false,-2),t(15,false,false,-6),
+  t(58,false,false,4),t(null,false,false),t(73,false,false,0),t(88,true,false,3),
+  t(25,false,false,-3),t(91,false,false,1),t(44,false,false,5),t(null,false,false),
+  t(32,false,false,-4),t(79,true,false,6),t(55,false,false,0),t(20,false,false,-7),
+  t(83,false,false,4),
+];
+
+var readingTopics = [
+  t(82,true,true,7),t(30,false,false,-5),t(91,true,false,3),t(22,false,false,-4),
+  t(67,false,true,9),t(45,true,false,6),t(null,false,false),t(88,false,false,2),
+  t(36,false,false,-3),t(null,false,false),
+];
+
+// Tile colors: #F03D3D → #FFCB45 → #27BD86
+function scoreColor(s) {
+  if (s === null) return 'var(--bg-disabled)';
+  var t = Math.max(0, Math.min(100, s)) / 100;
+  var r, g, b;
+  if (t < 0.5) {
+    // red to gold
+    var p = t / 0.5;
+    r = 240 + (255-240)*p;
+    g = 61 + (203-61)*p;
+    b = 61 + (69-61)*p;
+  } else {
+    // gold to green
+    var p = (t - 0.5) / 0.5;
+    r = 255 + (39-255)*p;
+    g = 203 + (189-203)*p;
+    b = 69 + (134-69)*p;
+  }
+  return 'rgba('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+',0.35)';
+}
+
+function chartBarColor(s) {
+  var t = Math.max(0, Math.min(100, s)) / 100;
+  var r, g, b;
+  if (t < 0.5) {
+    var p = t / 0.5;
+    r = 240 + (255-240)*p; g = 61 + (203-61)*p; b = 61 + (69-61)*p;
+  } else {
+    var p = (t - 0.5) / 0.5;
+    r = 255 + (39-255)*p; g = 203 + (189-203)*p; b = 69 + (134-69)*p;
+  }
+  return 'rgba('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+',0.6)';
+}
+
+function renderGrid(containerId, topics, section) {
+  var grid = document.getElementById(containerId);
+  grid.innerHTML = '';
+  topics.forEach(function(t) {
+    var tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.style.background = scoreColor(t.score);
+    tile.innerHTML = (t.changed ? '<div class="tile__changed"></div>' : '') +
+      '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+      (t.score !== null ? '<div class="tile__score">' + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
+    if (t.score === null) {
+      tile.style.cursor = 'default';
+      tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
+      tile.querySelector('.tile__name').style.color = 'var(--fg-muted)';
+      tile.querySelector('.tile__score').style.color = 'var(--fg-muted)';
+    }
+    tile.addEventListener('click', function() { if (t.score !== null) openDrill(t, section); else openDrillGrey(t, section); });
+    grid.appendChild(tile);
+  });
+}
+
+function openDrill(t, section) {
+  document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
+  document.getElementById('drillSub').textContent = section;
+  var badge = document.getElementById('drillBadge');
+  badge.textContent = t.score;
+  badge.style.background = 'none';
+  badge.style.color = '#141414';
+  badge.style.fontSize = '24px';
+  badge.style.fontFamily = 'var(--font-mono)';
+
+  // Chart — default to Day view
+  var dayData = generateDayData(t);
+  renderChart(dayData.values, dayData.labels);
+
+  // Change indicator
+  var ch = document.getElementById('drillChange');
+  var diff = t.trend[3] - t.trend[2];
+  var posReasons = ['Practice accuracy increased','Practice quantity increased','Good exam results'];
+  var negReasons = ['Practice accuracy decreased','Practice quantity decreased','Poor exam results'];
+  ch.style.display = 'flex';
+  ch.style.flexDirection = 'column';
+  ch.style.gap = '6px';
+  if (diff > 0) {
+    ch.style.background = 'rgba(39,189,134,0.08)';
+    ch.style.borderColor = 'rgba(39,189,134,0.2)';
+    ch.style.border = '1px solid rgba(39,189,134,0.2)';
+    ch.innerHTML = '<div><span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">+' + diff + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + posReasons[t.score % posReasons.length] + '</div>';
+  } else if (diff < 0) {
+    ch.style.background = 'rgba(240,61,61,0.06)';
+    ch.style.borderColor = 'rgba(240,61,61,0.15)';
+    ch.style.border = '1px solid rgba(240,61,61,0.15)';
+    ch.innerHTML = '<div><span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + diff + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + negReasons[t.score % negReasons.length] + '</div>';
+  } else {
+    ch.style.background = 'rgba(20,20,20,0.03)';
+    ch.style.border = '1px solid rgba(20,20,20,0.08)';
+    var noChangeReasons = ['Practice accuracy stayed the same','Practice quantity stayed the same','No exam results this week'];
+    ch.innerHTML = '<div style="color:var(--fg-secondary)"><span style="font-family:var(--font-mono);font-weight:600">0</span> change this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + noChangeReasons[t.score % noChangeReasons.length] + '</div>';
+  }
+
+  window._currentTopic = t;
+  document.getElementById('drill').classList.add('is-open');
+}
+
+function renderChart(data, labelTexts) {
+  var bars = document.getElementById('chartBars');
+  var labels = document.getElementById('chartLabels');
+  bars.innerHTML = '';
+  labels.innerHTML = '';
+  data.forEach(function(v, i) {
+    var b = document.createElement('div');
+    b.className = 'chart__bar';
+    b.style.height = v + '%';
+    b.style.background = chartBarColor(v);
+    b.dataset.val = v;
+    bars.appendChild(b);
+    var l = document.createElement('span');
+    l.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:1;text-align:center';
+    l.textContent = labelTexts[i] || '';
+    labels.appendChild(l);
+  });
+}
+
+function generateDayData(t) {
+  var s = t.score;
+  var d = t.trend[3] - t.trend[2];
+  var dayNames = ['Wed','Thu','Fri','Sat','Sun','Mon','Tue'];
+  var vals = [];
+  for (var i = 0; i < 7; i++) {
+    var jitter = Math.round((Math.random() - 0.4) * 6);
+    vals.push(Math.max(5, Math.min(100, s - (6 - i) * Math.round(d / 3) + jitter)));
+  }
+  vals[6] = s;
+  return { values: vals, labels: dayNames };
+}
+
+function generateWeekData(t) {
+  var s = t.score;
+  var d = t.trend[3] - t.trend[2];
+  var vals = [];
+  for (var i = 0; i < 4; i++) {
+    vals.push(Math.max(5, Math.min(100, s - (3 - i) * Math.round(d * 1.5) + Math.round((Math.random() - 0.3) * 4))));
+  }
+  vals[3] = s;
+  return { values: vals, labels: ['W1','W2','W3','W4'] };
+}
+
+function generateMonthData(t) {
+  var s = t.score;
+  var months = ['Nov','Dec','Jan','Feb','Mar','Apr'];
+  var vals = [];
+  for (var i = 0; i < 6; i++) {
+    var drift = Math.round((s - 30) * (i / 5)) + 30 + Math.round((Math.random() - 0.3) * 8);
+    vals.push(Math.max(5, Math.min(100, drift)));
+  }
+  vals[5] = s;
+  return { values: vals, labels: months };
+}
+
+// Range tab switching
+document.getElementById('rangeTabs').addEventListener('click', function(e) {
+  var btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#rangeTabs button').forEach(function(b) {
+    b.style.background = 'transparent';
+    b.style.color = 'var(--fg-secondary)';
+    b.style.boxShadow = 'none';
+  });
+  btn.style.background = 'var(--bg-raised)';
+  btn.style.color = 'var(--fg)';
+  btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
+  var t = window._currentTopic;
+  if (!t) return;
+  var range = btn.dataset.range;
+  var d;
+  if (range === 'day') d = generateDayData(t);
+  else if (range === 'week') d = generateWeekData(t);
+  else d = generateMonthData(t);
+  renderChart(d.values, d.labels);
+});
+
+document.getElementById('drillBack').addEventListener('click', function() {
+  document.getElementById('drill').classList.remove('is-open');
+});
+
+function openDrillGrey(t, section) {
+  document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
+  document.getElementById('drillSub').textContent = section;
+  var badge = document.getElementById('drillBadge');
+  badge.textContent = 'Not started';
+  badge.style.background = 'var(--bg-disabled)';
+  badge.style.color = 'var(--fg-muted)';
+  badge.style.fontSize = '11px';
+  document.getElementById('chartBars').innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:12px;height:80px">No data yet</div>';
+  document.getElementById('chartLabels').innerHTML = '';
+
+  var ch = document.getElementById('drillChange');
+  ch.style.display = 'flex';
+  ch.style.background = 'rgba(20,20,20,0.03)';
+  ch.style.border = '1px solid rgba(20,20,20,0.06)';
+  ch.style.flexDirection = 'column';
+  ch.style.gap = '0';
+  ch.innerHTML = 'This topic hasn\'t been covered yet. Start practicing to build your baseline.';
+  document.getElementById('drill').classList.add('is-open');
+}
+
+var examOn = false;
+document.getElementById('examFilter').addEventListener('click', function() {
+  examOn = !examOn;
+  this.textContent = examOn ? 'Show all' : 'Next exam';
+  renderGrid('mathGrid', examOn ? mathTopics.filter(function(t){return t.exam}) : mathTopics, 'Quantitative');
+  renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal');
+});
+
+// Init
+renderGrid('mathGrid', mathTopics, 'Quantitative');
+renderGrid('readingGrid', readingTopics, 'Verbal');
+var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
+document.getElementById('changedCount').innerHTML += changedNum + ' changed since last visit';
+</script>
+</body>
+</html>
