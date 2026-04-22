@@ -123,10 +123,9 @@ body{background:var(--void-400);margin:0}
     <div class="drill__body">
       <!-- Date range tabs -->
       <div style="display:flex;gap:0;background:rgba(232,228,220,0.03);border-radius:4px;box-shadow:inset 0 0 0 1px var(--border);padding:2px;margin-bottom:16px" id="rangeTabs">
-        <button style="flex:1;background:transparent;border:0;color:var(--fg-subtle);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer" data-range="4w">4W</button>
-        <button style="flex:1;background:var(--bg-raised);border:0;color:var(--fg);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer;box-shadow:inset 0 0 0 1px var(--border-strong)" data-range="8w">8W</button>
-        <button style="flex:1;background:transparent;border:0;color:var(--fg-subtle);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer" data-range="12w">12W</button>
-        <button style="flex:1;background:transparent;border:0;color:var(--fg-subtle);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer" data-range="all">All</button>
+        <button style="flex:1;background:var(--bg-raised);border:0;color:var(--fg);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer;box-shadow:inset 0 0 0 1px var(--border-strong)" data-range="day">Day</button>
+        <button style="flex:1;background:transparent;border:0;color:var(--fg-subtle);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer" data-range="week">Week</button>
+        <button style="flex:1;background:transparent;border:0;color:var(--fg-subtle);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:3px;cursor:pointer" data-range="month">Month</button>
       </div>
 
       <div class="chart">
@@ -230,8 +229,9 @@ function openDrill(t, section) {
   badge.style.color = scoreColor(t.score);
   badge.style.fontSize = '24px';
 
-  // Chart
-  renderChart(t.trend);
+  // Chart — default to Day view
+  var dayData = generateDayData(t);
+  renderChart(dayData.values, dayData.labels);
 
 
   // Change indicator - always shown
@@ -262,7 +262,7 @@ function openDrill(t, section) {
 
   document.getElementById('drill').classList.add('is-open');}
 
-function renderChart(data) {
+function renderChart(data, labelTexts) {
   var bars = document.getElementById('chartBars');
   var labels = document.getElementById('chartLabels');
   bars.innerHTML = '';
@@ -276,9 +276,46 @@ function renderChart(data) {
     bars.appendChild(b);
     var l = document.createElement('span');
     l.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);flex:1;text-align:center';
-    l.textContent = 'W' + (i + 1);
+    l.textContent = labelTexts[i] || '';
     labels.appendChild(l);
   });
+}
+
+function generateDayData(t) {
+  var s = t.score;
+  var d = t.trend[3] - t.trend[2];
+  var dayNames = ['Wed','Thu','Fri','Sat','Sun','Mon','Tue'];
+  var vals = [];
+  for (var i = 0; i < 7; i++) {
+    var jitter = Math.round((Math.random() - 0.4) * 6);
+    vals.push(Math.max(5, Math.min(100, s - (6 - i) * Math.round(d / 3) + jitter)));
+  }
+  vals[6] = s;
+  return { values: vals, labels: dayNames };
+}
+
+function generateWeekData(t) {
+  var s = t.score;
+  var d = t.trend[3] - t.trend[2];
+  var vals = [];
+  for (var i = 0; i < 4; i++) {
+    vals.push(Math.max(5, Math.min(100, s - (3 - i) * Math.round(d * 1.5) + Math.round((Math.random() - 0.3) * 4))));
+  }
+  vals[3] = s;
+  var labels = ['W1','W2','W3','W4'];
+  return { values: vals, labels: labels };
+}
+
+function generateMonthData(t) {
+  var s = t.score;
+  var months = ['Nov','Dec','Jan','Feb','Mar','Apr'];
+  var vals = [];
+  for (var i = 0; i < 6; i++) {
+    var drift = Math.round((s - 30) * (i / 5)) + 30 + Math.round((Math.random() - 0.3) * 8);
+    vals.push(Math.max(5, Math.min(100, drift)));
+  }
+  vals[5] = s;
+  return { values: vals, labels: months };
 }
 
 // Range tab switching
@@ -293,17 +330,14 @@ document.getElementById('rangeTabs').addEventListener('click', function(e) {
   btn.style.background = 'var(--bg-raised)';
   btn.style.color = 'var(--fg)';
   btn.style.boxShadow = 'inset 0 0 0 1px var(--border-strong)';
-  // Generate extended data based on range
   var t = window._currentTopic;
   if (!t) return;
-  var base = t.trend;
   var range = btn.dataset.range;
-  var data;
-  if (range === '4w') data = base;
-  else if (range === '8w') data = [Math.max(10,base[0]-20),Math.max(10,base[0]-12),Math.max(10,base[0]-6),base[0],base[1],base[2],base[3],base[3]];
-  else if (range === '12w') data = [Math.max(10,base[0]-30),Math.max(10,base[0]-25),Math.max(10,base[0]-18),Math.max(10,base[0]-12),Math.max(10,base[0]-6),base[0],base[1],base[2],base[3],base[3],base[3],base[3]];
-  else data = [Math.max(10,base[0]-35),Math.max(10,base[0]-30),Math.max(10,base[0]-25),Math.max(10,base[0]-18),Math.max(10,base[0]-12),Math.max(10,base[0]-6),base[0],base[1],base[2],base[3],base[3],base[3],base[3],base[3],base[3],base[3]];
-  renderChart(data);
+  var d;
+  if (range === 'day') d = generateDayData(t);
+  else if (range === 'week') d = generateWeekData(t);
+  else d = generateMonthData(t);
+  renderChart(d.values, d.labels);
 });
 
 document.getElementById('drillBack').addEventListener('click', function() {
