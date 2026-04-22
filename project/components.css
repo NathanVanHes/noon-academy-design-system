@@ -522,10 +522,15 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   color: var(--fg-faint); padding: var(--sp-2) 0;
 }
 
-/* Day grid */
+/* Day grid — rows are nested divs for collapse animation */
 .cal__days {
+  padding: 0 var(--sp-1); overflow: hidden;
+}
+.cal__week-row {
   display: grid; grid-template-columns: repeat(7, 1fr);
-  text-align: center; gap: 2px; padding: 0 var(--sp-1);
+  text-align: center; gap: 2px;
+  max-height: 48px; opacity: 1; overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.22,0.61,0.36,1), opacity 0.2s ease;
 }
 .cal__day {
   position: relative; display: flex; align-items: center; justify-content: center;
@@ -549,17 +554,6 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
 }
 .cal__day.is-selected .cal__day-dot { background: var(--accent-fg); }
-
-/* Animated expand/collapse */
-.cal__days {
-  overflow: hidden; transition: max-height 0.35s cubic-bezier(0.22,0.61,0.36,1);
-}
-.cal--month .cal__days { max-height: 400px; }
-.cal--week .cal__days { max-height: 48px; gap: 0; }
-
-/* Hide non-current-week rows when collapsed */
-.cal--week .cal__day-row { display: none; }
-.cal--week .cal__day-row.is-active { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 2px; }
 
 /* Drag handle */
 .cal__handle {

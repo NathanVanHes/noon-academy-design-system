@@ -3569,7 +3569,7 @@ P.calendar = {
         const dot = k.showEvents && !m.out && evtDays.includes(m.d) ? '<span class="cal__day-dot"></span>' : '';
         return `<button class="${cls.join(' ')}">${m.d}${dot}</button>`;
       }).join('');
-      return `<div class="cal__week-row" data-week="${wi}" style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:2px">${cells}</div>`;
+      return `<div class="cal__week-row" data-week="${wi}">${cells}</div>`;
     }).join('');
 
     return `<div class="cal cal--month" style="width:340px" data-active-week="${activeWeek}">
@@ -3627,29 +3627,18 @@ P.calendar = {
       });
     }
   },
-  renderCode(k) {
+  renderCode() {
     return `<div class="cal cal--month">
-  <div class="cal__header">
-    <span class="cal__month">April 2026</span>
-    <div class="cal__nav">
-      <button class="cal__nav-btn">‹</button>
-      <button class="cal__nav-btn">›</button>
-    </div>
-  </div>
-  <div class="cal__weekdays">Sun Mon Tue ...</div>
+  <div class="cal__header">...</div>
+  <div class="cal__weekdays">...</div>
   <div class="cal__days">
     <div class="cal__week-row">
-      <button class="cal__day is-outside">29</button>
-      ...
-      <button class="cal__day is-selected is-today">22
-        <span class="cal__day-dot"></span>
-      </button>
+      <button class="cal__day">1</button>
+      <button class="cal__day is-selected">22</button>
       ...
     </div>
   </div>
-  <div class="cal__handle">
-    <div class="cal__handle-bar"></div>
-  </div>
+  <div class="cal__handle">...</div>
 </div>`;
   },
   sections: `
