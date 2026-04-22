@@ -41,21 +41,29 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 /* Legend strip */
 .legend-strip{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08)}
-.legend-strip__inner{max-width:720px;margin:0 auto;padding:14px 40px;display:flex;flex-direction:column;gap:4px}
+.legend-strip__inner{max-width:720px;margin:0 auto;padding:14px 40px;display:flex;align-items:center;gap:24px}
+.legend-key{flex:1;display:flex;flex-direction:column;gap:3px}
+.legend-key__track{position:relative;width:100%;height:8px}
 .legend-key__bar{width:100%;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
-.legend-key__labels{display:flex;justify-content:space-between}
+.legend-key__marker{position:absolute;top:50%;left:80%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center}
+.legend-key__marker svg{filter:drop-shadow(0 0 3px rgba(255,255,255,0.9))}
+.legend-key__labels{display:flex;justify-content:space-between;position:relative}
 .legend-key__labels span{font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)}
+.legend-key__mastery{position:absolute;left:80%;transform:translateX(-50%);font-family:var(--font-mono);font-size:9px;color:var(--fg-secondary);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.legend-strip__divider{width:1px;height:28px;background:rgba(20,20,20,0.08);flex:none}
+.legend-strip__changed{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-secondary);white-space:nowrap;flex:none}
 
 /* Grid */
 .grid-section{margin-bottom:32px}
 .grid-section__label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px}
-.tile-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
 .tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
 @keyframes sparkle{0%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}25%{filter:drop-shadow(0 0 4px rgba(255,255,255,0.8));transform:scale(1.15)}50%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}75%{filter:drop-shadow(0 0 6px rgba(255,255,255,0.9));transform:scale(1.2)}100%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}}
 .mastery-star{animation:sparkle 3s ease-in-out infinite}
+.tile__diff{position:absolute;bottom:4px;right:4px;display:flex;align-items:center;gap:1px;font-family:var(--font-mono);font-size:8px;font-weight:600;color:rgba(0,0,0,0.4)}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
 
@@ -113,8 +121,21 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="legend-strip">
   <div class="legend-strip__inner">
-    <div class="legend-key__bar"></div>
-    <div class="legend-key__labels"><span>0</span><span>Reach 80 for mastery</span><span>100</span></div>
+    <div class="legend-key">
+      <div class="legend-key__track">
+        <div class="legend-key__bar"></div>
+        <div class="legend-key__marker"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></div>
+      </div>
+      <div class="legend-key__labels">
+        <span>0</span>
+        <span class="legend-key__mastery"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80 · Mastery</span>
+        <span>100</span>
+      </div>
+    </div>
+    <span class="legend-strip__divider"></span>
+    <span class="legend-strip__changed" id="changedCount">
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M4 2L7 6H1Z" fill="#74716C"/><path d="M10 8L7 4H13Z" fill="#74716C"/></svg>
+    </span>
   </div>
 </div>
 
@@ -248,10 +269,19 @@ function renderTile(t, section) {
   var mastered = t.score !== null && t.score >= 80;
   if (mastered) tile.classList.add('is-mastered');
   var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(255,255,255,0.85)" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  // Diff indicator bottom-right
+  var diffHtml = '';
+  if (t.score !== null && diff !== 0) {
+    var diffCaret = diff > 0
+      ? '<svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.4)"/></svg>'
+      : '<svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.4)"/></svg>';
+    diffHtml = '<div class="tile__diff">' + diffCaret + Math.abs(diff) + '</div>';
+  }
   tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
     (t.score !== null
-      ? '<div class="tile__score">' + (mastered ? starSvg : chevronSvg + t.score) + '</div>'
-      : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
+      ? '<div class="tile__score">' + (mastered ? starSvg : t.score) + '</div>'
+      : '<div class="tile__score" style="color:var(--fg-muted)">--</div>') +
+    diffHtml;
   if (t.score === null) {
     tile.style.cursor = 'default';
     tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
@@ -454,6 +484,8 @@ document.getElementById('examFilter').addEventListener('click', function() {
 // Init
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
 renderGrid('readingGrid', readingTopics, 'Verbal');
+var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
+document.getElementById('changedCount').innerHTML += changedNum + ' changed since last visit';
 </script>
 </body>
 </html>
