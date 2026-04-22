@@ -21,14 +21,9 @@ body{background:var(--paper-300);margin:0}
 .scroll{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .scroll::-webkit-scrollbar{display:none}
 
-/* Legend */
-.legend{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-6)}
-.legend__bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#9a4339,#8e7019,#1a795a)}
-.legend__label{font-family:var(--font-mono);font-size:9px;color:rgba(10,15,26,0.35)}
+/* Legend — fully inline */
 
-/* Changed indicator */
-.changed-bar{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-2) var(--sp-6);font-size:11px;color:rgba(10,15,26,0.5)}
-.changed-bar__dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+/* Legend — inline row */
 
 /* Grid */
 .grid-section{padding:var(--sp-3) var(--sp-6) var(--sp-5)}
@@ -38,8 +33,8 @@ body{background:var(--paper-300);margin:0}
 .tile:hover{transform:scale(1.05);z-index:1}
 .tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.6);text-align:center;line-height:1.1;padding:0 4px}
 .tile__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.5)}
-/* Changed dot */
-.tile__changed{position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--void-300);box-shadow:0 0 4px rgba(10,15,26,0.3)}
+/* Changed chevron */
+.tile__changed{position:absolute;top:3px;right:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
 
 /* Drilldown panel */
 .drill{position:absolute;inset:0;background:var(--paper-200);z-index:20;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1)}
@@ -85,11 +80,12 @@ body{background:var(--paper-300);margin:0}
       <span style="font-size:11px;color:rgba(10,15,26,0.6);flex:1">Verbal in <b style="color:#8e7019">12d</b> &middot; Quant in <b style="color:#8e7019">19d</b></span>
       <button class="btn btn--secondary btn--sm" id="examFilter" style="height:28px;padding:0 12px;font-size:11px">Next exam</button>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:14px 24px 8px;font-size:11px;color:rgba(10,15,26,0.5)" id="changedCount"><div style="width:5px;height:5px;border-radius:50%;background:var(--void-300);box-shadow:0 0 4px rgba(10,15,26,0.3);flex:none"></div></div>
-    <div class="legend">
-      <span class="legend__label">Weak</span>
-      <div class="legend__bar"></div>
-      <span class="legend__label">Strong</span>
+    <div style="display:flex;align-items:center;gap:8px;padding:12px 24px;flex-wrap:nowrap">
+      <span style="font-family:var(--font-mono);font-size:9px;color:rgba(10,15,26,0.35);flex:none">Weak</span>
+      <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#9a4339,#8e7019,#1a795a);min-width:60px"></div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:rgba(10,15,26,0.35);flex:none">Strong</span>
+      <span style="width:1px;height:12px;background:rgba(10,15,26,0.1);flex:none"></span>
+      <span id="changedCount" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:rgba(10,15,26,0.5);white-space:nowrap;flex:none"><svg width="18" height="10" viewBox="0 0 20 10" fill="none"><path d="M5 2L8 7H2Z" fill="currentColor"/><path d="M15 8L12 3H18Z" fill="currentColor"/></svg></span>
     </div>
 
     
@@ -170,14 +166,12 @@ var mathTopics = [
   t(85,false,false,3),t(42,true,false,7),t(28,false,false,-2),t(15,false,false,-6),
   t(58,false,false,4),t(null,false,false),t(73,false,false,0),t(88,true,false,3),
   t(25,false,false,-3),t(91,false,false,1),t(44,false,false,5),t(null,false,false),
-  t(32,false,false,-4),t(79,true,false,6),t(55,false,false,0),t(20,false,false,-7),
-  t(83,false,false,4),
+  t(32,false,false,-4),t(79,true,false,6),t(55,false,false,0),
 ];
 
 var readingTopics = [
   t(82,true,true,7),t(30,false,false,-5),t(91,true,false,3),t(22,false,false,-4),
-  t(67,false,true,9),t(45,true,false,6),t(null,false,false),t(88,false,false,2),
-  t(36,false,false,-3),t(null,false,false),
+  t(67,false,true,9),
 ];
 
 function scoreColor(s) {
@@ -223,7 +217,14 @@ function renderGrid(containerId, topics, section) {
     var tile = document.createElement('div');
     tile.className = 'tile';
     tile.style.background = scoreColor(t.score);
-    tile.innerHTML = (t.changed ? '<div class="tile__changed"></div>' : '') +
+    var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
+    var chevron = '';
+    if (t.changed) {
+      if (diff > 0) chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg></div>';
+      else if (diff < 0) chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg></div>';
+      else chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg></div>';
+    }
+    tile.innerHTML = chevron +
       '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
       (t.score !== null ? '<div class="tile__score">' + t.score + '</div>' : '<div class="tile__score" style="color:rgba(10,15,26,0.2)">--</div>');
     if (t.score === null) {
@@ -399,7 +400,7 @@ document.getElementById('examFilter').addEventListener('click', function() {
 renderGrid('mathGrid', mathTopics, 'Quantitative');
 renderGrid('readingGrid', readingTopics, 'Verbal');
 var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
-document.getElementById('changedCount').innerHTML += changedNum + ' changed since last visit';
+document.getElementById('changedCount').innerHTML += changedNum + ' changed';
 </script>
 </body>
 </html>
