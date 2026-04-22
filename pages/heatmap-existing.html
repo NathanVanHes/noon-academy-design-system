@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Mastery Heatmap (Existing) - Noon Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mastery Heatmap - Noon Academy</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box}
@@ -22,145 +22,155 @@
   --font-mono:'JetBrains Mono','Inter',monospace;
   --r:8px;
 }
-body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
-.frame{width:375px;height:812px;margin:40px auto;background:#F8F5EF;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 8px #EDEAE3,0 40px 80px -20px rgba(0,0,0,0.15);color:var(--fg);position:relative}
-.status-bar{height:44px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);flex:none;background:#FFFFFF}
-.hdr{padding:16px 24px 12px;flex:none;background:#FFFFFF}
-.hdr h1{font-size:22px;font-weight:700;color:var(--fg);margin:0}
-.scroll{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
-.scroll::-webkit-scrollbar{display:none}
+body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);min-height:100vh}
 
-/* Legend — fully inline, no classes needed */
+/* Top bar */
+.topbar{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:20px;font-weight:700;margin:0}
+.topbar__right{display:flex;align-items:center;gap:16px}
+
+/* Layout */
+.page{max-width:1200px;margin:0 auto;padding:32px 40px;position:relative}
+
+/* Exam banner */
+.exam-banner{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#E9F4FF;border-radius:var(--r);margin-bottom:24px}
+.exam-banner__text{font-size:13px;color:var(--fg-secondary);flex:1}
+.exam-banner__text b{color:#0084FF}
+
+/* Legend row */
+.legend-row{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.legend-row__bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));max-width:200px}
+.legend-row__label{font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)}
+.legend-row__divider{width:1px;height:14px;background:rgba(20,20,20,0.1)}
+.legend-row__changed{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-secondary)}
 
 /* Grid */
-.grid-section{padding:12px 24px 20px}
-.grid-section__label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px}
-.tile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.grid-section{margin-bottom:32px}
+.grid-section__label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px}
+.tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px}
 .tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
-.tile:hover{transform:scale(1.05);z-index:1}
-.tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.1;padding:0 4px}
-.tile__score{position:absolute;top:3px;right:3px;font-family:var(--font-mono);font-size:9px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:1px}
+.tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
+.tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
 .tile.is-mastered{opacity:0.55}
 .tile.is-mastered:hover{opacity:0.75}
-.tile__mastered{position:absolute;top:3px;left:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
+.tile__mastered{position:absolute;top:6px;left:6px;width:12px;height:12px;display:flex;align-items:center;justify-content:center}
 
-/* Drilldown panel */
-.drill{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1)}
-.drill.is-open{transform:translateY(0)}
-.drill__head{padding:20px 24px;flex:none;display:flex;align-items:flex-start;justify-content:space-between}
+/* Drilldown panel — slides in from right */
+.drill-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s ease}
+.drill-overlay.is-open{opacity:1;pointer-events:auto}
+.drill{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:100%;background:var(--bg-raised);z-index:51;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drill.is-open{transform:translateX(0)}
+.drill__head{padding:24px 28px;flex:none;display:flex;align-items:flex-start;justify-content:space-between}
 .drill__back{background:none;border:0;color:var(--fg-secondary);cursor:pointer;padding:4px;display:flex}
-.drill__title{font-size:20px;font-weight:700;color:var(--fg);margin:0}
-.drill__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px}
-.drill__body{flex:1;overflow-y:auto;padding:0 24px 24px;scrollbar-width:none}
-.drill__body::-webkit-scrollbar{display:none}
+.drill__back:hover{color:var(--fg)}
+.drill__title{font-size:22px;font-weight:700;color:var(--fg);margin:0}
+.drill__sub{font-size:13px;color:var(--fg-secondary);margin-top:4px}
+.drill__body{flex:1;overflow-y:auto;padding:0 28px 28px}
 
 /* Chart area */
-.chart{background:var(--bg-raised);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,0.06);padding:20px;margin-bottom:20px}
-.chart__bars{display:flex;align-items:flex-end;gap:3px;height:80px}
-.chart__bar{flex:1;border-radius:3px 3px 0 0;transition:height 0.3s ease;position:relative}
-.chart__bar:hover::after{content:attr(data-val);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:9px;color:var(--fg)}
+.chart{background:var(--bg);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.chart__bars{display:flex;align-items:flex-end;gap:4px;height:120px}
+.chart__bar{flex:1;border-radius:4px 4px 0 0;transition:height 0.3s ease;position:relative}
+.chart__bar:hover::after{content:attr(data-val);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:10px;color:var(--fg)}
 
 /* Practice CTA */
-.drill__cta{flex:none;padding:16px 24px 24px}
+.drill__cta{flex:none;padding:20px 28px 28px}
 
 /* Buttons */
 .btn-primary{display:block;width:100%;height:48px;background:var(--btn);color:#141414;border:0;border-radius:var(--r);font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
 .btn-primary:hover{opacity:0.9}
-.btn-secondary{height:28px;padding:0 12px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:6px;font:inherit;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s}
+.btn-secondary{height:32px;padding:0 14px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:6px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s}
 .btn-secondary:hover{border-color:rgba(20,20,20,0.25)}
 
-/* Tabbar */
-.tabbar{flex:none;display:flex;background:#FFFFFF;border-top:1px solid rgba(20,20,20,0.08);padding:6px 0 2px}
-.tabbar__item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:4px 0;font:inherit;font-size:10px;color:var(--fg-muted);cursor:pointer}
-.tabbar__item.is-on{color:var(--green)}
-.tabbar__icon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* Range tabs */
+.range-tabs{display:flex;gap:0;background:var(--bg);border-radius:6px;padding:3px;margin-bottom:20px}
+.range-tabs button{flex:1;background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-family:var(--font-mono);padding:8px;border-radius:4px;cursor:pointer;transition:all 0.15s}
+.range-tabs button.is-on{background:var(--bg-raised);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,0.06)}
 </style>
 </head>
 <body>
 
-<div class="frame" id="frame">
-  <div class="status-bar"><span>9:41</span></div>
+<!-- Top bar -->
+<div class="topbar">
+  <h1>Mastery</h1>
+  <div class="topbar__right">
+    <button class="btn-secondary" id="examFilter">Next exam</button>
+  </div>
+</div>
 
-  <div class="hdr">
-    <h1>Mastery</h1>
+<div class="page">
+  <!-- Exam banner -->
+  <div class="exam-banner">
+    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="#0084FF" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
+    <span class="exam-banner__text">Verbal in <b>12d</b> &middot; Quant in <b>19d</b></span>
   </div>
 
-  <div class="scroll" id="mainScroll">
-    <!-- Upcoming exams -->
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;background:#E9F4FF;border-bottom:1px solid rgba(0,132,255,0.15)">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#0084FF" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
-      <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#0084FF">12d</b> &middot; Quant in <b style="color:#0084FF">19d</b></span>
-      <button class="btn-secondary" id="examFilter">Next exam</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:12px 24px;flex-wrap:nowrap">
-      <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:none">Weak</span>
-      <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);min-width:60px"></div>
-      <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:none">Strong</span>
-      <span style="width:1px;height:12px;background:rgba(20,20,20,0.1);flex:none"></span>
-      <span id="changedCount" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--fg-secondary);white-space:nowrap;flex:none"><svg width="18" height="10" viewBox="0 0 20 10" fill="none"><path d="M5 2L8 7H2Z" fill="#74716C"/><path d="M15 8L12 3H18Z" fill="#74716C"/></svg></span>
-    </div>
-
-    <!-- Math section -->
-    <div class="grid-section">
-      <div class="grid-section__label">Quantitative</div>
-      <div class="tile-grid" id="mathGrid"></div>
-    </div>
-
-    <!-- Reading section -->
-    <div class="grid-section">
-      <div class="grid-section__label">Verbal</div>
-      <div class="tile-grid" id="readingGrid"></div>
-    </div>
+  <!-- Legend -->
+  <div class="legend-row">
+    <span class="legend-row__label">Weak</span>
+    <div class="legend-row__bar"></div>
+    <span class="legend-row__label">Strong</span>
+    <span class="legend-row__divider"></span>
+    <span class="legend-row__changed" id="changedCount">
+      <svg width="18" height="10" viewBox="0 0 20 10" fill="none"><path d="M5 2L8 7H2Z" fill="#74716C"/><path d="M15 8L12 3H18Z" fill="#74716C"/></svg>
+    </span>
   </div>
 
-  <!-- Drilldown -->
-  <div class="drill" id="drill">
-    <div class="status-bar"><span>9:41</span></div>
-    <div class="drill__head">
-      <div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <button class="drill__back" id="drillBack"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4l-5 5 5 5"/></svg></button>
-          <div>
-            <h2 class="drill__title" id="drillTitle">Topic</h2>
-            <div class="drill__sub" id="drillSub">Reading</div>
-          </div>
+  <!-- Math section -->
+  <div class="grid-section">
+    <div class="grid-section__label">Quantitative</div>
+    <div class="tile-grid" id="mathGrid"></div>
+  </div>
+
+  <!-- Reading section -->
+  <div class="grid-section">
+    <div class="grid-section__label">Verbal</div>
+    <div class="tile-grid" id="readingGrid"></div>
+  </div>
+</div>
+
+<!-- Drilldown overlay -->
+<div class="drill-overlay" id="drillOverlay"></div>
+
+<!-- Drilldown panel -->
+<div class="drill" id="drill">
+  <div class="drill__head">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="drill__back" id="drillBack"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>
+        <div>
+          <h2 class="drill__title" id="drillTitle">Topic</h2>
+          <div class="drill__sub" id="drillSub">Reading</div>
         </div>
       </div>
-      <div id="drillBadge" style="padding:4px 10px;border-radius:6px;font-family:var(--font-mono);font-size:13px;font-weight:600"></div>
     </div>
-    <div class="drill__body">
-      <!-- Date range tabs -->
-      <div style="display:flex;gap:0;background:var(--bg-disabled);border-radius:6px;padding:2px;margin-bottom:16px" id="rangeTabs">
-        <button style="flex:1;background:var(--bg-raised);border:0;color:var(--fg);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:4px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.06)" data-range="day">Day</button>
-        <button style="flex:1;background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:4px;cursor:pointer" data-range="week">Week</button>
-        <button style="flex:1;background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-family:var(--font-mono);padding:6px;border-radius:4px;cursor:pointer" data-range="month">Month</button>
-      </div>
-
-      <div class="chart">
-        <div style="position:relative">
-          <div style="position:absolute;bottom:80%;left:0;right:0;display:flex;align-items:center;gap:6px;pointer-events:none;z-index:1">
-            <span style="font-family:var(--font-mono);font-size:8px;color:var(--fg-muted);flex:none">80</span>
-            <div style="flex:1;border-top:1px dashed rgba(20,20,20,0.15)"></div>
-            <span style="font-family:var(--font-mono);font-size:7px;color:var(--fg-muted);flex:none">Mastered</span>
-          </div>
-          <div class="chart__bars" id="chartBars"></div>
-        </div>
-        <div id="chartLabels" style="display:flex;gap:3px;margin-top:8px"></div>
-      </div>
-
-      <div id="drillChange" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r);font-size:13px;color:var(--fg)"></div>
-    </div>
-    <div class="drill__cta">
-      <button class="btn-primary">Practice this topic</button>
-    </div>
+    <div id="drillBadge" style="padding:4px 12px;border-radius:6px;font-family:var(--font-mono);font-size:14px;font-weight:600"></div>
   </div>
+  <div class="drill__body">
+    <!-- Date range tabs -->
+    <div class="range-tabs" id="rangeTabs">
+      <button class="is-on" data-range="day">Day</button>
+      <button data-range="week">Week</button>
+      <button data-range="month">Month</button>
+    </div>
 
-  <div class="tabbar">
-    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8"/></svg>Page</button>
-    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><path d="M4 6h14M4 11h14M4 16h10"/></svg>Page</button>
-    <button class="tabbar__item is-on"><svg class="tabbar__icon" viewBox="0 0 22 22"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="12" y="3" width="7" height="7" rx="1"/><rect x="3" y="12" width="7" height="7" rx="1"/><rect x="12" y="12" width="7" height="7" rx="1"/></svg>Page</button>
-    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><rect x="4" y="4" width="14" height="14" rx="2"/></svg>Page</button>
-    <button class="tabbar__item"><svg class="tabbar__icon" viewBox="0 0 22 22"><circle cx="11" cy="8" r="4"/><path d="M4 19c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg>Page</button>
+    <div class="chart">
+      <div style="position:relative">
+        <div style="position:absolute;bottom:80%;left:0;right:0;display:flex;align-items:center;gap:6px;pointer-events:none;z-index:1">
+          <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:none">80</span>
+          <div style="flex:1;border-top:1px dashed rgba(20,20,20,0.15)"></div>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--fg-muted);flex:none">Mastered</span>
+        </div>
+        <div class="chart__bars" id="chartBars"></div>
+      </div>
+      <div id="chartLabels" style="display:flex;gap:4px;margin-top:10px"></div>
+    </div>
+
+    <div id="drillChange" style="display:flex;align-items:center;gap:8px;padding:14px 18px;border-radius:var(--r);font-size:13px;color:var(--fg)"></div>
+  </div>
+  <div class="drill__cta">
+    <button class="btn-primary">Practice this topic</button>
   </div>
 </div>
 
@@ -188,23 +198,16 @@ var readingTopics = [
   t(67,false,true,9),
 ];
 
-// Tile colors: #F03D3D → #FFCB45 → #27BD86
 function scoreColor(s) {
   if (s === null) return 'var(--bg-disabled)';
   var t = Math.max(0, Math.min(100, s)) / 100;
   var r, g, b;
   if (t < 0.5) {
-    // red to gold
     var p = t / 0.5;
-    r = 240 + (255-240)*p;
-    g = 61 + (203-61)*p;
-    b = 61 + (69-61)*p;
+    r = 240 + (255-240)*p; g = 61 + (203-61)*p; b = 61 + (69-61)*p;
   } else {
-    // gold to green
     var p = (t - 0.5) / 0.5;
-    r = 255 + (39-255)*p;
-    g = 203 + (189-203)*p;
-    b = 69 + (134-69)*p;
+    r = 255 + (39-255)*p; g = 203 + (189-203)*p; b = 69 + (134-69)*p;
   }
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
@@ -232,13 +235,13 @@ function renderGrid(containerId, topics, section) {
     var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
     var chevronSvg = '';
     if (t.changed) {
-      if (diff > 0) chevronSvg = '<svg width="7" height="7" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg>';
-      else if (diff < 0) chevronSvg = '<svg width="7" height="7" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg>';
-      else chevronSvg = '<svg width="7" height="7" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg>';
+      if (diff > 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg>';
+      else if (diff < 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg>';
+      else chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg>';
     }
     var mastered = t.score !== null && t.score >= 80;
     if (mastered) tile.classList.add('is-mastered');
-    tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.5 6L6.5 2" stroke="rgba(0,0,0,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : '') +
+    tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="10" height="10" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.5 6L6.5 2" stroke="rgba(0,0,0,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : '') +
       '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
       (t.score !== null ? '<div class="tile__score">' + chevronSvg + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
     if (t.score === null) {
@@ -259,14 +262,16 @@ function openDrill(t, section) {
   badge.textContent = t.score;
   badge.style.background = 'none';
   badge.style.color = scoreColor(t.score);
-  badge.style.fontSize = '24px';
+  badge.style.fontSize = '28px';
   badge.style.fontFamily = 'var(--font-mono)';
 
-  // Chart — default to Day view
   var dayData = generateDayData(t);
   renderChart(dayData.values, dayData.labels);
 
-  // Change indicator
+  // Reset range tabs
+  document.querySelectorAll('#rangeTabs button').forEach(function(b) { b.classList.remove('is-on'); });
+  document.querySelector('#rangeTabs button[data-range="day"]').classList.add('is-on');
+
   var ch = document.getElementById('drillChange');
   var diff = t.trend[3] - t.trend[2];
   var posReasons = ['Practice accuracy increased','Practice quantity increased','Good exam results'];
@@ -276,12 +281,10 @@ function openDrill(t, section) {
   ch.style.gap = '6px';
   if (diff > 0) {
     ch.style.background = 'rgba(39,189,134,0.08)';
-    ch.style.borderColor = 'rgba(39,189,134,0.2)';
     ch.style.border = '1px solid rgba(39,189,134,0.2)';
     ch.innerHTML = '<div><span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">+' + diff + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + posReasons[t.score % posReasons.length] + '</div>';
   } else if (diff < 0) {
     ch.style.background = 'rgba(240,61,61,0.06)';
-    ch.style.borderColor = 'rgba(240,61,61,0.15)';
     ch.style.border = '1px solid rgba(240,61,61,0.15)';
     ch.innerHTML = '<div><span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + diff + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + negReasons[t.score % negReasons.length] + '</div>';
   } else {
@@ -293,6 +296,7 @@ function openDrill(t, section) {
 
   window._currentTopic = t;
   document.getElementById('drill').classList.add('is-open');
+  document.getElementById('drillOverlay').classList.add('is-open');
 }
 
 function renderChart(data, labelTexts) {
@@ -308,15 +312,14 @@ function renderChart(data, labelTexts) {
     b.dataset.val = v;
     bars.appendChild(b);
     var l = document.createElement('span');
-    l.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:1;text-align:center';
+    l.style.cssText = 'font-family:var(--font-mono);font-size:10px;color:var(--fg-muted);flex:1;text-align:center';
     l.textContent = labelTexts[i] || '';
     labels.appendChild(l);
   });
 }
 
 function generateDayData(t) {
-  var s = t.score;
-  var d = t.trend[3] - t.trend[2];
+  var s = t.score, d = t.trend[3] - t.trend[2];
   var dayNames = ['Wed','Thu','Fri','Sat','Sun','Mon','Tue'];
   var vals = [];
   for (var i = 0; i < 7; i++) {
@@ -328,8 +331,7 @@ function generateDayData(t) {
 }
 
 function generateWeekData(t) {
-  var s = t.score;
-  var d = t.trend[3] - t.trend[2];
+  var s = t.score, d = t.trend[3] - t.trend[2];
   var vals = [];
   for (var i = 0; i < 4; i++) {
     vals.push(Math.max(5, Math.min(100, s - (3 - i) * Math.round(d * 1.5) + Math.round((Math.random() - 0.3) * 4))));
@@ -354,14 +356,8 @@ function generateMonthData(t) {
 document.getElementById('rangeTabs').addEventListener('click', function(e) {
   var btn = e.target.closest('button');
   if (!btn) return;
-  document.querySelectorAll('#rangeTabs button').forEach(function(b) {
-    b.style.background = 'transparent';
-    b.style.color = 'var(--fg-secondary)';
-    b.style.boxShadow = 'none';
-  });
-  btn.style.background = 'var(--bg-raised)';
-  btn.style.color = 'var(--fg)';
-  btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
+  document.querySelectorAll('#rangeTabs button').forEach(function(b) { b.classList.remove('is-on'); });
+  btn.classList.add('is-on');
   var t = window._currentTopic;
   if (!t) return;
   var range = btn.dataset.range;
@@ -372,9 +368,12 @@ document.getElementById('rangeTabs').addEventListener('click', function(e) {
   renderChart(d.values, d.labels);
 });
 
-document.getElementById('drillBack').addEventListener('click', function() {
+function closeDrill() {
   document.getElementById('drill').classList.remove('is-open');
-});
+  document.getElementById('drillOverlay').classList.remove('is-open');
+}
+document.getElementById('drillBack').addEventListener('click', closeDrill);
+document.getElementById('drillOverlay').addEventListener('click', closeDrill);
 
 function openDrillGrey(t, section) {
   document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
@@ -383,10 +382,9 @@ function openDrillGrey(t, section) {
   badge.textContent = 'Not started';
   badge.style.background = 'var(--bg-disabled)';
   badge.style.color = 'var(--fg-muted)';
-  badge.style.fontSize = '11px';
-  document.getElementById('chartBars').innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:12px;height:80px">No data yet</div>';
+  badge.style.fontSize = '12px';
+  document.getElementById('chartBars').innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:13px;height:120px">No data yet</div>';
   document.getElementById('chartLabels').innerHTML = '';
-
   var ch = document.getElementById('drillChange');
   ch.style.display = 'flex';
   ch.style.background = 'rgba(20,20,20,0.03)';
@@ -395,6 +393,7 @@ function openDrillGrey(t, section) {
   ch.style.gap = '0';
   ch.innerHTML = 'This topic hasn\'t been covered yet. Start practicing to build your baseline.';
   document.getElementById('drill').classList.add('is-open');
+  document.getElementById('drillOverlay').classList.add('is-open');
 }
 
 var examOn = false;
