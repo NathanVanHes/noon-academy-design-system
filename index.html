@@ -3583,13 +3583,16 @@ P.calendar = {
 
     let slideDir = null; // 'left','right', or null
 
-    function buildWeekRow(week) {
+    const evtDays = [2,5,8,10,15,now.getDate(),now.getDate()+2,now.getDate()-3].filter(d => d > 0 && d <= 31);
+
+    function buildWeekRow(week, weekView) {
       return week.map(day => {
         const cls = ['cal__day'];
-        if (day.out) cls.push('is-outside');
-        if (!day.out && isToday(day.d, day.m)) cls.push('is-today');
-        if (!day.out && isSelected(day.d, day.m)) cls.push('is-selected');
-        return '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-out="' + day.out + '">' + day.d + '</button>';
+        if (day.out && !weekView) cls.push('is-outside');
+        if (isToday(day.d, day.m)) cls.push('is-today');
+        if (isSelected(day.d, day.m)) cls.push('is-selected');
+        const dot = !day.out && evtDays.includes(day.d) ? '<span class="cal__day-dot"></span>' : '';
+        return '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-month="' + day.m + '">' + day.d + dot + '</button>';
       }).join('');
     }
 
@@ -3616,11 +3619,11 @@ P.calendar = {
       html += '<div class="cal__days">';
       weeks.forEach((week, wi) => {
         if (isWeek && wi !== activeWeek) {
-          html += '<div class="cal__week-row" style="max-height:0;opacity:0;overflow:hidden">' + buildWeekRow(week) + '</div>';
+          html += '<div class="cal__week-row" style="max-height:0;opacity:0;overflow:hidden">' + buildWeekRow(week, isWeek) + '</div>';
         } else if (isWeek && slideIn) {
-          html += '<div class="cal__week-row ' + slideIn + '">' + buildWeekRow(week) + '</div>';
+          html += '<div class="cal__week-row ' + slideIn + '">' + buildWeekRow(week, isWeek) + '</div>';
         } else {
-          html += '<div class="cal__week-row">' + buildWeekRow(week) + '</div>';
+          html += '<div class="cal__week-row">' + buildWeekRow(week, isWeek) + '</div>';
         }
       });
       html += '</div>';
@@ -3663,9 +3666,15 @@ P.calendar = {
           render();
         });
       });
-      root.querySelectorAll('.cal__day:not(.is-outside)').forEach(el => {
+      root.querySelectorAll('.cal__day').forEach(el => {
         el.addEventListener('click', () => {
-          selectedDate = new Date(viewYear, viewMonth, parseInt(el.dataset.day));
+          const m = parseInt(el.dataset.month);
+          const d = parseInt(el.dataset.day);
+          const y = m < 0 ? viewYear - 1 : m > 11 ? viewYear + 1 : viewYear;
+          const adjM = ((m % 12) + 12) % 12;
+          selectedDate = new Date(y, adjM, d);
+          viewMonth = selectedDate.getMonth();
+          viewYear = selectedDate.getFullYear();
           render();
         });
       });
