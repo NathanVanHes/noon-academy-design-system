@@ -339,15 +339,23 @@ function openDrill(t, section) {
   // Contextual nudge
   var nudge = document.getElementById('drillNudge');
   var ctaBtn = document.getElementById('drillCtaBtn');
-  if (t.score >= 80) {
-    nudge.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(39,189,134,0.06);border:1px solid rgba(39,189,134,0.12);border-radius:8px"><svg width="16" height="16" viewBox="0 0 12 12" fill="rgba(39,189,134,0.7)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span>You\'ve mastered this. Keep sharp with a few questions a week.</span></div>';
+  var name = t.name.replace('\n',' ');
+  var gap = 80 - t.score;
+  if (t.score >= 90) {
+    nudge.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(39,189,134,0.06);border:1px solid rgba(39,189,134,0.12);border-radius:8px"><svg width="16" height="16" viewBox="0 0 12 12" fill="rgba(39,189,134,0.7)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span>You\'ve mastered ' + name + '. A short session each week will keep you exam-ready.</span></div>';
+    ctaBtn.textContent = 'Stay sharp';
+  } else if (t.score >= 80) {
+    nudge.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(39,189,134,0.06);border:1px solid rgba(39,189,134,0.12);border-radius:8px"><svg width="16" height="16" viewBox="0 0 12 12" fill="rgba(39,189,134,0.7)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span>You\'ve just hit mastery on ' + name + '. Keep it up — consistent practice locks it in.</span></div>';
     ctaBtn.textContent = 'Keep practicing';
-  } else if (t.score >= 50) {
-    nudge.innerHTML = 'You\'re getting there. Focus on getting more right — take your time with each question.';
-    ctaBtn.textContent = 'Practice this topic';
+  } else if (t.score >= 65) {
+    nudge.innerHTML = 'You\'re <b>' + gap + ' points</b> away from mastering ' + name + '. We\'ve lined up questions targeting exactly where you\'re losing marks — one focused session could close the gap.';
+    ctaBtn.textContent = 'Close the gap';
+  } else if (t.score >= 40) {
+    nudge.innerHTML = 'You\'re building a foundation in ' + name + '. We\'ll start you with the core concepts and work up — complete a practice set and you\'ll see this move.';
+    ctaBtn.textContent = 'Practice ' + name;
   } else {
-    nudge.innerHTML = 'This one needs work. Start with a short session — doing more questions more often will help.';
-    ctaBtn.textContent = 'Start practicing';
+    nudge.innerHTML = name + ' is early days. We\'ve put together a plan starting from the basics — ' + gap + ' points to mastery, and every session gets you closer.';
+    ctaBtn.textContent = 'Start with the basics';
   }
 
   window._currentTopic = t;
