@@ -88,9 +88,9 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 
   <div class="scroll" id="mainScroll">
     <!-- Upcoming exams -->
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;background:rgba(255,203,69,0.08);border-bottom:1px solid rgba(255,203,69,0.15)">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#b8930f" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
-      <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#b8930f">12d</b> &middot; Quant in <b style="color:#b8930f">19d</b></span>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 24px;background:#E9F4FF;border-bottom:1px solid rgba(0,132,255,0.15)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#0084FF" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
+      <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#0084FF">12d</b> &middot; Quant in <b style="color:#0084FF">19d</b></span>
       <button class="btn-secondary" id="examFilter">Next exam</button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><div style="width:5px;height:5px;border-radius:50%;background:var(--fg);box-shadow:0 0 4px rgba(20,20,20,0.25);flex:none"></div></div>
@@ -203,7 +203,7 @@ function scoreColor(s) {
     g = 203 + (189-203)*p;
     b = 69 + (134-69)*p;
   }
-  return 'rgba('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+',0.35)';
+  return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
 function chartBarColor(s) {
@@ -216,7 +216,7 @@ function chartBarColor(s) {
     var p = (t - 0.5) / 0.5;
     r = 255 + (39-255)*p; g = 203 + (189-203)*p; b = 69 + (134-69)*p;
   }
-  return 'rgba('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+',0.6)';
+  return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
 function renderGrid(containerId, topics, section) {
