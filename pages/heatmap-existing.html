@@ -96,7 +96,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 /* Exam toggle */
 .exam-toggle{height:34px;padding:0 16px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:20px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
 .exam-toggle:hover{border-color:rgba(20,20,20,0.25)}
+.exam-toggle__dot{width:8px;height:8px;border-radius:50%;background:rgba(20,20,20,0.15);transition:all 0.2s;flex:none}
 .exam-toggle.is-on{background:#0084FF;color:#fff;border-color:#0084FF}
+.exam-toggle.is-on .exam-toggle__dot{background:#fff}
 
 /* Range tabs */
 .range-tabs{display:flex;gap:0;background:var(--bg);border-radius:6px;padding:3px;margin-bottom:20px}
@@ -111,7 +113,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="topbar__inner">
     <h1>Mastery</h1>
     <div class="topbar__right">
-      <button class="exam-toggle" id="examFilter">Show next exam</button>
+      <button class="exam-toggle" id="examFilter"><span class="exam-toggle__dot"></span>Show next exam</button>
     </div>
   </div>
 </div>
@@ -129,8 +131,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
         <span>100</span>
       </div>
     </div>
+    <span style="width:1px;height:24px;background:rgba(20,20,20,0.08);flex:none"></span>
     <div class="legend-strip__changed" id="changedCount">
-<svg width="16" height="8" viewBox="0 0 16 8" fill="none" style="flex:none"><path d="M3 7L0 3H6Z" fill="#74716C"/><path d="M13 1L16 5H10Z" fill="#74716C"/></svg>
+<svg width="14" height="6" viewBox="0 0 14 6" fill="none" style="flex:none"><path d="M3 0L6 5H0Z" fill="#74716C"/><path d="M11 5L8 0H14Z" fill="#74716C"/></svg>
     </div>
   </div>
 </div>
@@ -470,7 +473,7 @@ var examOn = false;
 document.getElementById('examFilter').addEventListener('click', function() {
   examOn = !examOn;
   this.classList.toggle('is-on', examOn);
-  this.textContent = examOn ? 'Show all topics' : 'Show next exam';
+  this.innerHTML = examOn ? '<span class="exam-toggle__dot"></span>Show all' : '<span class="exam-toggle__dot"></span>Show next exam';
   document.getElementById('quantExam').style.display = examOn ? 'inline' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'inline' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn);
