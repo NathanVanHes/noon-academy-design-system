@@ -39,11 +39,11 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 .tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
 .tile:hover{transform:scale(1.05);z-index:1}
 .tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.1;padding:0 4px}
-.tile__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.45)}
+.tile__score{position:absolute;top:3px;right:3px;font-family:var(--font-mono);font-size:9px;font-weight:600;color:rgba(0,0,0,0.45)}
 .tile.is-mastered{opacity:0.55}
 .tile.is-mastered:hover{opacity:0.75}
 .tile__mastered{position:absolute;top:3px;left:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
-.tile__changed{position:absolute;top:3px;right:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
+.tile__changed{position:absolute;bottom:3px;right:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
 
 /* Drilldown panel */
 .drill{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1)}
@@ -139,6 +139,11 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 
       <div class="chart">
         <div style="position:relative">
+          <div style="position:absolute;bottom:80%;left:0;right:0;display:flex;align-items:center;gap:6px;pointer-events:none;z-index:1">
+            <span style="font-family:var(--font-mono);font-size:8px;color:var(--fg-muted);flex:none">80</span>
+            <div style="flex:1;border-top:1px dashed rgba(20,20,20,0.15)"></div>
+            <span style="font-family:var(--font-mono);font-size:7px;color:var(--fg-muted);flex:none">Mastered</span>
+          </div>
           <div class="chart__bars" id="chartBars"></div>
         </div>
         <div id="chartLabels" style="display:flex;gap:3px;margin-top:8px"></div>
