@@ -350,7 +350,9 @@ function openDrill(t, section) {
     ch.style.border = '1px solid rgba(240,61,61,0.15)';
     ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + downCaret + '<span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">A practice session this week will help turn this around</div>';
   } else {
-    ch.style.display = 'none';
+    ch.style.background = 'rgba(20,20,20,0.03)';
+    ch.style.border = '1px solid rgba(20,20,20,0.08)';
+    ch.innerHTML = '<div style="color:var(--fg-secondary)">No change this week</div><div style="font-size:12px;color:var(--fg-muted)">Practice to get this moving</div>';
   }
 
   // Contextual nudge
