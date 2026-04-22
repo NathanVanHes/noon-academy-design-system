@@ -502,15 +502,8 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   font-family: var(--font-serif); font-size: var(--fs-16); font-weight: var(--fw-500); color: var(--fg);
 }
 .cal__nav {
-  display: flex; gap: var(--sp-1);
+  display: flex; align-items: center; gap: var(--sp-1);
 }
-.cal__nav-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: var(--r-1); border: 0;
-  background: transparent; color: var(--fg-subtle); cursor: pointer;
-  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
-}
-.cal__nav-btn:hover { background: var(--hover-overlay); color: var(--fg); }
 
 /* Day-of-week header row */
 .cal__weekdays {
