@@ -34,9 +34,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
 
 /* Section header */
-.grid-section__header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.grid-section__header{margin-bottom:12px}
 .grid-section__header .grid-section__label{margin-bottom:0}
-.grid-section__exam{font-size:11px;color:#0084FF;font-weight:500;display:flex;align-items:center;gap:4px}
+.grid-section__exam{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;color:#0084FF;margin-top:4px}
 .grid-section__exam b{font-weight:700}
 
 /* Legend strip */
@@ -144,7 +144,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Quantitative</div>
-      <div class="grid-section__exam" id="quantExam" style="display:none">Exam in <b>19d</b></div>
+      <div class="grid-section__exam" id="quantExam" style="display:none">Exam in 19 days</div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
@@ -153,7 +153,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Verbal</div>
-      <div class="grid-section__exam" id="verbalExam" style="display:none">Exam in <b>12d</b></div>
+      <div class="grid-section__exam" id="verbalExam" style="display:none">Exam in 12 days</div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
