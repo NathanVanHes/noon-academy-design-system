@@ -3633,6 +3633,24 @@ P.calendar = {
       wire();
     }
 
+    // Light update — just move selection classes without full re-render
+    function updateSelection() {
+      root.querySelectorAll('.cal__day').forEach(btn => {
+        const d = parseInt(btn.dataset.day);
+        const m = parseInt(btn.dataset.month);
+        btn.classList.toggle('is-selected', isSelected(d, m));
+      });
+      // Update title
+      const titleEl = root.querySelector('.cal__month');
+      if (titleEl) {
+        const weekTitle = FULL_DAYS[selectedDate.getDay()] + ', ' + MONTHS[selectedDate.getMonth()] + ' ' + selectedDate.getDate();
+        titleEl.textContent = isWeek ? weekTitle : MONTHS[viewMonth] + ' ' + viewYear;
+      }
+      // Update today button visibility
+      const todayBtn = root.querySelector('[data-action="today"]');
+      if (todayBtn) todayBtn.style.display = isTodaySelected() ? 'none' : '';
+    }
+
     function wire() {
       root.querySelectorAll('[data-action]').forEach(el => {
         el.addEventListener('click', e => {
@@ -3642,22 +3660,25 @@ P.calendar = {
             selectedDate = new Date(now);
             viewMonth = now.getMonth(); viewYear = now.getFullYear();
             isWeek = true; slideDir = null;
+            render(); return;
           } else if (action === 'prev') {
             if (isWeek) {
-              const oldDay = selectedDate.getDay();
+              const crossedWeek = selectedDate.getDay() === 0; // Sun going back = new week
               selectedDate.setDate(selectedDate.getDate() - 1);
               viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear();
-              slideDir = selectedDate.getDay() === 6 ? 'right' : null; // crossed into prev week (Sat)
+              if (crossedWeek) { slideDir = 'right'; render(); return; }
+              updateSelection(); return;
             } else {
               viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
               slideDir = null;
             }
           } else if (action === 'next') {
             if (isWeek) {
-              const oldDay = selectedDate.getDay();
+              const crossedWeek = selectedDate.getDay() === 6; // Sat going forward = new week
               selectedDate.setDate(selectedDate.getDate() + 1);
               viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear();
-              slideDir = selectedDate.getDay() === 0 ? 'left' : null; // crossed into next week (Sun)
+              if (crossedWeek) { slideDir = 'left'; render(); return; }
+              updateSelection(); return;
             } else {
               viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
               slideDir = null;
@@ -3674,10 +3695,11 @@ P.calendar = {
           const d = parseInt(el.dataset.day);
           const y = m < 0 ? viewYear - 1 : m > 11 ? viewYear + 1 : viewYear;
           const adjM = ((m % 12) + 12) % 12;
+          const oldMonth = viewMonth;
           selectedDate = new Date(y, adjM, d);
           viewMonth = selectedDate.getMonth();
           viewYear = selectedDate.getFullYear();
-          render();
+          if (viewMonth === oldMonth) { updateSelection(); } else { render(); }
         });
       });
       // Drag
