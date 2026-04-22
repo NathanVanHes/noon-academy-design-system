@@ -185,10 +185,10 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
     <div class="chart">
       <div style="position:relative">
-        <div style="position:absolute;bottom:80%;left:0;right:0;display:flex;align-items:center;gap:6px;pointer-events:none;z-index:1">
-          <span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);flex:none">80</span>
-          <div style="flex:1;border-top:1px dashed rgba(20,20,20,0.15)"></div>
-          <span style="font-family:var(--font-mono);font-size:8px;color:var(--fg-muted);flex:none">Mastered</span>
+        <div style="position:absolute;bottom:80%;left:0;right:0;display:flex;align-items:center;gap:4px;pointer-events:none;z-index:1">
+          <div style="width:2px;height:10px;background:var(--fg-muted);border-radius:1px;flex:none"></div>
+          <div style="flex:1;border-top:1px dashed rgba(20,20,20,0.12)"></div>
+          <span style="display:flex;align-items:center;gap:3px;flex:none"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-muted)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted)">80</span></span>
         </div>
         <div class="chart__bars" id="chartBars"></div>
       </div>
@@ -215,9 +215,9 @@ function t(score,changed,exam,diff,startWeek){
 }
 
 var mathChapters = [
-  { name: 'Chapter name', topics: [t(76,false,true,5,1),t(22,true,false,-3,1),t(61,false,false,4,1),t(94,false,true,3,1),t(35,false,false,-4,2),t(null,false,false,0,1),t(70,false,false,2,2),t(18,true,true,-5,1),t(85,false,false,-2,1)] },
+  { name: 'Chapter name', topics: [t(76,false,true,5,1),t(22,true,false,-3,1),t(61,false,false,4,1),t(94,false,true,3,1),t(35,false,false,-4,2),t(null,false,false,0,1),t(70,false,false,2,2),t(18,true,true,-5,1),t(85,false,false,-2,8)] },
   { name: 'Chapter name', topics: [t(42,true,false,7,3),t(28,false,false,-2,3),t(15,false,false,0,4),t(58,false,false,3,3),t(null,false,false,0,4)] },
-  { name: 'Chapter name', topics: [t(73,false,false,4,5),t(88,true,false,4,5),t(25,false,false,-3,6),t(91,false,false,2,5),t(44,false,false,0,6),t(null,false,false,0,6)] },
+  { name: 'Chapter name', topics: [t(73,false,false,4,5),t(88,true,false,4,7),t(25,false,false,-3,6),t(91,false,false,2,9),t(44,false,false,0,6),t(null,false,false,0,6)] },
   { name: 'Chapter name', topics: [t(32,false,false,-4,8),t(79,true,false,6,7),t(55,false,false,3,8)] },
 ];
 var mathTopics = [];
