@@ -33,9 +33,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 /* Layout */
 .page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
 
-/* Exam context */
-.exam-context{display:flex;align-items:center;gap:10px;padding:12px 20px;background:#E9F4FF;border-radius:var(--r);margin-bottom:24px;font-size:13px;color:var(--fg-secondary);line-height:1.4}
-.exam-context b{color:#0084FF}
+/* Section header */
+.grid-section__header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.grid-section__header .grid-section__label{margin-bottom:0}
+.grid-section__exam{font-size:11px;color:#0084FF;font-weight:500;display:flex;align-items:center;gap:4px}
+.grid-section__exam b{font-weight:700}
 
 /* Legend row */
 .legend-row{display:flex;align-items:center;gap:10px;margin-bottom:24px}
@@ -105,12 +107,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div class="page">
-  <!-- Exam context (shown when filter is on) -->
-  <div class="exam-context" id="examContext" style="display:none">
-    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="#0084FF" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
-    <span>These topics will be on your next exam. Verbal in <b>12d</b>, Quant in <b>19d</b>.</span>
-  </div>
-
   <!-- Legend -->
   <div class="legend-row">
     <span class="legend-row__label">Weak</span>
@@ -124,13 +120,19 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
   <!-- Math section -->
   <div class="grid-section">
-    <div class="grid-section__label">Quantitative</div>
+    <div class="grid-section__header">
+      <div class="grid-section__label">Quantitative</div>
+      <div class="grid-section__exam" id="quantExam" style="display:none">Exam in <b>19d</b></div>
+    </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
 
   <!-- Reading section -->
   <div class="grid-section">
-    <div class="grid-section__label">Verbal</div>
+    <div class="grid-section__header">
+      <div class="grid-section__label">Verbal</div>
+      <div class="grid-section__exam" id="verbalExam" style="display:none">Exam in <b>12d</b></div>
+    </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
 </div>
@@ -430,7 +432,8 @@ document.getElementById('examFilter').addEventListener('click', function() {
     this.style.color = '';
     this.style.borderColor = '';
   }
-  document.getElementById('examContext').style.display = examOn ? 'flex' : 'none';
+  document.getElementById('quantExam').style.display = examOn ? 'flex' : 'none';
+  document.getElementById('verbalExam').style.display = examOn ? 'flex' : 'none';
   renderGrid('mathGrid', examOn ? mathTopics.filter(function(t){return t.exam}) : mathTopics, 'Quantitative');
   renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal');
 });
