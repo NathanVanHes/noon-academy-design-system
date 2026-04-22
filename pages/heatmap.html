@@ -33,6 +33,10 @@ body{background:var(--void-400);margin:0}
 .tile:hover{transform:scale(1.05);z-index:1}
 .tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.7);text-align:center;line-height:1.1;padding:0 4px}
 .tile__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.5)}
+/* Mastered */
+.tile.is-mastered{opacity:0.55}
+.tile.is-mastered:hover{opacity:0.75}
+.tile__mastered{position:absolute;top:3px;left:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
 /* Changed chevron */
 .tile__changed{position:absolute;top:3px;right:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
 
@@ -207,7 +211,10 @@ function renderGrid(containerId, topics, section) {
       else if (diff < 0) chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg></div>';
       else chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg></div>';
     }
-    tile.innerHTML = chevron +
+    var mastered = t.score !== null && t.score >= 80;
+    if (mastered) tile.classList.add('is-mastered');
+    tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.5 6L6.5 2" stroke="rgba(0,0,0,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : '') +
+      chevron +
       '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
       (t.score !== null ? '<div class="tile__score">' + t.score + '</div>' : '<div class="tile__score" style="color:rgba(232,228,220,0.3)">--</div>');
     if (t.score === null) {
