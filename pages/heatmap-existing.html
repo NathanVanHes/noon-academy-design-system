@@ -93,11 +93,12 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
       <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#0084FF">12d</b> &middot; Quant in <b style="color:#0084FF">19d</b></span>
       <button class="btn-secondary" id="examFilter">Next exam</button>
     </div>
-    <div style="display:flex;align-items:center;gap:6px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex:none"><path d="M6 1L9 5H3Z" fill="var(--fg-secondary)"/><path d="M6 11L3 7H9Z" fill="var(--fg-secondary)"/></svg></div>
-    <div class="legend">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 24px">
       <span class="legend__label">Weak</span>
-      <div class="legend__bar"></div>
+      <div class="legend__bar" style="flex:1"></div>
       <span class="legend__label">Strong</span>
+      <span style="width:1px;height:12px;background:rgba(20,20,20,0.1)"></span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--fg-secondary)" id="changedCount"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1L9 5H3Z" fill="var(--fg-secondary)"/><path d="M6 11L3 7H9Z" fill="var(--fg-secondary)"/></svg></span>
     </div>
 
     <!-- Math section -->
