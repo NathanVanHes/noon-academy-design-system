@@ -56,7 +56,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
 .tile.is-mastered{}
 .tile__mastered{position:absolute;top:5px;left:5px;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
-@keyframes sparkle{0%{filter:drop-shadow(0 0 1px rgba(212,160,23,0.3));transform:scale(1)}25%{filter:drop-shadow(0 0 4px rgba(212,160,23,0.8));transform:scale(1.15)}50%{filter:drop-shadow(0 0 1px rgba(212,160,23,0.3));transform:scale(1)}75%{filter:drop-shadow(0 0 6px rgba(255,203,69,0.9));transform:scale(1.2)}100%{filter:drop-shadow(0 0 1px rgba(212,160,23,0.3));transform:scale(1)}}
+@keyframes sparkle{0%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}25%{filter:drop-shadow(0 0 4px rgba(255,255,255,0.8));transform:scale(1.15)}50%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}75%{filter:drop-shadow(0 0 6px rgba(255,255,255,0.9));transform:scale(1.2)}100%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}}
 .tile__mastered svg{animation:sparkle 3s ease-in-out infinite}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -88,6 +88,13 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .btn-secondary{height:32px;padding:0 14px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:6px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s}
 .btn-secondary:hover{border-color:rgba(20,20,20,0.25)}
 
+/* Exam toggle */
+.exam-toggle{height:34px;padding:0 14px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:20px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.exam-toggle:hover{border-color:rgba(20,20,20,0.25)}
+.exam-toggle__dot{width:8px;height:8px;border-radius:50%;background:rgba(20,20,20,0.15);transition:all 0.2s;flex:none}
+.exam-toggle.is-on{background:#0084FF;color:#fff;border-color:#0084FF}
+.exam-toggle.is-on .exam-toggle__dot{background:#fff;box-shadow:0 0 4px rgba(255,255,255,0.5)}
+
 /* Range tabs */
 .range-tabs{display:flex;gap:0;background:var(--bg);border-radius:6px;padding:3px;margin-bottom:20px}
 .range-tabs button{flex:1;background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-family:var(--font-mono);padding:8px;border-radius:4px;cursor:pointer;transition:all 0.15s}
@@ -101,7 +108,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="topbar__inner">
     <h1>Mastery</h1>
     <div class="topbar__right">
-      <button class="btn-secondary" id="examFilter">Next exam</button>
+      <button class="exam-toggle" id="examFilter"><span class="exam-toggle__dot"></span>Next exam</button>
     </div>
   </div>
 </div>
@@ -179,7 +186,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="drill__cta">
     <div id="drillNudge" style="font-size:12px;color:var(--fg-secondary);line-height:1.5;margin-bottom:12px;padding:0 2px"></div>
     <button class="btn-primary" id="drillCtaBtn">Practice this topic</button>
-    <div style="font-size:11px;color:var(--fg-muted);text-align:center;margin-top:10px">The more you practice, the more this improves</div>
+    <div style="font-size:11px;color:var(--fg-muted);text-align:center;margin-top:10px">Your mastery reflects how well you know this topic</div>
   </div>
 </div>
 
@@ -247,7 +254,7 @@ function renderTile(t, section) {
   }
   var mastered = t.score !== null && t.score >= 80;
   if (mastered) tile.classList.add('is-mastered');
-  tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="12" height="12" viewBox="0 0 12 12" fill="#D4A017"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></div>' : '') +
+  tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(255,255,255,0.85)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></div>' : '') +
     '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
     (t.score !== null ? '<div class="tile__score">' + chevronSvg + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
   if (t.score === null) {
@@ -442,16 +449,8 @@ function openDrillGrey(t, section) {
 var examOn = false;
 document.getElementById('examFilter').addEventListener('click', function() {
   examOn = !examOn;
-  this.textContent = examOn ? 'Show all topics' : 'Next exam';
-  if (examOn) {
-    this.style.background = '#0084FF';
-    this.style.color = '#fff';
-    this.style.borderColor = '#0084FF';
-  } else {
-    this.style.background = '';
-    this.style.color = '';
-    this.style.borderColor = '';
-  }
+  this.classList.toggle('is-on', examOn);
+  this.innerHTML = examOn ? '<span class="exam-toggle__dot"></span>Show all topics' : '<span class="exam-toggle__dot"></span>Next exam';
   document.getElementById('quantExam').style.display = examOn ? 'flex' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'flex' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn);
