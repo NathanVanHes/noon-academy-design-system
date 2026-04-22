@@ -24,8 +24,8 @@
 }
 body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 .frame{width:375px;height:812px;margin:40px auto;background:#FFFFFF;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 8px #EDEAE3,0 40px 80px -20px rgba(0,0,0,0.15);color:var(--fg);position:relative}
-.status-bar{height:44px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);flex:none;background:#F8F5EF}
-.hdr{padding:16px 24px 12px;flex:none;background:#F8F5EF}
+.status-bar{height:44px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);flex:none}
+.hdr{padding:16px 24px 12px;flex:none}
 .hdr h1{font-size:22px;font-weight:700;color:var(--fg);margin:0}
 .scroll{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .scroll::-webkit-scrollbar{display:none}
@@ -43,7 +43,7 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
 .tile:hover{transform:scale(1.05);z-index:1}
 .tile__name{font-size:9px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.1;padding:0 4px}
 .tile__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.45)}
-.tile__changed{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#27BD86;box-shadow:0 0 0 2px rgba(39,189,134,0.25)}
+.tile__changed{position:absolute;top:3px;right:3px;width:10px;height:10px;display:flex;align-items:center;justify-content:center}
 
 /* Drilldown panel */
 .drill{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.22,0.61,0.36,1)}
@@ -93,7 +93,7 @@ body{background:#EDEAE3;margin:0;font-family:var(--font-sans)}
       <span style="font-size:11px;color:var(--fg-secondary);flex:1">Verbal in <b style="color:#0084FF">12d</b> &middot; Quant in <b style="color:#0084FF">19d</b></span>
       <button class="btn-secondary" id="examFilter">Next exam</button>
     </div>
-    <div style="display:flex;align-items:center;gap:6px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex:none"><circle cx="7" cy="7" r="3" fill="#27BD86" opacity="0.2"/><circle cx="7" cy="7" r="1.5" fill="#27BD86"/></svg></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:14px 24px 8px;font-size:11px;color:var(--fg-secondary)" id="changedCount"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex:none"><path d="M6 1L9 5H3Z" fill="var(--fg-secondary)"/><path d="M6 11L3 7H9Z" fill="var(--fg-secondary)"/></svg></div>
     <div class="legend">
       <span class="legend__label">Weak</span>
       <div class="legend__bar"></div>
@@ -224,7 +224,14 @@ function renderGrid(containerId, topics, section) {
     var tile = document.createElement('div');
     tile.className = 'tile';
     tile.style.background = scoreColor(t.score);
-    tile.innerHTML = (t.changed ? '<div class="tile__changed"></div>' : '') +
+    var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
+    var chevron = '';
+    if (t.changed) {
+      if (diff > 0) chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg></div>';
+      else if (diff < 0) chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg></div>';
+      else chevron = '<div class="tile__changed"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg></div>';
+    }
+    tile.innerHTML = chevron +
       '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
       (t.score !== null ? '<div class="tile__score">' + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
     if (t.score === null) {
