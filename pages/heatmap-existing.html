@@ -30,7 +30,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .topbar__right{display:flex;align-items:center;gap:16px}
 
 /* Layout */
-.page{max-width:1200px;margin:0 auto;padding:32px 40px;position:relative}
+.page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
 
 /* Exam banner */
 .exam-banner{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#E9F4FF;border-radius:var(--r);margin-bottom:24px}
@@ -47,7 +47,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 /* Grid */
 .grid-section{margin-bottom:32px}
 .grid-section__label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px}
-.tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px}
+.tile-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
