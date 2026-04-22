@@ -54,10 +54,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
-.tile.is-mastered{}
-.tile__mastered{position:absolute;top:5px;left:5px;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
 @keyframes sparkle{0%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}25%{filter:drop-shadow(0 0 4px rgba(255,255,255,0.8));transform:scale(1.15)}50%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}75%{filter:drop-shadow(0 0 6px rgba(255,255,255,0.9));transform:scale(1.2)}100%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}}
-.tile__mastered svg{animation:sparkle 3s ease-in-out infinite}
+.mastery-star{animation:sparkle 3s ease-in-out infinite}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
 
@@ -249,9 +247,11 @@ function renderTile(t, section) {
   }
   var mastered = t.score !== null && t.score >= 80;
   if (mastered) tile.classList.add('is-mastered');
-  tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(255,255,255,0.85)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></div>' : '') +
-    '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
-    (t.score !== null ? '<div class="tile__score">' + chevronSvg + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
+  var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(255,255,255,0.85)" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+    (t.score !== null
+      ? '<div class="tile__score">' + (mastered ? starSvg : chevronSvg + t.score) + '</div>'
+      : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
   if (t.score === null) {
     tile.style.cursor = 'default';
     tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
