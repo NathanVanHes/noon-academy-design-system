@@ -49,7 +49,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .legend-key__labels{display:flex;justify-content:space-between;position:relative}
 .legend-key__labels span{font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)}
 .legend-key__mastery{position:absolute;left:80%;transform:translateX(-50%);font-family:var(--font-mono);font-size:9px;color:var(--fg-secondary);white-space:nowrap;display:flex;align-items:center;gap:3px}
-.legend-strip__changed{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--fg-secondary);white-space:nowrap;flex:none}
 
 /* Grid */
 .grid-section{margin-bottom:32px}
@@ -94,12 +93,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .btn-secondary{height:32px;padding:0 14px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:6px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s}
 .btn-secondary:hover{border-color:rgba(20,20,20,0.25)}
 
-/* Exam toggle */
-.exam-toggle{height:34px;padding:0 16px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:20px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
-.exam-toggle:hover{border-color:rgba(20,20,20,0.25)}
-.exam-toggle__dot{width:8px;height:8px;border-radius:50%;background:rgba(20,20,20,0.15);transition:all 0.2s;flex:none}
-.exam-toggle.is-on{background:#0084FF;color:#fff;border-color:#0084FF}
-.exam-toggle.is-on .exam-toggle__dot{background:#fff}
+/* Segmented control */
+.seg-ctrl{display:inline-flex;background:var(--bg-disabled);border-radius:6px;padding:2px}
+.seg-ctrl__btn{background:transparent;border:0;color:var(--fg-secondary);font:inherit;font-size:12px;font-weight:500;padding:6px 14px;border-radius:4px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.seg-ctrl__btn:hover{color:var(--fg)}
+.seg-ctrl__btn.is-on{background:var(--bg-raised);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,0.06)}
 
 /* Range tabs */
 .range-tabs{display:flex;gap:0;background:var(--bg);border-radius:6px;padding:3px;margin-bottom:20px}
@@ -118,7 +116,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="legend-strip">
   <div class="legend-strip__inner">
-    <span style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-muted);flex:none">Key</span>
     <div class="legend-key" style="max-width:200px">
       <div class="legend-key__track">
         <div class="legend-key__bar" style="height:6px"></div>
@@ -130,12 +127,12 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
         <span>100</span>
       </div>
     </div>
-    <span style="width:1px;height:20px;background:rgba(20,20,20,0.08);flex:none"></span>
-    <div class="legend-strip__changed" id="changedCount">
-      <span style="font-family:var(--font-mono);font-weight:600;color:var(--fg-secondary)">+/-</span>
+    <div style="margin-left:auto;flex:none" id="examSegment">
+      <div class="seg-ctrl">
+        <button class="seg-ctrl__btn is-on" data-filter="all">All</button>
+        <button class="seg-ctrl__btn" data-filter="exam">Next exam</button>
+      </div>
     </div>
-    <span style="width:1px;height:20px;background:rgba(20,20,20,0.08);flex:none"></span>
-    <button class="exam-toggle" id="examFilter"><span class="exam-toggle__dot"></span>Show next exam</button>
   </div>
 </div>
 
@@ -550,11 +547,12 @@ function openDrillGrey(t, section) {
   document.getElementById('drillOverlay').classList.add('is-open');
 }
 
-var examOn = false;
-document.getElementById('examFilter').addEventListener('click', function() {
-  examOn = !examOn;
-  this.classList.toggle('is-on', examOn);
-  this.innerHTML = examOn ? '<span class="exam-toggle__dot"></span>Show all' : '<span class="exam-toggle__dot"></span>Show next exam';
+document.getElementById('examSegment').addEventListener('click', function(e) {
+  var btn = e.target.closest('.seg-ctrl__btn');
+  if (!btn) return;
+  this.querySelectorAll('.seg-ctrl__btn').forEach(function(b) { b.classList.remove('is-on'); });
+  btn.classList.add('is-on');
+  var examOn = btn.dataset.filter === 'exam';
   document.getElementById('quantExam').style.display = examOn ? 'inline' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'inline' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn);
@@ -564,8 +562,6 @@ document.getElementById('examFilter').addEventListener('click', function() {
 // Init
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
 renderGrid('readingGrid', readingTopics, 'Verbal');
-var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
-document.getElementById('changedCount').innerHTML += ' Change this week';
 </script>
 </body>
 </html>
