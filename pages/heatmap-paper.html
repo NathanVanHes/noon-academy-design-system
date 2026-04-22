@@ -290,7 +290,7 @@ function renderChart(data) {
     b.className = 'chart__bar';
     b.style.height = v + '%';
     b.style.background = chartBarColor(v);
-    b.dataset.val = v + '%';
+    b.dataset.val = v;
     bars.appendChild(b);
     var l = document.createElement('span');
     l.style.cssText = 'font-family:var(--font-mono);font-size:9px;color:rgba(10,15,26,0.3)';
