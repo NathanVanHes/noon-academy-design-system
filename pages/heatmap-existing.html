@@ -56,8 +56,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .grid-section__label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px}
 .tile-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 @media(max-width:560px){.tile-grid{grid-template-columns:repeat(4,1fr)}}
-.tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden}
+.tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden;opacity:0;transform:translateY(8px);animation:tileIn 0.35s ease forwards}
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+@keyframes tileIn{to{opacity:1;transform:translateY(0)}}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px;z-index:2}
 .tile.is-mastered::after{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(135deg,rgba(0,0,0,0.03),rgba(0,0,0,0.03) 3px,transparent 3px,transparent 8px);pointer-events:none}
@@ -248,10 +249,11 @@ function chartBarColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
-function renderTile(t, section) {
+function renderTile(t, section, idx) {
   var tile = document.createElement('div');
   tile.className = 'tile';
   tile.style.background = scoreColor(t.score);
+  tile.style.animationDelay = (idx || 0) * 30 + 'ms';
   var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
   // no longer used in score area
   var mastered = t.score !== null && t.score >= 80;
@@ -281,23 +283,24 @@ function renderTile(t, section) {
 function renderGrid(containerId, topics, section) {
   var grid = document.getElementById(containerId);
   grid.innerHTML = '';
-  topics.forEach(function(t) {
-    grid.appendChild(renderTile(t, section));
+  topics.forEach(function(t, i) {
+    grid.appendChild(renderTile(t, section, i));
   });
 }
 
 function renderChapteredGrid(containerId, chapters, section, examOnly) {
   var grid = document.getElementById(containerId);
   grid.innerHTML = '';
+  var idx = 0;
   chapters.forEach(function(ch) {
     var topics = examOnly ? ch.topics.filter(function(t){return t.exam}) : ch.topics;
     if (topics.length === 0) return;
     var label = document.createElement('div');
     label.className = 'chapter-label';
-    label.textContent = ch.name;
     grid.appendChild(label);
+    label.textContent = ch.name;
     topics.forEach(function(t) {
-      grid.appendChild(renderTile(t, section));
+      grid.appendChild(renderTile(t, section, idx++));
     });
   });
 }
