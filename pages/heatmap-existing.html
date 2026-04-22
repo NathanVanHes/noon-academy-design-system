@@ -252,7 +252,7 @@ function renderTile(t, section) {
   tile.style.background = scoreColor(t.score);
   var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
   var chevronSvg = '';
-  if (t.changed) {
+  if (t.score !== null) {
     if (diff > 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg>';
     else if (diff < 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg>';
     else chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg>';
@@ -315,24 +315,24 @@ function openDrill(t, section) {
 
   var ch = document.getElementById('drillChange');
   var diff = t.trend[3] - t.trend[2];
-  var posReasons = ['Practice accuracy increased','Practice quantity increased','Good exam results'];
-  var negReasons = ['Practice accuracy decreased','Practice quantity decreased','Poor exam results'];
+  var upCaret = '<svg width="10" height="10" viewBox="0 0 8 8" fill="none" style="flex:none;vertical-align:middle"><path d="M4 2L7 6H1Z" fill="#27BD86"/></svg>';
+  var downCaret = '<svg width="10" height="10" viewBox="0 0 8 8" fill="none" style="flex:none;vertical-align:middle"><path d="M4 6L1 2H7Z" fill="#F03D3D"/></svg>';
+  var flatCaret = '<svg width="10" height="10" viewBox="0 0 8 8" fill="none" style="flex:none;vertical-align:middle"><path d="M1 4H7" stroke="var(--fg-muted)" stroke-width="1.5"/></svg>';
   ch.style.display = 'flex';
   ch.style.flexDirection = 'column';
   ch.style.gap = '6px';
   if (diff > 0) {
     ch.style.background = 'rgba(39,189,134,0.08)';
     ch.style.border = '1px solid rgba(39,189,134,0.2)';
-    ch.innerHTML = '<div><span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">+' + diff + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + posReasons[t.score % posReasons.length] + '</div>';
+    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + upCaret + '<span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">Heading in the right direction — keep going</div>';
   } else if (diff < 0) {
     ch.style.background = 'rgba(240,61,61,0.06)';
     ch.style.border = '1px solid rgba(240,61,61,0.15)';
-    ch.innerHTML = '<div><span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + diff + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + negReasons[t.score % negReasons.length] + '</div>';
+    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + downCaret + '<span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">' + Math.abs(diff) + '</span> <span>this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">A practice session this week will help turn this around</div>';
   } else {
     ch.style.background = 'rgba(20,20,20,0.03)';
     ch.style.border = '1px solid rgba(20,20,20,0.08)';
-    var noChangeReasons = ['Practice accuracy stayed the same','Practice quantity stayed the same','No exam results this week'];
-    ch.innerHTML = '<div style="color:var(--fg-secondary)"><span style="font-family:var(--font-mono);font-weight:600">0</span> change this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + noChangeReasons[t.score % noChangeReasons.length] + '</div>';
+    ch.innerHTML = '<div style="display:flex;align-items:center;gap:6px">' + flatCaret + '<span style="font-family:var(--font-mono);font-weight:600;color:var(--fg-secondary)">No change</span> <span style="color:var(--fg-secondary)">this week</span></div><div style="font-size:12px;color:var(--fg-secondary)">Practice to get this moving</div>';
   }
 
   // Contextual nudge
