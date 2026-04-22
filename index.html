@@ -3649,11 +3649,28 @@ P.calendar = {
     });
 
     // Today button
-    cal.querySelector('.cal__today-btn').addEventListener('click', () => {
+    const todayBtnEl = cal.querySelector('.cal__today-btn');
+    if (todayBtnEl) todayBtnEl.addEventListener('click', e => {
+      e.stopPropagation();
       cal.querySelectorAll('.cal__day').forEach(b => b.classList.remove('is-selected'));
-      const today = cal.querySelector('.cal__day.is-today');
-      if (today) today.classList.add('is-selected');
+      const todayEl = cal.querySelector('.cal__day.is-today');
+      if (todayEl) todayEl.classList.add('is-selected');
       collapse();
+    });
+
+    // Arrow navigation — move selection prev/next day
+    const navBtns = cal.querySelectorAll('.icon-btn');
+    const allDays = Array.from(cal.querySelectorAll('.cal__day:not(.is-outside)'));
+    function getSelectedIdx() { return allDays.findIndex(d => d.classList.contains('is-selected')); }
+    if (navBtns[0]) navBtns[0].addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = getSelectedIdx();
+      if (idx > 0) { allDays.forEach(d => d.classList.remove('is-selected')); allDays[idx-1].classList.add('is-selected'); }
+    });
+    if (navBtns[1]) navBtns[1].addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = getSelectedIdx();
+      if (idx < allDays.length - 1) { allDays.forEach(d => d.classList.remove('is-selected')); allDays[idx+1].classList.add('is-selected'); }
     });
   },
   renderCode() {

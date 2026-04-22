@@ -533,7 +533,7 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .cal__day:hover { background: var(--hover-overlay); }
-.cal__day.is-today { font-weight: var(--fw-700); background: var(--hover-overlay); box-shadow: inset 0 0 0 1.5px var(--fg-faint); }
+.cal__day.is-today { font-weight: var(--fw-700); background: var(--hover-overlay); }
 .cal__day.is-selected {
   background: var(--accent); color: var(--accent-fg); box-shadow: none;
 }
