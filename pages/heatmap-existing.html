@@ -258,9 +258,9 @@ function renderTile(t, section) {
   var mastered = t.score !== null && t.score >= 80;
   if (mastered) tile.classList.add('is-mastered');
   var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="#fff" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
-  // Diff indicator bottom-right
+  // Diff indicator bottom-right (not on mastered)
   var diffHtml = '';
-  if (t.score !== null && diff !== 0) {
+  if (t.score !== null && diff !== 0 && !mastered) {
     var diffCaret = diff > 0
       ? '<svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.4)"/></svg>'
       : '<svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.4)"/></svg>';
