@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Voice Tutor Session - Proven Routes</title>
+<link rel="stylesheet" href="../project/tokens.css">
+<link rel="stylesheet" href="../project/components.css">
+<style>
+*{box-sizing:border-box}
+
+.frame {
+  width: 375px;
+  height: 812px;
+  margin: 40px auto;
+  background: var(--void-300);
+  border-radius: 40px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 8px var(--void-100), 0 40px 80px -20px rgba(0,0,0,0.6);
+  font-family: var(--font-sans);
+  color: var(--chalk-200);
+}
+
+.status-bar {
+  height: 44px; padding: 0 var(--sp-6);
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 12px; color: rgba(232,228,220,0.5); flex: none;
+}
+
+.ctx {
+  padding: var(--sp-3) var(--sp-6);
+  border-bottom: 1px solid rgba(232,228,220,0.06);
+  flex: none;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ctx__topic { font-family: var(--font-sans); font-size: 15px; font-weight: 500; color: var(--chalk-200); }
+.ctx__label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: rgba(232,228,220,0.35); }
+
+.chat { flex: 1; overflow-y: auto; padding: var(--sp-5) var(--sp-6) 20px; display: flex; flex-direction: column; gap: var(--sp-5); scrollbar-width: none; -ms-overflow-style: none; }
+.chat::-webkit-scrollbar { display: none; }
+
+.msg-tutor {
+  border-left: 2px solid rgba(176,138,249,0.4);
+  padding-left: var(--sp-4); margin-right: 15%;
+  font-size: 14px; line-height: 1.55; color: var(--chalk-200);
+}
+.msg-tutor.is-streaming { border-left-color: rgba(176,138,249,0.6); }
+
+.msg-student {
+  border-right: 2px solid rgba(100,216,174,0.4);
+  padding: var(--sp-3) var(--sp-4); text-align: right;
+  background: rgba(232,228,220,0.04);
+  border-radius: var(--r-2) 0 0 var(--r-2); margin-left: 15%;
+  font-size: 14px; line-height: 1.55; color: var(--chalk-200);
+}
+.msg-student.is-unconfirmed {
+  border-right-color: rgba(100,216,174,0.1);
+  background: rgba(232,228,220,0.02);
+  color: rgba(232,228,220,0.3); font-style: italic;
+}
+
+.block {
+  background: rgba(232,228,220,0.03);
+  border-radius: var(--r-2); padding: var(--sp-4);
+}
+.block__label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: rgba(176,138,249,0.6); margin-bottom: var(--sp-2); }
+.block__title { font-family: var(--font-serif); font-size: 15px; color: var(--chalk-200); margin-bottom: var(--sp-1); }
+.block__desc { font-size: 13px; color: rgba(232,228,220,0.55); margin-bottom: var(--sp-3); }
+.block-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.block-list__item { display: flex; gap: var(--sp-2); align-items: baseline; font-size: 13px; color: rgba(232,228,220,0.75); line-height: 1.5; }
+.block-list__dot { width: 4px; height: 4px; border-radius: 1px; background: rgba(176,138,249,0.5); flex: none; margin-top: 6px; }
+
+.tutor-panel {
+  flex: none;
+  border-top: 1px solid rgba(232,228,220,0.06);
+  background: rgba(232,228,220,0.02);
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--sp-6) var(--sp-6) var(--sp-5);
+}
+.tutor-panel__aura { width: 80px; height: 80px; position: relative; display: flex; align-items: center; justify-content: center; }
+.tutor-panel__glow { position: absolute; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(ellipse, rgba(176,138,249,0.12) 0%, transparent 65%); transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.tutor-panel__core { width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle, rgba(212,160,255,1), rgba(176,138,249,0.95)); box-shadow: 0 0 20px rgba(176,138,249,0.4), 0 0 50px rgba(176,138,249,0.1); position: relative; transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.tutor-panel__status { font-size: 12px; color: rgba(176,138,249,0.6); margin-top: var(--sp-3); letter-spacing: 0.05em; }
+
+[data-state="idle"] .tutor-panel__core { animation: vt-breathe 4s ease-in-out infinite; }
+[data-state="idle"] .tutor-panel__glow { animation: vt-breathe 4s ease-in-out infinite; }
+[data-state="listening"] .tutor-panel__core { width: 36px; height: 36px; animation: vt-listen-core 3s ease-in-out infinite; box-shadow: 0 0 30px rgba(176,138,249,0.5); }
+[data-state="listening"] .tutor-panel__glow { width: 90px; height: 90px; animation: vt-listen-aura 3s ease-in-out infinite; }
+[data-state="thinking"] .tutor-panel__core { width: 20px; height: 20px; animation: vt-think 2s ease-in-out infinite; }
+[data-state="thinking"] .tutor-panel__glow { width: 50px; height: 50px; opacity: 0.5; }
+.tutor-panel__orbit { position: absolute; width: 50px; height: 50px; opacity: 0; pointer-events: none; }
+.tutor-panel__dot { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: rgba(176,138,249,0.5); }
+[data-state="thinking"] .tutor-panel__orbit { opacity: 1; animation: vt-orbit 2s linear infinite; }
+[data-state="speaking"] .tutor-panel__core { width: 36px; height: 36px; animation: vt-speak-core 0.4s ease-in-out infinite; box-shadow: 0 0 40px rgba(176,138,249,0.7), 0 0 100px rgba(176,138,249,0.2); }
+[data-state="speaking"] .tutor-panel__glow { width: 100px; height: 100px; animation: vt-radiate 1s ease-in-out infinite; }
+
+.typing { display: flex; gap: 4px; padding: 4px 0; }
+.typing__dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(176,138,249,0.5); animation: typingBounce 1.2s ease-in-out infinite; }
+.typing__dot:nth-child(2) { animation-delay: 0.15s; }
+.typing__dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.safe-bottom { height: 22px; flex: none; }
+
+@keyframes vt-orbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes vt-breathe{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.08);filter:brightness(1.15)}}
+@keyframes vt-listen-aura{0%,100%{transform:scale(0.85);opacity:0.5}50%{transform:scale(1.15);opacity:0.85}}
+@keyframes vt-listen-core{0%,100%{transform:scale(0.92);filter:brightness(0.95)}50%{transform:scale(1.12);filter:brightness(1.15)}}
+@keyframes vt-think{0%{transform:scale(0.92) rotate(0deg)}25%{transform:scale(1.02) rotate(5deg)}50%{transform:scale(0.95) rotate(0deg)}75%{transform:scale(1.0) rotate(-5deg)}100%{transform:scale(0.92) rotate(0deg)}}
+@keyframes vt-speak-core{0%,100%{transform:scale(1)}25%{transform:scale(1.08)}50%{transform:scale(0.96)}75%{transform:scale(1.04)}}
+@keyframes vt-radiate{0%,100%{transform:scale(0.9);opacity:0.6}50%{transform:scale(1.1);opacity:1}}
+</style>
+</head>
+<body style="background:var(--void-400);margin:0">
+
+<div class="frame" id="frame" data-state="idle">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span style="display:flex;gap:6px;align-items:center">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="0.5" opacity="0.3"/><rect x="4" y="2" width="3" height="10" rx="0.5" opacity="0.5"/><rect x="8" y="1" width="3" height="11" rx="0.5" opacity="0.7"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="22" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="18" height="11" rx="2"/><rect x="19" y="3.5" width="2" height="5" rx="0.5" fill="currentColor"/><rect x="2" y="2" width="12" height="8" rx="1" fill="currentColor" stroke="none"/></svg>
+    </span>
+  </div>
+  <div class="ctx">
+    <div style="display:flex;align-items:center;gap:var(--sp-3)">
+      <button style="background:none;border:0;color:rgba(232,228,220,0.5);cursor:pointer;padding:4px;display:flex" onclick="history.back()">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4l-5 5 5 5"/></svg>
+      </button>
+      <div>
+        <div class="ctx__topic" style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:#c55a4e;flex:none"></span>Trigonometry recap</div>
+      </div>
+    </div>
+    <button style="background:none;border:0;color:var(--fg-subtle);cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:500">Skip</button>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="tutor-panel">
+    <div class="tutor-panel__aura">
+      <div class="tutor-panel__glow"></div>
+      <div class="tutor-panel__orbit">
+        <div class="tutor-panel__dot" style="top:0;left:50%;margin-left:-2.5px"></div>
+        <div class="tutor-panel__dot" style="bottom:0;right:0;width:4px;height:4px"></div>
+        <div class="tutor-panel__dot" style="top:50%;left:0;margin-top:-1.5px;width:3px;height:3px"></div>
+      </div>
+      <div class="tutor-panel__core"></div>
+    </div>
+    <div class="tutor-panel__status" id="tutorStatus">Starting session...</div>
+  </div>
+</div>
+
+<script>
+const chat = document.getElementById('chat');
+const frame = document.getElementById('frame');
+const statusEl = document.getElementById('tutorStatus');
+
+function setState(s, label) {
+  frame.dataset.state = s;
+  if (label) statusEl.textContent = label;
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function addTyping() {
+  const d = document.createElement('div');
+  d.className = 'msg-tutor'; d.id = 'typing';
+  d.innerHTML = '<div class="typing"><div class="typing__dot"></div><div class="typing__dot"></div><div class="typing__dot"></div></div>';
+  chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing'); if(t) t.remove(); }
+
+async function tutorSays(text) {
+  setState('thinking', 'Thinking...');
+  addTyping();
+  await wait(800 + Math.random() * 600);
+  removeTyping();
+  setState('speaking', 'Speaking...');
+  const el = document.createElement('div');
+  el.className = 'msg-tutor is-streaming';
+  chat.appendChild(el);
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    chat.scrollTop = chat.scrollHeight;
+    await wait(18 + Math.random() * 12);
+  }
+  el.classList.remove('is-streaming');
+  await wait(200);
+}
+
+async function studentSays(text) {
+  setState('listening', 'Listening...');
+  const el = document.createElement('div');
+  el.className = 'msg-student is-unconfirmed';
+  chat.appendChild(el);
+  // Simulate speech recognition word by word
+  const words = text.split(' ');
+  for (let i = 0; i < words.length; i++) {
+    el.textContent = words.slice(0, i+1).join(' ');
+    chat.scrollTop = chat.scrollHeight;
+    await wait(150 + Math.random() * 200);
+  }
+  await wait(500);
+  el.classList.remove('is-unconfirmed');
+  await wait(300);
+}
+
+function addBlock(html, wide) {
+  const el = document.createElement('div');
+  el.className = 'block';
+  if (!wide) el.style.marginRight = '15%';
+  el.innerHTML = html;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showCTA(text) {
+  document.querySelector('.tutor-panel').style.display = 'none';
+  const bar = document.createElement('div');
+  bar.style.cssText = 'flex:none;padding:12px 24px 28px;border-top:1px solid rgba(232,228,220,0.06);background:rgba(232,228,220,0.02)';
+  bar.innerHTML = '<button class="btn btn--primary btn--block" style="height:48px;font-size:15px">' + text + '</button>';
+  frame.appendChild(bar);
+}
+
+function addHTML(html) {
+  var d = document.createElement('div');
+  d.innerHTML = html;
+  var el = d.firstElementChild;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function runConversation() {
+  await wait(1500);
+
+  // 1
+  await tutorSays("So trig. What do you remember?");
+  setState('listening', 'Listening...');
+  await wait(1500);
+
+  // 2
+  await studentSays("I know SOH CAH TOA but I always forget which one to use when");
+  await wait(400);
+
+  // 3
+  await tutorSays("That's the common sticking point. It comes down to which two sides you're working with. If one of them is the hypotenuse, it's sine or cosine. If neither is the hypotenuse, it's tangent.");
+  setState('idle', '');
+  await wait(1200);
+
+  // 4
+  await studentSays("Ok so tangent is the odd one out. It's the one without the hypotenuse?");
+  await wait(400);
+
+  // 5
+  await tutorSays("Exactly. Here's how I think about it:");
+  await wait(300);
+
+  addBlock(
+    '<div class="block-list">' +
+    '<div class="block-list__item"><div class="block-list__dot"></div>Hypotenuse + opposite = <b>sine</b></div>' +
+    '<div class="block-list__item"><div class="block-list__dot"></div>Hypotenuse + adjacent = <b>cosine</b></div>' +
+    '<div class="block-list__item"><div class="block-list__dot"></div>No hypotenuse = <b>tangent</b></div>' +
+    '</div>'
+  );
+  setState('idle', '');
+  await wait(1800);
+
+  // 6
+  await studentSays("Oh that's way simpler than trying to remember the formulas. Just look at what sides I have");
+  await wait(400);
+
+  // 7
+  await tutorSays("That's it. Try this one to see if it clicks:");
+  await wait(300);
+
+  // Activity card appears
+  const act = document.createElement('div');
+  act.style.cssText = 'margin-right:15%;background:rgba(232,228,220,0.03);border-radius:4px;box-shadow:inset 0 0 0 1px rgba(232,228,220,0.08);cursor:pointer';
+  act.innerHTML = '<div style="padding:16px 20px"><div class="block__label">Activity</div><div class="block__title">Pick the right ratio</div><div class="block__desc">A triangle with two labeled sides. Tap the ratio that connects them.</div></div><div style="padding:0 20px 16px"><button class="btn btn--primary btn--sm">Start</button></div>';
+  chat.appendChild(act);
+  chat.scrollTo({top: chat.scrollHeight, behavior: 'smooth'});
+  setState('idle', '');
+  await wait(2500);
+
+  // Student taps Start
+  act.style.opacity = '0.5';
+  act.querySelector('button').textContent = 'Opening...';
+  await wait(600);
+
+  // Activity fullscreen - drag labels onto triangle
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:absolute;inset:0;background:rgba(6,9,19,0.97);z-index:10;display:flex;flex-direction:column;animation:fadeIn 0.3s ease';
+
+  // Use HTML divs instead of SVG for the triangle + labels
+  ov.innerHTML =
+    '<div style="padding:14px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(232,228,220,0.06)">' +
+    '<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:rgba(232,228,220,0.35)">Label the sides</span>' +
+    '</div>' +
+    '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">' +
+    // Triangle SVG - wider viewBox so labels don't clip
+    '<svg width="280" height="200" viewBox="-20 -10 280 190" fill="none" style="overflow:visible">' +
+    '<path d="M30,150 L200,150 L200,40 Z" stroke="rgba(232,228,220,0.4)" stroke-width="1.5"/>' +
+    '<rect x="188" y="138" width="12" height="12" stroke="rgba(232,228,220,0.2)" stroke-width="1" fill="none"/>' +
+    '<text x="42" y="142" fill="rgba(176,138,249,0.7)" font-family="sans-serif" font-size="14" font-style="italic">35°</text>' +
+    // Drop zones - below and right of triangle
+    '<rect x="80" y="156" width="70" height="18" rx="3" stroke="rgba(232,228,220,0.2)" stroke-width="1" stroke-dasharray="4 3" fill="none" id="z1"/>' +
+    '<rect x="206" y="83" width="56" height="18" rx="3" stroke="rgba(232,228,220,0.2)" stroke-width="1" stroke-dasharray="4 3" fill="none" id="z2"/>' +
+    '<text x="115" y="169" text-anchor="middle" fill="rgba(232,228,220,0.15)" font-family="monospace" font-size="9" id="z1t">drop here</text>' +
+    '<text x="234" y="96" text-anchor="middle" fill="rgba(232,228,220,0.15)" font-family="monospace" font-size="9" id="z2t">drop here</text>' +
+    // Hypotenuse - already labeled
+    '<text x="95" y="86" fill="rgba(232,228,220,0.45)" font-family="monospace" font-size="10" transform="rotate(-33 95 86)">Hyp = 15</text>' +
+    '</svg>' +
+    '<div style="font-size:13px;color:rgba(232,228,220,0.45);text-align:center">Drag each label to the correct side</div>' +
+    // Label chips to drag
+    '<div style="display:flex;gap:10px" id="chips">' +
+    '<div style="padding:8px 16px;border-radius:4px;background:rgba(232,228,220,0.06);box-shadow:inset 0 0 0 1px rgba(232,228,220,0.12);color:#e8e4dc;font-size:13px;font-family:monospace;transition:all 0.3s ease" id="cOpp">Opposite</div>' +
+    '<div style="padding:8px 16px;border-radius:4px;background:rgba(232,228,220,0.06);box-shadow:inset 0 0 0 1px rgba(232,228,220,0.12);color:#e8e4dc;font-size:13px;font-family:monospace;transition:all 0.3s ease" id="cAdj">Adjacent</div>' +
+    '</div>' +
+    '</div>' +
+    '<div style="padding:0 24px 16px;display:flex;gap:3px;height:5px">' +
+    '<div style="flex:1;border-radius:2px;background:rgba(232,228,220,0.08)" id="b1"></div>' +
+    '<div style="flex:1;border-radius:2px;background:rgba(232,228,220,0.08)" id="b2"></div>' +
+    '</div>';
+  frame.appendChild(ov);
+  await wait(2000);
+
+  // Student drags "Adjacent" to bottom zone
+  ov.querySelector('#cAdj').style.cssText = 'padding:8px 16px;border-radius:4px;background:rgba(100,216,174,0.1);box-shadow:inset 0 0 0 1px rgba(100,216,174,0.3);color:#64D8AE;font-size:13px;font-family:monospace;opacity:0.4;transform:scale(0.9)';
+  ov.querySelector('#z1').setAttribute('stroke','rgba(100,216,174,0.4)');
+  ov.querySelector('#z1').setAttribute('stroke-dasharray','');
+  ov.querySelector('#z1t').textContent = 'Adjacent';
+  ov.querySelector('#z1t').setAttribute('fill','#64D8AE');
+  ov.querySelector('#z1t').setAttribute('font-size','10');
+  ov.querySelector('#b1').style.background = '#64D8AE';
+  await wait(1200);
+
+  // Student drags "Opposite" to right zone
+  ov.querySelector('#cOpp').style.cssText = ov.querySelector('#cAdj').style.cssText;
+  ov.querySelector('#z2').setAttribute('stroke','rgba(100,216,174,0.4)');
+  ov.querySelector('#z2').setAttribute('stroke-dasharray','');
+  ov.querySelector('#z2t').textContent = 'Opposite';
+  ov.querySelector('#z2t').setAttribute('fill','#64D8AE');
+  ov.querySelector('#z2t').setAttribute('font-size','10');
+  ov.querySelector('#b2').style.background = '#64D8AE';
+  await wait(1000);
+
+  // Done
+  ov.style.transition = 'opacity 0.3s ease';
+  ov.style.opacity = '0';
+  await wait(300);
+  ov.remove();
+
+  // Update card to complete
+  act.style.opacity = '1';
+  act.style.cssText = 'margin-right:15%;background:rgba(232,228,220,0.03);border-radius:4px;box-shadow:inset 0 0 0 1px rgba(100,216,174,0.2)';
+  act.innerHTML =
+    '<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center">' +
+    '<div><div class="block__label" style="color:rgba(100,216,174,0.6)">Complete</div><div style="font-size:13px;color:#e8e4dc">Label the sides</div></div>' +
+    '<span style="font-family:monospace;font-size:13px;color:#64D8AE">2/2</span>' +
+    '</div>' +
+    '<div style="display:flex;gap:3px;padding:0 20px 12px;height:4px"><div style="flex:1;background:#64D8AE;border-radius:2px"></div><div style="flex:1;background:#64D8AE;border-radius:2px"></div></div>';
+  chat.scrollTo({top: chat.scrollHeight, behavior: 'smooth'});
+  await wait(800);
+
+  // Post-activity
+  await tutorSays("You got both right away. You know your sides.");
+  setState('listening', 'Listening...');
+  await wait(1500);
+
+  await studentSays("Yeah that actually made it click. Seeing the triangle and placing the labels myself helped");
+  await wait(400);
+
+  // Wrap up
+  await tutorSays("Good. Here's a walkthrough and some reference if you want it.");
+  await wait(400);
+
+  // Video block - plain HTML, same approach as tutor messages
+  // Video block - added as a tutor-side element like a message
+  var vb = document.createElement('div');
+  vb.className = 'msg-tutor';
+  vb.style.padding = '0';
+  vb.style.borderLeft = 'none';
+  vb.innerHTML = '<div style="border-radius:4px;overflow:hidden;border:1px solid rgba(232,228,220,0.1);cursor:pointer">' +
+    '<div style="height:140px;background:linear-gradient(135deg,rgba(232,228,220,0.06),rgba(232,228,220,0.02));display:flex;align-items:center;justify-content:center;position:relative">' +
+    '<div style="width:44px;height:44px;border-radius:50%;background:rgba(232,228,220,0.08);display:flex;align-items:center;justify-content:center">' +
+    '<div style="width:0;height:0;border-left:12px solid rgba(232,228,220,0.6);border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px"></div>' +
+    '</div>' +
+    '<div style="position:absolute;bottom:8px;right:10px;font-family:monospace;font-size:10px;color:rgba(232,228,220,0.4);background:rgba(6,9,19,0.6);padding:2px 6px;border-radius:2px">3:45</div>' +
+    '</div>' +
+    '<div style="padding:12px 16px;background:rgba(232,228,220,0.03)">' +
+    '<div style="font-size:13px;color:#e8e4dc;font-weight:500">When to use sin, cos, tan</div>' +
+    '<div style="font-size:11px;color:rgba(232,228,220,0.4);margin-top:2px">Star Teacher - Ms. Al-Harbi</div>' +
+    '</div></div>';
+  chat.appendChild(vb);
+  chat.scrollTop = 999999;
+  await wait(1200);
+
+  // Resources block - plain HTML
+  addHTML('<div style="margin-right:15%;background:rgba(232,228,220,0.03);border-radius:4px;padding:16px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:rgba(232,228,220,0.35);margin-bottom:12px">Resources</div><div style="display:flex;flex-direction:column;gap:8px"><a href="#" onclick="return false" style="font-size:13px;color:#64D8AE;text-decoration:none">SOH CAH TOA decision tree</a><a href="#" onclick="return false" style="font-size:13px;color:#64D8AE;text-decoration:none">Quick reference card</a></div></div>');
+  setState('idle', 'Session complete');
+  await wait(1000);
+
+  showCTA('Continue to questions');
+}
+
+runConversation();
+</script>
+</body>
+</html>

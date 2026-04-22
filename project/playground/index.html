@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Noon Academy — Design System Playground</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  body { overflow: hidden; }
+  .app { display: grid; grid-template-columns: 240px 1fr 320px; block-size: 100vh; }
+
+  /* Sidebar */
+  .nav { background: var(--bg-sunken); border-inline-end: 1px solid var(--border); padding: var(--sp-5) 0; display: flex; flex-direction: column; }
+  .nav__brand { padding: 0 var(--sp-5) var(--sp-6); display: flex; align-items: baseline; gap: var(--sp-2); }
+  .nav__brand strong { font-family: var(--font-serif); font-weight: var(--fw-500); font-size: var(--fs-18); letter-spacing: var(--tr-tight); color: var(--fg); }
+  .nav__brand em { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-style: normal; }
+  .nav__group { padding: 0 var(--sp-3); margin-block-end: var(--sp-5); }
+  .nav__heading { font-family: var(--font-sans); font-size: 11px; letter-spacing: var(--tr-caps); text-transform: uppercase; font-weight: var(--fw-600); color: var(--fg-faint); padding: 0 var(--sp-3) var(--sp-2); }
+  .nav__item { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding: 6px var(--sp-3); border-radius: var(--r-1); color: var(--fg-muted); font-size: var(--fs-14); cursor: pointer; user-select: none; border: 0; background: transparent; inline-size: 100%; text-align: start; font-family: var(--font-sans); }
+  .nav__item:hover { color: var(--fg); background: rgba(232,228,220,0.04); }
+  .nav__item.is-on { color: var(--fg); background: rgba(232,228,220,0.08); }
+  .nav__item code { font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); }
+
+  /* Stage */
+  .stage { overflow-y: auto; padding: var(--sp-8) var(--sp-9); background:
+    radial-gradient(ellipse at 50% 0%, rgba(100,216,174,0.04) 0%, transparent 40%),
+    var(--bg);
+  }
+  .stage__header { margin-block-end: var(--sp-7); display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-5); }
+  .stage__title { font-family: var(--font-serif); font-size: var(--fs-32); font-weight: var(--fw-400); margin: 0; letter-spacing: var(--tr-tight); color: var(--fg); }
+  .stage__sub { font-family: var(--font-serif); font-style: italic; color: var(--fg-subtle); font-size: var(--fs-15); margin: 4px 0 0; }
+  .stage__meta { font-family: var(--font-mono); font-size: var(--fs-12); color: var(--fg-faint); display: flex; gap: var(--sp-4); }
+  .stage__meta b { color: var(--fg-subtle); font-weight: var(--fw-500); }
+
+  .canvas { background: var(--bg-raised); border-radius: var(--r-3); box-shadow: inset 0 0 0 1px var(--border); padding: var(--sp-9) var(--sp-7); min-block-size: 320px; display: grid; place-items: center; position: relative; overflow: hidden; }
+  .canvas::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(232,228,220,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,228,220,0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+  .canvas > * { position: relative; }
+  .canvas--compact { padding: var(--sp-6); min-block-size: 0; }
+  .canvas--start { place-items: start stretch; }
+  .canvas--left { justify-items: start; }
+
+  .row { display: flex; gap: var(--sp-4); flex-wrap: wrap; align-items: center; }
+  .col { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+  /* Specs */
+  .specs { margin-block-start: var(--sp-6); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .spec { background: var(--bg-sunken); border-radius: var(--r-2); padding: var(--sp-5); box-shadow: inset 0 0 0 1px var(--border); }
+  .spec h4 { font-family: var(--font-sans); font-size: 11px; letter-spacing: var(--tr-caps); text-transform: uppercase; font-weight: var(--fw-600); color: var(--fg-faint); margin: 0 0 var(--sp-3); }
+  .spec dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-12); }
+  .spec dt { color: var(--fg-subtle); }
+  .spec dd { margin: 0; color: var(--fg); }
+
+  .code { background: var(--bg-sunken); border-radius: var(--r-2); padding: var(--sp-5); box-shadow: inset 0 0 0 1px var(--border); margin-block-start: var(--sp-5); position: relative; }
+  .code pre { margin: 0; font-family: var(--font-mono); font-size: var(--fs-12); color: var(--fg); line-height: 1.6; overflow-x: auto; }
+  .code .tag { color: var(--iris-300); }
+  .code .attr { color: var(--noon-300); }
+  .code .str { color: var(--gold-200); }
+  .code .com { color: var(--fg-faint); font-style: italic; }
+  .code__copy { position: absolute; inset-block-start: var(--sp-3); inset-inline-end: var(--sp-3); background: transparent; border: 0; color: var(--fg-subtle); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; padding: 4px 8px; border-radius: var(--r-1); }
+  .code__copy:hover { color: var(--fg); background: rgba(232,228,220,0.06); }
+
+  /* Knobs */
+  .knobs { background: var(--bg-sunken); border-inline-start: 1px solid var(--border); padding: var(--sp-6); overflow-y: auto; }
+  .knobs__title { font-family: var(--font-sans); font-size: 11px; letter-spacing: var(--tr-caps); text-transform: uppercase; font-weight: var(--fw-600); color: var(--fg-faint); margin: 0 0 var(--sp-5); display: flex; align-items: center; gap: var(--sp-2); }
+  .knobs__title::before { content: ""; inline-size: 6px; block-size: 6px; background: var(--accent); transform: rotate(45deg); }
+  .knob { margin-block-end: var(--sp-5); }
+  .knob__label { font-family: var(--font-sans); font-size: var(--fs-12); font-weight: var(--fw-500); color: var(--fg-muted); margin-block-end: var(--sp-2); display: flex; justify-content: space-between; align-items: center; }
+  .knob__label code { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: var(--fw-400); }
+  .knob__options { display: flex; flex-wrap: wrap; gap: 2px; background: var(--bg); padding: 2px; border-radius: var(--r-2); box-shadow: inset 0 0 0 1px var(--border); }
+  .knob__options button { flex: 1; min-inline-size: max-content; background: transparent; border: 0; color: var(--fg-subtle); font: inherit; font-size: var(--fs-12); font-family: var(--font-mono); padding: 6px 10px; border-radius: var(--r-1); cursor: pointer; text-align: center; }
+  .knob__options button:hover { color: var(--fg); }
+  .knob__options button.is-on { background: var(--bg-raised); color: var(--fg); box-shadow: inset 0 0 0 1px var(--border-strong); }
+  .knob__toggle { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-3) 0; border-block-end: 1px solid var(--divider); }
+  .knob__toggle:last-child { border-block-end: 0; }
+
+  /* Toggle all booleans into one section */
+  .knobs__section { margin-block-end: var(--sp-6); }
+  .knobs__sectionTitle { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-faint); margin: 0 0 var(--sp-3); padding-block-end: var(--sp-2); border-block-end: 1px solid var(--divider); }
+
+  /* Inline meta banner (RTL/theme info) */
+  .banner { display: flex; gap: var(--sp-3); align-items: center; padding: var(--sp-3) var(--sp-4); background: var(--bg-sunken); border-radius: var(--r-1); box-shadow: inset 0 0 0 1px var(--border); font-family: var(--font-mono); font-size: 11px; color: var(--fg-subtle); }
+  .banner b { color: var(--fg); font-weight: var(--fw-500); }
+
+  /* Preset buttons at top of stage */
+  .stage__controls { display: flex; gap: var(--sp-2); align-items: center; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ NAV ============ -->
+  <aside class="nav" id="nav">
+    <div class="nav__brand">
+      <strong>Noon</strong>
+      <em>/ design system</em>
+    </div>
+    <!-- populated by JS -->
+  </aside>
+
+  <!-- ============ STAGE ============ -->
+  <main class="stage">
+    <header class="stage__header">
+      <div>
+        <h1 class="stage__title" id="compTitle">Button</h1>
+        <p class="stage__sub" id="compSub">Ink on signal. Primary action per surface.</p>
+      </div>
+      <div class="stage__meta">
+        <span><b id="metaStates">0</b> states</span>
+        <span><b id="metaProps">0</b> props</span>
+        <span><b>void</b> theme</span>
+      </div>
+    </header>
+
+    <div id="stage" class="canvas"></div>
+
+    <div class="specs">
+      <div class="spec">
+        <h4>Anatomy</h4>
+        <dl id="anatomy"></dl>
+      </div>
+      <div class="spec">
+        <h4>Tokens in use</h4>
+        <dl id="tokens"></dl>
+      </div>
+    </div>
+
+    <div class="code">
+      <button class="code__copy" id="copyBtn">Copy</button>
+      <pre id="codeOut"></pre>
+    </div>
+  </main>
+
+  <!-- ============ KNOBS ============ -->
+  <aside class="knobs">
+    <h3 class="knobs__title">Props</h3>
+    <div id="knobs"></div>
+  </aside>
+</div>
+
+<script>
+// Noon Academy — component registry
+// Every component has: render(props), knobs, anatomy, tokens, code(props)
+
+const REG = {};
+
+/* ============ BUTTON ============ */
+REG.button = {
+  title: 'Button',
+  sub: 'Primary, secondary, ghost, danger. Three sizes, six states.',
+  group: 'Actions',
+  defaults: { variant: 'primary', size: 'md', state: 'default', icon: 'none', block: false, disabled: false },
+  knobs: [
+    { id: 'variant', type: 'options', opts: ['primary','secondary','ghost','danger','danger-solid'] },
+    { id: 'size',    type: 'options', opts: ['sm','md','lg'] },
+    { id: 'state',   type: 'options', opts: ['default','hover','focus','active','loading'] },
+    { id: 'icon',    type: 'options', opts: ['none','start','end','only'] },
+    { id: 'block',   type: 'toggle', label: 'Full width' },
+    { id: 'disabled',type: 'toggle', label: 'Disabled' },
+  ],
+  anatomy: {
+    'height': 'var(--h-{size})', 'padding-x': 'var(--sp-3/5/6)',
+    'radius': 'var(--r-2)', 'font': 'Work Sans 600 / 13-15px',
+  },
+  tokens: {
+    '--accent': '#64D8AE', '--accent-fg': '#0a3326',
+    '--focus-ring': 'blue-400 @ 24%', 'transition': '120ms',
+  },
+  render(p) {
+    const cls = ['btn','btn--'+p.variant,'btn--'+p.size];
+    if (p.block) cls.push('btn--block');
+    if (p.icon === 'only') cls.push('btn--icon');
+    if (p.state === 'loading') cls.push('is-loading');
+    const stateAttr = (p.state === 'hover' || p.state === 'active' || p.state === 'focus')
+      ? ` data-force="${p.state}"` : '';
+    const ico = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 7l3 3 5-6"/></svg>`;
+    let inner = 'Continue route';
+    if (p.icon === 'only') inner = ico;
+    else if (p.icon === 'start') inner = `${ico}<span>Continue route</span>`;
+    else if (p.icon === 'end') inner = `<span>Continue route</span>${ico}`;
+    return `<button class="${cls.join(' ')}"${p.disabled?' disabled':''}${stateAttr}>${inner}</button>`;
+  },
+  code(p) {
+    const cls = `btn btn--${p.variant} btn--${p.size}${p.block?' btn--block':''}${p.icon==='only'?' btn--icon':''}${p.state==='loading'?' is-loading':''}`;
+    return `<button class="${cls}"${p.disabled?' disabled':''}>\n  Continue route\n</button>`;
+  }
+};
+
+/* ============ INPUT ============ */
+REG.input = {
+  title: 'Input',
+  sub: 'Text, number, search, password. All states.',
+  group: 'Forms',
+  defaults: { size: 'md', state: 'default', icon: false, label: true, hint: true, disabled: false, readonly: false, error: false },
+  knobs: [
+    { id: 'size',   type: 'options', opts: ['sm','md','lg'] },
+    { id: 'state',  type: 'options', opts: ['default','hover','focus','filled'] },
+    { id: 'icon',   type: 'toggle', label: 'Leading icon' },
+    { id: 'label',  type: 'toggle', label: 'Show label' },
+    { id: 'hint',   type: 'toggle', label: 'Show hint' },
+    { id: 'error',  type: 'toggle', label: 'Error state' },
+    { id: 'disabled', type: 'toggle', label: 'Disabled' },
+    { id: 'readonly', type: 'toggle', label: 'Read-only' },
+  ],
+  anatomy: { 'height': '32 / 40 / 48px', 'radius': 'var(--r-2)', 'border': 'inset 1px border-strong' },
+  tokens: { 'focus': 'inset 1px blue-400 + ring', 'error': 'inset 1px danger-400' },
+  render(p) {
+    const cls = ['input'];
+    if (p.error) cls.push('is-error');
+    if (p.state === 'hover' || p.state === 'focus') cls.push('state-'+p.state);
+    if (p.readonly) cls.push('is-readonly');
+    const attrs = [];
+    if (p.disabled) attrs.push('disabled');
+    if (p.readonly) attrs.push('readonly');
+    const val = p.state === 'filled' ? 'value="Fatima Al-Otaibi"' : 'placeholder="Your full name"';
+    const sty = p.size === 'sm' ? 'style="height:32px;font-size:13px"' : (p.size === 'lg' ? 'style="height:48px;font-size:15px"' : '');
+    const ico = p.icon ? `<span class="input-group__icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg></span>` : '';
+    const input = `<input class="${cls.join(' ')}" type="text" ${val} ${attrs.join(' ')} ${sty}>`;
+    const body = p.icon ? `<div class="input-group">${ico}${input}</div>` : input;
+    return `
+      <div class="field" style="inline-size:min(380px,100%)">
+        ${p.label?`<label class="field__label"><span>Full name</span>${!p.error?'<em>required</em>':''}</label>`:''}
+        ${body}
+        ${p.error ? `<span class="field__err">Enter your name as it appears on your ID</span>` : (p.hint ? `<span class="field__hint">As shown on your national ID</span>` : '')}
+      </div>`;
+  },
+  code(p) {
+    return `<div class="field">\n  <label class="field__label">Full name</label>\n  <input class="input${p.error?' is-error':''}" type="text" placeholder="Your full name"${p.disabled?' disabled':''}>\n</div>`;
+  }
+};
+
+/* ============ SELECT ============ */
+REG.select = {
+  title: 'Select',
+  sub: 'Native select styled as input.',
+  group: 'Forms',
+  defaults: { open: false, size: 'md' },
+  knobs: [
+    { id: 'size', type: 'options', opts: ['sm','md','lg'] },
+    { id: 'open', type: 'toggle', label: 'Show options' },
+  ],
+  anatomy: { 'height': '32/40/48px', 'chevron': '12px at end' },
+  tokens: { 'bg-popover': '#1a2236', 'shadow': 'z-3' },
+  render(p) {
+    if (p.open) {
+      return `
+        <div style="position:relative;inline-size:280px">
+          <button class="input" style="display:flex;align-items:center;justify-content:space-between;text-align:start">
+            <span>Qudrat — Verbal</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg>
+          </button>
+          <div class="menu" style="position:absolute;top:100%;margin-top:4px;inline-size:100%">
+            <div class="menu__item">Qudrat — Verbal</div>
+            <div class="menu__item">Qudrat — Quantitative</div>
+            <div class="menu__item">Tahsili — Biology</div>
+            <div class="menu__item">Tahsili — Chemistry</div>
+            <div class="menu__item">STEP — Reading</div>
+          </div>
+        </div>`;
+    }
+    return `<button class="input" style="inline-size:280px;display:flex;align-items:center;justify-content:space-between;text-align:start"><span>Qudrat — Verbal</span><svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l4 4 4-4"/></svg></button>`;
+  },
+  code(p) { return `<button class="input"><span>Qudrat</span><svg…/></button>\n<div class="menu">\n  <div class="menu__item">Qudrat — Verbal</div>\n</div>`; }
+};
+
+/* ============ CHECKBOX ============ */
+REG.checkbox = {
+  title: 'Checkbox',
+  sub: 'Multi-select. Checked, indeterminate, disabled.',
+  group: 'Forms',
+  defaults: { state: 'unchecked', disabled: false },
+  knobs: [
+    { id: 'state', type: 'options', opts: ['unchecked','checked','indeterminate','focus'] },
+    { id: 'disabled', type: 'toggle', label: 'Disabled' },
+  ],
+  anatomy: { size: '18×18', radius: 'var(--r-1)', 'check-color': 'accent-fg' },
+  tokens: { '--accent': '#64D8AE', 'border': 'border-strong' },
+  render(p) {
+    const checked = p.state === 'checked' || p.state === 'indeterminate';
+    const indet = p.state === 'indeterminate';
+    return `
+      <div class="col" style="gap:14px">
+        <label class="check ${indet?'is-indeterminate':''}">
+          <input type="checkbox" ${checked?'checked':''} ${p.disabled?'disabled':''}>
+          <span class="check__box"></span>
+          <span>Include past Qudrat results</span>
+        </label>
+      </div>`;
+  },
+  code(p) { return `<label class="check${p.state==='indeterminate'?' is-indeterminate':''}">\n  <input type="checkbox"${p.state==='checked'?' checked':''}>\n  <span class="check__box"></span>\n  <span>Label</span>\n</label>`; }
+};
+
+/* ============ RADIO ============ */
+REG.radio = {
+  title: 'Radio',
+  sub: 'One-of-many. Grouped selection.',
+  group: 'Forms',
+  defaults: { selected: 1 },
+  knobs: [{ id: 'selected', type: 'options', opts: ['0','1','2'] }],
+  anatomy: { size: '18×18', 'inner-dot': '5px ring' },
+  tokens: { '--accent': '#64D8AE' },
+  render(p) {
+    const sel = parseInt(p.selected);
+    const opts = ['Morning crew (6–8 AM)','Evening crew (8–10 PM)','Solo route'];
+    return `<div class="col" style="gap:12px">${opts.map((o,i)=>`
+      <label class="radio">
+        <input type="radio" name="r" ${i===sel?'checked':''}>
+        <span class="radio__box"></span>
+        <span>${o}</span>
+      </label>`).join('')}</div>`;
+  },
+  code() { return `<label class="radio">\n  <input type="radio" name="crew" checked>\n  <span class="radio__box"></span>\n  <span>Morning crew</span>\n</label>`; }
+};
+
+/* ============ SWITCH ============ */
+REG.switch = {
+  title: 'Switch',
+  sub: 'Binary toggle. Immediate effect.',
+  group: 'Forms',
+  defaults: { on: true, disabled: false },
+  knobs: [
+    { id: 'on', type: 'toggle', label: 'On' },
+    { id: 'disabled', type: 'toggle', label: 'Disabled' },
+  ],
+  anatomy: { track: '36×20', thumb: '16×16', motion: '200ms' },
+  tokens: { 'on': 'accent', 'off': 'chalk-200 on void' },
+  render(p) {
+    return `<label class="switch"><input type="checkbox" ${p.on?'checked':''} ${p.disabled?'disabled':''}><span class="switch__track"></span><span>Let crew see my mastery</span></label>`;
+  },
+  code(p) { return `<label class="switch">\n  <input type="checkbox"${p.on?' checked':''}>\n  <span class="switch__track"></span>\n  <span>Label</span>\n</label>`; }
+};
+
+/* ============ SEGMENTED ============ */
+REG.segmented = {
+  title: 'Segmented',
+  sub: 'Compact mode picker. 2–4 options.',
+  group: 'Forms',
+  defaults: { active: 1, count: 3 },
+  knobs: [
+    { id: 'count',  type: 'options', opts: ['2','3','4'] },
+    { id: 'active', type: 'options', opts: ['0','1','2','3'] },
+  ],
+  anatomy: { padding: '2px', height: 'auto' },
+  tokens: { 'on': 'bg-overlay + border-strong' },
+  render(p) {
+    const n = parseInt(p.count);
+    const a = parseInt(p.active);
+    const labels = ['Today','Week','Month','Year'];
+    return `<div class="seg">${Array.from({length:n}).map((_,i)=>`<button class="${i===a?'is-on':''}">${labels[i]}</button>`).join('')}</div>`;
+  },
+  code() { return `<div class="seg">\n  <button>Today</button>\n  <button class="is-on">Week</button>\n  <button>Month</button>\n</div>`; }
+};
+
+/* ============ CHIP ============ */
+REG.chip = {
+  title: 'Chip',
+  sub: 'Filter, choice, status. Dismissible.',
+  group: 'Display',
+  defaults: { variant: 'default', state: 'default', dismiss: false, dot: false },
+  knobs: [
+    { id: 'variant', type: 'options', opts: ['default','on','gold','ok','danger'] },
+    { id: 'state',   type: 'options', opts: ['default','hover','disabled'] },
+    { id: 'dot',     type: 'toggle', label: 'Leading dot' },
+    { id: 'dismiss', type: 'toggle', label: 'Dismissible' },
+  ],
+  anatomy: { height: '28px', padding: 'var(--sp-3)', radius: 'var(--r-1)' },
+  tokens: { 'on': 'accent-soft + accent-border', 'gold': 'signal-soft' },
+  render(p) {
+    const cls = ['chip','chip--interactive'];
+    if (p.variant === 'on') cls.push('is-on');
+    else if (p.variant !== 'default') cls.push('chip--'+p.variant);
+    if (p.state === 'disabled') cls.push('is-disabled');
+    const dot = p.dot ? `<span class="chip__dot"></span>` : '';
+    const x = p.dismiss ? `<span class="chip__x"><svg viewBox="0 0 10 10"><path d="M2 2l6 6M8 2l-6 6"/></svg></span>` : '';
+    return `<div class="row">
+      <span class="${cls.join(' ')}" ${p.state==='hover'?'data-force="hover"':''}>${dot}Qudrat${x}</span>
+      <span class="${cls.join(' ')}">${dot}Verbal reasoning${x}</span>
+      <span class="${cls.join(' ')}">${dot}Last 30 days${x}</span>
+    </div>`;
+  },
+  code(p) { return `<span class="chip${p.variant==='on'?' is-on':''}${p.variant!=='default'&&p.variant!=='on'?' chip--'+p.variant:''}">\n  ${p.dot?'<span class="chip__dot"></span>\n  ':''}Label${p.dismiss?'\n  <span class="chip__x">×</span>':''}\n</span>`; }
+};
+
+/* ============ BADGE ============ */
+REG.badge = {
+  title: 'Badge',
+  sub: 'Count, status dot, notification.',
+  group: 'Display',
+  defaults: { variant: 'default', kind: 'count' },
+  knobs: [
+    { id: 'kind', type: 'options', opts: ['count','dot','text'] },
+    { id: 'variant', type: 'options', opts: ['default','accent','danger'] },
+  ],
+  anatomy: { height: '18px', 'min-width': '18px' },
+  tokens: { default: 'fg on fg-inverse' },
+  render(p) {
+    const cls = ['badge'];
+    if (p.variant !== 'default') cls.push('badge--'+p.variant);
+    if (p.kind === 'dot') cls.push('badge--dot');
+    const body = p.kind === 'dot' ? '' : (p.kind === 'count' ? '12' : 'New');
+    return `<div class="row">
+      <span class="${cls.join(' ')}">${body}</span>
+      <div style="position:relative;display:inline-flex">
+        <button class="btn btn--secondary btn--sm">Notifications</button>
+        <span class="${cls.join(' ')}" style="position:absolute;top:-6px;inset-inline-end:-6px">${body}</span>
+      </div>
+    </div>`;
+  },
+  code(p) { return `<span class="badge${p.variant!=='default'?' badge--'+p.variant:''}">12</span>`; }
+};
+
+/* ============ AVATAR ============ */
+REG.avatar = {
+  title: 'Avatar',
+  sub: 'User presence. Five sizes + stacks.',
+  group: 'Display',
+  defaults: { size: 'md', variant: 'default', status: 'none' },
+  knobs: [
+    { id: 'size',    type: 'options', opts: ['xs','sm','md','lg','xl'] },
+    { id: 'variant', type: 'options', opts: ['default','noon','iris'] },
+    { id: 'status',  type: 'options', opts: ['none','online','busy','star'] },
+  ],
+  anatomy: { sizes: '24 · 32 · 40 · 56 · 72', stack: 'overlap -10px' },
+  tokens: { noon: 'accent + accent-fg', iris: 'iris-400 + void-300' },
+  render(p) {
+    const cls = ['avatar','avatar--'+p.size];
+    if (p.variant !== 'default') cls.push('avatar--'+p.variant);
+    const indicator = p.status === 'star' ? '<span class="avatar__star"></span>' :
+      p.status === 'online' ? '<span class="avatar__status avatar__status--online"></span>' :
+      p.status === 'busy' ? '<span class="avatar__status avatar__status--busy"></span>' : '';
+    return `<div class="col" style="gap:24px;align-items:center">
+      <span class="${cls.join(' ')}">F${indicator}</span>
+      <div class="avatar-stack">
+        <span class="avatar avatar--${p.size} avatar--noon">F</span>
+        <span class="avatar avatar--${p.size}">O</span>
+        <span class="avatar avatar--${p.size} avatar--iris">Y</span>
+        <span class="avatar avatar--${p.size}" style="font-family:var(--font-num);font-size:${p.size==='xs'?'10':'12'}px;color:var(--fg-subtle)">+4</span>
+      </div>
+    </div>`;
+  },
+  code(p) { return `<span class="avatar avatar--${p.size}${p.variant!=='default'?' avatar--'+p.variant:''}">F</span>`; }
+};
+
+/* ============ CARD ============ */
+REG.card = {
+  title: 'Card',
+  sub: 'Surface container. Default, interactive, selected.',
+  group: 'Display',
+  defaults: { state: 'default', kind: 'default' },
+  knobs: [
+    { id: 'kind',  type: 'options', opts: ['default','route','stat'] },
+    { id: 'state', type: 'options', opts: ['default','hover','selected','loading','error'] },
+  ],
+  anatomy: { padding: '20 / 24', radius: 'var(--r-2)', border: 'inset 1px border' },
+  tokens: { selected: 'accent-border', error: 'danger-border' },
+  render(p) {
+    const cls = ['card'];
+    if (p.kind !== 'stat') cls.push('card--interactive');
+    if (p.state === 'selected') cls.push('is-selected');
+    if (p.state === 'loading') cls.push('is-loading');
+    if (p.state === 'error') cls.push('is-error');
+    if (p.state === 'hover') cls.push('data-force-hover');
+
+    if (p.kind === 'route') {
+      return `<div class="${cls.join(' ')}" style="inline-size:min(380px,100%)">
+        <div class="row" style="justify-content:space-between;margin-bottom:16px">
+          <span class="caps">Route · Day 14 / 60</span>
+          <span class="chip chip--gold"><span class="chip__dot"></span>On pace</span>
+        </div>
+        <h3 style="font-family:var(--font-serif);font-size:24px;font-weight:500;margin:0 0 6px;letter-spacing:-0.015em">Qudrat — Verbal</h3>
+        <p style="font-family:var(--font-serif);font-style:italic;color:var(--fg-subtle);margin:0 0 20px">Analogies &amp; completion. 18 items today.</p>
+        <div class="progress progress--gold" style="margin-bottom:8px"><div class="progress__bar" style="width:62%"></div></div>
+        <div class="row" style="justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)"><span>62% mastery</span><span>92 target</span></div>
+      </div>`;
+    }
+    if (p.kind === 'stat') {
+      return `<div class="${cls.join(' ')}" style="inline-size:240px">
+        <div class="caps" style="margin-bottom:12px">Streak</div>
+        <div style="font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:48px;font-weight:300;color:var(--fg);letter-spacing:-0.02em;line-height:1">14<span style="font-size:18px;color:var(--fg-faint);margin-inline-start:6px">days</span></div>
+        <div class="row" style="margin-top:12px;gap:6px"><span class="chip chip--ok" style="height:22px;padding:0 8px;font-size:11px"><span class="chip__dot"></span>+3 this week</span></div>
+      </div>`;
+    }
+    return `<div class="${cls.join(' ')}" style="inline-size:min(380px,100%)">
+      <h3 style="font-family:var(--font-serif);font-size:20px;font-weight:500;margin:0 0 8px">Passage card</h3>
+      <p style="color:var(--fg-muted);margin:0 0 16px;font-size:14px">Default surface. Use for grouped content that doesn't need its own frame.</p>
+      <div class="row"><button class="btn btn--primary btn--sm">Continue</button><button class="btn btn--ghost btn--sm">Later</button></div>
+    </div>`;
+  },
+  code(p) { return `<div class="card${p.state==='selected'?' is-selected':''}">\n  <h3>Title</h3>\n  <p>Body</p>\n</div>`; }
+};
+
+/* ============ PROGRESS ============ */
+REG.progress = {
+  title: 'Route progress',
+  sub: 'Linear, circular, stepped route. Gold = journey.',
+  group: 'Feedback',
+  defaults: { kind: 'linear', value: 62, color: 'gold', indet: false },
+  knobs: [
+    { id: 'kind',  type: 'options', opts: ['linear','circular','steps'] },
+    { id: 'color', type: 'options', opts: ['gold','accent'] },
+    { id: 'value', type: 'options', opts: ['25','50','62','88','100'] },
+    { id: 'indet', type: 'toggle', label: 'Indeterminate (linear only)' },
+  ],
+  anatomy: { linear: '4px', circular: '48×48', step: '10px diamond' },
+  tokens: { gold: 'signal (c9a227) — journey', accent: 'noon — generic progress' },
+  render(p) {
+    const v = parseInt(p.value);
+    const colorCls = p.color === 'gold' ? 'progress--gold' : '';
+    if (p.kind === 'linear') {
+      return `<div class="col" style="inline-size:min(420px,100%);gap:12px">
+        <div class="progress ${colorCls} ${p.indet?'is-indeterminate':''}"><div class="progress__bar" style="width:${p.indet?'40':v}%"></div></div>
+        <div class="row" style="justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)">
+          <span>${p.indet?'Calibrating':v+'% complete'}</span>
+          <span>Day ${Math.round(v*60/100)} / 60</span>
+        </div>
+      </div>`;
+    }
+    if (p.kind === 'circular') {
+      const r = 20, c = 2 * Math.PI * r;
+      const off = c * (1 - v/100);
+      const stroke = p.color === 'gold' ? 'var(--signal)' : 'var(--accent)';
+      return `<div class="circ" style="inline-size:96px;block-size:96px">
+        <svg viewBox="0 0 48 48">
+          <circle class="circ__track" cx="24" cy="24" r="${r}" stroke-width="2"/>
+          <circle class="circ__bar" cx="24" cy="24" r="${r}" stroke-width="2" stroke="${stroke}" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div class="circ__val">${v}%</div>
+      </div>`;
+    }
+    const stages = 6;
+    const doneTo = Math.round(v/100 * stages);
+    return `<div class="steps">${Array.from({length:stages}).map((_,i)=>`
+      <span class="steps__dot ${i<doneTo?'is-done':''} ${i===doneTo?'is-now':''}"></span>
+      ${i<stages-1?`<span class="steps__line ${i<doneTo?'is-done':''}"></span>`:''}
+    `).join('')}</div>`;
+  },
+  code(p) {
+    if (p.kind === 'linear') return `<div class="progress${p.color==='gold'?' progress--gold':''}">\n  <div class="progress__bar" style="width:${p.value}%"></div>\n</div>`;
+    if (p.kind === 'circular') return `<div class="circ">\n  <svg><circle class="circ__track"/><circle class="circ__bar"/></svg>\n  <div class="circ__val">${p.value}%</div>\n</div>`;
+    return `<div class="steps">\n  <span class="steps__dot is-done"></span>\n  <span class="steps__line is-done"></span>\n  <span class="steps__dot is-now"></span>\n</div>`;
+  }
+};
+
+/* ============ TABS ============ */
+REG.tabs = {
+  title: 'Tabs',
+  sub: 'Section switcher. Desktop.',
+  group: 'Navigation',
+  defaults: { active: 1, count: 4 },
+  knobs: [{ id: 'active', type: 'options', opts: ['0','1','2','3'] }],
+  anatomy: { 'underline': '1px accent', 'padding-y': 'var(--sp-3)' },
+  tokens: { on: 'fg + accent underline' },
+  render(p) {
+    const labels = ['Atlas','Today','Crew','Water'];
+    const a = parseInt(p.active);
+    return `<div class="tabs" style="inline-size:min(520px,100%)">${labels.map((l,i)=>`<button class="tab ${i===a?'is-on':''}">${l}</button>`).join('')}</div>`;
+  },
+  code() { return `<div class="tabs">\n  <button class="tab is-on">Atlas</button>\n  <button class="tab">Today</button>\n</div>`; }
+};
+
+/* ============ TABBAR (mobile) ============ */
+REG.tabbar = {
+  title: 'App tab bar',
+  sub: 'Mobile bottom navigation. Noon app primary nav.',
+  group: 'Navigation',
+  defaults: { active: 0 },
+  knobs: [{ id: 'active', type: 'options', opts: ['0','1','2','3','4'] }],
+  anatomy: { height: '~60px', icons: '22×22 stroke-1.5', label: '10px caps' },
+  tokens: { on: 'accent', off: 'fg-subtle' },
+  render(p) {
+    const items = [
+      { label: 'ATLAS',   icon: `<path d="M4 6l5-2 5 2 5-2v13l-5 2-5-2-5 2z"/><path d="M9 4v15M14 6v15"/>` },
+      { label: 'TODAY',   icon: `<rect x="4" y="5" width="15" height="14" rx="1"/><path d="M4 9h15M9 3v4M14 3v4"/>` },
+      { label: 'CREW',    icon: `<circle cx="8" cy="9" r="3"/><circle cx="15" cy="9" r="3"/><path d="M3 18c0-2 2-4 5-4M11 18c0-2 2-4 5-4"/>` },
+      { label: 'WATER',   icon: `<path d="M11 3s6 6 6 10a6 6 0 0 1-12 0c0-4 6-10 6-10z"/>` },
+      { label: 'PASSAGE', icon: `<circle cx="11" cy="11" r="7"/><path d="M11 4l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>` },
+    ];
+    const a = parseInt(p.active);
+    return `<div class="tabbar" style="inline-size:min(380px,100%);border-radius:var(--r-3);box-shadow:inset 0 0 0 1px var(--border)">
+      ${items.map((it,i)=>`<button class="tabbar__item ${i===a?'is-on':''}"><svg class="tabbar__icon" viewBox="0 0 22 22">${it.icon}</svg><span>${it.label}</span></button>`).join('')}
+    </div>`;
+  },
+  code() { return `<nav class="tabbar">\n  <button class="tabbar__item is-on">\n    <svg class="tabbar__icon">…</svg>\n    <span>ATLAS</span>\n  </button>\n</nav>`; }
+};
+
+/* ============ SIDENAV ============ */
+REG.sidenav = {
+  title: 'Side nav',
+  sub: 'Desktop primary nav. Admin + facilitator.',
+  group: 'Navigation',
+  defaults: { active: 1 },
+  knobs: [{ id: 'active', type: 'options', opts: ['0','1','2','3','4'] }],
+  anatomy: { width: '~220px', 'item-height': 'auto' },
+  tokens: { on: 'rgba(chalk,0.08)' },
+  render(p) {
+    const items = [
+      { icon: `<path d="M3 9l6-5 6 5v7H3z"/>`, label: 'Overview' },
+      { icon: `<rect x="3" y="3" width="12" height="12" rx="1"/><path d="M3 7h12M7 3v12"/>`, label: 'Routes' },
+      { icon: `<circle cx="9" cy="7" r="3"/><path d="M3 16c0-3 3-5 6-5s6 2 6 5"/>`, label: 'Crews' },
+      { icon: `<path d="M9 2v14M2 9h14"/>`, label: 'Passages' },
+      { icon: `<circle cx="9" cy="9" r="7"/><path d="M9 5v4l2 2"/>`, label: 'History' },
+    ];
+    const a = parseInt(p.active);
+    return `<nav class="sidenav" style="inline-size:220px;border-radius:var(--r-3);border-inline-end:0;box-shadow:inset 0 0 0 1px var(--border)">
+      ${items.map((it,i)=>`<button class="sidenav__item ${i===a?'is-on':''}"><svg viewBox="0 0 18 18">${it.icon}</svg><span>${it.label}</span></button>`).join('')}
+    </nav>`;
+  },
+  code() { return `<nav class="sidenav">\n  <a class="sidenav__item">Overview</a>\n  <a class="sidenav__item is-on">Routes</a>\n</nav>`; }
+};
+
+/* ============ BREADCRUMB ============ */
+REG.breadcrumb = {
+  title: 'Breadcrumb',
+  sub: 'Hierarchical location. Coordinate style.',
+  group: 'Navigation',
+  defaults: { depth: 3 },
+  knobs: [{ id: 'depth', type: 'options', opts: ['2','3','4'] }],
+  anatomy: { 'font': 'JetBrains Mono 12px', 'sep': '›' },
+  tokens: { muted: 'fg-subtle', cur: 'fg' },
+  render(p) {
+    const crumbs = ['Atlas','Qudrat','Verbal','Analogies — Set 3'];
+    const d = parseInt(p.depth);
+    const items = crumbs.slice(0, d);
+    return `<nav class="breadcrumbs">${items.map((c,i)=>`
+      ${i>0?`<span class="sep">›</span>`:''}
+      <a ${i===items.length-1?'class="cur"':'href="#"'}>${c}</a>
+    `).join('')}</nav>`;
+  },
+  code() { return `<nav class="breadcrumbs">\n  <a href="#">Atlas</a>\n  <span class="sep">›</span>\n  <a class="cur">Qudrat</a>\n</nav>`; }
+};
+
+/* ============ PAGINATION ============ */
+REG.pagination = {
+  title: 'Pagination',
+  sub: 'Paged navigation.',
+  group: 'Navigation',
+  defaults: { page: 3 },
+  knobs: [{ id: 'page', type: 'options', opts: ['1','2','3','4','5','6'] }],
+  anatomy: { 'btn-size': '32×32' },
+  tokens: {},
+  render(p) {
+    const cur = parseInt(p.page);
+    const pages = [1,2,3,4,5,6];
+    return `<nav class="pagination">
+      <button ${cur===1?'disabled':''}>‹</button>
+      ${pages.map(n=>`<button class="${n===cur?'is-on':''}">${n}</button>`).join('')}
+      <button ${cur===6?'disabled':''}>›</button>
+    </nav>`;
+  },
+  code() { return `<nav class="pagination">\n  <button class="is-on">1</button>\n</nav>`; }
+};
+
+/* ============ ALERT ============ */
+REG.alert = {
+  title: 'Alert',
+  sub: 'Inline banner. Info, warn, danger, ok.',
+  group: 'Feedback',
+  defaults: { variant: 'info' },
+  knobs: [{ id: 'variant', type: 'options', opts: ['info','warn','danger','ok'] }],
+  anatomy: { padding: 'var(--sp-4) var(--sp-5)', radius: 'var(--r-2)' },
+  tokens: { info: 'blue-400', warn: 'warn-400', danger: 'danger-400', ok: 'ok-400' },
+  render(p) {
+    const icons = {
+      info: `<circle cx="8" cy="8" r="7"/><path d="M8 5v.01M8 8v4"/>`,
+      warn: `<path d="M8 1l7 13H1z"/><path d="M8 6v4M8 12v.01"/>`,
+      danger: `<circle cx="8" cy="8" r="7"/><path d="M5 5l6 6M11 5l-6 6"/>`,
+      ok: `<circle cx="8" cy="8" r="7"/><path d="M5 8l2 2 4-4"/>`,
+    };
+    const titles = { info: 'Pace check-in tomorrow', warn: 'Route drift detected', danger: 'Session expired', ok: 'Passage saved' };
+    const bodies = {
+      info: 'Your crew reviews Qudrat verbal together at 19:30. Solo prep before that pays double.',
+      warn: 'You’re 3 days behind on Tahsili — Biology. Reset the cadence or drop the target?',
+      danger: 'You were idle for 30 minutes. Sign in again to continue your route.',
+      ok: 'Arrival logged at 14:22. +240m water.',
+    };
+    return `<div class="alert alert--${p.variant}" style="inline-size:min(520px,100%)">
+      <svg class="alert__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">${icons[p.variant]}</svg>
+      <div>
+        <p class="alert__title">${titles[p.variant]}</p>
+        <p class="alert__body">${bodies[p.variant]}</p>
+      </div>
+    </div>`;
+  },
+  code(p) { return `<div class="alert alert--${p.variant}">\n  <svg class="alert__icon">…</svg>\n  <div>\n    <p class="alert__title">Title</p>\n    <p class="alert__body">Body</p>\n  </div>\n</div>`; }
+};
+
+/* ============ TOAST ============ */
+REG.toast = {
+  title: 'Toast',
+  sub: 'Ephemeral confirmation. Self-dismiss.',
+  group: 'Feedback',
+  defaults: { action: true },
+  knobs: [{ id: 'action', type: 'toggle', label: 'With action' }],
+  anatomy: { shadow: 'z-3' },
+  tokens: { dot: 'accent' },
+  render(p) {
+    return `<div class="toast"><span class="toast__dot"></span><span class="toast__body">Route saved. +18 items to tomorrow’s water.</span>${p.action?`<button class="toast__action">Undo</button>`:''}</div>`;
+  },
+  code() { return `<div class="toast">\n  <span class="toast__dot"></span>\n  <span class="toast__body">Saved.</span>\n  <button class="toast__action">Undo</button>\n</div>`; }
+};
+
+/* ============ MENU ============ */
+REG.menu = {
+  title: 'Menu',
+  sub: 'Dropdown / context actions.',
+  group: 'Navigation',
+  defaults: { shortcuts: true },
+  knobs: [{ id: 'shortcuts', type: 'toggle', label: 'Show shortcuts' }],
+  anatomy: { 'min-width': '200px', shadow: 'z-3' },
+  tokens: { 'item-height': 'auto', 'hover': 'rgba(chalk,0.06)' },
+  render(p) {
+    return `<div class="menu" style="inline-size:240px">
+      <button class="menu__item">Start route${p.shortcuts?`<span class="menu__shortcut">⌘ ↵</span>`:''}</button>
+      <button class="menu__item">Mark as reviewed${p.shortcuts?`<span class="menu__shortcut">⌘ R</span>`:''}</button>
+      <button class="menu__item">Share with crew${p.shortcuts?`<span class="menu__shortcut">⌘ ⇧ S</span>`:''}</button>
+      <div class="menu__sep"></div>
+      <button class="menu__item is-danger">Delete passage${p.shortcuts?`<span class="menu__shortcut">⌫</span>`:''}</button>
+    </div>`;
+  },
+  code() { return `<div class="menu">\n  <button class="menu__item">Start route</button>\n  <button class="menu__item is-danger">Delete</button>\n</div>`; }
+};
+
+/* ============ DIALOG ============ */
+REG.dialog = {
+  title: 'Dialog',
+  sub: 'Focused decision. Destructive or confirming.',
+  group: 'Feedback',
+  defaults: { kind: 'confirm' },
+  knobs: [{ id: 'kind', type: 'options', opts: ['confirm','destructive'] }],
+  anatomy: { 'max-width': '520px', padding: 'var(--sp-7)' },
+  tokens: { shadow: 'z-4' },
+  render(p) {
+    if (p.kind === 'destructive') {
+      return `<div class="dialog">
+        <h3 class="dialog__title">Drop this route?</h3>
+        <p class="dialog__body">You’ll lose 14 days of mastery on Qudrat verbal. Your crew will see the drop-off. This cannot be undone.</p>
+        <div class="dialog__actions"><button class="btn btn--ghost">Keep route</button><button class="btn btn--danger-solid">Drop route</button></div>
+      </div>`;
+    }
+    return `<div class="dialog">
+      <h3 class="dialog__title">Start passage now?</h3>
+      <p class="dialog__body">18 items, about 22 minutes. Your crew is waiting to start together at 19:30.</p>
+      <div class="dialog__actions"><button class="btn btn--ghost">Not yet</button><button class="btn btn--primary">Begin</button></div>
+    </div>`;
+  },
+  code() { return `<div class="dialog">\n  <h3 class="dialog__title">Title</h3>\n  <p class="dialog__body">Body</p>\n  <div class="dialog__actions">\n    <button class="btn btn--ghost">Cancel</button>\n    <button class="btn btn--primary">Confirm</button>\n  </div>\n</div>`; }
+};
+
+/* ============ TABLE ============ */
+REG.table = {
+  title: 'Table',
+  sub: 'Data grid. Tabular numerics.',
+  group: 'Display',
+  defaults: { rows: 5, selected: -1 },
+  knobs: [{ id: 'selected', type: 'options', opts: ['none','0','1','2'] }],
+  anatomy: { 'row-height': 'auto', 'cell-padding': 'var(--sp-3) var(--sp-4)' },
+  tokens: { hover: 'rgba(chalk,0.02)', selected: 'accent-soft' },
+  render(p) {
+    const rows = [
+      ['Qudrat — Verbal',     '62%', '92', 'Day 14'],
+      ['Qudrat — Quantitative','48%', '88', 'Day 11'],
+      ['Tahsili — Biology',   '71%', '94', 'Day 20'],
+      ['Tahsili — Chemistry', '55%', '85', 'Day 9'],
+      ['STEP — Reading',      '38%', '70', 'Day 6'],
+    ];
+    const sel = p.selected === 'none' ? -1 : parseInt(p.selected);
+    return `<table class="table" style="inline-size:min(560px,100%)">
+      <thead><tr><th>Route</th><th class="num">Mastery</th><th class="num">Target</th><th>Day</th></tr></thead>
+      <tbody>${rows.map((r,i)=>`<tr class="${i===sel?'is-selected':''}"><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td><td style="color:var(--fg-subtle)">${r[3]}</td></tr>`).join('')}</tbody>
+    </table>`;
+  },
+  code() { return `<table class="table">\n  <thead><tr><th>Route</th><th class="num">Mastery</th></tr></thead>\n  <tbody><tr><td>Qudrat</td><td class="num">62%</td></tr></tbody>\n</table>`; }
+};
+
+/* ============ EMPTY ============ */
+REG.empty = {
+  title: 'Empty state',
+  sub: 'No-data affordance. Always offer a next step.',
+  group: 'Feedback',
+  defaults: { kind: 'no-routes' },
+  knobs: [{ id: 'kind', type: 'options', opts: ['no-routes','no-crew','error'] }],
+  anatomy: { padding: 'var(--sp-9) var(--sp-6)', 'max-width': '36ch' },
+  tokens: { icon: 'fg-faint' },
+  render(p) {
+    const config = {
+      'no-routes': { title: 'No routes yet', body: 'Pick a test — Qudrat, Tahsili or STEP — and we’ll draft a 60-day route tuned to your current level.', cta: 'Choose a test' },
+      'no-crew':   { title: 'Travelling solo', body: 'Routes go faster with a crew. Invite up to three classmates and share water when you’re ahead.', cta: 'Invite crew' },
+      'error':     { title: 'Route didn’t load', body: 'We couldn’t reach your progress. Check your connection and try again, or keep prepping offline.', cta: 'Retry' },
+    }[p.kind];
+    return `<div class="empty">
+      <svg class="empty__icon" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M8 14l8-3 8 3 8-3 8 3v22l-8 3-8-3-8 3-8-3z"/><path d="M16 11v25M24 14v25M32 11v25" stroke-dasharray="2 3"/></svg>
+      <h3 class="empty__title">${config.title}</h3>
+      <p class="empty__body">${config.body}</p>
+      <button class="btn btn--primary btn--sm" style="margin-top:8px">${config.cta}</button>
+    </div>`;
+  },
+  code() { return `<div class="empty">\n  <svg class="empty__icon">…</svg>\n  <h3 class="empty__title">No routes yet</h3>\n  <p class="empty__body">Pick a test…</p>\n  <button class="btn btn--primary btn--sm">Choose a test</button>\n</div>`; }
+};
+
+/* ============ SKELETON ============ */
+REG.skeleton = {
+  title: 'Skeleton',
+  sub: 'Loading placeholder. Matches final shape.',
+  group: 'Feedback',
+  defaults: { kind: 'card' },
+  knobs: [{ id: 'kind', type: 'options', opts: ['card','list','line'] }],
+  anatomy: { animation: '1.4s shimmer' },
+  tokens: { 'base': 'rgba(chalk,0.04)', 'shine': 'rgba(chalk,0.10)' },
+  render(p) {
+    if (p.kind === 'card') {
+      return `<div class="card" style="inline-size:min(380px,100%)">
+        <div class="skel" style="inline-size:100px;block-size:12px;margin-bottom:16px"></div>
+        <div class="skel" style="inline-size:70%;block-size:24px;margin-bottom:12px"></div>
+        <div class="skel" style="inline-size:90%;block-size:14px;margin-bottom:6px"></div>
+        <div class="skel" style="inline-size:60%;block-size:14px;margin-bottom:24px"></div>
+        <div class="skel" style="inline-size:100%;block-size:4px;border-radius:2px"></div>
+      </div>`;
+    }
+    if (p.kind === 'list') {
+      return `<div class="col" style="gap:12px;inline-size:min(380px,100%)">${[1,2,3].map(()=>`
+        <div class="row" style="gap:12px;padding:12px;background:var(--bg-raised);border-radius:var(--r-2);box-shadow:inset 0 0 0 1px var(--border)">
+          <div class="skel" style="inline-size:32px;block-size:32px;border-radius:50%"></div>
+          <div class="col" style="flex:1;gap:6px"><div class="skel" style="inline-size:60%;block-size:12px"></div><div class="skel" style="inline-size:40%;block-size:10px"></div></div>
+        </div>`).join('')}</div>`;
+    }
+    return `<div class="col" style="gap:8px;inline-size:min(380px,100%)">
+      <div class="skel" style="block-size:14px"></div>
+      <div class="skel" style="block-size:14px;inline-size:95%"></div>
+      <div class="skel" style="block-size:14px;inline-size:70%"></div>
+    </div>`;
+  },
+  code() { return `<div class="skel" style="inline-size:100%;block-size:14px"></div>`; }
+};
+
+/* ============ SLIDER ============ */
+REG.slider = {
+  title: 'Slider',
+  sub: 'Range picker. Single value.',
+  group: 'Forms',
+  defaults: { value: 60 },
+  knobs: [{ id: 'value', type: 'options', opts: ['0','25','50','75','100'] }],
+  anatomy: { track: '2px', thumb: '16×16' },
+  tokens: { thumb: 'accent' },
+  render(p) {
+    return `<div class="col" style="inline-size:min(320px,100%);gap:12px">
+      <div class="row" style="justify-content:space-between;font-family:var(--font-mono);font-size:12px"><span class="caps" style="margin:0">Target score</span><span class="num">${p.value}%</span></div>
+      <input type="range" class="slider" min="0" max="100" value="${p.value}">
+      <div class="row" style="justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)"><span>Low</span><span>Target</span><span>Peak</span></div>
+    </div>`;
+  },
+  code() { return `<input type="range" class="slider" min="0" max="100" value="60">`; }
+};
+
+/* ============ FILE / DROPZONE ============ */
+REG.dropzone = {
+  title: 'File drop',
+  sub: 'Upload affordance.',
+  group: 'Forms',
+  defaults: { state: 'default' },
+  knobs: [{ id: 'state', type: 'options', opts: ['default','active','error'] }],
+  anatomy: { 'border': '1.5px dashed border-strong', padding: 'var(--sp-7)' },
+  tokens: { active: 'accent-border' },
+  render(p) {
+    const cls = p.state === 'active' ? 'is-active' : (p.state === 'error' ? 'is-error' : '');
+    return `<div class="dropzone ${cls}" style="inline-size:min(420px,100%)">
+      <svg class="dropzone__icon" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4v18M9 11l7-7 7 7M5 24v4h22v-4"/></svg>
+      <h3 class="dropzone__title">${p.state==='error'?'Upload failed':'Drop ID or transcript here'}</h3>
+      <p class="dropzone__hint">${p.state==='error'?'File was larger than 10 MB. Try a smaller image.':'PNG or PDF · max 10 MB · or click to browse'}</p>
+    </div>`;
+  },
+  code() { return `<div class="dropzone">\n  <svg class="dropzone__icon">…</svg>\n  <h3 class="dropzone__title">Drop files</h3>\n  <p class="dropzone__hint">PNG or PDF</p>\n</div>`; }
+};
+
+/* ============ TOOLTIP ============ */
+REG.tooltip = {
+  title: 'Tooltip',
+  sub: 'Hover hint. Single line.',
+  group: 'Feedback',
+  defaults: {},
+  knobs: [],
+  anatomy: { bg: 'chalk-200', fg: 'void-300', padding: '6px 10px' },
+  tokens: { arrow: '8×8 rotated' },
+  render() {
+    return `<div class="col" style="gap:40px;align-items:center;padding:20px 0">
+      <div class="tooltip">Press ⌘↵ to start the route</div>
+      <button class="btn btn--secondary">Hover me</button>
+    </div>`;
+  },
+  code() { return `<div class="tooltip">Press ⌘↵ to start</div>`; }
+};
+
+/* ============ ICONS ============ */
+REG.icons = {
+  title: 'Icon set',
+  sub: '24 core icons. 18px base, 1.5px stroke.',
+  group: 'Display',
+  defaults: {},
+  knobs: [],
+  anatomy: { 'viewBox': '0 0 20 20', stroke: '1.5px', fill: 'none' },
+  tokens: { color: 'currentColor' },
+  render() {
+    const icons = {
+      'atlas': `<path d="M4 6l5-2 5 2 5-2v13l-5 2-5-2-5 2z"/><path d="M9 4v15M14 6v15"/>`,
+      'compass': `<circle cx="10" cy="10" r="7"/><path d="M13 7l-2 5-5 2 2-5z" fill="currentColor"/>`,
+      'route': `<circle cx="5" cy="5" r="2"/><circle cx="15" cy="15" r="2"/><path d="M5 7c0 4 10 4 10 6" stroke-dasharray="2 2"/>`,
+      'water': `<path d="M10 3s5 5 5 9a5 5 0 0 1-10 0c0-4 5-9 5-9z"/>`,
+      'crew': `<circle cx="7" cy="8" r="2.5"/><circle cx="13" cy="8" r="2.5"/><path d="M3 16c0-2 2-3 4-3M9 16c0-2 2-3 4-3"/>`,
+      'passage': `<circle cx="10" cy="10" r="7"/><path d="M10 4l1.5 4.5L16 10l-4.5 1.5L10 16l-1.5-4.5L4 10l4.5-1.5z"/>`,
+      'star': `<path d="M10 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>`,
+      'check': `<path d="M4 10l4 4 8-9"/>`,
+      'plus': `<path d="M10 4v12M4 10h12"/>`,
+      'minus': `<path d="M4 10h12"/>`,
+      'x': `<path d="M5 5l10 10M15 5L5 15"/>`,
+      'chevron': `<path d="M8 4l4 6-4 6"/>`,
+      'search': `<circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/>`,
+      'filter': `<path d="M4 5h12l-4.5 6v4l-3 1v-5z"/>`,
+      'menu': `<path d="M3 6h14M3 10h14M3 14h14"/>`,
+      'more': `<circle cx="5" cy="10" r="1" fill="currentColor"/><circle cx="10" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/>`,
+      'settings': `<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4 4l1.5 1.5M14.5 14.5L16 16M4 16l1.5-1.5M14.5 5.5L16 4"/>`,
+      'bell': `<path d="M10 3a4 4 0 0 0-4 4v3l-2 3h12l-2-3V7a4 4 0 0 0-4-4zM8 16a2 2 0 0 0 4 0"/>`,
+      'calendar': `<rect x="3" y="5" width="14" height="12" rx="1"/><path d="M3 8h14M7 3v4M13 3v4"/>`,
+      'book': `<path d="M4 4h5a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2H4zM16 4h-5a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2h5z"/>`,
+      'message': `<path d="M3 5h14v9h-7l-4 3v-3H3z"/>`,
+      'arrow-up': `<path d="M10 16V4M5 9l5-5 5 5"/>`,
+      'arrow-right': `<path d="M4 10h12M11 5l5 5-5 5"/>`,
+      'target': `<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="4"/><circle cx="10" cy="10" r="1" fill="currentColor"/>`,
+    };
+    return `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;inline-size:min(540px,100%)">
+      ${Object.entries(icons).map(([name, svg])=>`
+        <div class="col" style="gap:8px;align-items:center;padding:12px;background:var(--bg-sunken);border-radius:var(--r-2);box-shadow:inset 0 0 0 1px var(--border)">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--fg)">${svg}</svg>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)">${name}</span>
+        </div>`).join('')}
+    </div>`;
+  },
+  code() { return `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">\n  <!-- icon path -->\n</svg>`; }
+};
+
+/* ============ STATS ============ */
+REG.stats = {
+  title: 'Stat block',
+  sub: 'Large numeric display. Tabular, anchored.',
+  group: 'Display',
+  defaults: { trend: 'up' },
+  knobs: [{ id: 'trend', type: 'options', opts: ['up','down','flat'] }],
+  anatomy: { 'num-size': '48px', 'num-weight': '300' },
+  tokens: { trend: 'ok / danger / fg-subtle' },
+  render(p) {
+    const trend = {
+      up:   { chip: 'chip--ok',     dot: '+3 this week', arrow: '↑' },
+      down: { chip: 'chip--danger', dot: '-2 this week', arrow: '↓' },
+      flat: { chip: '',             dot: 'stable',       arrow: '→' },
+    }[p.trend];
+    return `<div class="row" style="gap:40px;align-items:flex-start">
+      <div class="col" style="gap:10px">
+        <div class="caps">Streak</div>
+        <div style="font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:56px;font-weight:300;line-height:1;letter-spacing:-0.02em">14<span style="font-size:18px;color:var(--fg-faint);margin-inline-start:8px">days</span></div>
+        <span class="chip ${trend.chip}" style="height:22px"><span class="chip__dot"></span>${trend.dot}</span>
+      </div>
+      <div class="col" style="gap:10px">
+        <div class="caps">Target pace</div>
+        <div style="font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:56px;font-weight:300;line-height:1;letter-spacing:-0.02em">92<span style="font-size:18px;color:var(--fg-faint);margin-inline-start:8px">/ 100</span></div>
+        <span class="chip chip--gold" style="height:22px"><span class="chip__dot"></span>On pace</span>
+      </div>
+    </div>`;
+  },
+  code() { return `<div class="stat">\n  <div class="caps">Streak</div>\n  <div class="stat__num num">14<small>days</small></div>\n  <span class="chip chip--ok">+3 this week</span>\n</div>`; }
+};
+
+/* Order shown in sidebar */
+REG.__order = [
+  { group: 'Actions',    items: ['button'] },
+  { group: 'Forms',      items: ['input','select','checkbox','radio','switch','segmented','slider','dropzone'] },
+  { group: 'Display',    items: ['card','chip','badge','avatar','stats','table','icons'] },
+  { group: 'Navigation', items: ['tabs','tabbar','sidenav','breadcrumb','pagination','menu'] },
+  { group: 'Feedback',   items: ['progress','alert','toast','dialog','tooltip','empty','skeleton'] },
+];
+
+</script>
+<script>
+// Noon Academy — Playground runtime
+// Wires the registry to the UI: nav + stage + knobs + code + specs.
+
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  const nav     = $('#nav');
+  const stage   = $('#stage');
+  const knobs   = $('#knobs');
+  const anatomy = $('#anatomy');
+  const tokensEl= $('#tokens');
+  const codeOut = $('#codeOut');
+  const title   = $('#compTitle');
+  const sub     = $('#compSub');
+  const metaP   = $('#metaProps');
+  const metaS   = $('#metaStates');
+
+  const state = { current: 'button', props: {} };
+
+  /* ---------- Build sidebar ---------- */
+  function buildNav() {
+    const search = document.createElement('div');
+    search.style.cssText = 'padding: 0 20px 16px; border-bottom: 1px solid var(--divider); margin-bottom: 12px;';
+    search.innerHTML = `
+      <div class="input-group" style="position:relative">
+        <span class="input-group__icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="4"/><path d="M9 9l4 4"/></svg></span>
+        <input class="input" id="search" placeholder="Search…" style="height:32px;font-size:13px">
+      </div>`;
+    nav.appendChild(search);
+
+    REG.__order.forEach(group => {
+      const g = document.createElement('div');
+      g.className = 'nav__group';
+      g.innerHTML = `<div class="nav__heading">${group.group}</div>`;
+      group.items.forEach(id => {
+        const c = REG[id];
+        if (!c) return;
+        const btn = document.createElement('button');
+        btn.className = 'nav__item';
+        btn.dataset.id = id;
+        btn.innerHTML = `<span>${c.title}</span><code>${id}</code>`;
+        btn.addEventListener('click', () => select(id));
+        g.appendChild(btn);
+      });
+      nav.appendChild(g);
+    });
+
+    $('#search').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      $('.nav__item', nav).forEach(it => {
+        const match = !q || it.textContent.toLowerCase().includes(q);
+        it.style.display = match ? '' : 'none';
+      });
+    });
+  }
+
+  /* ---------- Select component ---------- */
+  function select(id) {
+    state.current = id;
+    state.props = { ...(REG[id].defaults || {}) };
+    $('.nav__item', nav).forEach(b => b.classList.toggle('is-on', b.dataset.id === id));
+    try { localStorage.setItem('noon-ds-cur', id); } catch(e){}
+    renderAll();
+  }
+
+  /* ---------- Render stage + knobs + specs + code ---------- */
+  function renderAll() {
+    const c = REG[state.current];
+    title.textContent = c.title;
+    sub.textContent = c.sub;
+
+    // Knobs
+    knobs.innerHTML = '';
+    const opts = c.knobs.filter(k => k.type === 'options');
+    const toggles = c.knobs.filter(k => k.type === 'toggle');
+
+    opts.forEach(k => {
+      const wrap = document.createElement('div');
+      wrap.className = 'knob';
+      wrap.innerHTML = `
+        <div class="knob__label"><span>${prettify(k.id)}</span><code>${state.props[k.id]}</code></div>
+        <div class="knob__options">${k.opts.map(o => `<button data-val="${o}" class="${String(state.props[k.id])===String(o)?'is-on':''}">${o}</button>`).join('')}</div>`;
+      wrap.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+        state.props[k.id] = b.dataset.val;
+        renderAll();
+      }));
+      knobs.appendChild(wrap);
+    });
+
+    if (toggles.length) {
+      const section = document.createElement('div');
+      section.className = 'knobs__section';
+      section.innerHTML = `<h4 class="knobs__sectionTitle">Flags</h4>`;
+      toggles.forEach(k => {
+        const on = !!state.props[k.id];
+        const row = document.createElement('label');
+        row.className = 'knob__toggle';
+        row.innerHTML = `
+          <span style="font-size:13px;color:var(--fg-muted)">${k.label || prettify(k.id)}</span>
+          <span class="switch"><input type="checkbox" ${on?'checked':''}><span class="switch__track"></span></span>`;
+        row.querySelector('input').addEventListener('change', e => {
+          state.props[k.id] = e.target.checked;
+          renderAll();
+        });
+        section.appendChild(row);
+      });
+      knobs.appendChild(section);
+    }
+
+    if (!c.knobs.length) {
+      knobs.innerHTML = `<div style="font-family:var(--font-serif);font-style:italic;color:var(--fg-subtle);font-size:13px">No props — this component is fixed.</div>`;
+    }
+
+    // Stage
+    stage.innerHTML = c.render(state.props);
+
+    // Force-state helper (click buttons etc. show their hover/active look)
+    stage.querySelectorAll('[data-force]').forEach(el => {
+      const f = el.getAttribute('data-force');
+      if (f === 'hover') el.style.filter = 'brightness(1.05)';
+      if (f === 'active') el.style.transform = 'translateY(0.5px) scale(0.99)';
+      if (f === 'focus') el.style.boxShadow = 'var(--focus-ring)';
+    });
+
+    // Specs
+    anatomy.innerHTML = Object.entries(c.anatomy || {}).map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+    tokensEl.innerHTML = Object.entries(c.tokens || {}).map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+
+    metaP.textContent = c.knobs.length;
+    metaS.textContent = (c.knobs.find(k=>k.id==='state')?.opts.length) || Object.values(state.props).length;
+
+    // Code
+    codeOut.innerHTML = highlight(c.code(state.props));
+  }
+
+  function prettify(id) { return id.replace(/[-_]/g,' ').replace(/\b\w/g, c => c.toUpperCase()); }
+
+  function highlight(src) {
+    return src
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/(&lt;\/?)([\w-]+)/g, '$1<span class="tag">$2</span>')
+      .replace(/([\w-]+)=/g, '<span class="attr">$1</span>=')
+      .replace(/"([^"]*)"/g, '"<span class="str">$1</span>"')
+      .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="com">$1</span>');
+  }
+
+  $('#copyBtn').addEventListener('click', () => {
+    const c = REG[state.current];
+    navigator.clipboard.writeText(c.code(state.props));
+    $('#copyBtn').textContent = 'Copied';
+    setTimeout(()=>$('#copyBtn').textContent='Copy', 1200);
+  });
+
+  /* ---------- Go ---------- */
+  buildNav();
+  const saved = (() => { try { return localStorage.getItem('noon-ds-cur'); } catch(e){ return null; } })();
+  select(saved && REG[saved] ? saved : 'button');
+})();
+
+</script>
+</body></html>

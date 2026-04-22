@@ -1,0 +1,313 @@
+{
+  "$name": "Noon Academy — The Proven Routes",
+  "$description": "Design tokens for the Noon Academy design system. Saudi-native surveyor's-notebook visual language.",
+  "$version": "1.0.0",
+
+  "color": {
+    "primitive": {
+      "void": {
+        "50":  { "$value": "#232c43", "$description": "Highest dark surface" },
+        "100": { "$value": "#1a2236", "$description": "Elevated dark surface" },
+        "200": { "$value": "#10172a", "$description": "Raised dark surface" },
+        "300": { "$value": "#0a0f1a", "$description": "Canonical void — primary brand surface" },
+        "400": { "$value": "#060913", "$description": "Deepest dark surface" }
+      },
+      "chalk": {
+        "100": { "$value": "#f5f1e8" },
+        "200": { "$value": "#e8e4dc", "$description": "Canonical chalk — text on void" },
+        "300": { "$value": "#c9c4b8" },
+        "400": { "$value": "#8e8a80" }
+      },
+      "paper": {
+        "100": { "$value": "#fbf8ef", "$description": "Lifted paper — card bg on paper mode" },
+        "200": { "$value": "#f2ece0", "$description": "Canonical paper surface" },
+        "300": { "$value": "#e8e1d2", "$description": "Sunken paper" }
+      },
+      "noon": {
+        "100": { "$value": "#c8f4e2" },
+        "200": { "$value": "#9EEACB" },
+        "300": { "$value": "#7FE3BE", "$description": "Hover" },
+        "400": { "$value": "#64D8AE", "$description": "Canonical noon — brand primary" },
+        "500": { "$value": "#3FAE87", "$description": "Active/pressed" },
+        "600": { "$value": "#2A8A6A" },
+        "700": { "$value": "#194d3b" },
+        "800": { "$value": "#0a3326", "$description": "Text on noon green" }
+      },
+      "gold": {
+        "200": { "$value": "#f0cf5a" },
+        "300": { "$value": "#e0b83a", "$description": "Golden-hour, current position" },
+        "400": { "$value": "#c9a227", "$description": "Canonical gold — journey signal" },
+        "500": { "$value": "#8e7019" },
+        "600": { "$value": "#5a4610" }
+      },
+      "iris": {
+        "300": { "$value": "#C7A8FF" },
+        "400": { "$value": "#B08AF9", "$description": "Heliotrope — secondary accent" },
+        "500": { "$value": "#8E63E0" }
+      },
+      "blue": {
+        "300": { "$value": "#96BCFF" },
+        "400": { "$value": "#6BA3FF", "$description": "Focus ring color" },
+        "500": { "$value": "#4881E0" }
+      },
+      "danger": {
+        "300": { "$value": "#e58a7f" },
+        "400": { "$value": "#c55a4e", "$description": "Canonical danger" },
+        "500": { "$value": "#9a4339" }
+      },
+      "warn": {
+        "400": { "$value": "#d9a74a" }
+      },
+      "ok": {
+        "300": { "$value": "#a9bc91" },
+        "400": { "$value": "#7a8e64", "$description": "Earned — desaturated green" },
+        "500": { "$value": "#566648" }
+      }
+    },
+
+    "alpha": {
+      "100": { "$value": 1.00 },
+      "80":  { "$value": 0.80 },
+      "70":  { "$value": 0.70 },
+      "55":  { "$value": 0.55 },
+      "45":  { "$value": 0.45 },
+      "35":  { "$value": 0.35 },
+      "30":  { "$value": 0.30 },
+      "25":  { "$value": 0.25 },
+      "22":  { "$value": 0.22 },
+      "14":  { "$value": 0.14 },
+      "10":  { "$value": 0.10 },
+      "08":  { "$value": 0.08 },
+      "06":  { "$value": 0.06 },
+      "04":  { "$value": 0.04 }
+    }
+  },
+
+  "themes": {
+    "void": {
+      "$description": "Default — pre-dawn desert, void-first",
+      "surface": {
+        "bg":        { "$value": "{color.primitive.void.300}" },
+        "bgSunken":  { "$value": "{color.primitive.void.400}" },
+        "bgRaised":  { "$value": "{color.primitive.void.200}" },
+        "bgOverlay": { "$value": "{color.primitive.void.100}" },
+        "bgPopover": { "$value": "{color.primitive.void.100}" },
+        "scrim":     { "$value": "rgba(6, 9, 19, 0.72)" }
+      },
+      "foreground": {
+        "fg":        { "$value": "rgba(232, 228, 220, 1.00)" },
+        "fgMuted":   { "$value": "rgba(232, 228, 220, 0.70)" },
+        "fgSubtle":  { "$value": "rgba(232, 228, 220, 0.55)" },
+        "fgFaint":   { "$value": "rgba(232, 228, 220, 0.35)" },
+        "fgDisabled":{ "$value": "rgba(232, 228, 220, 0.25)" },
+        "fgInverse": { "$value": "{color.primitive.void.300}" }
+      },
+      "border": {
+        "border":       { "$value": "rgba(232, 228, 220, 0.10)" },
+        "borderStrong": { "$value": "rgba(232, 228, 220, 0.22)" },
+        "borderFocus":  { "$value": "{color.primitive.blue.400}" },
+        "divider":      { "$value": "rgba(232, 228, 220, 0.06)" }
+      },
+      "accent": {
+        "accent":       { "$value": "{color.primitive.noon.400}" },
+        "accentHover":  { "$value": "{color.primitive.noon.300}" },
+        "accentActive": { "$value": "{color.primitive.noon.500}" },
+        "accentFg":     { "$value": "{color.primitive.noon.800}" },
+        "accentSoft":   { "$value": "rgba(100, 216, 174, 0.14)" },
+        "accentSoftHv": { "$value": "rgba(100, 216, 174, 0.22)" },
+        "accentBorder": { "$value": "rgba(100, 216, 174, 0.35)" }
+      },
+      "signal": {
+        "signal":       { "$value": "{color.primitive.gold.400}" },
+        "signalBright": { "$value": "{color.primitive.gold.300}" },
+        "signalFg":     { "$value": "{color.primitive.void.300}" },
+        "signalSoft":   { "$value": "rgba(201, 162, 39, 0.12)" },
+        "signalBorder": { "$value": "rgba(201, 162, 39, 0.35)" }
+      },
+      "semantic": {
+        "danger":       { "$value": "{color.primitive.danger.400}" },
+        "dangerFg":     { "$value": "{color.primitive.chalk.100}" },
+        "dangerSoft":   { "$value": "rgba(197, 90, 78, 0.10)" },
+        "dangerBorder": { "$value": "rgba(197, 90, 78, 0.40)" },
+        "warn":         { "$value": "{color.primitive.warn.400}" },
+        "warnSoft":     { "$value": "rgba(217, 167, 74, 0.12)" },
+        "ok":           { "$value": "{color.primitive.ok.400}" },
+        "okSoft":       { "$value": "rgba(122, 142, 100, 0.14)" },
+        "okBorder":     { "$value": "rgba(122, 142, 100, 0.40)" }
+      }
+    },
+
+    "paper": {
+      "$description": "Paper specimen — warm cream, light theme",
+      "surface": {
+        "bg":        { "$value": "{color.primitive.paper.200}" },
+        "bgSunken":  { "$value": "{color.primitive.paper.300}" },
+        "bgRaised":  { "$value": "{color.primitive.paper.100}" },
+        "bgOverlay": { "$value": "{color.primitive.paper.100}" },
+        "bgPopover": { "$value": "{color.primitive.paper.100}" }
+      },
+      "foreground": {
+        "fg":        { "$value": "{color.primitive.void.300}" },
+        "fgMuted":   { "$value": "rgba(10, 15, 26, 0.72)" },
+        "fgSubtle":  { "$value": "rgba(10, 15, 26, 0.55)" },
+        "fgFaint":   { "$value": "rgba(10, 15, 26, 0.38)" },
+        "fgDisabled":{ "$value": "rgba(10, 15, 26, 0.25)" },
+        "fgInverse": { "$value": "{color.primitive.chalk.100}" }
+      },
+      "border": {
+        "border":       { "$value": "rgba(10, 15, 26, 0.10)" },
+        "borderStrong": { "$value": "rgba(10, 15, 26, 0.22)" },
+        "divider":      { "$value": "rgba(10, 15, 26, 0.06)" }
+      }
+    }
+  },
+
+  "interaction": {
+    "$description": "Overlay and interaction state colors — theme-dependent",
+    "void": {
+      "hoverOverlay": { "$value": "rgba(232,228,220,0.04)" },
+      "activeOverlay": { "$value": "rgba(232,228,220,0.08)" },
+      "selectedOverlay": { "$value": "rgba(232,228,220,0.06)" },
+      "subtleOverlay": { "$value": "rgba(232,228,220,0.02)" },
+      "faintOverlay": { "$value": "rgba(232,228,220,0.03)" },
+      "accentDisabledBg": { "$value": "rgba(100,216,174,0.18)" },
+      "accentDisabledFg": { "$value": "rgba(10,51,38,0.5)" },
+      "accentGlow": { "$value": "rgba(100,216,174,0.15)" },
+      "accentTint": { "$value": "rgba(100,216,174,0.06)" },
+      "dangerHover": { "$value": "#b84e43" },
+      "dangerGlow": { "$value": "rgba(197,90,78,0.18)" },
+      "signalGlow": { "$value": "rgba(224,184,58,0.2)" },
+      "infoBorder": { "$value": "rgba(107,163,255,0.3)" },
+      "warnBorder": { "$value": "rgba(217,167,74,0.35)" }
+    },
+    "paper": {
+      "hoverOverlay": { "$value": "rgba(10,15,26,0.04)" },
+      "activeOverlay": { "$value": "rgba(10,15,26,0.08)" },
+      "selectedOverlay": { "$value": "rgba(10,15,26,0.06)" },
+      "subtleOverlay": { "$value": "rgba(10,15,26,0.02)" },
+      "faintOverlay": { "$value": "rgba(10,15,26,0.03)" },
+      "accentDisabledBg": { "$value": "rgba(42,138,106,0.15)" },
+      "accentDisabledFg": { "$value": "rgba(10,51,38,0.5)" },
+      "accentGlow": { "$value": "rgba(42,138,106,0.12)" },
+      "accentTint": { "$value": "rgba(42,138,106,0.06)" },
+      "dangerHover": { "$value": "#b84e43" },
+      "dangerGlow": { "$value": "rgba(197,90,78,0.15)" },
+      "signalGlow": { "$value": "rgba(201,162,39,0.15)" },
+      "infoBorder": { "$value": "rgba(107,163,255,0.25)" },
+      "warnBorder": { "$value": "rgba(217,167,74,0.30)" }
+    }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "serif":  { "$value": "'Crimson Pro', Georgia, serif" },
+      "sans":   { "$value": "'Work Sans', 'Inter', ui-sans-serif, system-ui, sans-serif" },
+      "mono":   { "$value": "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" },
+      "arabic": { "$value": "'Noto Naskh Arabic', 'Amiri', serif" },
+      "num":    { "$value": "'Inter', ui-sans-serif, system-ui, sans-serif" }
+    },
+    "fontFamilyNative": {
+      "$description": "React Native font family names (no fallbacks)",
+      "serif":  { "$value": "CrimsonPro" },
+      "sans":   { "$value": "WorkSans" },
+      "mono":   { "$value": "JetBrainsMono" },
+      "arabic": { "$value": "NotoNaskhArabic" }
+    },
+    "fontSize": {
+      "12": { "$value": 12 },
+      "13": { "$value": 13 },
+      "14": { "$value": 14 },
+      "15": { "$value": 15 },
+      "16": { "$value": 16 },
+      "18": { "$value": 18 },
+      "20": { "$value": 20 },
+      "22": { "$value": 22 },
+      "24": { "$value": 24 },
+      "28": { "$value": 28 },
+      "32": { "$value": 32 },
+      "40": { "$value": 40 },
+      "48": { "$value": 48 },
+      "64": { "$value": 64 },
+      "80": { "$value": 80 }
+    },
+    "fontWeight": {
+      "light":    { "$value": "300" },
+      "regular":  { "$value": "400" },
+      "medium":   { "$value": "500" },
+      "semibold": { "$value": "600" },
+      "bold":     { "$value": "700" }
+    },
+    "lineHeight": {
+      "tight":  { "$value": 1.05 },
+      "snug":   { "$value": 1.2 },
+      "normal": { "$value": 1.5 },
+      "loose":  { "$value": 1.7 }
+    },
+    "letterSpacing": {
+      "tight": { "$value": -0.24, "$description": "-0.015em at 16px" },
+      "caps":  { "$value": 2.24, "$description": "0.14em at 16px" }
+    }
+  },
+
+  "spacing": {
+    "$description": "4px base grid",
+    "0":  { "$value": 0 },
+    "1":  { "$value": 4 },
+    "2":  { "$value": 8 },
+    "3":  { "$value": 12 },
+    "4":  { "$value": 16 },
+    "5":  { "$value": 20 },
+    "6":  { "$value": 24 },
+    "7":  { "$value": 32 },
+    "8":  { "$value": 40 },
+    "9":  { "$value": 48 },
+    "10": { "$value": 64 },
+    "11": { "$value": 80 },
+    "12": { "$value": 96 }
+  },
+
+  "radius": {
+    "0":    { "$value": 0, "$description": "Cartographic — sharp" },
+    "1":    { "$value": 2, "$description": "Chips, inputs, buttons" },
+    "2":    { "$value": 4, "$description": "Cards" },
+    "3":    { "$value": 6 },
+    "4":    { "$value": 8, "$description": "Max soft — nothing above" },
+    "pill": { "$value": 999, "$description": "Avatars only" }
+  },
+
+  "size": {
+    "$description": "Control heights",
+    "xs": { "$value": 24 },
+    "sm": { "$value": 32 },
+    "md": { "$value": 40 },
+    "lg": { "$value": 48 },
+    "xl": { "$value": 56 }
+  },
+
+  "elevation": {
+    "z0": { "$value": "none" },
+    "z1": { "$value": "inset 0 0 0 1px var(--border)" },
+    "z2": { "$value": "inset 0 0 0 1px var(--border-strong), 0 2px 4px -1px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.5)" },
+    "z3": { "$value": "inset 0 0 0 1px var(--border-strong), 0 0 0 1px rgba(232,228,220,0.04), 0 4px 8px -2px rgba(0,0,0,0.5), 0 24px 48px -20px rgba(0,0,0,0.7)" },
+    "z4": { "$value": "inset 0 0 0 1px var(--border-strong), 0 0 0 1px rgba(232,228,220,0.06), 0 8px 16px -4px rgba(0,0,0,0.6), 0 40px 80px -24px rgba(0,0,0,0.8)" }
+  },
+
+  "elevationNative": {
+    "$description": "React Native shadow objects (iOS shadowX / Android elevation)",
+    "z0": { "$value": { "shadowColor": "transparent", "shadowOffset": { "width": 0, "height": 0 }, "shadowOpacity": 0, "shadowRadius": 0, "elevation": 0 } },
+    "z1": { "$value": { "shadowColor": "#000000", "shadowOffset": { "width": 0, "height": 1 }, "shadowOpacity": 0.08, "shadowRadius": 2, "elevation": 1 } },
+    "z2": { "$value": { "shadowColor": "#000000", "shadowOffset": { "width": 0, "height": 4 }, "shadowOpacity": 0.35, "shadowRadius": 16, "elevation": 6 } },
+    "z3": { "$value": { "shadowColor": "#000000", "shadowOffset": { "width": 0, "height": 12 }, "shadowOpacity": 0.45, "shadowRadius": 28, "elevation": 10 } },
+    "z4": { "$value": { "shadowColor": "#000000", "shadowOffset": { "width": 0, "height": 20 }, "shadowOpacity": 0.55, "shadowRadius": 44, "elevation": 16 } }
+  },
+
+  "motion": {
+    "ease":   { "$value": "cubic-bezier(0.22, 0.61, 0.36, 1)" },
+    "easeIn": { "$value": "cubic-bezier(0.4, 0, 1, 1)" },
+    "duration": {
+      "fast":   { "$value": 120 },
+      "normal": { "$value": 200 },
+      "slow":   { "$value": 320 }
+    }
+  }
+}

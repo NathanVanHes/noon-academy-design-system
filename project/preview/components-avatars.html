@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:32px;background:var(--void);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .av{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Crimson Pro';font-weight:500;background:#1a2236;color:#e8e4dc;box-shadow:inset 0 0 0 1px rgba(232,228,220,.14);position:relative}
+  body.rtl .av{font-family:'Noto Naskh Arabic',serif;font-weight:700}
+  .av.noon{background:#64D8AE;color:#0a3326}
+  .s56{width:56px;height:56px;font-size:22px}
+  .s40{width:40px;height:40px;font-size:16px}
+  .s32{width:32px;height:32px;font-size:13px}
+  .star{position:absolute;inset-inline-end:-2px;bottom:-2px;width:14px;height:14px;background:#e0b83a;transform:rotate(45deg)}
+  .stack{display:flex}
+  body.rtl .stack{flex-direction:row-reverse}
+  .stack .av{box-shadow:inset 0 0 0 1px rgba(232,228,220,.14),0 0 0 2px #0a0f1a}
+  .stack .av+.av{margin-inline-start:-10px}
+  .cap{font-family:'Work Sans';font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:rgba(232,228,220,.45);margin-inline-start:8px;align-self:center}
+  body.rtl .cap{font-family:'Noto Naskh Arabic',serif;font-size:13px;letter-spacing:0;text-transform:none;font-weight:700;color:rgba(232,228,220,.55)}
+</style></head><body>
+<div class="av s56 noon"><span data-en="S" data-ar="س">S</span><div class="star"></div></div>
+<div class="av s56"><span data-en="FA" data-ar="فر">FA</span></div>
+<div class="av s40"><span data-en="MH" data-ar="مه">MH</span></div>
+<div class="av s32"><span data-en="OR" data-ar="عر">OR</span></div>
+<div class="stack">
+  <div class="av s40"><span data-en="SA" data-ar="سا">SA</span></div>
+  <div class="av s40 noon"><span data-en="FA" data-ar="فر">FA</span></div>
+  <div class="av s40"><span data-en="MH" data-ar="مه">MH</span></div>
+  <div class="av s40"><span data-en="OR" data-ar="عر">OR</span></div>
+  <div class="av s40" style="font-size:12px;color:rgba(232,228,220,.55)">+2</div>
+</div>
+<span class="cap" data-en="Dune Six · 6 members" data-ar="كثبان الستة · 6 أعضاء">Dune Six · 6 members</span>
+<script src="dir-toggle.js"></script>
+</body></html>

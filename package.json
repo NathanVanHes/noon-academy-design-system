@@ -1,0 +1,12 @@
+{
+  "name": "noon-design-system",
+  "version": "1.0.0",
+  "description": "Noon Academy — The Proven Routes design system tokens and explorer",
+  "scripts": {
+    "build": "node scripts/build-tokens.js",
+    "dev": "npx serve . -p 3333 -s",
+    "explorer": "npm run build && npx serve . -p 3333 -s"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:32px;background:var(--void)}
+  .block{margin-bottom:22px}
+  .caps{font-family:'Work Sans';font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:rgba(232,228,220,.45);margin-bottom:10px;display:flex;justify-content:space-between}
+  body.rtl .caps{font-family:'Noto Naskh Arabic',serif;font-size:13px;letter-spacing:0;text-transform:none;font-weight:700;color:rgba(232,228,220,.55)}
+  .caps b{color:#e8e4dc;font-weight:600}
+  .route{height:2px;background:rgba(201,162,39,.2);position:relative;border-radius:1px}
+  .route .done{position:absolute;inset-inline-start:0;top:0;height:100%;background:#c9a227;border-radius:1px;width:52%}
+  .route .now{position:absolute;inset-inline-start:52%;top:-5px;width:12px;height:12px;background:#e0b83a;transform:translateX(-6px) rotate(45deg)}
+  body.rtl .route .now{transform:translateX(6px) rotate(45deg)}
+  .wps{display:flex;justify-content:space-between;margin-top:10px;font-family:'JetBrains Mono';font-size:10px;color:rgba(232,228,220,.45)}
+  body.rtl .wps{font-family:'Noto Naskh Arabic',serif;font-size:12px;font-weight:600}
+  .bar{height:2px;background:rgba(232,228,220,.08);position:relative}
+  .bar .f{position:absolute;inset-inline-start:0;top:0;height:100%;background:#64D8AE;width:72%}
+</style></head><body>
+  <div class="block">
+    <div class="caps"><span data-en="Route · day 14/28" data-ar="المسار · اليوم 14/28">Route · day 14/28</span><b data-en="On pace for 92" data-ar="على مسار الـ92">On pace for 92</b></div>
+    <div class="route"><div class="done"></div><div class="now"></div></div>
+    <div class="wps">
+      <span data-en="START" data-ar="البداية">START</span>
+      <span data-en="WEEK 4" data-ar="أسبوع 4">WEEK 4</span>
+      <span data-en="WEEK 8" data-ar="أسبوع 8">WEEK 8</span>
+      <span data-en="ARRIVAL" data-ar="الوصول">ARRIVAL</span>
+    </div>
+  </div>
+  <div class="block">
+    <div class="caps"><span data-en="Crew water · weekly minimum" data-ar="ماء الفريق · الحد الأدنى الأسبوعي">Crew water · weekly minimum</span><b>18 / 12</b></div>
+    <div class="bar"><div class="f"></div></div>
+  </div>
+<script src="dir-toggle.js"></script>
+</body></html>

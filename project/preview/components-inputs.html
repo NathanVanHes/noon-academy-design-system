@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{margin:0;padding:28px;background:var(--void);display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  label{font-family:'Work Sans';font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:rgba(232,228,220,.45);display:flex;justify-content:space-between}
+  body.rtl label{font-family:'Noto Naskh Arabic',serif;font-size:13px;letter-spacing:0;text-transform:none;font-weight:700;color:rgba(232,228,220,.55)}
+  label em{font-style:normal;color:rgba(232,228,220,.3);font-weight:500;letter-spacing:.04em;text-transform:none}
+  input{font-family:'Work Sans';font-size:14px;height:44px;padding:0 14px;background:rgba(232,228,220,.03);color:#e8e4dc;border:0;box-shadow:inset 0 0 0 1px rgba(232,228,220,.14);border-radius:4px;outline:none;transition:box-shadow 120ms}
+  body.rtl input{font-family:'Noto Naskh Arabic',serif;font-size:15px}
+  input:hover{box-shadow:inset 0 0 0 1px rgba(232,228,220,.28)}
+  input::placeholder{color:rgba(232,228,220,.3)}
+  input.focus{box-shadow:inset 0 0 0 1px #6BA3FF, 0 0 0 3px rgba(107,163,255,.18)}
+  input.err{box-shadow:inset 0 0 0 1px #c55a4e}
+  .hint{font-family:'Crimson Pro';font-style:italic;font-size:12px;color:rgba(232,228,220,.5)}
+  body.rtl .hint{font-family:'Noto Naskh Arabic',serif;font-style:normal;font-size:13px}
+  .err-msg{font-family:'JetBrains Mono';font-size:11px;color:#d97b70;display:flex;align-items:center;gap:6px}
+  .err-msg::before{content:'';width:4px;height:4px;background:#c55a4e;transform:rotate(45deg)}
+  .focus-msg{font-family:'JetBrains Mono';font-size:10px;color:#6BA3FF;letter-spacing:.08em;text-transform:uppercase}
+</style></head><body>
+<div class="field">
+  <label><span data-en="Crew name" data-ar="اسم الفريق">Crew name</span> <em data-en="default" data-ar="افتراضي">default</em></label>
+  <input value="Dune Six" data-en-value="Dune Six" data-ar-value="كثبان الستة">
+  <span class="hint" data-en="Visible to your facilitator only" data-ar="مرئي للميسر فقط">Visible to your facilitator only</span>
+</div>
+<div class="field">
+  <label><span data-en="Test target" data-ar="درجة الهدف">Test target</span> <em data-en="focused" data-ar="قيد التعديل">focused</em></label>
+  <input class="focus" value="92">
+  <span class="focus-msg" data-en="editing" data-ar="تحرير">editing</span>
+</div>
+<div class="field">
+  <label><span data-en="Arrival date" data-ar="تاريخ الوصول">Arrival date</span> <em data-en="placeholder" data-ar="نائب">placeholder</em></label>
+  <input placeholder="May 14, 2026" data-en-placeholder="May 14, 2026" data-ar-placeholder="١٤ مايو ٢٠٢٦">
+  <span class="hint" data-en="Your Qudrat sitting" data-ar="موعد اختبار القدرات">Your Qudrat sitting</span>
+</div>
+<div class="field">
+  <label><span data-en="Projected score" data-ar="الدرجة المتوقعة">Projected score</span> <em data-en="error" data-ar="خطأ">error</em></label>
+  <input class="err" value="110">
+  <span class="err-msg">Score is between 60 and 100</span>
+</div>
+<script src="dir-toggle.js"></script>
+<script>
+  // extra pass to swap input value / placeholder
+  const obs = new MutationObserver(()=>swap());
+  function swap(){
+    const rtl = document.body.classList.contains('rtl');
+    document.querySelectorAll('input').forEach(i=>{
+      const v = rtl ? i.dataset.arValue : i.dataset.enValue;
+      if (v != null) i.value = v;
+      const p = rtl ? i.dataset.arPlaceholder : i.dataset.enPlaceholder;
+      if (p != null) i.placeholder = p;
+    });
+  }
+  obs.observe(document.body,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('DOMContentLoaded',swap);
+</script>
+</body></html>
