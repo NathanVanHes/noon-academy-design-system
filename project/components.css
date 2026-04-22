@@ -543,8 +543,9 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 
 /* Dot indicator for events */
 .cal__day-dot {
-  position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
   width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
+  pointer-events: none;
 }
 .cal__day.is-selected .cal__day-dot { background: var(--accent-fg); }
 

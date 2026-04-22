@@ -3583,7 +3583,8 @@ P.calendar = {
 
     let slideDir = null; // 'left','right', or null
 
-    const evtDays = [2,5,8,10,15,now.getDate(),now.getDate()+2,now.getDate()-3].filter(d => d > 0 && d <= 31);
+    const showDots = currentKnobs && currentKnobs.showEvents !== false;
+    const evtDays = showDots ? [2,5,8,10,15,now.getDate(),now.getDate()+2,now.getDate()-3].filter(d => d > 0 && d <= 31) : [];
 
     function buildWeekRow(week, weekView) {
       return week.map(day => {
