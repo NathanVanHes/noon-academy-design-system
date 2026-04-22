@@ -3547,7 +3547,7 @@ P.calendar = {
   },
   renderCanvas(k) {
     // Just a container — afterRender builds everything
-    return `<div id="calRoot" style="width:360px"></div>`;
+    return `<div id="calRoot" style="width:360px;overflow:hidden"></div>`;
   },
   afterRender() {
     const root = document.getElementById('calRoot');
@@ -3581,14 +3581,30 @@ P.calendar = {
     function isSelected(d, m) { return d === selectedDate.getDate() && m === selectedDate.getMonth() && viewYear === selectedDate.getFullYear(); }
     function isTodaySelected() { return selectedDate.getDate() === now.getDate() && selectedDate.getMonth() === now.getMonth() && selectedDate.getFullYear() === now.getFullYear(); }
 
+    let slideDir = null; // 'left','right', or null
+
+    function buildWeekRow(week) {
+      return week.map(day => {
+        const cls = ['cal__day'];
+        if (day.out) cls.push('is-outside');
+        if (!day.out && isToday(day.d, day.m)) cls.push('is-today');
+        if (!day.out && isSelected(day.d, day.m)) cls.push('is-selected');
+        return '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-out="' + day.out + '">' + day.d + '</button>';
+      }).join('');
+    }
+
     function render() {
       const weeks = buildGrid(viewYear, viewMonth);
       const selWeek = weeks.findIndex(w => w.some(d => !d.out && isSelected(d.d, d.m)));
-      const activeWeek = selWeek >= 0 ? selWeek : weeks.findIndex(w => w.some(d => !d.out && isToday(d.d, d.m)));
+      const activeWeek = Math.max(0, selWeek >= 0 ? selWeek : weeks.findIndex(w => w.some(d => !d.out && isToday(d.d, d.m))));
 
       const weekTitle = FULL_DAYS[selectedDate.getDay()] + ', ' + MONTHS[selectedDate.getMonth()] + ' ' + selectedDate.getDate();
       const monthTitle = MONTHS[viewMonth] + ' ' + viewYear;
       const title = isWeek ? weekTitle : monthTitle;
+
+      // Slide animation class for week rows
+      const slideIn = slideDir === 'left' ? 'cal__slide-in-left' : slideDir === 'right' ? 'cal__slide-in-right' : '';
+      slideDir = null;
 
       let html = '<div class="cal ' + (isWeek ? 'cal--week' : 'cal--month') + '">';
       html += '<div class="cal__header"><span class="cal__month">' + title + '</span><div class="cal__nav">';
@@ -3599,16 +3615,13 @@ P.calendar = {
       html += '<div class="cal__weekdays">' + DAY_NAMES.map(d => '<span class="cal__weekday">' + d + '</span>').join('') + '</div>';
       html += '<div class="cal__days">';
       weeks.forEach((week, wi) => {
-        const hide = isWeek && wi !== activeWeek ? ' style="max-height:0;opacity:0;overflow:hidden"' : '';
-        html += '<div class="cal__week-row"' + hide + '>';
-        week.forEach(day => {
-          const cls = ['cal__day'];
-          if (day.out) cls.push('is-outside');
-          if (!day.out && isToday(day.d, day.m)) cls.push('is-today');
-          if (!day.out && isSelected(day.d, day.m)) cls.push('is-selected');
-          html += '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-out="' + day.out + '">' + day.d + '</button>';
-        });
-        html += '</div>';
+        if (isWeek && wi !== activeWeek) {
+          html += '<div class="cal__week-row" style="max-height:0;opacity:0;overflow:hidden">' + buildWeekRow(week) + '</div>';
+        } else if (isWeek && slideIn) {
+          html += '<div class="cal__week-row ' + slideIn + '">' + buildWeekRow(week) + '</div>';
+        } else {
+          html += '<div class="cal__week-row">' + buildWeekRow(week) + '</div>';
+        }
       });
       html += '</div>';
       html += '<div class="cal__handle" data-action="toggle"><div class="cal__handle-bar"></div></div>';
@@ -3625,15 +3638,27 @@ P.calendar = {
           if (action === 'today') {
             selectedDate = new Date(now);
             viewMonth = now.getMonth(); viewYear = now.getFullYear();
-            isWeek = true;
+            isWeek = true; slideDir = null;
           } else if (action === 'prev') {
-            if (isWeek) { selectedDate.setDate(selectedDate.getDate() - 7); viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear(); }
-            else { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; } }
+            if (isWeek) {
+              selectedDate.setDate(selectedDate.getDate() - 1);
+              viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear();
+              slideDir = 'right';
+            } else {
+              viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+              slideDir = null;
+            }
           } else if (action === 'next') {
-            if (isWeek) { selectedDate.setDate(selectedDate.getDate() + 7); viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear(); }
-            else { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; } }
+            if (isWeek) {
+              selectedDate.setDate(selectedDate.getDate() + 1);
+              viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear();
+              slideDir = 'left';
+            } else {
+              viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+              slideDir = null;
+            }
           } else if (action === 'toggle') {
-            isWeek = !isWeek;
+            isWeek = !isWeek; slideDir = null;
           }
           render();
         });
@@ -3651,8 +3676,8 @@ P.calendar = {
         handle.addEventListener('mousedown', e => { startY = e.clientY; drag = true; });
         handle.addEventListener('touchstart', e => { startY = e.touches[0].clientY; drag = true; }, {passive:true});
       }
-      document.addEventListener('mousemove', e => { if (!drag) return; if (e.clientY - startY > 30) { isWeek = false; drag = false; render(); } else if (startY - e.clientY > 30) { isWeek = true; drag = false; render(); } });
-      document.addEventListener('touchmove', e => { if (!drag) return; const y = e.touches[0].clientY; if (y - startY > 30) { isWeek = false; drag = false; render(); } else if (startY - y > 30) { isWeek = true; drag = false; render(); } }, {passive:true});
+      document.addEventListener('mousemove', e => { if (!drag) return; if (e.clientY - startY > 30) { isWeek = false; drag = false; slideDir = null; render(); } else if (startY - e.clientY > 30) { isWeek = true; drag = false; slideDir = null; render(); } });
+      document.addEventListener('touchmove', e => { if (!drag) return; const y = e.touches[0].clientY; if (y - startY > 30) { isWeek = false; drag = false; slideDir = null; render(); } else if (startY - y > 30) { isWeek = true; drag = false; slideDir = null; render(); } }, {passive:true});
       document.addEventListener('mouseup', () => { drag = false; });
       document.addEventListener('touchend', () => { drag = false; });
     }

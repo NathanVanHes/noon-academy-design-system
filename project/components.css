@@ -558,3 +558,9 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   opacity: 0.3; transition: opacity var(--dur-1) var(--ease);
 }
 .cal__handle:hover .cal__handle-bar { opacity: 0.5; }
+
+/* Horizontal slide animations for week nav */
+@keyframes calSlideInLeft { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes calSlideInRight { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.cal__slide-in-left { animation: calSlideInLeft 0.25s ease forwards; }
+.cal__slide-in-right { animation: calSlideInRight 0.25s ease forwards; }
