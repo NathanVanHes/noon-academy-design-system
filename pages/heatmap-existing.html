@@ -54,12 +54,12 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
-.tile.is-mastered{box-shadow:inset 0 0 0 2px rgba(255,255,255,0.5),0 2px 8px rgba(39,189,134,0.25)}
-.tile.is-mastered::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,0.35) 0%,rgba(255,255,255,0) 50%,rgba(255,255,255,0.1) 100%);pointer-events:none}
+.tile.is-mastered{}
 .tile__mastered{position:absolute;top:5px;left:5px;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
-.tile__mastered svg{filter:drop-shadow(0 0 2px rgba(201,162,39,0.5))}
-@keyframes shimmer{0%{opacity:0.6}50%{opacity:1}100%{opacity:0.6}}
-.tile__mastered svg{animation:shimmer 2s ease-in-out infinite}
+@keyframes sparkle{0%{filter:drop-shadow(0 0 1px rgba(212,160,23,0.3));transform:scale(1)}25%{filter:drop-shadow(0 0 4px rgba(212,160,23,0.8));transform:scale(1.15)}50%{filter:drop-shadow(0 0 1px rgba(212,160,23,0.3));transform:scale(1)}75%{filter:drop-shadow(0 0 6px rgba(255,203,69,0.9));transform:scale(1.2)}100%{filter:drop-shadow(0 0 1px rgba(212,160,23,0.3));transform:scale(1)}}
+.tile__mastered svg{animation:sparkle 3s ease-in-out infinite}
+/* Chapter subheader */
+.chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
 
 /* Drilldown panel — slides in from right */
 .drill-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s ease}
@@ -193,14 +193,15 @@ function t(score,changed,exam,diff){
   return{name:'Topic name',score:s,changed:changed,exam:exam,trend:tr};
 }
 
-var mathTopics = [
-  t(76,false,true,5),t(22,true,false,-3),t(61,false,false,8),t(94,false,true,2),
-  t(35,false,false,-4),t(null,false,false),t(70,false,false,6),t(18,true,true,-5),
-  t(85,false,false,3),t(42,true,false,7),t(28,false,false,-2),t(15,false,false,-6),
-  t(58,false,false,4),t(null,false,false),t(73,false,false,0),t(88,true,false,3),
-  t(25,false,false,-3),t(91,false,false,1),t(44,false,false,5),t(null,false,false),
-  t(32,false,false,-4),t(79,true,false,6),t(55,false,false,0),
+var mathChapters = [
+  { name: 'Arithmetic', topics: [t(76,false,true,5),t(22,true,false,-3),t(61,false,false,8),t(94,false,true,2),t(35,false,false,-4)] },
+  { name: 'Algebra', topics: [t(null,false,false),t(70,false,false,6),t(18,true,true,-5),t(85,false,false,3),t(42,true,false,7)] },
+  { name: 'Geometry', topics: [t(28,false,false,-2),t(15,false,false,-6),t(58,false,false,4),t(null,false,false),t(73,false,false,0)] },
+  { name: 'Statistics', topics: [t(88,true,false,3),t(25,false,false,-3),t(91,false,false,1),t(44,false,false,5)] },
+  { name: 'Problem Solving', topics: [t(null,false,false),t(32,false,false,-4),t(79,true,false,6),t(55,false,false,0)] },
 ];
+var mathTopics = [];
+mathChapters.forEach(function(c){c.topics.forEach(function(t){mathTopics.push(t)})});
 
 var readingTopics = [
   t(82,true,true,7),t(30,false,false,-5),t(91,true,false,3),t(22,false,false,-4),
@@ -234,33 +235,53 @@ function chartBarColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
+function renderTile(t, section) {
+  var tile = document.createElement('div');
+  tile.className = 'tile';
+  tile.style.background = scoreColor(t.score);
+  var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
+  var chevronSvg = '';
+  if (t.changed) {
+    if (diff > 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg>';
+    else if (diff < 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg>';
+    else chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg>';
+  }
+  var mastered = t.score !== null && t.score >= 80;
+  if (mastered) tile.classList.add('is-mastered');
+  tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="12" height="12" viewBox="0 0 12 12" fill="#D4A017"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></div>' : '') +
+    '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+    (t.score !== null ? '<div class="tile__score">' + chevronSvg + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
+  if (t.score === null) {
+    tile.style.cursor = 'default';
+    tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
+    tile.querySelector('.tile__name').style.color = 'var(--fg-muted)';
+    tile.querySelector('.tile__score').style.color = 'var(--fg-muted)';
+  }
+  tile.addEventListener('click', function() { if (t.score !== null) openDrill(t, section); else openDrillGrey(t, section); });
+  return tile;
+}
+
 function renderGrid(containerId, topics, section) {
   var grid = document.getElementById(containerId);
   grid.innerHTML = '';
   topics.forEach(function(t) {
-    var tile = document.createElement('div');
-    tile.className = 'tile';
-    tile.style.background = scoreColor(t.score);
-    var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
-    var chevronSvg = '';
-    if (t.changed) {
-      if (diff > 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 2L7 6H1Z" fill="rgba(0,0,0,0.45)"/></svg>';
-      else if (diff < 0) chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M4 6L1 2H7Z" fill="rgba(0,0,0,0.45)"/></svg>';
-      else chevronSvg = '<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="flex:none"><path d="M1 4H7" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></svg>';
-    }
-    var mastered = t.score !== null && t.score >= 80;
-    if (mastered) tile.classList.add('is-mastered');
-    tile.innerHTML = (mastered ? '<div class="tile__mastered"><svg width="12" height="12" viewBox="0 0 12 12" fill="#D4A017"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></div>' : '') +
-      '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
-      (t.score !== null ? '<div class="tile__score">' + chevronSvg + t.score + '</div>' : '<div class="tile__score" style="color:var(--fg-muted)">--</div>');
-    if (t.score === null) {
-      tile.style.cursor = 'default';
-      tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
-      tile.querySelector('.tile__name').style.color = 'var(--fg-muted)';
-      tile.querySelector('.tile__score').style.color = 'var(--fg-muted)';
-    }
-    tile.addEventListener('click', function() { if (t.score !== null) openDrill(t, section); else openDrillGrey(t, section); });
-    grid.appendChild(tile);
+    grid.appendChild(renderTile(t, section));
+  });
+}
+
+function renderChapteredGrid(containerId, chapters, section, examOnly) {
+  var grid = document.getElementById(containerId);
+  grid.innerHTML = '';
+  chapters.forEach(function(ch) {
+    var topics = examOnly ? ch.topics.filter(function(t){return t.exam}) : ch.topics;
+    if (topics.length === 0) return;
+    var label = document.createElement('div');
+    label.className = 'chapter-label';
+    label.textContent = ch.name;
+    grid.appendChild(label);
+    topics.forEach(function(t) {
+      grid.appendChild(renderTile(t, section));
+    });
   });
 }
 
@@ -434,12 +455,12 @@ document.getElementById('examFilter').addEventListener('click', function() {
   }
   document.getElementById('quantExam').style.display = examOn ? 'flex' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'flex' : 'none';
-  renderGrid('mathGrid', examOn ? mathTopics.filter(function(t){return t.exam}) : mathTopics, 'Quantitative');
+  renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn);
   renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal');
 });
 
 // Init
-renderGrid('mathGrid', mathTopics, 'Quantitative');
+renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
 renderGrid('readingGrid', readingTopics, 'Verbal');
 var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
 document.getElementById('changedCount').innerHTML += changedNum + ' changed since you last visited';
