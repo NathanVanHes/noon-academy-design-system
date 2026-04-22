@@ -334,13 +334,13 @@ function openDrill(t, section) {
   var nudge = document.getElementById('drillNudge');
   var ctaBtn = document.getElementById('drillCtaBtn');
   if (t.score >= 80) {
-    nudge.textContent = 'You\'ve mastered this topic. Keep practicing to stay sharp — even a few questions a week helps.';
+    nudge.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(39,189,134,0.06);border:1px solid rgba(39,189,134,0.12);border-radius:8px"><svg width="16" height="16" viewBox="0 0 12 12" fill="rgba(39,189,134,0.7)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span>You\'ve mastered this. Keep sharp with a few questions a week.</span></div>';
     ctaBtn.textContent = 'Keep practicing';
   } else if (t.score >= 50) {
-    nudge.textContent = 'You\'re getting there. Focus on accuracy — take your time with each question and aim to get more right.';
+    nudge.innerHTML = 'You\'re getting there. Focus on getting more right — take your time with each question.';
     ctaBtn.textContent = 'Practice this topic';
   } else {
-    nudge.textContent = 'This one needs work. Start with a short session and build up — doing more questions more often is the fastest way to improve.';
+    nudge.innerHTML = 'This one needs work. Start with a short session — doing more questions more often will help.';
     ctaBtn.textContent = 'Start practicing';
   }
 
