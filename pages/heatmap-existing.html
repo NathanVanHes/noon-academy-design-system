@@ -25,7 +25,8 @@
 body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);min-height:100vh}
 
 /* Top bar */
-.topbar{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+.topbar{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08);position:sticky;top:0;z-index:10}
+.topbar__inner{max-width:720px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px}
 .topbar h1{font-size:20px;font-weight:700;margin:0}
 .topbar__right{display:flex;align-items:center;gap:16px}
 
@@ -93,9 +94,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <!-- Top bar -->
 <div class="topbar">
-  <h1>Mastery</h1>
-  <div class="topbar__right">
-    <button class="btn-secondary" id="examFilter">Next exam</button>
+  <div class="topbar__inner">
+    <h1>Mastery</h1>
+    <div class="topbar__right">
+      <button class="btn-secondary" id="examFilter">Next exam</button>
+    </div>
   </div>
 </div>
 
@@ -170,7 +173,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
     <div id="drillChange" style="display:flex;align-items:center;gap:8px;padding:14px 18px;border-radius:var(--r);font-size:13px;color:var(--fg)"></div>
   </div>
   <div class="drill__cta">
-    <button class="btn-primary">Practice this topic</button>
+    <div id="drillNudge" style="font-size:12px;color:var(--fg-secondary);line-height:1.5;margin-bottom:12px;padding:0 2px"></div>
+    <button class="btn-primary" id="drillCtaBtn">Practice this topic</button>
+    <div style="font-size:11px;color:var(--fg-muted);text-align:center;margin-top:10px">Your score is based on <b style="color:var(--fg-secondary)">practice accuracy</b> and <b style="color:var(--fg-secondary)">practice quantity</b></div>
   </div>
 </div>
 
@@ -292,6 +297,20 @@ function openDrill(t, section) {
     ch.style.border = '1px solid rgba(20,20,20,0.08)';
     var noChangeReasons = ['Practice accuracy stayed the same','Practice quantity stayed the same','No exam results this week'];
     ch.innerHTML = '<div style="color:var(--fg-secondary)"><span style="font-family:var(--font-mono);font-weight:600">0</span> change this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + noChangeReasons[t.score % noChangeReasons.length] + '</div>';
+  }
+
+  // Contextual nudge
+  var nudge = document.getElementById('drillNudge');
+  var ctaBtn = document.getElementById('drillCtaBtn');
+  if (t.score >= 80) {
+    nudge.textContent = 'You\'ve mastered this topic. Keep practicing to stay sharp — even a few questions a week helps.';
+    ctaBtn.textContent = 'Keep practicing';
+  } else if (t.score >= 50) {
+    nudge.textContent = 'You\'re getting there. Focus on accuracy — take your time with each question and aim to get more right.';
+    ctaBtn.textContent = 'Practice this topic';
+  } else {
+    nudge.textContent = 'This one needs work. Start with a short session and build up — doing more questions more often is the fastest way to improve.';
+    ctaBtn.textContent = 'Start practicing';
   }
 
   window._currentTopic = t;
