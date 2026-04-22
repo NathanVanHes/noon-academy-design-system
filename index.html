@@ -3538,7 +3538,7 @@ P.leaderboard = {
 
 // ──────── CALENDAR ────────
 P.calendar = {
-  title: 'Calendar', desc: 'Starts as a week strip. Drag or tap the handle to expand to full month. Tap a day to select. Today button snaps back.',
+  title: 'Calendar', desc: 'Week strip by default, expand to full month. Arrows navigate weeks or months. Fully portable to React Native.',
   tokens() {
     return ['--accent','--accent-fg','--fg','--fg-faint','--fg-disabled','--hover-overlay','--r-1','--sp-2','--sp-3','--dur-1','--ease'];
   },
@@ -3546,154 +3546,118 @@ P.calendar = {
     showEvents: { type:'toggle', default:true, label:'Show event dots' },
   },
   renderCanvas(k) {
-    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const fullDayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const now = new Date();
-    const today = now.getDate();
-    const month = now.getMonth();
-    const year = now.getFullYear();
-    const todayDow = fullDayNames[now.getDay()];
-    const monthName = months[month] + ' ' + year;
-    const weekTitle = todayDow + ', ' + months[month] + ' ' + today;
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrev = new Date(year, month, 0).getDate();
-    const evtDays = [2,8,10,15,today,today+2,today-3].filter(d => d > 0 && d <= daysInMonth);
-
-    // Build flat day array
-    const allDays = [];
-    for (let i = firstDay - 1; i >= 0; i--) allDays.push({d: daysInPrev - i, out: true});
-    for (let d = 1; d <= daysInMonth; d++) allDays.push({d, out: false});
-    while (allDays.length % 7 !== 0) allDays.push({d: allDays.length - firstDay - daysInMonth + 1, out: true});
-
-    // Split into weeks
-    const weeks = [];
-    for (let i = 0; i < allDays.length; i += 7) weeks.push(allDays.slice(i, i + 7));
-
-    // Find which week contains today
-    let aw = 0;
-    weeks.forEach((w, i) => { if (w.some(d => !d.out && d.d === today)) aw = i; });
-
-    const header = dayNames.map(d => `<span class="cal__weekday">${d}</span>`).join('');
-    const rows = weeks.map((week, wi) => {
-      const hide = wi !== aw ? ' style="max-height:0;opacity:0;overflow:hidden"' : '';
-      const cells = week.map(m => {
-        const cls = ['cal__day'];
-        if (m.out) cls.push('is-outside');
-        if (!m.out && m.d === today) { cls.push('is-selected'); cls.push('is-today'); }
-        const dot = k.showEvents && !m.out && evtDays.includes(m.d) ? '<span class="cal__day-dot"></span>' : '';
-        return `<button class="${cls.join(' ')}">${m.d}${dot}</button>`;
-      }).join('');
-      return `<div class="cal__week-row" data-week="${wi}"${hide}>${cells}</div>`;
-    }).join('');
-
-    return `<div class="cal cal--week" style="width:360px" data-active-week="${aw}" data-week-title="${weekTitle}" data-month-title="${monthName}">
-      <div class="cal__header">
-        <span class="cal__month">${weekTitle}</span>
-        <div class="cal__nav">
-          <button class="btn btn--ghost btn--sm cal__today-btn">Today</button>
-          <button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
-          <button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>
-        </div>
-      </div>
-      <div class="cal__weekdays">${header}</div>
-      <div class="cal__days">${rows}</div>
-      <div class="cal__handle"><div class="cal__handle-bar"></div></div>
-    </div>`;
+    // Just a container — afterRender builds everything
+    return `<div id="calRoot" style="width:360px"></div>`;
   },
   afterRender() {
-    const cal = document.querySelector('#canvas .cal');
-    if (!cal) return;
-    const rows = cal.querySelectorAll('.cal__week-row');
-    const aw = cal.dataset.activeWeek || '3';
+    const root = document.getElementById('calRoot');
+    if (!root) return;
 
-    const titleEl = cal.querySelector('.cal__month');
+    const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const FULL_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const now = new Date();
+    const todayKey = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
 
-    // Expand/collapse
-    function expand() {
-      cal.classList.remove('cal--week'); cal.classList.add('cal--month');
-      rows.forEach(r => { r.style.maxHeight = '48px'; r.style.opacity = '1'; });
-      titleEl.textContent = cal.dataset.monthTitle;
+    let viewMonth = now.getMonth();
+    let viewYear = now.getFullYear();
+    let selectedDate = new Date(now);
+    let isWeek = true;
+
+    function buildGrid(y, m) {
+      const first = new Date(y, m, 1).getDay();
+      const dim = new Date(y, m + 1, 0).getDate();
+      const prevDim = new Date(y, m, 0).getDate();
+      const days = [];
+      for (let i = first - 1; i >= 0; i--) days.push({d: prevDim - i, m: m-1, out: true});
+      for (let d = 1; d <= dim; d++) days.push({d, m, out: false});
+      while (days.length % 7 !== 0) days.push({d: days.length - first - dim + 1, m: m+1, out: true});
+      const weeks = [];
+      for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
+      return weeks;
     }
-    function collapse() {
-      cal.classList.remove('cal--month'); cal.classList.add('cal--week');
-      rows.forEach(r => {
-        if (r.dataset.week === aw) { r.style.maxHeight = '48px'; r.style.opacity = '1'; }
-        else { r.style.maxHeight = '0'; r.style.opacity = '0'; }
+
+    function isToday(d, m) { return d === now.getDate() && m === now.getMonth() && viewYear === now.getFullYear(); }
+    function isSelected(d, m) { return d === selectedDate.getDate() && m === selectedDate.getMonth() && viewYear === selectedDate.getFullYear(); }
+    function isTodaySelected() { return selectedDate.getDate() === now.getDate() && selectedDate.getMonth() === now.getMonth() && selectedDate.getFullYear() === now.getFullYear(); }
+
+    function render() {
+      const weeks = buildGrid(viewYear, viewMonth);
+      const selWeek = weeks.findIndex(w => w.some(d => !d.out && isSelected(d.d, d.m)));
+      const activeWeek = selWeek >= 0 ? selWeek : weeks.findIndex(w => w.some(d => !d.out && isToday(d.d, d.m)));
+
+      const weekTitle = FULL_DAYS[selectedDate.getDay()] + ', ' + MONTHS[selectedDate.getMonth()] + ' ' + selectedDate.getDate();
+      const monthTitle = MONTHS[viewMonth] + ' ' + viewYear;
+      const title = isWeek ? weekTitle : monthTitle;
+
+      let html = '<div class="cal ' + (isWeek ? 'cal--week' : 'cal--month') + '">';
+      html += '<div class="cal__header"><span class="cal__month">' + title + '</span><div class="cal__nav">';
+      if (!isTodaySelected()) html += '<button class="btn btn--ghost btn--sm" data-action="today">Today</button>';
+      html += '<button class="icon-btn icon-btn--ghost icon-btn--sm" data-action="prev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>';
+      html += '<button class="icon-btn icon-btn--ghost icon-btn--sm" data-action="next"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>';
+      html += '</div></div>';
+      html += '<div class="cal__weekdays">' + DAY_NAMES.map(d => '<span class="cal__weekday">' + d + '</span>').join('') + '</div>';
+      html += '<div class="cal__days">';
+      weeks.forEach((week, wi) => {
+        const hide = isWeek && wi !== activeWeek ? ' style="max-height:0;opacity:0;overflow:hidden"' : '';
+        html += '<div class="cal__week-row"' + hide + '>';
+        week.forEach(day => {
+          const cls = ['cal__day'];
+          if (day.out) cls.push('is-outside');
+          if (!day.out && isToday(day.d, day.m)) cls.push('is-today');
+          if (!day.out && isSelected(day.d, day.m)) cls.push('is-selected');
+          html += '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-out="' + day.out + '">' + day.d + '</button>';
+        });
+        html += '</div>';
       });
-      titleEl.textContent = cal.dataset.weekTitle;
+      html += '</div>';
+      html += '<div class="cal__handle" data-action="toggle"><div class="cal__handle-bar"></div></div>';
+      html += '</div>';
+      root.innerHTML = html;
+      wire();
     }
 
-    // Handle click toggle
-    cal.querySelector('.cal__handle').addEventListener('click', () => {
-      cal.classList.contains('cal--week') ? expand() : collapse();
-    });
-
-    // Handle drag
-    let startY = 0, dragging = false;
-    const handle = cal.querySelector('.cal__handle');
-    handle.addEventListener('mousedown', e => { startY = e.clientY; dragging = true; });
-    handle.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; }, {passive:true});
-    document.addEventListener('mousemove', e => { if (!dragging) return; if (e.clientY - startY > 30) { expand(); dragging = false; } else if (startY - e.clientY > 30) { collapse(); dragging = false; } });
-    document.addEventListener('touchmove', e => { if (!dragging) return; const y = e.touches[0].clientY; if (y - startY > 30) { expand(); dragging = false; } else if (startY - y > 30) { collapse(); dragging = false; } }, {passive:true});
-    document.addEventListener('mouseup', () => { dragging = false; });
-    document.addEventListener('touchend', () => { dragging = false; });
-
-    // Day selection
-    cal.querySelectorAll('.cal__day').forEach(d => {
-      d.addEventListener('click', function() {
-        cal.querySelectorAll('.cal__day').forEach(b => b.classList.remove('is-selected'));
-        this.classList.add('is-selected');
-        updateTodayBtn();
+    function wire() {
+      root.querySelectorAll('[data-action]').forEach(el => {
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          const action = el.dataset.action;
+          if (action === 'today') {
+            selectedDate = new Date(now);
+            viewMonth = now.getMonth(); viewYear = now.getFullYear();
+            isWeek = true;
+          } else if (action === 'prev') {
+            if (isWeek) { selectedDate.setDate(selectedDate.getDate() - 7); viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear(); }
+            else { viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; } }
+          } else if (action === 'next') {
+            if (isWeek) { selectedDate.setDate(selectedDate.getDate() + 7); viewMonth = selectedDate.getMonth(); viewYear = selectedDate.getFullYear(); }
+            else { viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; } }
+          } else if (action === 'toggle') {
+            isWeek = !isWeek;
+          }
+          render();
+        });
       });
-    });
-
-    // Today button — hide when today is selected
-    const todayBtnEl = cal.querySelector('.cal__today-btn');
-    function updateTodayBtn() {
-      const todayEl = cal.querySelector('.cal__day.is-today');
-      todayBtnEl.style.display = todayEl && todayEl.classList.contains('is-selected') ? 'none' : '';
-    }
-    updateTodayBtn();
-    if (todayBtnEl) todayBtnEl.addEventListener('click', e => {
-      e.stopPropagation();
-      cal.querySelectorAll('.cal__day').forEach(b => b.classList.remove('is-selected'));
-      const todayEl = cal.querySelector('.cal__day.is-today');
-      if (todayEl) todayEl.classList.add('is-selected');
-      collapse();
-      updateTodayBtn();
-    });
-
-    // Arrow navigation — move selection, scroll weeks in week view
-    const navBtns = cal.querySelectorAll('.icon-btn');
-    const allDayBtns = Array.from(cal.querySelectorAll('.cal__day:not(.is-outside)'));
-    function getSelectedIdx() { return allDayBtns.findIndex(d => d.classList.contains('is-selected')); }
-    function showWeekForDay(dayEl) {
-      if (!cal.classList.contains('cal--week')) return;
-      const row = dayEl.closest('.cal__week-row');
-      if (!row) return;
-      rows.forEach(r => {
-        if (r === row) { r.style.maxHeight = '52px'; r.style.opacity = '1'; }
-        else { r.style.maxHeight = '0'; r.style.opacity = '0'; }
+      root.querySelectorAll('.cal__day:not(.is-outside)').forEach(el => {
+        el.addEventListener('click', () => {
+          selectedDate = new Date(viewYear, viewMonth, parseInt(el.dataset.day));
+          render();
+        });
       });
+      // Drag
+      let startY = 0, drag = false;
+      const handle = root.querySelector('.cal__handle');
+      if (handle) {
+        handle.addEventListener('mousedown', e => { startY = e.clientY; drag = true; });
+        handle.addEventListener('touchstart', e => { startY = e.touches[0].clientY; drag = true; }, {passive:true});
+      }
+      document.addEventListener('mousemove', e => { if (!drag) return; if (e.clientY - startY > 30) { isWeek = false; drag = false; render(); } else if (startY - e.clientY > 30) { isWeek = true; drag = false; render(); } });
+      document.addEventListener('touchmove', e => { if (!drag) return; const y = e.touches[0].clientY; if (y - startY > 30) { isWeek = false; drag = false; render(); } else if (startY - y > 30) { isWeek = true; drag = false; render(); } }, {passive:true});
+      document.addEventListener('mouseup', () => { drag = false; });
+      document.addEventListener('touchend', () => { drag = false; });
     }
-    function selectDay(idx) {
-      allDayBtns.forEach(d => d.classList.remove('is-selected'));
-      allDayBtns[idx].classList.add('is-selected');
-      showWeekForDay(allDayBtns[idx]);
-      updateTodayBtn();
-    }
-    if (navBtns[0]) navBtns[0].addEventListener('click', e => {
-      e.stopPropagation();
-      const idx = getSelectedIdx();
-      if (idx > 0) selectDay(idx - 1);
-    });
-    if (navBtns[1]) navBtns[1].addEventListener('click', e => {
-      e.stopPropagation();
-      const idx = getSelectedIdx();
-      if (idx < allDayBtns.length - 1) selectDay(idx + 1);
-    });
+
+    render();
   },
   renderCode() {
     return `<!-- Starts collapsed as week strip -->
