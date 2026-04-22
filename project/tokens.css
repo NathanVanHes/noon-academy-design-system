@@ -139,6 +139,7 @@
   --font-mono:         'JetBrains Mono', 'Vazirmatn', ui-monospace, monospace;
   --font-arabic:       'Vazirmatn', sans-serif;
 
+  --fs-9:  9px;  --fs-10: 10px; --fs-11: 11px;
   --fs-12: 12px; --fs-13: 13px; --fs-14: 14px; --fs-15: 15px;
   --fs-16: 16px; --fs-18: 18px; --fs-20: 20px; --fs-22: 22px;
   --fs-24: 24px; --fs-28: 28px; --fs-32: 32px; --fs-40: 40px;
@@ -152,7 +153,9 @@
   --lh-loose:   1.7;
 
   --tr-tight:   -0.015em;
+  --tr-snug:    -0.005em;
   --tr-caps:     0.14em;
+  --tr-wide:     0.08em;
 
   /* Space (4px grid) */
   --sp-0:   0;
