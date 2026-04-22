@@ -63,7 +63,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.45);display:flex;align-items:center;gap:2px}
 @keyframes sparkle{0%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}25%{filter:drop-shadow(0 0 4px rgba(255,255,255,0.8));transform:scale(1.15)}50%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}75%{filter:drop-shadow(0 0 6px rgba(255,255,255,0.9));transform:scale(1.2)}100%{filter:drop-shadow(0 0 1px rgba(255,255,255,0.3));transform:scale(1)}}
 .mastery-star{animation:sparkle 3s ease-in-out infinite}
-.tile__diff{position:absolute;bottom:4px;right:4px;display:flex;align-items:center;gap:1px;font-family:var(--font-mono);font-size:8px;font-weight:600;color:rgba(0,0,0,0.4)}
+.tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.4)}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
 
@@ -95,11 +95,13 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .btn-secondary:hover{border-color:rgba(20,20,20,0.25)}
 
 /* Exam toggle */
-.exam-toggle{height:34px;padding:0 14px;background:var(--bg-raised);color:var(--fg-secondary);border:1px solid rgba(20,20,20,0.12);border-radius:20px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px}
-.exam-toggle:hover{border-color:rgba(20,20,20,0.25)}
-.exam-toggle__dot{width:8px;height:8px;border-radius:50%;background:rgba(20,20,20,0.15);transition:all 0.2s;flex:none}
-.exam-toggle.is-on{background:#0084FF;color:#fff;border-color:#0084FF}
-.exam-toggle.is-on .exam-toggle__dot{background:#fff;box-shadow:0 0 4px rgba(255,255,255,0.5)}
+.exam-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;background:none;border:0;padding:0;font:inherit}
+.exam-toggle__label{font-size:13px;font-weight:500;color:var(--fg-secondary);transition:color 0.2s}
+.exam-toggle.is-on .exam-toggle__label{color:var(--fg)}
+.exam-toggle__track{width:36px;height:20px;border-radius:10px;background:rgba(20,20,20,0.12);position:relative;transition:background 0.2s;flex:none}
+.exam-toggle__thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15);transition:transform 0.2s}
+.exam-toggle.is-on .exam-toggle__track{background:#0084FF}
+.exam-toggle.is-on .exam-toggle__thumb{transform:translateX(16px)}
 
 /* Range tabs */
 .range-tabs{display:flex;gap:0;background:var(--bg);border-radius:6px;padding:3px;margin-bottom:20px}
@@ -114,7 +116,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="topbar__inner">
     <h1>Mastery</h1>
     <div class="topbar__right">
-      <button class="exam-toggle" id="examFilter"><span class="exam-toggle__dot"></span>Next exam</button>
+      <button class="exam-toggle" id="examFilter"><span class="exam-toggle__label">Next exam</span><span class="exam-toggle__track"><span class="exam-toggle__thumb"></span></span></button>
     </div>
   </div>
 </div>
@@ -474,7 +476,6 @@ var examOn = false;
 document.getElementById('examFilter').addEventListener('click', function() {
   examOn = !examOn;
   this.classList.toggle('is-on', examOn);
-  this.innerHTML = examOn ? '<span class="exam-toggle__dot"></span>Show all topics' : '<span class="exam-toggle__dot"></span>Next exam';
   document.getElementById('quantExam').style.display = examOn ? 'flex' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'flex' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn);
