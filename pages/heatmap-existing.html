@@ -40,14 +40,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .grid-section__exam b{font-weight:700}
 
 /* Legend row */
-.legend-row{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.legend-row{display:flex;align-items:center;gap:16px;padding:12px 0;background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.06);margin:-32px -40px 24px;padding:12px 40px}
 .legend-key{display:flex;flex-direction:column;gap:2px}
 .legend-key__bar{width:180px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
 .legend-key__labels{display:flex;justify-content:space-between}
 .legend-key__labels span{font-family:var(--font-mono);font-size:9px;color:var(--fg-muted)}
-.legend-row__divider{width:1px;height:24px;background:rgba(20,20,20,0.08)}
-.legend-row__changed{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--fg-secondary)}
-.legend-row__mastered{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--fg-muted)}
 
 /* Grid */
 .grid-section{margin-bottom:32px}
@@ -121,14 +118,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="legend-row">
     <div class="legend-key">
       <div class="legend-key__bar"></div>
-      <div class="legend-key__labels"><span>0</span><span>80 Mastered</span><span>100</span></div>
+      <div class="legend-key__labels"><span>0</span><span>Reach 80 for mastery</span><span>100</span></div>
     </div>
-    <span class="legend-row__divider"></span>
-    <span class="legend-row__changed" id="changedCount">
-      <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M4 2L7 6H1Z" fill="#74716C"/><path d="M10 8L7 4H13Z" fill="#74716C"/></svg>
-    </span>
-    <span class="legend-row__divider"></span>
-    <span class="legend-row__mastered"><svg width="10" height="10" viewBox="0 0 12 12" fill="rgba(39,189,134,0.6)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> = Mastered</span>
   </div>
 
   <!-- Math section -->
@@ -464,8 +455,6 @@ document.getElementById('examFilter').addEventListener('click', function() {
 // Init
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
 renderGrid('readingGrid', readingTopics, 'Verbal');
-var changedNum = mathTopics.filter(function(t){return t.changed}).length + readingTopics.filter(function(t){return t.changed}).length;
-document.getElementById('changedCount').innerHTML += changedNum + ' changed since you last visited';
 </script>
 </body>
 </html>
