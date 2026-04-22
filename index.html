@@ -2512,148 +2512,50 @@ P.sessionbar = {
 
 // ──────── LINEAR & CIRCULAR PROGRESS ────────
 P.progress = {
-  title: 'Linear & Circular', desc: 'Utility progress indicators for non-journey contexts: file uploads, loading states, capacity meters. For student progress use Route Steps or Session Bar instead.',
+  title: 'Linear & Circular', desc: 'Utility progress indicators for uploads, loading states, and capacity meters. For student progress use Route Steps or Session Bar.',
   tokens(k) {
-    const base = ['--dur-3','--ease'];
-    if (k.type==='steps') base.push('--signal','--signal-bright','--signal-glow','--fg-14');
-    if (k.type==='linear') base.push('--accent','--r-pill', k.variant==='gold'?'--signal':'--accent');
-    if (k.type==='circular') base.push('--accent','--fg');
+    const base = ['--accent','--r-pill','--dur-3','--ease'];
+    if (k.variant==='gold') base.push('--signal');
     return base;
   },
   knobs: {
-    type: { type:'select', options:['steps','linear','circular'], default:'steps', label:'Type' },
-    value: { type:'range', min:0, max:100, step:5, default:55, label:'Position' },
-    variant: { type:'select', options:['accent','gold'], default:'gold', label:'Color' },
-    stepCount: { type:'select', options:['3','5','7','10'], default:'7', label:'Waypoints' },
+    type: { type:'select', options:['linear','circular'], default:'linear', label:'Type' },
+    value: { type:'range', min:0, max:100, step:5, default:55, label:'Value' },
+    variant: { type:'select', options:['accent','gold'], default:'accent', label:'Color' },
   },
   renderCanvas(k) {
-    if (k.type==='steps') {
-      const total=Number(k.stepCount); const done=Math.round(k.value/100*(total-1));
-      let h='<div class="steps">';
-      for(let i=0;i<total;i++){
-        if(i>0) h+=`<div class="steps__line${i<=done?' is-done':''}"></div>`;
-        h+=`<div class="steps__dot${i<done?' is-done':i===done?' is-now':''}"></div>`;
-      }
-      return h+'</div>';
-    }
     if (k.type==='circular') {
       const c = 125.6; const off = c - (c * k.value / 100);
-      return `<div class="circ"><svg viewBox="0 0 48 48"><circle class="circ__track" cx="24" cy="24" r="20" stroke-width="3"/><circle class="circ__bar" cx="24" cy="24" r="20" stroke-width="3" stroke-dasharray="${c}" stroke-dashoffset="${off}" style="${k.variant==='gold'?'stroke:var(--signal)':''}"/></svg><span class="circ__val" style="font-size:11px">${Math.round(k.value/100*Number(k.stepCount))}/${k.stepCount}</span></div>`;
+      return `<div class="circ"><svg viewBox="0 0 48 48"><circle class="circ__track" cx="24" cy="24" r="20" stroke-width="3"/><circle class="circ__bar" cx="24" cy="24" r="20" stroke-width="3" stroke-dasharray="${c}" stroke-dashoffset="${off}" style="${k.variant==='gold'?'stroke:var(--signal)':''}"/></svg><span class="circ__val" style="font-size:11px">${k.value}%</span></div>`;
     }
     const gold = k.variant==='gold' ? ' progress--gold' : '';
     return `<div class="progress${gold}" style="width:100%;max-width:400px"><div class="progress__bar" style="width:${k.value}%"></div></div>`;
   },
   renderCode(k) {
-    if (k.type==='steps') return `<div class="steps">\n  <div class="steps__dot is-done"></div>\n  <div class="steps__line is-done"></div>\n  <div class="steps__dot is-now"></div>\n  <div class="steps__line"></div>\n  <div class="steps__dot"></div>\n</div>`;
+    if (k.type==='circular') return `<div class="circ">\n  <svg viewBox="0 0 48 48">\n    <circle class="circ__track" cx="24" cy="24" r="20" stroke-width="3"/>\n    <circle class="circ__bar" cx="24" cy="24" r="20" stroke-width="3"\n      stroke-dasharray="125.6" stroke-dashoffset="..."/>\n  </svg>\n  <span class="circ__val">${k.value}%</span>\n</div>`;
     return `<div class="progress${k.variant==='gold'?' progress--gold':''}">\n  <div class="progress__bar" style="width:${k.value}%"></div>\n</div>`;
   },
   sections: `
-    <div class="sect"><div class="sect__title">Route Steps (primary)</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">The default progress pattern. Diamond waypoints in gold - position on terrain, not a fill bar. Each dot is a passage or checkpoint.</p>
-      <div class="col gap-5">
-        <div class="cell"><div class="cell__label">In progress - 3 of 7</div><div class="steps"><div class="steps__dot is-done"></div><div class="steps__line is-done"></div><div class="steps__dot is-done"></div><div class="steps__line is-done"></div><div class="steps__dot is-now"></div><div class="steps__line"></div><div class="steps__dot"></div><div class="steps__line"></div><div class="steps__dot"></div><div class="steps__line"></div><div class="steps__dot"></div><div class="steps__line"></div><div class="steps__dot"></div></div></div>
-        <div class="cell"><div class="cell__label">Arrived - all complete</div><div class="steps">${Array(5).fill(0).map((_,i)=>`${i>0?'<div class="steps__line is-done"></div>':''}<div class="steps__dot is-done"></div>`).join('')}</div></div>
-        <div class="cell"><div class="cell__label">Just starting</div><div class="steps">${Array(5).fill(0).map((_,i)=>`${i>0?'<div class="steps__line"></div>':''}<div class="steps__dot${i===0?' is-now':''}"></div>`).join('')}</div></div>
-        <div class="cell"><div class="cell__label">Long route - 10 waypoints</div><div class="steps">${Array(10).fill(0).map((_,i)=>`${i>0?`<div class="steps__line${i<=6?' is-done':''}"></div>`:''}<div class="steps__dot${i<6?' is-done':i===6?' is-now':''}"></div>`).join('')}</div></div>
-      </div>
-    </div>
-    <div class="sect"><div class="sect__title">In Context</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">How route steps appear inside cards and headers.</p>
-      <div class="col gap-5">
-        <div class="card" style="max-width:400px">
-          <div class="caps" style="margin-bottom:var(--sp-3)">Route &middot; Day 14/28</div>
-          <div style="font-family:var(--font-serif);font-size:var(--fs-20);color:var(--fg);margin-bottom:var(--sp-3)">Qudrat Reading</div>
-          <div class="steps" style="margin-bottom:var(--sp-4)">${Array(7).fill(0).map((_,i)=>`${i>0?`<div class="steps__line${i<=3?' is-done':''}"></div>`:''}<div class="steps__dot${i<3?' is-done':i===3?' is-now':''}"></div>`).join('')}</div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)">4 of 7 passages &middot; On pace for 92</div>
-        </div>
-        <div class="card" style="max-width:400px">
-          <div style="display:flex;align-items:center;gap:var(--sp-4)">
-            <div class="avatar avatar--noon" style="flex:none">S</div>
-            <div style="flex:1">
-              <div style="font-size:14px;color:var(--fg)">Sarah Al-Rashid</div>
-              <div class="steps" style="margin-top:var(--sp-2)">${Array(5).fill(0).map((_,i)=>`${i>0?`<div class="steps__line${i<=4?' is-done':''}"></div>`:''}<div class="steps__dot${i<=4?' is-done':''}"></div>`).join('')}</div>
-            </div>
-            <div style="font-family:var(--font-mono);font-size:12px;color:var(--signal-bright)">Arrived</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="sect"><div class="sect__title">Session Progress (quiz/practice)</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">For in-session question-by-question results. Not waypoint diamonds (those are the journey). Segmented blocks like tick marks on a ruler. Each block = one question.</p>
-      <div class="col gap-5" style="max-width:480px">
-        <div class="cell">
-          <div class="cell__label">Mid-quiz - 6 of 10 answered</div>
-          <div class="session-bar" style="margin-top:8px">
-            ${['is-correct','is-correct','is-incorrect','is-correct','is-correct','is-incorrect','is-current','','',''].map(s=>'<div class="session-bar__seg '+s+'"></div>').join('')}
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px">
-            <div class="mono" style="font-size:10px">Q7 of 10</div>
-            <div class="mono" style="font-size:10px">4 correct</div>
-          </div>
-        </div>
-        <div class="cell">
-          <div class="cell__label">Completed - all answered</div>
-          <div class="session-bar" style="margin-top:8px">
-            ${['is-correct','is-correct','is-incorrect','is-correct','is-correct','is-incorrect','is-correct','is-correct','is-skipped','is-correct'].map(s=>'<div class="session-bar__seg '+s+'"></div>').join('')}
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px">
-            <div class="mono" style="font-size:10px">Complete</div>
-            <div class="mono" style="font-size:10px">7/10 correct</div>
-          </div>
-        </div>
-        <div class="cell">
-          <div class="cell__label">Just started</div>
-          <div class="session-bar" style="margin-top:8px">
-            ${['is-current','','','','','','','','',''].map(s=>'<div class="session-bar__seg '+s+'"></div>').join('')}
-          </div>
-        </div>
-        <div class="cell">
-          <div class="cell__label">Large size (8px)</div>
-          <div class="session-bar session-bar--lg" style="margin-top:8px">
-            ${['is-correct','is-correct','is-incorrect','is-correct','is-current','','',''].map(s=>'<div class="session-bar__seg '+s+'"></div>').join('')}
-          </div>
-        </div>
-        <div class="cell">
-          <div class="cell__label">Small size (4px) - inline</div>
-          <div class="session-bar session-bar--sm" style="margin-top:8px">
-            ${['is-correct','is-correct','is-correct','is-incorrect','is-correct','is-correct','is-incorrect','is-correct','is-correct','is-correct'].map(s=>'<div class="session-bar__seg '+s+'"></div>').join('')}
-          </div>
-        </div>
-      </div>
-      <div class="grid grid--2" style="margin-top:var(--sp-5)">
-        <div class="cell"><div class="cell__label">States</div>
-          <div class="col gap-2" style="margin-top:8px">
-            <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:6px;border-radius:2px;background:var(--accent)"></div><span class="mono" style="font-size:10px">Correct</span></div>
-            <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:6px;border-radius:2px;background:var(--danger-400)"></div><span class="mono" style="font-size:10px">Incorrect</span></div>
-            <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:6px;border-radius:2px;background:var(--fg-muted);box-shadow:0 0 0 1px var(--fg-muted)"></div><span class="mono" style="font-size:10px">Current</span></div>
-            <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:6px;border-radius:2px;background:var(--border);box-shadow:inset 0 0 0 1px var(--border-strong)"></div><span class="mono" style="font-size:10px">Skipped</span></div>
-            <div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:6px;border-radius:2px;background:var(--border)"></div><span class="mono" style="font-size:10px">Unanswered</span></div>
-          </div>
-        </div>
-        <div class="cell"><div class="cell__label">When to use</div>
-          <div style="font-size:13px;color:var(--fg-muted);margin-top:8px">Inside quizzes, practice sessions, and passage attempts. Each segment = one question. This is NOT for journey progress (use route steps for that). The visual difference: blocks vs diamonds.</div>
-        </div>
-      </div>
-    </div>
-    <div class="sect"><div class="sect__title">Utility - Linear Bar</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">For non-journey contexts where a simple fill indicator is appropriate - file uploads, loading states, capacity meters. Never for student progress.</p>
+    <div class="sect"><div class="sect__title">Linear Bar</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">Simple fill indicator for uploads, loading, and capacity. Not for student progress — use Route Steps or Session Bar for that.</p>
       <div class="col gap-5" style="max-width:400px">
-        <div class="cell"><div class="cell__label">Upload progress</div><div class="progress"><div class="progress__bar" style="width:65%"></div></div></div>
-        <div class="cell"><div class="cell__label">Capacity (gold)</div><div class="progress progress--gold"><div class="progress__bar" style="width:75%"></div></div></div>
+        <div class="cell"><div class="cell__label">Default (accent)</div><div class="progress"><div class="progress__bar" style="width:65%"></div></div></div>
+        <div class="cell"><div class="cell__label">Gold variant</div><div class="progress progress--gold"><div class="progress__bar" style="width:75%"></div></div></div>
         <div class="cell"><div class="cell__label">Indeterminate</div><div class="progress is-indeterminate"><div class="progress__bar"></div></div></div>
+        <div class="cell"><div class="cell__label">Complete</div><div class="progress"><div class="progress__bar" style="width:100%"></div></div></div>
+        <div class="cell"><div class="cell__label">Empty</div><div class="progress"><div class="progress__bar" style="width:0%"></div></div></div>
       </div>
     </div>
-    <div class="sect"><div class="sect__title">Utility - Circular</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">For compact spaces - dashboard stat widgets, inline indicators. Show position as a fraction, not a percentage.</p>
-      <div class="row gap-5">${[[4,7],[2,5],[5,5]].map(([done,total])=>{const c=125.6;const o=c-(c*done/total);return`<div class="col" style="align-items:center;gap:8px"><div class="circ"><svg viewBox="0 0 48 48"><circle class="circ__track" cx="24" cy="24" r="20" stroke-width="3"/><circle class="circ__bar" cx="24" cy="24" r="20" stroke-width="3" stroke-dasharray="${c}" stroke-dashoffset="${o}"/></svg><span class="circ__val" style="font-size:11px">${done}/${total}</span></div></div>`}).join('')}</div>
+    <div class="sect"><div class="sect__title">Circular</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">Compact indicator for dashboards and inline stats.</p>
+      <div class="row gap-5">${[[25,100,'25%'],[55,100,'55%'],[100,100,'Done']].map(([done,total,label])=>{const c=125.6;const o=c-(c*done/total);return`<div class="col" style="align-items:center;gap:8px"><div class="circ"><svg viewBox="0 0 48 48"><circle class="circ__track" cx="24" cy="24" r="20" stroke-width="3"/><circle class="circ__bar" cx="24" cy="24" r="20" stroke-width="3" stroke-dasharray="${c}" stroke-dashoffset="${o}"/></svg><span class="circ__val" style="font-size:11px">${label}</span></div></div>`}).join('')}</div>
     </div>
     <div class="sect"><div class="sect__title">Rules</div>
       <div class="grid grid--2">
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Student progress = route steps. Always. Position on terrain, not a bar</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Steps use gold (signal) - the journey color. Not accent green</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Show fractions (4/7) not percentages (57%). Position, not math</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Linear bars only for utility - uploads, loading, capacity. Never for student journey</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Session bar (blocks) for in-quiz progress. Route steps (diamonds) for journey progress. Different shapes, different contexts</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Linear and circular are for utility only — uploads, loading, capacity</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Student journey progress → Route Steps (diamonds)</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">In-quiz question results → Session Bar (blocks)</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Gold variant for signal/journey contexts, accent for general utility</div></div>
       </div>
     </div>`
 };
