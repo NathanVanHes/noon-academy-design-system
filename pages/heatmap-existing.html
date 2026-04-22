@@ -244,7 +244,7 @@ function openDrill(t, section) {
   var badge = document.getElementById('drillBadge');
   badge.textContent = t.score;
   badge.style.background = 'none';
-  badge.style.color = '#141414';
+  badge.style.color = scoreColor(t.score);
   badge.style.fontSize = '24px';
   badge.style.fontFamily = 'var(--font-mono)';
 
