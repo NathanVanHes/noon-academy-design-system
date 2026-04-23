@@ -116,10 +116,14 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="legend-strip">
   <div class="legend-strip__inner">
-    <div style="display:flex;align-items:center;gap:10px;flex:none">
-      <div style="width:80px;height:8px;border-radius:4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></div>
-      <svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-      <span style="font-size:11px;color:var(--fg-secondary)">Reach 80 for mastery</span>
+    <div style="display:flex;align-items:center;gap:12px;flex:none">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:12px;height:12px;border-radius:2px;background:#F03D3D"></div>
+        <div style="width:12px;height:12px;border-radius:2px;background:#FFCB45"></div>
+        <div style="width:12px;height:12px;border-radius:2px;background:#27BD86"></div>
+      </div>
+      <span style="font-size:11px;color:var(--fg-secondary)">Reach 80 for</span>
+      <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--fg-secondary)"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> mastery</span>
     </div>
     <div style="margin-left:auto;flex:none" id="examSegment">
       <div class="seg-ctrl">
