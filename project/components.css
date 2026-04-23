@@ -528,7 +528,8 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 }
 
 /* Status (right side) */
-.session__status { flex: none; }
+.session__status { flex: none; min-inline-size: 48px; text-align: end; }
+.session__status .chip { font-size: var(--fs-11); }
 
 /* ── States ── */
 
@@ -537,20 +538,23 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 
 /* Starting soon */
 .session--soon .session__indicator { background: var(--accent); }
+.session--soon .session__time { color: var(--accent); }
 
-/* Live */
+/* Live — accent indicator + left border */
+.session--live { border-inline-start: 3px solid var(--accent); }
 .session--live .session__indicator { background: var(--accent); }
 .session--live .session__time { color: var(--accent); font-weight: var(--fw-600); }
 
-/* Done */
-.session--done { opacity: 0.55; }
+/* Done — muted with strikethrough time */
 .session--done .session__indicator { background: var(--fg-faint); }
 .session--done .session__title { color: var(--fg-muted); }
-.session--done:hover { opacity: 0.75; }
+.session--done .session__time { color: var(--fg-disabled); }
+.session--done .session__meta { color: var(--fg-faint); }
 
 /* Cancelled */
-.session--cancelled { opacity: 0.4; }
 .session--cancelled .session__title { text-decoration: line-through; color: var(--fg-faint); }
+.session--cancelled .session__meta { color: var(--fg-faint); }
+.session--cancelled .session__time { color: var(--fg-disabled); }
 .session--cancelled .session__indicator { background: var(--danger-400); }
 
 /* ============ CALENDAR ============ */

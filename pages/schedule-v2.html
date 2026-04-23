@@ -229,10 +229,10 @@ function renderSessions() {
     html += '<div class="session-list">';
     list.forEach(function(s,i){
       var timeDisplay = s.time.split(' - ')[0];
-      var statusChip = s.state==='live'?'<span class="chip chip--signal" style="height:22px;font-size:10px"><span class="chip__dot"></span> Live</span>'
-        :s.state==='soon'?'<span class="chip chip--signal" style="height:22px;font-size:10px">Soon</span>'
-        :s.state==='done'?'<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">Done</span>'
-        :'<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">'+s.duration+'</span>';
+      var statusChip = s.state==='live'?'<span class="chip chip--signal"><span class="chip__dot"></span> Live</span>'
+        :s.state==='soon'?'<span class="chip chip--signal"><span class="chip__dot"></span> Soon</span>'
+        :s.state==='done'?'<span class="mono">Done</span>'
+        :'<span class="mono">'+s.duration+'</span>';
       html += '<div class="session session--'+s.state+'" data-idx="'+i+'" style="animation:fadeIn 0.25s ease '+(i*50)+'ms both">';
       html += '<div class="session__time">'+timeDisplay+'</div>';
       html += '<div class="session__indicator"></div>';
