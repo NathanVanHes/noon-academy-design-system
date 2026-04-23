@@ -327,6 +327,10 @@ function openDrill(t, section) {
   document.querySelector('.drill__body').innerHTML = _origDrillBody;
   wireRangeTabs();
   document.querySelector('.drill__cta').style.display = '';
+  var ctaBtn = document.getElementById('drillCtaBtn');
+  ctaBtn.disabled = false;
+  ctaBtn.style.opacity = '';
+  ctaBtn.style.cursor = '';
   document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
   document.getElementById('drillSub').textContent = section;
   var badge = document.getElementById('drillBadge');
@@ -564,10 +568,10 @@ function openDrillGrey(t, section) {
   document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
   document.getElementById('drillSub').textContent = section;
   var badge = document.getElementById('drillBadge');
-  badge.textContent = 'Not started';
+  badge.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg> Not started';
   badge.style.background = 'var(--bg-disabled)';
   badge.style.color = 'var(--fg-muted)';
-  badge.style.fontSize = '12px';
+  badge.style.fontSize = '11px';
   document.getElementById('chartContainer').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:13px;height:140px">No data yet</div>';
   document.getElementById('chartLabels').innerHTML = '';
   var ch = document.getElementById('drillChange');
@@ -577,6 +581,17 @@ function openDrillGrey(t, section) {
   ch.style.flexDirection = 'column';
   ch.style.gap = '0';
   ch.innerHTML = 'This topic hasn\'t been covered yet. Start practicing to build your baseline.';
+
+  // Set nudge and CTA for grey tile
+  var nudge = document.getElementById('drillNudge');
+  nudge.innerHTML = 'This topic is locked until your class covers it. Check back soon.';
+  var ctaBtn = document.getElementById('drillCtaBtn');
+  ctaBtn.textContent = 'Not available yet';
+  ctaBtn.disabled = true;
+  ctaBtn.style.opacity = '0.5';
+  ctaBtn.style.cursor = 'default';
+  document.querySelector('.drill__cta [style*="margin-top"]').textContent = '';
+
   document.getElementById('drill').classList.add('is-open');
   document.getElementById('drillOverlay').classList.add('is-open');
 }
