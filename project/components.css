@@ -497,8 +497,10 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 .video__overlay {
   position: absolute; inset: 0; display: flex; flex-direction: column;
   justify-content: flex-end; background: linear-gradient(transparent 40%, rgba(0,0,0,0.6));
-  padding: var(--sp-4); transition: opacity var(--dur-1) var(--ease);
+  padding: var(--sp-4); opacity: 0; transition: opacity var(--dur-1) var(--ease);
 }
+.video.is-playing .video__overlay { opacity: 1; }
+.video.is-playing:hover .video__overlay { opacity: 1; }
 .video__play {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   width: 48px; height: 48px; border-radius: 50%; border: 0;
