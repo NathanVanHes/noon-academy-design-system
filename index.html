@@ -3797,6 +3797,54 @@ P.video = {
   </div>
 </div>`;
   },
+  afterRender() {
+    var canvas = document.getElementById('canvas');
+    if (!canvas) return;
+    var video = canvas.querySelector('.video');
+    if (!video) return;
+    var playBtn = video.querySelector('.video__play');
+    var ctrlPlay = video.querySelector('.video__btn');
+    var btns = video.querySelectorAll('.video__btn');
+    var fsBtn = btns.length > 1 ? btns[1] : null;
+    var fill = video.querySelector('.video__bar-fill');
+    var timeEl = video.querySelector('.video__time');
+    var bar = video.querySelector('.video__bar');
+    var playing = false;
+    var progress = parseFloat(fill ? fill.style.width : 0) || 0;
+    var interval;
+
+    function formatTime(pct) {
+      var total = 750;
+      var c = Math.floor(pct / 100 * total);
+      return Math.floor(c/60) + ':' + String(c%60).padStart(2,'0') + ' / 12:30';
+    }
+
+    function togglePlay() {
+      playing = !playing;
+      video.classList.toggle('is-playing', playing);
+      if (ctrlPlay) ctrlPlay.innerHTML = playing
+        ? '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="4" height="12" rx="1"/><rect x="9" y="2" width="4" height="12" rx="1"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6z"/></svg>';
+      if (playing) {
+        interval = setInterval(function() {
+          progress = Math.min(100, progress + 0.3);
+          if (fill) fill.style.width = progress + '%';
+          if (timeEl) timeEl.textContent = formatTime(progress);
+          if (progress >= 100) { clearInterval(interval); playing = false; video.classList.remove('is-playing'); }
+        }, 100);
+      } else { clearInterval(interval); }
+    }
+
+    if (playBtn) playBtn.addEventListener('click', togglePlay);
+    if (ctrlPlay) ctrlPlay.addEventListener('click', function(e) { e.stopPropagation(); togglePlay(); });
+    if (fsBtn) fsBtn.addEventListener('click', function(e) { e.stopPropagation(); video.classList.toggle('is-fullscreen'); });
+    if (bar) bar.addEventListener('click', function(e) {
+      var r = bar.getBoundingClientRect();
+      progress = (e.clientX - r.left) / r.width * 100;
+      if (fill) fill.style.width = progress + '%';
+      if (timeEl) timeEl.textContent = formatTime(progress);
+    });
+  },
   sections: `
     <div class="sect"><div class="sect__title">Sizes</div>
       <div class="row gap-5" style="align-items:flex-start">

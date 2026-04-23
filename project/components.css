@@ -539,6 +539,8 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   position: fixed; inset: 0; z-index: 100; border-radius: 0;
   aspect-ratio: auto; width: 100%; height: 100%;
 }
+.video.is-fullscreen .video__play { width: 64px; height: 64px; }
+.video.is-fullscreen .video__play svg { width: 28px; height: 28px; }
 
 /* Mini/collapsed */
 .video--mini { aspect-ratio: auto; width: 160px; height: 90px; border-radius: var(--r-2); }
