@@ -336,10 +336,15 @@ function openDrill(t, section) {
   document.getElementById('drillSub').textContent = section;
   var badge = document.getElementById('drillBadge');
   var starSvg = '<svg width="16" height="16" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  var diff = t.trend[3] - t.trend[2];
+  var diffStr = '';
+  if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diff + '</span> this week';
+  else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + Math.abs(diff) + '</span> this week';
+  else diffStr = '<span style="color:var(--fg-muted)">No change this week</span>';
   if (t.score >= 80) {
-    badge.innerHTML = '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><div style="display:flex;align-items:center;gap:4px">' + starSvg + '<span style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:' + scoreColor(t.score) + '">' + t.score + '</span></div><span style="font-size:10px;color:var(--fg-muted)">Mastery reached</span></div>';
+    badge.innerHTML = '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><div style="display:flex;align-items:center;gap:4px">' + starSvg + '<span style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:' + scoreColor(t.score) + '">' + t.score + '</span></div><span style="font-size:10px;color:var(--fg-muted)">Mastery reached</span><span style="font-family:var(--font-mono);font-size:10px">' + diffStr + '</span></div>';
   } else {
-    badge.innerHTML = '<span style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:' + scoreColor(t.score) + '">' + t.score + '</span>';
+    badge.innerHTML = '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:' + scoreColor(t.score) + '">' + t.score + '</span><span style="font-family:var(--font-mono);font-size:10px">' + diffStr + '</span></div>';
   }
   badge.style.background = 'none';
 
@@ -351,18 +356,10 @@ function openDrill(t, section) {
   document.querySelectorAll('#rangeTabs button').forEach(function(b) { b.classList.remove('is-on'); });
   document.querySelector('#rangeTabs button[data-range="week"]').classList.add('is-on');
 
+  // Change indicator now shown in badge above
   var ch = document.getElementById('drillChange');
-  var diff = t.trend[3] - t.trend[2];
-  ch.style.background = 'none';
-  ch.style.border = 'none';
-  ch.style.padding = '0';
-  if (diff > 0) {
-    ch.innerHTML = '<span style="color:#27BD86;font-weight:600">+' + Math.abs(diff) + '</span><span style="color:var(--fg-muted)">this week</span>';
-  } else if (diff < 0) {
-    ch.innerHTML = '<span style="color:#F03D3D;font-weight:600">-' + Math.abs(diff) + '</span><span style="color:var(--fg-muted)">this week</span>';
-  } else {
-    ch.innerHTML = '<span style="color:var(--fg-muted)">No change this week</span>';
-  }
+  ch.innerHTML = '';
+  ch.style.display = 'none';
 
   // Contextual nudge
   var nudge = document.getElementById('drillNudge');
@@ -399,7 +396,7 @@ function renderChart(data, labelTexts, mastered) {
   var n = data.length;
   var containerW = container.offsetWidth || 360;
   var h = 150;
-  var pad = {top:30,right:16,bottom:4,left:16};
+  var pad = {top:30,right:16,bottom:4,left:32};
   var w = containerW;
   var cw = w - pad.left - pad.right;
   var ch = h - pad.top - pad.bottom;
@@ -420,6 +417,13 @@ function renderChart(data, labelTexts, mastered) {
   var masteryY = pad.top + ch - (80 / 100) * ch;
 
   var svg = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" class="chart__svg" fill="none">';
+
+  // Grid lines every 20 (0, 20, 40, 60, 80, 100) + Y axis labels
+  for (var g = 0; g <= 100; g += 20) {
+    var gy = pad.top + ch - (g / 100) * ch;
+    svg += '<line x1="' + pad.left + '" y1="' + gy + '" x2="' + (pad.left + cw) + '" y2="' + gy + '" stroke="rgba(20,20,20,0.04)"/>';
+    svg += '<text x="' + (pad.left - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-family="\'JetBrains Mono\',monospace" font-size="8" fill="#BBB8B1">' + g + '</text>';
+  }
 
   // Full connected line (grey segments + colored segments)
   if (allPoints.length > 1) {
@@ -580,8 +584,6 @@ function openDrillGrey(t, section) {
   ctaBtn.disabled = true;
   ctaBtn.style.opacity = '0.5';
   ctaBtn.style.cursor = 'default';
-  document.querySelector('.drill__cta [style*="margin-top"]').textContent = '';
-
   document.getElementById('drill').classList.add('is-open');
   document.getElementById('drillOverlay').classList.add('is-open');
 }
