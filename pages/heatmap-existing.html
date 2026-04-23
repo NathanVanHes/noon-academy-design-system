@@ -58,6 +58,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile{aspect-ratio:1;border-radius:var(--r);cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all 0.15s ease;overflow:hidden;opacity:0;transform:translateY(8px);animation:tileIn 0.35s ease forwards}
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 @keyframes tileIn{to{opacity:1;transform:translateY(0)}}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(200px) rotate(360deg)}}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.25);display:flex;align-items:center;gap:2px;z-index:2}
 .tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.12);transform:scale(0.9)}
@@ -117,14 +118,16 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="legend-strip">
   <div class="legend-strip__inner">
-    <div class="legend-key" style="max-width:200px">
+    <div class="legend-key" style="max-width:220px">
       <div class="legend-key__track">
         <div class="legend-key__bar" style="height:6px"></div>
+        <div style="position:absolute;left:70%;top:-2px;width:2px;height:10px;background:var(--fg-muted);border-radius:1px;transform:translateX(-50%);opacity:0.5"></div>
         <div class="legend-key__marker" style="width:2px;height:10px;background:var(--fg-secondary);border-radius:1px"></div>
       </div>
       <div class="legend-key__labels">
         <span>0</span>
-        <span class="legend-key__mastery"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ Mastery</span>
+        <span style="position:absolute;left:70%;transform:translateX(-50%);font-family:var(--font-mono);font-size:8px;color:var(--fg-muted);white-space:nowrap">70</span>
+        <span class="legend-key__mastery"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80</span>
       </div>
     </div>
     <div style="margin-left:auto;flex:none" id="examSegment">
@@ -141,7 +144,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Quantitative</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> Level 1</div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <svg width="6" height="6" viewBox="0 0 12 12" fill="var(--fg-muted)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80 · Level 1</div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
@@ -150,7 +153,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Verbal</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> Level 2</div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <svg width="6" height="6" viewBox="0 0 12 12" fill="var(--fg-muted)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 70 · Level 2</div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
@@ -247,14 +250,15 @@ function chartBarColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
-function renderTile(t, section, idx) {
+function renderTile(t, section, idx, mastery) {
+  mastery = mastery || 80;
   var tile = document.createElement('div');
   tile.className = 'tile';
   tile.style.background = scoreColor(t.score);
   tile.style.animationDelay = (idx || 0) * 30 + 'ms';
   var diff = t.trend.length >= 4 ? t.trend[3] - t.trend[2] : 0;
   // no longer used in score area
-  var mastered = t.score !== null && t.score >= 80;
+  var mastered = t.score !== null && t.score >= mastery;
   if (mastered) tile.classList.add('is-mastered');
   var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(0,0,0,0.5)" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
   // Diff indicator bottom-right (not on mastered)
@@ -295,19 +299,21 @@ function renderTile(t, section, idx) {
     tile.querySelector('.tile__name').style.color = 'var(--fg-muted)';
     tile.querySelector('.tile__score').style.color = 'var(--fg-muted)';
   }
-  tile.addEventListener('click', function() { if (t.score !== null) openDrill(t, section); else openDrillGrey(t, section); });
+  tile.addEventListener('click', function() { if (t.score !== null) openDrill(t, section, mastery); else openDrillGrey(t, section); });
   return tile;
 }
 
-function renderGrid(containerId, topics, section) {
+function renderGrid(containerId, topics, section, mastery) {
+  mastery = mastery || 80;
   var grid = document.getElementById(containerId);
   grid.innerHTML = '';
   topics.forEach(function(t, i) {
-    grid.appendChild(renderTile(t, section, i));
+    grid.appendChild(renderTile(t, section, i, mastery));
   });
 }
 
-function renderChapteredGrid(containerId, chapters, section, examOnly) {
+function renderChapteredGrid(containerId, chapters, section, examOnly, mastery) {
+  mastery = mastery || 80;
   var grid = document.getElementById(containerId);
   grid.innerHTML = '';
   var idx = 0;
@@ -319,12 +325,14 @@ function renderChapteredGrid(containerId, chapters, section, examOnly) {
     grid.appendChild(label);
     label.textContent = ch.name;
     topics.forEach(function(t) {
-      grid.appendChild(renderTile(t, section, idx++));
+      grid.appendChild(renderTile(t, section, idx++, mastery));
     });
   });
 }
 
-function openDrill(t, section) {
+function openDrill(t, section, mastery) {
+  mastery = mastery || 80;
+  window._currentMasteryThreshold = mastery;
   document.querySelector('.drill__body').innerHTML = _origDrillBody;
   wireRangeTabs();
   document.querySelector('.drill__cta').style.display = '';
@@ -342,7 +350,7 @@ function openDrill(t, section) {
   else diffStr = '<span style="color:var(--fg-muted)">No change this week</span>';
   var name = t.name.replace('\n',' ');
 
-  if (t.score >= 80) {
+  if (t.score >= mastery) {
     // Mastered — no graph, just a clear message
     badge.innerHTML = '';
     badge.style.background = 'none';
@@ -360,6 +368,17 @@ function openDrill(t, section) {
     if (ctaBtn) ctaBtn.textContent = 'Stay sharp';
     document.getElementById('drill').classList.add('is-open');
     document.getElementById('drillOverlay').classList.add('is-open');
+    // Confetti
+    setTimeout(function() {
+      var container = document.querySelector('.drill__body');
+      var colors = ['#27BD86','#64D8AE','#FFCB45','#F8F5EF','#BBB8B1'];
+      for (var i = 0; i < 30; i++) {
+        var c = document.createElement('div');
+        var size = 4 + Math.random() * 4;
+        c.style.cssText = 'position:absolute;width:'+size+'px;height:'+size+'px;border-radius:'+(Math.random()>0.5?'50%':'1px')+';background:'+colors[Math.floor(Math.random()*colors.length)]+';left:'+Math.random()*100+'%;top:-10px;opacity:0;animation:confettiFall '+(0.8+Math.random()*1.2)+'s ease '+(Math.random()*0.4)+'s forwards;pointer-events:none';
+        container.appendChild(c);
+      }
+    }, 200);
     return;
   }
 
@@ -368,7 +387,7 @@ function openDrill(t, section) {
 
   var weekData = generateThisWeek(t);
   window._currentMastered = false;
-  renderChart(weekData.values, weekData.labels, false);
+  renderChart(weekData.values, weekData.labels, false, mastery);
 
   // Reset range tabs
   document.querySelectorAll('#rangeTabs button').forEach(function(b) { b.classList.remove('is-on'); });
@@ -382,8 +401,8 @@ function openDrill(t, section) {
   // Contextual nudge
   var nudge = document.getElementById('drillNudge');
   var ctaBtn = document.getElementById('drillCtaBtn');
-  var gap = 80 - t.score;
-  if (t.score >= 65) {
+  var gap = mastery - t.score;
+  if (t.score >= mastery - 15) {
     nudge.innerHTML = 'You\'re <b>' + gap + ' points</b> away from mastering ' + name + '. We\'ve lined up questions targeting exactly where you\'re losing marks — one focused session could close the gap.';
     ctaBtn.textContent = 'Close the gap';
   } else if (t.score >= 40) {
@@ -399,7 +418,8 @@ function openDrill(t, section) {
   document.getElementById('drillOverlay').classList.add('is-open');
 }
 
-function renderChart(data, labelTexts, mastered) {
+function renderChart(data, labelTexts, mastered, masteryLine) {
+  masteryLine = masteryLine || 80;
   var container = document.getElementById('chartContainer');
   var labels = document.getElementById('chartLabels');
   labels.innerHTML = '';
@@ -425,7 +445,7 @@ function renderChart(data, labelTexts, mastered) {
   });
   var points = allPoints.filter(function(p){return !p.grey});
 
-  var masteryY = pad.top + ch - (80 / 100) * ch;
+  var masteryY = pad.top + ch - (masteryLine / 100) * ch;
 
   var svg = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" class="chart__svg" fill="none">';
 
@@ -459,7 +479,7 @@ function renderChart(data, labelTexts, mastered) {
   svg += '<line x1="' + pad.left + '" y1="' + masteryY + '" x2="' + (pad.left + cw) + '" y2="' + masteryY + '" stroke="rgba(20,20,20,0.1)" stroke-dasharray="4,3"/>';
 
   // Mastery label — top left above the line
-  svg += '<text x="' + pad.left + '" y="' + (masteryY - 6) + '" font-family="\'JetBrains Mono\',monospace" font-size="8" font-weight="600" fill="#BBB8B1">★ 80+</text>';
+  svg += '<text x="' + pad.left + '" y="' + (masteryY - 6) + '" font-family="\'JetBrains Mono\',monospace" font-size="8" font-weight="600" fill="#BBB8B1">★ ' + masteryLine + '+</text>';
 
   // Area fill for mastered
   if (mastered && points.length > 1) {
@@ -557,7 +577,7 @@ function wireRangeTabs() {
     if (!t) return;
     var range = btn.dataset.range;
     var d = range === 'week' ? generateThisWeek(t) : generateSemester(t);
-    renderChart(d.values, d.labels, window._currentMastered);
+    renderChart(d.values, d.labels, window._currentMastered, window._currentMasteryThreshold || 80);
   });
 }
 wireRangeTabs();
@@ -607,16 +627,16 @@ document.getElementById('examSegment').addEventListener('click', function(e) {
   var examOn = btn.dataset.filter === 'exam';
   document.getElementById('quantExam').style.display = examOn ? 'inline' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'inline' : 'none';
-  renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn);
-  renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal');
+  renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn, 80);
+  renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal', 70);
 });
 
 // Save original drill body for restoring after mastery info
 var _origDrillBody = document.querySelector('.drill__body').innerHTML;
 
 // Init
-renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
-renderGrid('readingGrid', readingTopics, 'Verbal');
+renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false, 80);
+renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 
 // Shimmer on mastered tiles — sweeps top-left to bottom-right, twice
 setTimeout(function() {
