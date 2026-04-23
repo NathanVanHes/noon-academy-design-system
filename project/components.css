@@ -606,6 +606,73 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   opacity: 0.5; pointer-events: none;
 }
 
+/* ============ TITLE BAR ============ */
+/* Top navigation bar — sticky, consistent across all screens */
+.titlebar {
+  display: flex; align-items: center; gap: var(--sp-3);
+  height: 56px; padding: 0 var(--sp-5);
+  background: var(--bg); position: sticky; top: 0; z-index: 10;
+  border-block-end: 1px solid var(--border);
+}
+
+/* Back button */
+.titlebar__back {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex: none;
+  background: none; border: 0; color: var(--fg-muted); cursor: pointer;
+  border-radius: var(--r-1); margin-inline-start: calc(var(--sp-2) * -1);
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.titlebar__back:hover { background: var(--hover-overlay); color: var(--fg); }
+
+/* Title */
+.titlebar__title {
+  flex: 1; min-width: 0;
+  font-family: var(--font-sans); font-size: var(--fs-16); font-weight: var(--fw-600);
+  color: var(--fg); margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Subtitle variant — smaller title with subtitle below */
+.titlebar__title-group { flex: 1; min-width: 0; }
+.titlebar__title-group .titlebar__title { font-size: var(--fs-14); line-height: 1.2; }
+.titlebar__subtitle {
+  font-size: var(--fs-12); color: var(--fg-subtle); margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Right actions */
+.titlebar__actions {
+  display: flex; align-items: center; gap: var(--sp-2); flex: none;
+}
+
+/* ── Variants ── */
+
+/* Large — serif title, taller */
+.titlebar--lg { height: 64px; }
+.titlebar--lg .titlebar__title {
+  font-family: var(--font-serif); font-size: var(--fs-20); font-weight: var(--fw-500);
+}
+
+/* Transparent — no background, no border */
+.titlebar--transparent { background: transparent; border-block-end: 0; }
+
+/* Overlay — sits on top of content (e.g. over images/video) */
+.titlebar--overlay {
+  position: absolute; inset-inline: 0; top: 0;
+  background: linear-gradient(rgba(6,9,19,0.5), transparent);
+  border-block-end: 0; color: var(--chalk-100);
+}
+.titlebar--overlay .titlebar__title { color: var(--chalk-100); }
+.titlebar--overlay .titlebar__back { color: rgba(232,228,220,0.7); }
+.titlebar--overlay .titlebar__back:hover { color: var(--chalk-100); background: rgba(232,228,220,0.1); }
+
+/* Elevated — raised surface */
+.titlebar--elevated {
+  background: var(--bg-overlay); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-block-end: 0;
+}
+
 /* ============ INTERSTITIAL ============ */
 /* Full-screen moment card: graphic, message, CTA */
 .interstitial {

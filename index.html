@@ -3809,6 +3809,105 @@ P.sessioncard = {
     </div>`
 };
 
+// ──────── TITLE BAR ────────
+P.titlebar = {
+  title: 'Title Bar', desc: 'Top navigation bar. Sticky, consistent across screens. Variants: default, large, transparent, overlay, elevated.',
+  tokens() {
+    return ['--bg','--bg-overlay','--border','--fg','--fg-muted','--fg-subtle','--chalk-100','--hover-overlay','--font-sans','--font-serif','--fs-12','--fs-14','--fs-16','--fs-20','--fw-500','--fw-600','--sp-2','--sp-3','--sp-5','--r-1','--dur-1','--ease'];
+  },
+  knobs: {
+    variant: { type:'select', options:['default','large','transparent','overlay','elevated'], default:'default', label:'Variant' },
+    withBack: { type:'toggle', default:true, label:'Back button' },
+    withSubtitle: { type:'toggle', default:false, label:'With subtitle' },
+    withActions: { type:'toggle', default:true, label:'Right actions' },
+    title: { type:'text', default:'Page Title', label:'Title' },
+  },
+  renderCanvas(k) {
+    const cls = k.variant !== 'default' ? ' titlebar--' + k.variant : '';
+    const overlayBg = k.variant === 'overlay' ? 'background:var(--void-300);padding:var(--sp-10) 0;position:relative;border-radius:var(--r-2);overflow:hidden;' : '';
+    const back = k.withBack ? '<button class="titlebar__back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>' : '';
+    const actions = k.withActions ? '<div class="titlebar__actions"><button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1"/></svg></button><button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3.5" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="12.5" r="1.5"/></svg></button></div>' : '';
+    let titleHTML;
+    if (k.withSubtitle) {
+      titleHTML = '<div class="titlebar__title-group"><div class="titlebar__title">' + esc(k.title) + '</div><div class="titlebar__subtitle">Qudrat Reading - Mr. Hassan</div></div>';
+    } else {
+      titleHTML = '<div class="titlebar__title">' + esc(k.title) + '</div>';
+    }
+    return `<div style="width:100%;max-width:420px;${overlayBg}">
+      <div class="titlebar${cls}">${back}${titleHTML}${actions}</div>
+    </div>`;
+  },
+  renderCode(k) {
+    const cls = k.variant !== 'default' ? ' titlebar--' + k.variant : '';
+    return `<div class="titlebar${cls}">
+  ${k.withBack ? '<button class="titlebar__back">←</button>' : ''}
+  <div class="titlebar__title">${esc(k.title)}</div>
+  ${k.withActions ? '<div class="titlebar__actions">...</div>' : ''}
+</div>`;
+  },
+  sections: `
+    <div class="sect"><div class="sect__title">All Variants</div>
+      <div class="col gap-5" style="max-width:420px">
+        <div class="cell">
+          <div class="cell__label">Default — with back + actions</div>
+          <div class="titlebar" style="position:relative">
+            <button class="titlebar__back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>
+            <div class="titlebar__title">Inference & implied meaning</div>
+            <div class="titlebar__actions"><button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="3.5" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="12.5" r="1.5"/></svg></button></div>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="cell__label">Large — serif title</div>
+          <div class="titlebar titlebar--lg" style="position:relative">
+            <div class="titlebar__title">Schedule</div>
+            <div class="titlebar__actions"><button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1"/></svg></button></div>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="cell__label">With subtitle</div>
+          <div class="titlebar" style="position:relative">
+            <button class="titlebar__back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>
+            <div class="titlebar__title-group"><div class="titlebar__title">Question 4</div><div class="titlebar__subtitle">Qudrat Reading - Mr. Hassan</div></div>
+            <div class="titlebar__actions"><span class="mono">4 / 10</span></div>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="cell__label">No back — root screen</div>
+          <div class="titlebar" style="position:relative">
+            <div class="titlebar__title">Mastery</div>
+            <div class="titlebar__actions"><button class="icon-btn icon-btn--ghost icon-btn--sm"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h10M3 8h10M3 11h6"/></svg></button></div>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="cell__label">Elevated</div>
+          <div class="titlebar titlebar--elevated" style="position:relative">
+            <button class="titlebar__back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>
+            <div class="titlebar__title">Practice Session</div>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="cell__label">Overlay — on dark content</div>
+          <div style="background:var(--void-300);padding:var(--sp-10) 0;position:relative;border-radius:var(--r-2);overflow:hidden">
+            <div class="titlebar titlebar--overlay" style="position:absolute">
+              <button class="titlebar__back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>
+              <div class="titlebar__title">Video Lesson</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Rules</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Height:</b> 56px default, 64px large. Sticky top:0 on all screens.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Back:</b> Show on all sub-screens. Hide on root screens (home, schedule, profile).</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Title:</b> Sans 16px semibold default. Serif 20px medium for large. Truncates with ellipsis.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Actions:</b> icon-btn--ghost on the right. Max 2 actions. Use more menu (⋮) for overflow.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Overlay:</b> For content behind the bar (video, images). Gradient fade from dark to transparent.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Elevated:</b> For when content scrolls under the bar. Shadow replaces border.</div></div>
+      </div>
+    </div>`
+};
+
 // ──────── VIDEO PLAYER ────────
 P.video = {
   title: 'Video Player', desc: '16:9 video with play/pause, progress bar, timestamp, fullscreen toggle. Collapsible to mini player.',
@@ -4316,6 +4415,7 @@ const NAV = [
     { id:'progress', label:'Linear & Circular' },
   ]},
   { group: 'Navigation', items: [
+    { id:'titlebar', label:'Title Bar' },
     { id:'tabs', label:'Tabs' },
     { id:'bottomnav', label:'Bottom Nav' },
     { id:'breadcrumbs', label:'Breadcrumbs' },
