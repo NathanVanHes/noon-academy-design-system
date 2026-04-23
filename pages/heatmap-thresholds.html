@@ -65,8 +65,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile.is-mastered .tile__score{opacity:0}
 .tile.is-mastered.is-revealed .tile__score{opacity:1;animation:stampIn 0.3s ease}
 @keyframes stampIn{0%{transform:scale(2);opacity:0}60%{transform:scale(0.9);opacity:1}100%{transform:scale(1);opacity:1}}
-.tile__border-svg{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);pointer-events:none;z-index:4;overflow:visible}
-.tile__border-svg path{fill:none;stroke:url(#borderGrad);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.tile__border-svg{position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);pointer-events:none;z-index:4}
+.tile__border-svg rect{fill:none;stroke:#D4A017;stroke-width:4;rx:10;ry:10;transition:stroke-dashoffset 1.2s ease}
 .tile.is-mastered.is-revealed .tile__border-svg{opacity:0;transition:opacity 0.5s ease 0.3s}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
@@ -279,31 +279,19 @@ function renderTile(t, section, idx, mastery) {
     var svgNS = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('class', 'tile__border-svg');
-    svg.setAttribute('viewBox', '0 0 104 104');
+    svg.setAttribute('viewBox', '0 0 100 100');
     svg.setAttribute('preserveAspectRatio', 'none');
-    // Gradient for shimmer gold effect
-    var defs = document.createElementNS(svgNS, 'defs');
-    var grad = document.createElementNS(svgNS, 'linearGradient');
-    grad.setAttribute('id', 'borderGrad');
-    grad.setAttribute('gradientUnits', 'userSpaceOnUse');
-    grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
-    grad.setAttribute('x2', '104'); grad.setAttribute('y2', '104');
-    var s1 = document.createElementNS(svgNS, 'stop');
-    s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#D4A017');
-    var s2 = document.createElementNS(svgNS, 'stop');
-    s2.setAttribute('offset', '50%'); s2.setAttribute('stop-color', '#FFCB45');
-    var s3 = document.createElementNS(svgNS, 'stop');
-    s3.setAttribute('offset', '100%'); s3.setAttribute('stop-color', '#D4A017');
-    grad.appendChild(s1); grad.appendChild(s2); grad.appendChild(s3);
-    defs.appendChild(grad); svg.appendChild(defs);
-    // Path starting top-right, going down, left, up, back to top-right
-    var r = 8;
-    var path = document.createElementNS(svgNS, 'path');
-    path.setAttribute('d', 'M96 2 L' + (104-r) + ' 2 Q104 2 104 ' + r + ' L104 ' + (104-r) + ' Q104 104 ' + (104-r) + ' 104 L' + r + ' 104 Q0 104 0 ' + (104-r) + ' L0 ' + r + ' Q0 0 ' + r + ' 0 L96 0');
-    path.setAttribute('pathLength', '400');
-    path.setAttribute('stroke-dasharray', '400');
-    path.setAttribute('stroke-dashoffset', '400');
-    svg.appendChild(path);
+    // Rotate so stroke-dashoffset draws from top-right
+    svg.style.transform = 'rotate(90deg) scaleX(-1)';
+    var rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('x', '2');
+    rect.setAttribute('y', '2');
+    rect.setAttribute('width', '96');
+    rect.setAttribute('height', '96');
+    rect.setAttribute('pathLength', '100');
+    rect.setAttribute('stroke-dasharray', '100');
+    rect.setAttribute('stroke-dashoffset', '100');
+    svg.appendChild(rect);
     tile.appendChild(svg);
   }
   // Animate counter
@@ -688,12 +676,12 @@ renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 function shimmerMastered() {
   setTimeout(function() {
     document.querySelectorAll('.tile.is-mastered:not(.is-revealed)').forEach(function(tile, i) {
-      var path = tile.querySelector('.tile__border-svg path');
+      var el = tile.querySelector('.tile__border-svg rect');
       setTimeout(function() {
-        if (path) path.setAttribute('stroke-dashoffset', '0');
+        if (el) el.setAttribute('stroke-dashoffset', '0');
         setTimeout(function() {
           tile.classList.add('is-revealed');
-        }, 1000);
+        }, 1200);
       }, i * 200);
     });
   }, 600);
