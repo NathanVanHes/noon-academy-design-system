@@ -82,32 +82,23 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div class="page">
-  <!-- Countdown block -->
-  <div style="background:var(--bg-raised);border-radius:var(--r);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:20px">
-    <div style="text-align:center;min-width:48px">
-      <div style="font-family:var(--font-mono);font-size:40px;font-weight:700;color:var(--blue);line-height:1">5</div>
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em">days</div>
+  <!-- Header block -->
+  <div style="background:var(--bg-raised);border-radius:var(--r);padding:20px 24px;margin-bottom:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:16px;font-weight:700">Quantitative Exam</div>
+      <span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue)">5 days</span>
     </div>
-    <div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:2px">Quantitative Exam</div>
-      <div style="font-size:12px;color:var(--fg-secondary)">Reach <svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ in all topics before exam day</div>
-    </div>
-  </div>
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-    <div style="display:flex;align-items:center;gap:16px">
-      <div style="display:flex;align-items:center;gap:6px">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="var(--fg-secondary)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-        <span style="font-family:var(--font-mono);font-size:14px;font-weight:700" id="masteredNum">1</span>
-        <span style="font-size:12px;color:var(--fg-secondary)">mastered</span>
+    <div style="font-size:12px;color:var(--fg-secondary);margin-bottom:16px">Reach <svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ in all topics before exam day</div>
+    <div style="display:flex;gap:12px">
+      <div style="flex:1;background:rgba(39,189,134,0.06);border-radius:6px;padding:12px;text-align:center">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--green)">1</div>
+        <div style="font-size:11px;color:var(--fg-secondary);display:flex;align-items:center;justify-content:center;gap:3px;margin-top:2px"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>
       </div>
-      <span style="width:1px;height:16px;background:rgba(20,20,20,0.08)"></span>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-family:var(--font-mono);font-size:14px;font-weight:700" id="remainNum">2</span>
-        <span style="font-size:12px;color:var(--fg-secondary)">remaining</span>
+      <div style="flex:1;background:rgba(20,20,20,0.03);border-radius:6px;padding:12px;text-align:center">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--fg)">2</div>
+        <div style="font-size:11px;color:var(--fg-secondary);margin-top:2px">Remaining</div>
       </div>
     </div>
-    <span style="font-family:var(--font-mono);font-size:12px;color:var(--blue)">5 days til exam</span>
   </div>
 
   <div id="topics"></div>
