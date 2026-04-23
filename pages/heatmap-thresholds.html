@@ -32,6 +32,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 /* Layout */
 .page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
+@media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}.key-inner{padding:10px 16px !important}}
 
 /* Section header */
 .grid-section__header{display:flex;align-items:baseline;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(20,20,20,0.06)}
@@ -126,10 +127,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div style="background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.06);position:sticky;top:64px;z-index:9">
-  <div style="max-width:720px;margin:0 auto;padding:10px 40px;display:flex;align-items:center;gap:20px;font-size:11px;color:var(--fg-muted)">
-    <span style="display:inline-flex;align-items:center;gap:4px"><span style="font-family:var(--font-mono);font-size:9px">0</span><span style="width:60px;height:14px;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></span><span style="font-family:var(--font-mono);font-size:9px">10</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</span>
-    <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:16px;height:16px;border-radius:3px;background:var(--bg-disabled);display:inline-grid;place-items:center"><svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="var(--fg-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></span> Not started</span>
+  <div style="max-width:720px;margin:0 auto;padding:10px 40px;display:flex;align-items:center;gap:12px 16px;font-size:11px;color:var(--fg-muted);flex-wrap:wrap" class="key-inner">
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="font-family:var(--font-mono);font-size:9px">0</span><span style="width:50px;height:12px;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></span><span style="font-family:var(--font-mono);font-size:9px">10</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)">-- Not started</span>
+    <button style="margin-left:auto;background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;flex:none" onclick="openMasteryInfo()">How does mastery work?</button>
   </div>
 </div>
 
@@ -406,16 +408,14 @@ function openDrill(t, section, mastery) {
   // Contextual nudge
   var nudge = document.getElementById('drillNudge');
   var ctaBtn = document.getElementById('drillCtaBtn');
-  var gap = (mastery - t.score) / 10;
-  var gapDisplay = gap % 1 === 0 ? gap.toFixed(0) : gap.toFixed(1);
   if (t.score >= mastery - 15) {
-    nudge.innerHTML = 'You\'re <b>' + gapDisplay + '</b> away from mastering ' + name + '. We\'ve lined up questions targeting exactly where you\'re losing marks — one focused session could close the gap.';
+    nudge.innerHTML = 'You\'re close to mastering ' + name + '. One focused session could get you there.';
     ctaBtn.textContent = 'Close the gap';
   } else if (t.score >= 40) {
-    nudge.innerHTML = 'You\'re building a foundation in ' + name + '. We\'ll start you with the core concepts and work up — complete a practice set and you\'ll see this move.';
+    nudge.innerHTML = 'You\'re building a foundation in ' + name + '. A practice set will help move this forward.';
     ctaBtn.textContent = 'Practice ' + name;
   } else {
-    nudge.innerHTML = name + ' is early days. We\'ve put together a plan starting from the basics — ' + gapDisplay + ' to mastery, and every session gets you closer.';
+    nudge.innerHTML = name + ' is early days. Start from the basics and build up — every session gets you closer.';
     ctaBtn.textContent = 'Start with the basics';
   }
 
