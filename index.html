@@ -3555,6 +3555,152 @@ P.leaderboard = {
     </div>`
 };
 
+// ──────── SESSION CARD ────────
+P.sessioncard = {
+  title: 'Session Card', desc: 'Clickable card for scheduled classes. Shows time, subject, status. Opens bottom sheet with details and join button.',
+  tokens() {
+    return ['--card-bg','--card-border','--card-border-hover','--card-radius','--accent','--accent-border','--signal','--fg','--fg-faint','--fg-muted','--fg-subtle','--font-mono','--font-sans','--sp-4','--sp-5','--dur-1','--ease'];
+  },
+  knobs: {
+    state: { type:'select', options:['upcoming','soon','live','done','cancelled'], default:'upcoming', label:'State' },
+    title: { type:'text', default:'Inference & implied meaning', label:'Session name' },
+    subject: { type:'text', default:'Qudrat Reading', label:'Subject' },
+    teacher: { type:'text', default:'Mr. Hassan', label:'Teacher' },
+    time: { type:'text', default:'10:00', label:'Time' },
+  },
+  renderCanvas(k) {
+    const stateClass = 'session--' + k.state;
+    const statusMap = {
+      upcoming: '<span class="chip" style="height:22px;font-size:10px">1:30</span>',
+      soon: '<span class="chip chip--signal" style="height:22px;font-size:10px">Starting soon</span>',
+      live: '<span class="chip chip--signal" style="height:22px;font-size:10px"><span class="chip__dot"></span> Live</span>',
+      done: '<span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)">Done</span>',
+      cancelled: '<span style="font-family:var(--font-mono);font-size:10px;color:var(--danger-400)">Cancelled</span>',
+    };
+    return `<div style="width:100%;max-width:420px">
+      <div class="session ${stateClass}">
+        <div class="session__time">${esc(k.time)}</div>
+        <div class="session__indicator"></div>
+        <div class="session__body">
+          <div class="session__title">${esc(k.title)}</div>
+          <div class="session__meta">${esc(k.subject)} - ${esc(k.teacher)}</div>
+        </div>
+        <div class="session__status">${statusMap[k.state]}</div>
+      </div>
+    </div>`;
+  },
+  renderCode(k) {
+    return `<div class="session session--${k.state}">
+  <div class="session__time">${esc(k.time)}</div>
+  <div class="session__indicator"></div>
+  <div class="session__body">
+    <div class="session__title">${esc(k.title)}</div>
+    <div class="session__meta">${esc(k.subject)} - ${esc(k.teacher)}</div>
+  </div>
+  <div class="session__status">...</div>
+</div>`;
+  },
+  sections: `
+    <div class="sect"><div class="sect__title">All States</div>
+      <div class="col gap-3" style="max-width:420px">
+        <div class="session session--live">
+          <div class="session__time">8:30</div>
+          <div class="session__indicator"></div>
+          <div class="session__body">
+            <div class="session__title">Storytelling</div>
+            <div class="session__meta">Digital Media - Ms. Al-Harbi</div>
+          </div>
+          <div class="session__status"><span class="chip chip--signal" style="height:22px;font-size:10px"><span class="chip__dot"></span> Live</span></div>
+        </div>
+        <div class="session session--soon">
+          <div class="session__time">10:00</div>
+          <div class="session__indicator"></div>
+          <div class="session__body">
+            <div class="session__title">Inference & implied meaning</div>
+            <div class="session__meta">Qudrat Reading - Mr. Hassan</div>
+          </div>
+          <div class="session__status"><span class="chip chip--signal" style="height:22px;font-size:10px">Starting soon</span></div>
+        </div>
+        <div class="session session--upcoming">
+          <div class="session__time">11:30</div>
+          <div class="session__indicator"></div>
+          <div class="session__body">
+            <div class="session__title">Quantitative reasoning</div>
+            <div class="session__meta">Qudrat Math - Ms. Noor</div>
+          </div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)">3:00</span></div>
+        </div>
+        <div class="session session--done">
+          <div class="session__time">7:00</div>
+          <div class="session__indicator"></div>
+          <div class="session__body">
+            <div class="session__title">Reading comprehension</div>
+            <div class="session__meta">Qudrat Reading - Mr. Hassan</div>
+          </div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)">Done</span></div>
+        </div>
+        <div class="session session--cancelled">
+          <div class="session__time">14:30</div>
+          <div class="session__indicator"></div>
+          <div class="session__body">
+            <div class="session__title">Crew discussion</div>
+            <div class="session__meta">Facilitated - Omar's crew</div>
+          </div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:10px;color:var(--danger-400)">Cancelled</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Bottom Sheet (on click)</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">Clicking any session card opens a bottom sheet with full details and a join/review button. The sheet uses the existing bottom sheet component.</p>
+      <div class="col gap-3" style="max-width:420px">
+        <div class="card" style="padding:var(--sp-5)">
+          <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+            <div style="width:4px;height:32px;border-radius:var(--r-pill);background:var(--accent)"></div>
+            <div>
+              <div style="font-family:var(--font-serif);font-size:var(--fs-18);color:var(--fg)">Inference & implied meaning</div>
+              <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-top:2px">Qudrat Reading - Mr. Hassan</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+            <div><div class="caps" style="margin-bottom:4px">Time</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">10:00 - 10:45</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Duration</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">45 min</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Status</div><div style="font-size:var(--fs-14);color:var(--accent);font-weight:var(--fw-500)">Live now</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Room</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">Room 3A</div></div>
+          </div>
+          <button class="btn btn--primary btn--block" style="height:48px;font-size:var(--fs-15)">Join class</button>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">After Class</div>
+      <div class="col gap-3" style="max-width:420px">
+        <div class="card" style="padding:var(--sp-5)">
+          <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+            <div style="width:4px;height:32px;border-radius:var(--r-pill);background:var(--fg-faint)"></div>
+            <div>
+              <div style="font-family:var(--font-serif);font-size:var(--fs-18);color:var(--fg)">Reading comprehension</div>
+              <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-top:2px">Qudrat Reading - Mr. Hassan</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+            <div><div class="caps" style="margin-bottom:4px">Time</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">7:00 - 7:45</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Duration</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">45 min</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Attendance</div><div style="font-size:var(--fs-14);color:var(--fg);font-weight:var(--fw-500)">Present</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Recording</div><div style="font-size:var(--fs-14);color:var(--accent);font-weight:var(--fw-500)">Available</div></div>
+          </div>
+          <button class="btn btn--secondary btn--block" style="height:44px">Watch recording</button>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Rules</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Before:</b> Show time, subject, teacher. Status shows countdown or "Starting soon". Card is clickable to see details.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>During:</b> Live indicator with accent border and pulsing dot. Bottom sheet shows "Join class" as primary action.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>After:</b> Card fades to muted state. Bottom sheet shows attendance, recording availability, "Watch recording" as secondary action.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Cancelled:</b> Struck-through title, danger indicator. No action in bottom sheet.</div></div>
+      </div>
+    </div>`
+};
+
 // ──────── CALENDAR ────────
 P.calendar = {
   title: 'Calendar', desc: 'Week strip by default, expand to full month. Arrows navigate weeks or months. Fully portable to React Native.',
@@ -3824,6 +3970,7 @@ const NAV = [
     { id:'identity', label:'Identity' },
     { id:'badges', label:'Badges' },
     { id:'tables', label:'Tables' },
+    { id:'sessioncard', label:'Session Card' },
   ]},
   { group: 'Progress', items: [
     { id:'routesteps', label:'Route Steps' },
