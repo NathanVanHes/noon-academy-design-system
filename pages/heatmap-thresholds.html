@@ -621,12 +621,12 @@ function openDrillGrey(t, section) {
 
   // Set nudge and CTA for grey tile
   var nudge = document.getElementById('drillNudge');
-  nudge.innerHTML = 'This topic is locked until your class covers it. Check back soon.';
+  nudge.innerHTML = 'Your class hasn\'t covered this yet, but you can get a head start.';
   var ctaBtn = document.getElementById('drillCtaBtn');
-  ctaBtn.textContent = 'Not available yet';
-  ctaBtn.disabled = true;
-  ctaBtn.style.opacity = '0.5';
-  ctaBtn.style.cursor = 'default';
+  ctaBtn.textContent = 'Start early';
+  ctaBtn.disabled = false;
+  ctaBtn.style.opacity = '';
+  ctaBtn.style.cursor = '';
   document.getElementById('drill').classList.add('is-open');
   document.getElementById('drillOverlay').classList.add('is-open');
 }
