@@ -32,6 +32,7 @@
   font-size: var(--fs-12);
   color: var(--fg-muted);
   flex: none;
+  flex: none;
 }
 
 
@@ -193,6 +194,14 @@ var sessions = {
     { time: '8:30 - 9:15', name: 'Reading comprehension', subject: 'Qudrat Reading', teacher: 'Mr. Hassan', state: 'upcoming', room: 'Room 3A', duration: '45 min' },
     { time: '10:00 - 10:45', name: 'Geometry foundations', subject: 'Tahsili Math', teacher: 'Ms. Noor', state: 'upcoming', room: 'Room 2C', duration: '45 min' },
     { time: '13:00 - 13:45', name: 'Crew practice session', subject: 'Facilitated', teacher: "Omar's crew", state: 'upcoming', room: 'Room 4D', duration: '45 min' },
+  ],
+  yesterday: [
+    { time: '8:30 - 9:15', name: 'Vocabulary building', subject: 'Qudrat Reading', teacher: 'Mr. Hassan', state: 'done', room: 'Room 3A', duration: '45 min' },
+    { time: '10:00 - 10:45', name: 'Algebra foundations', subject: 'Qudrat Math', teacher: 'Ms. Noor', state: 'done', room: 'Room 2C', duration: '45 min' },
+  ],
+  other: [
+    { time: '9:00 - 9:45', name: 'Grammar review', subject: 'Qudrat Reading', teacher: 'Mr. Hassan', state: 'upcoming', room: 'Room 3A', duration: '45 min' },
+    { time: '11:00 - 11:45', name: 'Statistics intro', subject: 'Qudrat Math', teacher: 'Ms. Noor', state: 'upcoming', room: 'Room 2C', duration: '45 min' },
   ]
 };
 
@@ -244,7 +253,7 @@ function renderCal() {
       if (isSelected(day.d, day.m)) cls.push('is-selected');
       var count = !day.out && evtCounts[day.d] ? evtCounts[day.d] : 0;
       var dots = count > 0 ? '<span class="cal__day-dots">' + Array(Math.min(count, 3)).fill('<span class="cal__day-dot"></span>').join('') + '</span>' : '';
-      return '<button class="cal__day" data-day="' + day.d + '" data-month="' + day.m + '">' + day.d + dots + '</button>';
+      return '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-month="' + day.m + '">' + day.d + dots + '</button>';
     }).join('');
     return '<div class="cal__week-row"' + hide + '>' + cells + '</div>';
   }).join('');
@@ -314,14 +323,20 @@ function renderSessions() {
   var content = document.getElementById('content');
   var isCurrentDay = selectedDate.toDateString() === now.toDateString();
   var isTomorrow = selectedDate.toDateString() === new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toDateString();
+  var isYesterday = selectedDate.toDateString() === new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toDateString();
 
-  var todaySessions = isCurrentDay ? sessions.today : isTomorrow ? sessions.tomorrow : [];
+  var todaySessions = isCurrentDay ? sessions.today : isTomorrow ? sessions.tomorrow : isYesterday ? sessions.yesterday : sessions.other;
   var tomorrowSessions = isCurrentDay ? sessions.tomorrow : [];
+
+  // Past days: mark all as done
+  if (selectedDate < now && !isCurrentDay) {
+    todaySessions = todaySessions.map(function(s) { return Object.assign({}, s, {state: 'done'}); });
+  }
 
   var html = '';
 
   if (todaySessions.length) {
-    var label = isCurrentDay ? 'Today' : isTomorrow ? 'Tomorrow' : FULL_DAYS[selectedDate.getDay()];
+    var label = isCurrentDay ? 'Today' : isTomorrow ? 'Tomorrow' : isYesterday ? 'Yesterday' : FULL_DAYS[selectedDate.getDay()];
     html += '<div class="section-hdr"><span class="section-hdr__label">' + label + '</span><span class="section-hdr__count">' + todaySessions.length + ' sessions</span></div>';
     html += '<div class="session-list">';
     todaySessions.forEach(function(s, i) {
