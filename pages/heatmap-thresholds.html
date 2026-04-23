@@ -66,7 +66,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile.is-mastered.is-revealed .tile__score{opacity:1;animation:stampIn 0.3s ease}
 @keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
 .tile__border-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
-.tile__border-svg rect{fill:none;stroke:url(#goldTrail);stroke-width:5;rx:6;ry:6;stroke-linecap:round}
+.tile__border-svg path{fill:none;stroke:#D4A017;stroke-width:5;stroke-linecap:round}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -280,11 +280,7 @@ function renderTile(t, section, idx, mastery) {
     svg.setAttribute('class', 'tile__border-svg');
     svg.setAttribute('viewBox', '0 0 100 100');
     svg.setAttribute('preserveAspectRatio', 'none');
-    // Gradient for gold trail
-    var defs = document.createElementNS(svgNS, 'defs');
-    defs.innerHTML = '<linearGradient id="goldTrail" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100"><stop offset="0%" stop-color="#FFCB45"/><stop offset="50%" stop-color="#D4A017"/><stop offset="100%" stop-color="#FFCB45"/></linearGradient>';
-    svg.appendChild(defs);
-    // Path: starts top-right, goes right→down→left→up→back to start
+    // Path: starts top-right, goes down→left→up→back to start
     var r = 6, x1 = 3, y1 = 3, x2 = 97, y2 = 97;
     var path = document.createElementNS(svgNS, 'path');
     path.setAttribute('d',
