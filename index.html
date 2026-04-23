@@ -3650,45 +3650,53 @@ P.sessioncard = {
         </div>
       </div>
     </div>
-    <div class="sect"><div class="sect__title">Bottom Sheet (on click)</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">Clicking any session card opens a bottom sheet with full details and a join/review button. The sheet uses the existing bottom sheet component.</p>
-      <div class="col gap-3" style="max-width:420px">
-        <div class="card" style="padding:var(--sp-5)">
-          <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-            <div style="width:4px;height:32px;border-radius:var(--r-pill);background:var(--accent)"></div>
-            <div>
-              <div style="font-family:var(--font-serif);font-size:var(--fs-18);color:var(--fg)">Inference & implied meaning</div>
-              <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-top:2px">Qudrat Reading - Mr. Hassan</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+    <div class="sect"><div class="sect__title">Bottom Sheet — Live Class</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">Clicking a session card opens the bottom sheet component with session details.</p>
+      <div style="max-width:420px;position:relative;border-radius:var(--r-4) var(--r-4) 0 0;background:var(--bg-overlay);box-shadow:var(--z-4);overflow:hidden">
+        <div class="sheet__handle"></div>
+        <div class="sheet__header"><h3 class="sheet__title">Inference & implied meaning</h3></div>
+        <div class="sheet__body">
+          <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-bottom:var(--sp-4)">Qudrat Reading - Mr. Hassan</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-4)">
             <div><div class="caps" style="margin-bottom:4px">Time</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">10:00 - 10:45</div></div>
             <div><div class="caps" style="margin-bottom:4px">Duration</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">45 min</div></div>
             <div><div class="caps" style="margin-bottom:4px">Status</div><div style="font-size:var(--fs-14);color:var(--accent);font-weight:var(--fw-500)">Live now</div></div>
             <div><div class="caps" style="margin-bottom:4px">Room</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">Room 3A</div></div>
           </div>
-          <button class="btn btn--primary btn--block" style="height:48px;font-size:var(--fs-15)">Join class</button>
         </div>
+        <div class="sheet__actions"><button class="btn btn--primary btn--block" style="height:48px;font-size:var(--fs-15)">Join class</button></div>
       </div>
     </div>
-    <div class="sect"><div class="sect__title">After Class</div>
-      <div class="col gap-3" style="max-width:420px">
-        <div class="card" style="padding:var(--sp-5)">
-          <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-            <div style="width:4px;height:32px;border-radius:var(--r-pill);background:var(--fg-faint)"></div>
-            <div>
-              <div style="font-family:var(--font-serif);font-size:var(--fs-18);color:var(--fg)">Reading comprehension</div>
-              <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-top:2px">Qudrat Reading - Mr. Hassan</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-5)">
+    <div class="sect"><div class="sect__title">Bottom Sheet — After Class (recording available)</div>
+      <div style="max-width:420px;position:relative;border-radius:var(--r-4) var(--r-4) 0 0;background:var(--bg-overlay);box-shadow:var(--z-4);overflow:hidden">
+        <div class="sheet__handle"></div>
+        <div class="sheet__header"><h3 class="sheet__title">Reading comprehension</h3></div>
+        <div class="sheet__body">
+          <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-bottom:var(--sp-4)">Qudrat Reading - Mr. Hassan</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-4)">
             <div><div class="caps" style="margin-bottom:4px">Time</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">7:00 - 7:45</div></div>
             <div><div class="caps" style="margin-bottom:4px">Duration</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">45 min</div></div>
             <div><div class="caps" style="margin-bottom:4px">Attendance</div><div style="font-size:var(--fs-14);color:var(--fg);font-weight:var(--fw-500)">Present</div></div>
             <div><div class="caps" style="margin-bottom:4px">Recording</div><div style="font-size:var(--fs-14);color:var(--accent);font-weight:var(--fw-500)">Available</div></div>
           </div>
-          <button class="btn btn--secondary btn--block" style="height:44px">Watch recording</button>
         </div>
+        <div class="sheet__actions"><button class="btn btn--secondary btn--block" style="height:44px">Watch recording</button></div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Bottom Sheet — After Class (no recording)</div>
+      <div style="max-width:420px;position:relative;border-radius:var(--r-4) var(--r-4) 0 0;background:var(--bg-overlay);box-shadow:var(--z-4);overflow:hidden">
+        <div class="sheet__handle"></div>
+        <div class="sheet__header"><h3 class="sheet__title">Quantitative reasoning</h3></div>
+        <div class="sheet__body">
+          <div style="font-size:var(--fs-12);color:var(--fg-subtle);margin-bottom:var(--sp-4)">Qudrat Math - Ms. Noor</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+            <div><div class="caps" style="margin-bottom:4px">Time</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">11:30 - 12:15</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Duration</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg)">45 min</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Attendance</div><div style="font-size:var(--fs-14);color:var(--fg);font-weight:var(--fw-500)">Present</div></div>
+            <div><div class="caps" style="margin-bottom:4px">Recording</div><div style="font-size:var(--fs-14);color:var(--fg-faint)">Not available</div></div>
+          </div>
+        </div>
+        <div class="sheet__actions"><button class="btn btn--ghost btn--block" style="height:44px;color:var(--fg-muted)">No recording for this session</button></div>
       </div>
     </div>
     <div class="sect"><div class="sect__title">Rules</div>
