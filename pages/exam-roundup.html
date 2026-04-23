@@ -67,13 +67,13 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .btn-go{height:34px;padding:0 16px;background:var(--btn);color:var(--fg);border:0;border-radius:var(--r);font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
 .btn-go:hover{opacity:0.9}
 
-/* Mastered row */
+/* Mastery reached row */
 .topic.is-mastered{opacity:0;animation:rowIn 0.3s ease forwards}
 
 /* Star */
 .star-svg{flex:none}
 
-/* Mastered badge */
+/* Mastery reached badge */
 .mastered-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--fg-secondary);background:rgba(39,189,134,0.08);padding:4px 10px;border-radius:20px}
 </style>
 </head>
@@ -97,7 +97,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
     <div style="display:flex;gap:12px">
       <div style="flex:1;background:rgba(39,189,134,0.06);border-radius:6px;padding:12px;text-align:center">
         <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--green)">1</div>
-        <div style="font-size:11px;color:var(--fg-secondary);display:flex;align-items:center;justify-content:center;gap:3px;margin-top:2px"><svg width="8" height="8" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>
+        <div style="font-size:11px;color:var(--fg-secondary);display:flex;align-items:center;justify-content:center;gap:3px;margin-top:2px"><svg width="8" height="8" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastery reached</div>
       </div>
       <div style="flex:1;background:rgba(20,20,20,0.03);border-radius:6px;padding:12px;text-align:center">
         <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--fg)">2</div>
@@ -155,7 +155,7 @@ topics.forEach(function(t, i) {
   html += '<div class="topic__info"><div class="topic__name">' + t.name + '</div><div class="topic__chapter">' + t.chapter + '</div></div>';
 
   if (mastered) {
-    html += '<div class="mastered-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" class="star-svg"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
+    html += '<div class="mastered-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" class="star-svg"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastery reached</div>';
   } else {
     // Gradient fill bar with 80 marker
     html += '<div class="topic__gap">';
