@@ -587,25 +587,34 @@ document.getElementById('examSegment').addEventListener('click', function(e) {
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false);
 renderGrid('readingGrid', readingTopics, 'Verbal');
 
-// Shimmer on mastered tiles — inject a div that sweeps across then removes itself
+// Shimmer on mastered tiles — sweeps top-left to bottom-right, twice
 setTimeout(function() {
   document.querySelectorAll('.tile.is-mastered').forEach(function(tile) {
     var shim = document.createElement('div');
     shim.style.cssText = 'position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:inherit;pointer-events:none';
     var band = document.createElement('div');
-    band.style.cssText = 'position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,0.3) 50%,transparent 58%);transform:translateX(100%) translateY(100%);transition:transform 1.2s ease';
+    band.style.cssText = 'position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,0.3) 50%,transparent 58%);transform:translateX(-100%) translateY(-100%)';
     shim.appendChild(band);
     tile.appendChild(shim);
-    requestAnimationFrame(function() {
+    var count = 0;
+    function sweep() {
+      band.style.transition = 'none';
+      band.style.transform = 'translateX(-100%) translateY(-100%)';
       requestAnimationFrame(function() {
-        band.style.transform = 'translateX(-100%) translateY(-100%)';
+        requestAnimationFrame(function() {
+          band.style.transition = 'transform 0.8s ease';
+          band.style.transform = 'translateX(100%) translateY(100%)';
+        });
       });
-    });
+    }
     band.addEventListener('transitionend', function() {
-      shim.remove();
+      count++;
+      if (count < 2) { setTimeout(sweep, 200); }
+      else { shim.remove(); }
     });
+    sweep();
   });
-}, 1200);
+}, 500);
 </script>
 
 <!-- Score bottom sheet -->
