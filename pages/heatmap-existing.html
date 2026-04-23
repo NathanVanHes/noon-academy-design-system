@@ -347,11 +347,13 @@ function openDrill(t, section) {
     badge.innerHTML = '';
     badge.style.background = 'none';
     var body = document.querySelector('.drill__body');
-    body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 20px">' +
-      '<svg width="40" height="40" viewBox="0 0 12 12" fill="#141414" style="margin-bottom:16px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>' +
-      '<div style="font-size:18px;font-weight:700;margin-bottom:6px">You\'ve mastered ' + name + '</div>' +
-      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5;max-width:280px;margin-bottom:16px">Nice work. A short practice session each week will keep you exam-ready. We\'ll let you know if anything needs attention.</div>' +
-      '<div style="font-family:var(--font-mono);font-size:11px;margin-bottom:4px">' + diffStr + '</div>' +
+    body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 24px 32px">' +
+      '<div style="width:56px;height:56px;border-radius:50%;background:rgba(39,189,134,0.08);display:grid;place-items:center;margin-bottom:20px">' +
+        '<svg width="24" height="24" viewBox="0 0 12 12" fill="#27BD86"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>' +
+      '</div>' +
+      '<div style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--fg)">You\'ve mastered ' + name + '</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.6;max-width:260px;margin-bottom:20px">Well done — you can move on to other topics. We\'ll check back before your exam and let you know if a refresher is needed.</div>' +
+      '<div style="font-family:var(--font-mono);font-size:11px;color:var(--fg-muted)">' + diffStr + '</div>' +
     '</div>';
     var nudge = document.getElementById('drillNudge');
     if (nudge) nudge.innerHTML = '';
