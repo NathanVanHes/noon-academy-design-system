@@ -590,7 +590,8 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 }
 .cal__day {
   position: relative; display: grid; place-items: center;
-  aspect-ratio: 1; border-radius: 50%; font-size: var(--fs-15); font-weight: var(--fw-500);
+  width: 40px; height: 40px; margin: 0 auto;
+  border-radius: 50%; font-size: var(--fs-15); font-weight: var(--fw-500);
   color: var(--fg); cursor: pointer; border: 0; background: transparent;
   font-family: var(--font-sans); line-height: var(--lh-tight);
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
