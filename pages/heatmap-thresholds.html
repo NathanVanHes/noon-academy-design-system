@@ -674,14 +674,29 @@ renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 
 // Border draws then star stamps on mastered tiles
 function shimmerMastered() {
+  console.log('[shimmer] called');
   setTimeout(function() {
-    document.querySelectorAll('.tile.is-mastered:not(.is-revealed)').forEach(function(tile, i) {
+    var tiles = document.querySelectorAll('.tile.is-mastered:not(.is-revealed)');
+    console.log('[shimmer] mastered tiles to animate:', tiles.length);
+    tiles.forEach(function(tile, i) {
+      console.log('[shimmer] tile', i, '_borderRect:', !!tile._borderRect);
+      var svg = tile.querySelector('.tile__border-svg');
+      console.log('[shimmer] tile', i, 'svg element:', !!svg);
+      var rect = svg ? svg.querySelector('rect') : null;
+      console.log('[shimmer] tile', i, 'rect element:', !!rect);
+      if (rect) {
+        console.log('[shimmer] tile', i, 'dashoffset before:', rect.getAttribute('stroke-dashoffset'));
+        console.log('[shimmer] tile', i, 'rect bbox:', rect.getBBox ? rect.getBBox() : 'no getBBox');
+        console.log('[shimmer] tile', i, 'svg style:', window.getComputedStyle(svg).display, window.getComputedStyle(svg).position);
+      }
       setTimeout(function() {
-        if (tile._borderRect) {
-          tile._borderRect.setAttribute('stroke-dashoffset', '0');
+        if (rect) {
+          rect.setAttribute('stroke-dashoffset', '0');
+          console.log('[shimmer] tile', i, 'dashoffset set to 0');
         }
         setTimeout(function() {
           tile.classList.add('is-revealed');
+          console.log('[shimmer] tile', i, 'revealed');
         }, 1200);
       }, i * 200);
     });
