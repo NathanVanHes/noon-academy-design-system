@@ -62,7 +62,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:5px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;color:rgba(0,0,0,0.3);display:flex;align-items:center;gap:2px;z-index:2}
 .tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.12)}
-@keyframes masteredSink{from{opacity:1;transform:scale(1)}to{opacity:0.4;transform:scale(0.88)}}
+@keyframes masteredSink{from{opacity:1;transform:scale(1)}to{opacity:0.4;transform:scale(0.94)}}
 .tile.is-mastered.is-faded{animation:masteredSink 1s ease forwards !important}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
@@ -294,7 +294,8 @@ function renderTile(t, section, idx, mastery) {
     }
   }
   if (t.score === null) {
-    tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
+    tile.style.background = 'var(--bg-disabled)';
+    tile.style.boxShadow = 'none';
     tile.querySelector('.tile__name').style.color = 'var(--fg-muted)';
     tile.querySelector('.tile__score').style.color = 'var(--fg-muted)';
   }
@@ -638,6 +639,7 @@ document.getElementById('examSegment').addEventListener('click', function(e) {
   document.getElementById('verbalExam').style.display = examOn ? 'inline' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn, 80);
   renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal', 70);
+  shimmerMastered();
 });
 
 // Save original drill body for restoring after mastery info
@@ -647,38 +649,30 @@ var _origDrillBody = document.querySelector('.drill__body').innerHTML;
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false, 80);
 renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 
-// Shimmer on mastered tiles
-var masteredTiles = document.querySelectorAll('.tile.is-mastered');
-console.log('Mastered tiles found:', masteredTiles.length);
-setTimeout(function() {
-  document.querySelectorAll('.tile.is-mastered').forEach(function(tile, i) {
-    console.log('Shimmer tile', i, tile.querySelector('.tile__name').textContent);
-    var shim = document.createElement('div');
-    shim.style.cssText = 'position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:inherit;pointer-events:none';
-    var band = document.createElement('div');
-    band.style.cssText = 'position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,0.3) 50%,transparent 58%);transform:translateX(-100%) translateY(-100%)';
-    shim.appendChild(band);
-    tile.appendChild(shim);
-    var count = 0;
-    function sweep() {
-      band.style.transition = 'none';
-      band.style.transform = 'translateX(-100%) translateY(-100%)';
+// Shimmer + fade on mastered tiles — callable after any render
+function shimmerMastered() {
+  setTimeout(function() {
+    document.querySelectorAll('.tile.is-mastered:not(.is-faded)').forEach(function(tile) {
+      var shim = document.createElement('div');
+      shim.style.cssText = 'position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:inherit;pointer-events:none';
+      var band = document.createElement('div');
+      band.style.cssText = 'position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,0.3) 50%,transparent 58%);transform:translateX(-100%) translateY(-100%)';
+      shim.appendChild(band);
+      tile.appendChild(shim);
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           band.style.transition = 'transform 2s ease';
           band.style.transform = 'translateX(100%) translateY(100%)';
         });
       });
-    }
-    setTimeout(function() {
-      console.log('Fading tile', tile.querySelector('.tile__name').textContent, 'classes before:', tile.className);
-      shim.remove();
-      tile.classList.add('is-faded');
-      console.log('Classes after:', tile.className, 'computed opacity:', getComputedStyle(tile).opacity);
-    }, 2200);
-    sweep();
-  });
-}, 700);
+      setTimeout(function() {
+        shim.remove();
+        tile.classList.add('is-faded');
+      }, 2050);
+    });
+  }, 500);
+}
+shimmerMastered();
 
 // Open mastery info in the drilldown panel
 function openMasteryInfo() {
