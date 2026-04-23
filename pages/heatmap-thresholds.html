@@ -261,7 +261,7 @@ function renderTile(t, section, idx, mastery) {
   // no longer used in score area
   var mastered = t.score !== null && t.score >= mastery;
   if (mastered) tile.classList.add('is-mastered');
-  var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(0,0,0,0.5)" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
   var diffHtml = '';
   var scoreDelayMs = (idx || 0) * 30 + 200;
   tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
