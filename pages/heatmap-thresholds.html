@@ -59,8 +59,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile:hover{transform:scale(1.04);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 @keyframes tileIn{to{opacity:1;transform:translateY(0)}}
 @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(200px) rotate(360deg)}}
-.tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
-.tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.25);display:flex;align-items:center;gap:2px;z-index:2}
+.tile__name{font-size:10px;font-weight:600;color:rgba(0,0,0,0.45);text-align:center;line-height:1.1;padding:0 6px}
+.tile__score{font-family:var(--font-mono);font-size:16px;font-weight:700;color:rgba(0,0,0,0.35);z-index:2;margin-bottom:1px}
 .tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.12);transform:scale(0.9)}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
@@ -127,7 +127,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Quantitative</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--fg-muted)">Target <svg width="7" height="7" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> <b style="color:var(--fg-secondary)">80</b> · Level 1</span></div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--fg-muted)">Target <svg width="7" height="7" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> <b style="color:var(--fg-secondary)">8</b> · Level 1</span></div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
@@ -136,7 +136,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Verbal</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--fg-muted)">Target <svg width="7" height="7" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> <b style="color:var(--fg-secondary)">70</b> · Level 2</span></div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--fg-muted)">Target <svg width="7" height="7" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> <b style="color:var(--fg-secondary)">7</b> · Level 2</span></div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
@@ -233,6 +233,16 @@ function chartBarColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
+// Display score as 0-10 scale
+function displayScore(s) {
+  if (s === null) return null;
+  var v = s / 10;
+  return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1);
+}
+function displayMastery(m) {
+  return (m / 10) % 1 === 0 ? (m / 10).toFixed(0) : (m / 10).toFixed(1);
+}
+
 function renderTile(t, section, idx, mastery) {
   mastery = mastery || 80;
   var tile = document.createElement('div');
@@ -247,28 +257,32 @@ function renderTile(t, section, idx, mastery) {
   // Diff indicator bottom-right (not on mastered)
   var diffHtml = '';
   if (t.score !== null && diff !== 0 && !mastered) {
-    var diffSign = diff > 0 ? '+' : '';
-    diffHtml = '<div class="tile__diff">' + diffSign + diff + '</div>';
+    var diffSign = diff > 0 ? '+' : '-';
+    var diffVal = (Math.abs(diff) / 10).toFixed(1);
+    diffHtml = '<div class="tile__diff">' + diffSign + diffVal + '</div>';
   }
   var scoreDelayMs = (idx || 0) * 30 + 200;
-  tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+  tile.innerHTML =
     (t.score !== null
       ? '<div class="tile__score">' + (mastered ? starSvg : '<span class="tile__counter" data-target="' + t.score + '">0</span>') + '</div>'
-      : '<div class="tile__score" style="color:var(--fg-muted)"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></div>') +
+      : '<div class="tile__score" style="color:var(--fg-muted)"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></div>') +
+    '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
     diffHtml;
   // Animate counter
   if (t.score !== null && !mastered) {
     var counterEl = tile.querySelector('.tile__counter');
     if (counterEl) {
       (function(el, target, delay) {
-        var duration = 500 + target * 3; // longer for bigger numbers
-        var last = -1;
+        var duration = 600;
+        var last = '';
         setTimeout(function() {
           var start = performance.now();
           function tick(now) {
             var p = Math.min((now - start) / duration, 1);
-            var val = Math.round((1 - Math.pow(1 - p, 2)) * target);
-            if (val !== last) { el.textContent = val; last = val; }
+            var raw = (1 - Math.pow(1 - p, 2)) * target / 10;
+            var display = raw < 10 ? raw.toFixed(1) : '10';
+            if (p >= 1) display = displayScore(target);
+            if (display !== last) { el.textContent = display; last = display; }
             if (p < 1) requestAnimationFrame(tick);
           }
           requestAnimationFrame(tick);
@@ -328,8 +342,9 @@ function openDrill(t, section, mastery) {
   var badge = document.getElementById('drillBadge');
   var diff = t.trend[3] - t.trend[2];
   var diffStr = '';
-  if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diff + '</span> this week';
-  else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + Math.abs(diff) + '</span> this week';
+  var diffDisplay = (Math.abs(diff) / 10).toFixed(1);
+  if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diffDisplay + '</span> this week';
+  else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + diffDisplay + '</span> this week';
   else diffStr = '<span style="color:var(--fg-muted)">No change this week</span>';
   var name = t.name.replace('\n',' ');
 
@@ -365,7 +380,7 @@ function openDrill(t, section, mastery) {
     return;
   }
 
-  badge.innerHTML = '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:' + scoreColor(t.score) + '">' + t.score + '</span><span style="font-family:var(--font-mono);font-size:10px">' + diffStr + '</span></div>';
+  badge.innerHTML = '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-family:var(--font-mono);font-size:28px;font-weight:600;color:' + scoreColor(t.score) + '">' + displayScore(t.score) + '</span><span style="font-family:var(--font-mono);font-size:10px">' + diffStr + '</span></div>';
   badge.style.background = 'none';
 
   var weekData = generateThisWeek(t);
@@ -384,15 +399,16 @@ function openDrill(t, section, mastery) {
   // Contextual nudge
   var nudge = document.getElementById('drillNudge');
   var ctaBtn = document.getElementById('drillCtaBtn');
-  var gap = mastery - t.score;
+  var gap = (mastery - t.score) / 10;
+  var gapDisplay = gap % 1 === 0 ? gap.toFixed(0) : gap.toFixed(1);
   if (t.score >= mastery - 15) {
-    nudge.innerHTML = 'You\'re <b>' + gap + ' points</b> away from mastering ' + name + '. We\'ve lined up questions targeting exactly where you\'re losing marks — one focused session could close the gap.';
+    nudge.innerHTML = 'You\'re <b>' + gapDisplay + '</b> away from mastering ' + name + '. We\'ve lined up questions targeting exactly where you\'re losing marks — one focused session could close the gap.';
     ctaBtn.textContent = 'Close the gap';
   } else if (t.score >= 40) {
     nudge.innerHTML = 'You\'re building a foundation in ' + name + '. We\'ll start you with the core concepts and work up — complete a practice set and you\'ll see this move.';
     ctaBtn.textContent = 'Practice ' + name;
   } else {
-    nudge.innerHTML = name + ' is early days. We\'ve put together a plan starting from the basics — ' + gap + ' points to mastery, and every session gets you closer.';
+    nudge.innerHTML = name + ' is early days. We\'ve put together a plan starting from the basics — ' + gapDisplay + ' to mastery, and every session gets you closer.';
     ctaBtn.textContent = 'Start with the basics';
   }
 
@@ -436,7 +452,7 @@ function renderChart(data, labelTexts, mastered, masteryLine) {
   for (var g = 0; g <= 100; g += 20) {
     var gy = pad.top + ch - (g / 100) * ch;
     svg += '<line x1="' + pad.left + '" y1="' + gy + '" x2="' + (pad.left + cw) + '" y2="' + gy + '" stroke="rgba(20,20,20,0.04)"/>';
-    svg += '<text x="' + (pad.left - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-family="\'JetBrains Mono\',monospace" font-size="8" fill="#BBB8B1">' + g + '</text>';
+    svg += '<text x="' + (pad.left - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-family="\'JetBrains Mono\',monospace" font-size="8" fill="#BBB8B1">' + (g/10) + '</text>';
   }
 
   // Full connected line (grey segments + colored segments)
@@ -462,7 +478,7 @@ function renderChart(data, labelTexts, mastered, masteryLine) {
   svg += '<line x1="' + pad.left + '" y1="' + masteryY + '" x2="' + (pad.left + cw) + '" y2="' + masteryY + '" stroke="rgba(20,20,20,0.1)" stroke-dasharray="4,3"/>';
 
   // Mastery label — top left above the line
-  svg += '<text x="' + pad.left + '" y="' + (masteryY - 6) + '" font-family="\'JetBrains Mono\',monospace" font-size="8" font-weight="600" fill="#BBB8B1">★ ' + masteryLine + '+</text>';
+  svg += '<text x="' + pad.left + '" y="' + (masteryY - 6) + '" font-family="\'JetBrains Mono\',monospace" font-size="8" font-weight="600" fill="#BBB8B1">★ ' + displayMastery(masteryLine) + '+</text>';
 
   // Area fill for mastered
   if (mastered && points.length > 1) {
@@ -495,7 +511,7 @@ function renderChart(data, labelTexts, mastered, masteryLine) {
     var ty = p.y - 22;
     svg += '<g class="chart__tooltip">';
     svg += '<rect x="' + (p.x - 15) + '" y="' + (ty - 7) + '" width="30" height="18" rx="4" fill="#141414"/>';
-    svg += '<text x="' + p.x + '" y="' + (ty + 5) + '" text-anchor="middle" font-family="\'JetBrains Mono\',monospace" font-size="10" font-weight="600" fill="#fff">' + p.v + '</text>';
+    svg += '<text x="' + p.x + '" y="' + (ty + 5) + '" text-anchor="middle" font-family="\'JetBrains Mono\',monospace" font-size="10" font-weight="600" fill="#fff">' + displayScore(p.v) + '</text>';
     svg += '</g>';
     svg += '</g>';
   });
@@ -668,13 +684,13 @@ function openMasteryInfo() {
     '</div>' +
     // 80+ is good
     '<div style="background:rgba(39,189,134,0.06);border-radius:8px;padding:14px 16px;margin-bottom:16px">' +
-      '<div style="font-size:13px;font-weight:600;margin-bottom:4px">80+ means you\'re good to go</div>' +
-      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you hit 80, you\'ve mastered this topic. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div>' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:4px">Reaching your target means you\'re good to go</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you reach your target, you\'ve mastered this topic. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div>' +
     '</div>' +
     // What to do
     '<div style="background:rgba(20,20,20,0.03);border-radius:8px;padding:14px 16px">' +
       '<div style="font-size:13px;font-weight:600;margin-bottom:4px">How to improve</div>' +
-      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Focus on topics below 80. Practice sessions are the fastest way to move your score.</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Focus on topics below their target. Practice sessions are the fastest way to move your score.</div>' +
     '</div>' +
   '</div>';
 
