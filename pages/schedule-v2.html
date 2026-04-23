@@ -27,7 +27,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);
 .section-hdr__count{font-family:var(--font-mono);font-size:var(--fs-11);color:var(--fg-faint)}
 
 /* Session list */
-.session-list{display:flex;flex-direction:column;gap:var(--sp-2);padding:0 var(--sp-4)}
+.session-list{padding:0}
 
 /* Bottom nav */
 .nav-bar{position:sticky;bottom:0;z-index:10;background:var(--bg-overlay);border-top:1px solid var(--border)}
@@ -228,13 +228,17 @@ function renderSessions() {
     html += '<div class="section-hdr"><span class="section-hdr__label">'+label+'</span><span class="section-hdr__count">'+list.length+' sessions</span></div>';
     html += '<div class="session-list">';
     list.forEach(function(s,i){
-      var statusLine = s.state==='live'?'Live now':s.state==='soon'?'Starting soon':s.state==='done'?'Done':s.time;
+      var timeDisplay = s.time.split(' - ')[0];
+      var statusChip = s.state==='live'?'<span class="chip chip--signal" style="height:22px;font-size:10px"><span class="chip__dot"></span> Live</span>'
+        :s.state==='soon'?'<span class="chip chip--signal" style="height:22px;font-size:10px">Soon</span>'
+        :s.state==='done'?'<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">Done</span>'
+        :'<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">'+s.duration+'</span>';
       html += '<div class="session session--'+s.state+'" data-idx="'+i+'" style="animation:fadeIn 0.25s ease '+(i*50)+'ms both">';
-      html += '<div class="session__indicator"></div><div class="session__body">';
-      html += '<div class="session__status-line">'+statusLine+'</div>';
-      html += '<div class="session__title">'+s.name+'</div>';
-      html += '<div class="session__meta">'+s.subject+'</div>';
-      html += '</div></div>';
+      html += '<div class="session__time">'+timeDisplay+'</div>';
+      html += '<div class="session__indicator"></div>';
+      html += '<div class="session__body"><div class="session__title">'+s.name+'</div><div class="session__meta">'+s.subject+' - '+s.teacher+'</div></div>';
+      html += '<div class="session__status">'+statusChip+'</div>';
+      html += '</div>';
     });
     html += '</div>';
   } else {

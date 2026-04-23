@@ -3599,96 +3599,85 @@ P.leaderboard = {
 
 // ──────── SESSION CARD ────────
 P.sessioncard = {
-  title: 'Session Card', desc: 'Clickable card for scheduled classes. Stacked layout: status/time, session name, subject. Opens bottom sheet on click.',
+  title: 'Session Card', desc: 'List-item for scheduled classes. Time, indicator, title, status. Opens bottom sheet on click.',
   tokens() {
-    return ['--card-bg','--card-border','--card-border-hover','--card-radius','--accent','--accent-border','--signal','--fg','--fg-faint','--fg-muted','--fg-subtle','--font-mono','--font-sans','--sp-4','--sp-5','--dur-1','--ease'];
+    return ['--divider','--hover-overlay','--accent','--signal','--fg','--fg-faint','--fg-muted','--fg-subtle','--font-mono','--font-sans','--sp-4','--sp-5','--dur-1','--ease'];
   },
   knobs: {
     state: { type:'select', options:['upcoming','soon','live','done','cancelled'], default:'upcoming', label:'State' },
     title: { type:'text', default:'Inference & implied meaning', label:'Session name' },
-    subject: { type:'text', default:'Qudrat Reading', label:'Subject' },
-    time: { type:'text', default:'10:00 - 10:45', label:'Time' },
+    subject: { type:'text', default:'Qudrat Reading - Mr. Hassan', label:'Subject + Teacher' },
+    time: { type:'text', default:'10:00', label:'Time' },
   },
   renderCanvas(k) {
-    const stateClass = 'session--' + k.state;
-    const statusLine = {
-      upcoming: esc(k.time),
-      soon: 'in 12 mins',
-      live: 'Live now',
-      done: '45 mins',
-      cancelled: 'Cancelled',
+    const statusMap = {
+      upcoming: '<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">45 min</span>',
+      soon: '<span class="chip chip--signal" style="height:22px;font-size:10px">Soon</span>',
+      live: '<span class="chip chip--signal" style="height:22px;font-size:10px"><span class="chip__dot"></span> Live</span>',
+      done: '<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">Done</span>',
+      cancelled: '<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--danger-400)">Cancelled</span>',
     };
     return `<div style="width:100%;max-width:420px">
-      <div class="session ${stateClass}">
+      <div class="session session--${k.state}">
+        <div class="session__time">${esc(k.time)}</div>
         <div class="session__indicator"></div>
         <div class="session__body">
-          <div class="session__status-line">${statusLine[k.state]}</div>
           <div class="session__title">${esc(k.title)}</div>
           <div class="session__meta">${esc(k.subject)}</div>
         </div>
+        <div class="session__status">${statusMap[k.state]}</div>
       </div>
     </div>`;
   },
   renderCode(k) {
     return `<div class="session session--${k.state}">
+  <div class="session__time">${esc(k.time)}</div>
   <div class="session__indicator"></div>
   <div class="session__body">
-    <div class="session__status-line">${k.state === 'soon' ? 'in 12 mins' : esc(k.time)}</div>
     <div class="session__title">${esc(k.title)}</div>
     <div class="session__meta">${esc(k.subject)}</div>
   </div>
+  <div class="session__status">...</div>
 </div>`;
   },
   sections: `
     <div class="sect"><div class="sect__title">All States</div>
-      <div class="col gap-3" style="max-width:420px">
+      <div style="max-width:420px">
         <div class="session session--live">
+          <div class="session__time">8:30</div>
           <div class="session__indicator"></div>
-          <div class="session__body">
-            <div class="session__status-line">Live now</div>
-            <div class="session__title">Storytelling</div>
-            <div class="session__meta">Digital Media</div>
-          </div>
+          <div class="session__body"><div class="session__title">Storytelling</div><div class="session__meta">Digital Media - Ms. Al-Harbi</div></div>
+          <div class="session__status"><span class="chip chip--signal" style="height:22px;font-size:10px"><span class="chip__dot"></span> Live</span></div>
         </div>
         <div class="session session--soon">
+          <div class="session__time">10:00</div>
           <div class="session__indicator"></div>
-          <div class="session__body">
-            <div class="session__status-line">in 12 mins</div>
-            <div class="session__title">Inference & implied meaning</div>
-            <div class="session__meta">Qudrat Reading</div>
-          </div>
+          <div class="session__body"><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
+          <div class="session__status"><span class="chip chip--signal" style="height:22px;font-size:10px">Soon</span></div>
         </div>
         <div class="session session--upcoming">
+          <div class="session__time">11:30</div>
           <div class="session__indicator"></div>
-          <div class="session__body">
-            <div class="session__status-line">10:00 - 10:45</div>
-            <div class="session__title">Quantitative reasoning</div>
-            <div class="session__meta">Qudrat Math</div>
-          </div>
+          <div class="session__body"><div class="session__title">Quantitative reasoning</div><div class="session__meta">Qudrat Math - Ms. Noor</div></div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">3:00</span></div>
         </div>
         <div class="session session--upcoming">
+          <div class="session__time">13:00</div>
           <div class="session__indicator"></div>
-          <div class="session__body">
-            <div class="session__status-line">13:00 - 13:45</div>
-            <div class="session__title">Analogy patterns</div>
-            <div class="session__meta">Qudrat Reading</div>
-          </div>
+          <div class="session__body"><div class="session__title">Analogy patterns</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">4:30</span></div>
         </div>
         <div class="session session--done">
+          <div class="session__time">7:00</div>
           <div class="session__indicator"></div>
-          <div class="session__body">
-            <div class="session__status-line">45 mins</div>
-            <div class="session__title">Reading comprehension</div>
-            <div class="session__meta">Qudrat Reading</div>
-          </div>
+          <div class="session__body"><div class="session__title">Reading comprehension</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-faint)">Done</span></div>
         </div>
         <div class="session session--cancelled">
+          <div class="session__time">14:30</div>
           <div class="session__indicator"></div>
-          <div class="session__body">
-            <div class="session__status-line">Cancelled</div>
-            <div class="session__title">Crew discussion</div>
-            <div class="session__meta">Facilitated</div>
-          </div>
+          <div class="session__body"><div class="session__title">Crew discussion</div><div class="session__meta">Facilitated - Omar's crew</div></div>
+          <div class="session__status"><span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--danger-400)">Cancelled</span></div>
         </div>
       </div>
     </div>
