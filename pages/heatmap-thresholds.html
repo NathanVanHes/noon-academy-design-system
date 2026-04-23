@@ -61,9 +61,13 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(200px) rotate(360deg)}}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:5px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;color:rgba(0,0,0,0.3);display:flex;align-items:center;gap:2px;z-index:2}
-.tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.12)}
-@keyframes masteredSink{from{opacity:1;transform:scale(1)}to{opacity:0.4;transform:scale(0.94)}}
-.tile.is-mastered.is-faded{animation:masteredSink 1s ease forwards !important}
+/* Mastered tile flip */
+.tile.is-mastered{perspective:600px}
+.tile__flip{position:absolute;inset:0;border-radius:inherit;transform-style:preserve-3d;transition:transform 0.6s ease}
+.tile__flip-front,.tile__flip-back{position:absolute;inset:0;border-radius:inherit;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tile__flip-back{transform:rotateY(180deg);background:var(--bg-raised);box-shadow:inset 0 0 0 1px rgba(20,20,20,0.06)}
+.tile.is-mastered.is-flipped .tile__flip{transform:rotateY(180deg)}
+.tile.is-mastered.is-flipped{overflow:visible}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -266,11 +270,26 @@ function renderTile(t, section, idx, mastery) {
   var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
   var diffHtml = '';
   var scoreDelayMs = (idx || 0) * 30 + 200;
-  tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
-    (t.score !== null
-      ? '<div class="tile__score">' + (mastered ? starSvg : '<span class="tile__counter" data-target="' + t.score + '">0</span>') + '</div>'
-      : '<div class="tile__score" style="color:var(--fg-muted)"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></div>') +
-    diffHtml;
+  if (mastered) {
+    tile.innerHTML = '<div class="tile__flip">' +
+      '<div class="tile__flip-front" style="background:' + scoreColor(t.score) + '">' +
+        '<div class="tile__score">' + displayScore(t.score) + '</div>' +
+        '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+      '</div>' +
+      '<div class="tile__flip-back">' +
+        '<svg width="16" height="16" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>' +
+        '<div style="font-size:8px;font-weight:600;color:var(--fg-secondary);text-transform:uppercase;letter-spacing:0.05em">Mastered</div>' +
+        '<div style="font-size:9px;color:var(--fg-muted);margin-top:1px">' + t.name.replace('\n',' ') + '</div>' +
+      '</div>' +
+    '</div>';
+    tile.style.background = 'transparent';
+  } else {
+    tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+      (t.score !== null
+        ? '<div class="tile__score"><span class="tile__counter" data-target="' + t.score + '">0</span></div>'
+        : '<div class="tile__score" style="color:var(--fg-muted)"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></div>') +
+      diffHtml;
+  }
   // Animate counter
   if (t.score !== null && !mastered) {
     var counterEl = tile.querySelector('.tile__counter');
@@ -639,7 +658,7 @@ document.getElementById('examSegment').addEventListener('click', function(e) {
   document.getElementById('verbalExam').style.display = examOn ? 'inline' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn, 80);
   renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal', 70);
-  shimmerMastered();
+  flipMastered();
 });
 
 // Save original drill body for restoring after mastery info
@@ -649,30 +668,17 @@ var _origDrillBody = document.querySelector('.drill__body').innerHTML;
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false, 80);
 renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 
-// Shimmer + fade on mastered tiles — callable after any render
-function shimmerMastered() {
+// Flip mastered tiles — callable after any render
+function flipMastered() {
   setTimeout(function() {
-    document.querySelectorAll('.tile.is-mastered:not(.is-faded)').forEach(function(tile) {
-      var shim = document.createElement('div');
-      shim.style.cssText = 'position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:inherit;pointer-events:none';
-      var band = document.createElement('div');
-      band.style.cssText = 'position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(135deg,transparent 42%,rgba(255,255,255,0.3) 50%,transparent 58%);transform:translateX(-100%) translateY(-100%)';
-      shim.appendChild(band);
-      tile.appendChild(shim);
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          band.style.transition = 'transform 2s ease';
-          band.style.transform = 'translateX(100%) translateY(100%)';
-        });
-      });
+    document.querySelectorAll('.tile.is-mastered:not(.is-flipped)').forEach(function(tile, i) {
       setTimeout(function() {
-        shim.remove();
-        tile.classList.add('is-faded');
-      }, 2050);
+        tile.classList.add('is-flipped');
+      }, i * 150);
     });
-  }, 500);
+  }, 800);
 }
-shimmerMastered();
+flipMastered();
 
 // Open mastery info in the drilldown panel
 function openMasteryInfo() {
