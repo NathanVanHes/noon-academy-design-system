@@ -324,7 +324,6 @@ body.rtl .tabbar__item { font-family: var(--font-arabic); font-size: var(--fs-11
 .sheet__header { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6) var(--sp-4); }
 .sheet__title { font-family: var(--font-serif); font-size: var(--fs-18); font-weight: var(--fw-500); color: var(--fg); margin: 0; }
 .sheet__body { padding: 0 var(--sp-6) var(--sp-8); overflow-y: auto; flex: 0 1 auto; }
-.sheet__body:last-child { padding-block-end: var(--sp-10); }
 .sheet__actions { display: flex; gap: var(--sp-3); padding: var(--sp-4) var(--sp-6); border-block-start: 1px solid var(--border); }
 .sheet--full { max-block-size: 90vh; }
 .sheet--full .sheet__body { flex: 1; }
