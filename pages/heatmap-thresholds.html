@@ -666,10 +666,10 @@ setTimeout(function() {
         });
       });
     }
-    band.addEventListener('transitionend', function() {
+    setTimeout(function() {
       shim.remove();
       tile.classList.add('is-faded');
-    });
+    }, 2200);
     sweep();
   });
 }, 700);
