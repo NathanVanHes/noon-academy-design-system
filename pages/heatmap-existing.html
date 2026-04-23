@@ -60,7 +60,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 @keyframes tileIn{to{opacity:1;transform:translateY(0)}}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.25);display:flex;align-items:center;gap:2px;z-index:2}
-.tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.15),inset 0 1px 2px rgba(0,0,0,0.1)}
+.tile.is-mastered{box-shadow:inset 0 2px 8px rgba(0,0,0,0.2),inset 0 1px 2px rgba(0,0,0,0.12);filter:saturate(0.6) brightness(0.92)}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -116,14 +116,10 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="legend-strip">
   <div class="legend-strip__inner">
-    <div style="display:flex;align-items:center;gap:12px;flex:none">
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="width:12px;height:12px;border-radius:2px;background:#F03D3D"></div>
-        <div style="width:12px;height:12px;border-radius:2px;background:#FFCB45"></div>
-        <div style="width:12px;height:12px;border-radius:2px;background:#27BD86"></div>
-      </div>
-      <span style="font-size:11px;color:var(--fg-secondary)">Reach 80 for</span>
-      <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--fg-secondary)"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> mastery</span>
+    <div style="display:flex;align-items:center;gap:10px;flex:none">
+      <div style="width:80px;height:8px;border-radius:4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></div>
+      <svg width="10" height="10" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+      <span style="font-size:11px;color:var(--fg-secondary)">Reach 80 for mastery</span>
     </div>
     <div style="margin-left:auto;flex:none" id="examSegment">
       <div class="seg-ctrl">
@@ -269,18 +265,20 @@ function renderTile(t, section, idx) {
   if (t.score !== null && !mastered) {
     var counterEl = tile.querySelector('.tile__counter');
     if (counterEl) {
-      var target = t.score;
-      var duration = 600;
-      setTimeout(function() {
-        var start = performance.now();
-        function tick(now) {
-          var p = Math.min((now - start) / duration, 1);
-          var eased = 1 - Math.pow(1 - p, 3);
-          counterEl.textContent = Math.round(eased * target);
-          if (p < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      }, scoreDelayMs);
+      (function(el, target, delay) {
+        var duration = 500 + target * 3; // longer for bigger numbers
+        var last = -1;
+        setTimeout(function() {
+          var start = performance.now();
+          function tick(now) {
+            var p = Math.min((now - start) / duration, 1);
+            var val = Math.round((1 - Math.pow(1 - p, 2)) * target);
+            if (val !== last) { el.textContent = val; last = val; }
+            if (p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }, delay);
+      })(counterEl, t.score, scoreDelayMs);
     }
   }
   if (t.score === null) {
