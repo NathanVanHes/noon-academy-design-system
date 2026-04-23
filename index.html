@@ -3741,12 +3741,21 @@ P.sessioncard = {
         <div class="sheet__actions"><button class="btn btn--ghost btn--block">No recording for this session</button></div>
       </div></div>
     </div>
+    <div class="sect"><div class="sect__title">Indicator Color</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">The left indicator bar is status-driven, not subject-driven. It tells the student what's happening now.</p>
+      <div class="col gap-2" style="max-width:300px">
+        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--signal)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Upcoming</b> — signal (gold)</span></div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--accent)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Starting soon / Live</b> — accent (green)</span></div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--fg-faint)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Done</b> — faint (grey)</span></div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--danger-400)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Cancelled</b> — danger (red)</span></div>
+      </div>
+    </div>
     <div class="sect"><div class="sect__title">Rules</div>
       <div class="grid grid--2">
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Before:</b> Show time, subject, teacher. Status shows countdown or "Starting soon". Card is clickable to see details.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>During:</b> Live indicator with accent border and pulsing dot. Bottom sheet shows "Join class" as primary action.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>After:</b> Card fades to muted state. Bottom sheet shows attendance, recording availability, "Watch recording" as secondary action.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Cancelled:</b> Struck-through title, danger indicator. No action in bottom sheet.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Before:</b> Show time range, session name, subject. Status line shows countdown or time. Card is clickable to open bottom sheet.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>During:</b> Accent indicator + border. Status line shows "Live now" in uppercase. Bottom sheet has "Join class" primary action.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>After:</b> Card fades to 55% opacity. Bottom sheet shows attendance + recording availability.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Cancelled:</b> 40% opacity, title struck-through, danger indicator. No action in bottom sheet.</div></div>
       </div>
     </div>`
 };
