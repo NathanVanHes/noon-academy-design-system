@@ -60,7 +60,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);
 </div>
 
 <!-- Overdue (today only) -->
-<div class="overdue-bar" id="overdue" style="display:none">
+<div class="overdue-bar" id="overdue">
   <div class="overdue-bar__inner" style="display:flex;align-items:center;gap:var(--sp-3)">
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="flex:none"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3M7 9v0"/></svg>
     <span style="font-weight:var(--fw-600)">3</span>
@@ -242,7 +242,7 @@ function renderSessions() {
   }
 
   content.innerHTML = html;
-  document.getElementById('overdue').style.display = isCurrent?'block':'none';
+  document.getElementById('overdue').style.display = 'block';
 
   // Wire clicks
   content.querySelectorAll('.session').forEach(function(el){
