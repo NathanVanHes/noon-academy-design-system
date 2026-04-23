@@ -603,19 +603,15 @@ setTimeout(function() {
       band.style.transform = 'translateX(-100%) translateY(-100%)';
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
-          band.style.transition = 'transform 1.5s ease';
+          band.style.transition = 'transform 2s ease';
           band.style.transform = 'translateX(100%) translateY(100%)';
         });
       });
     }
-    band.addEventListener('transitionend', function() {
-      count++;
-      if (count < 2) { setTimeout(sweep, 200); }
-      else { shim.remove(); }
-    });
+    band.addEventListener('transitionend', function() { shim.remove(); });
     sweep();
   });
-}, 500);
+}, 700);
 
 // Open mastery info in the drilldown panel
 function openMasteryInfo() {
