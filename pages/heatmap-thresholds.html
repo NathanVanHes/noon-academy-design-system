@@ -61,13 +61,12 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(200px) rotate(360deg)}}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:5px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;color:rgba(0,0,0,0.3);display:flex;align-items:center;gap:2px;z-index:2}
-/* Mastered tile — border draws then star stamps in */
+/* Mastered tile — trailing swoop then star */
 .tile.is-mastered .tile__score{opacity:0}
 .tile.is-mastered.is-revealed .tile__score{opacity:1;animation:stampIn 0.3s ease}
-@keyframes stampIn{0%{transform:scale(2);opacity:0}60%{transform:scale(0.9);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
 .tile__border-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
-.tile__border-svg rect{fill:none;stroke:#D4A017;stroke-width:6;rx:8;ry:8;transition:stroke-dashoffset 1.2s ease}
-.tile.is-mastered.is-revealed .tile__border-svg{opacity:0;transition:opacity 0.5s ease 0.3s}
+.tile__border-svg rect{fill:none;stroke:url(#goldTrail);stroke-width:5;rx:6;ry:6;stroke-linecap:round}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -281,17 +280,29 @@ function renderTile(t, section, idx, mastery) {
     svg.setAttribute('class', 'tile__border-svg');
     svg.setAttribute('viewBox', '0 0 100 100');
     svg.setAttribute('preserveAspectRatio', 'none');
-    // Rotate so stroke-dashoffset draws from top-right
-    svg.style.transform = 'rotate(90deg) scaleX(-1)';
-    var rect = document.createElementNS(svgNS, 'rect');
-    rect.setAttribute('x', '4');
-    rect.setAttribute('y', '4');
-    rect.setAttribute('width', '92');
-    rect.setAttribute('height', '92');
-    rect.setAttribute('pathLength', '100');
-    rect.setAttribute('stroke-dasharray', '100');
-    rect.setAttribute('stroke-dashoffset', '100');
-    svg.appendChild(rect);
+    // Gradient for gold trail
+    var defs = document.createElementNS(svgNS, 'defs');
+    defs.innerHTML = '<linearGradient id="goldTrail" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100"><stop offset="0%" stop-color="#FFCB45"/><stop offset="50%" stop-color="#D4A017"/><stop offset="100%" stop-color="#FFCB45"/></linearGradient>';
+    svg.appendChild(defs);
+    // Path: starts top-right, goes right→down→left→up→back to start
+    var r = 6, x1 = 3, y1 = 3, x2 = 97, y2 = 97;
+    var path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d',
+      'M' + x2 + ' ' + (y1+r) +
+      ' L' + x2 + ' ' + (y2-r) +
+      ' Q' + x2 + ' ' + y2 + ' ' + (x2-r) + ' ' + y2 +
+      ' L' + (x1+r) + ' ' + y2 +
+      ' Q' + x1 + ' ' + y2 + ' ' + x1 + ' ' + (y2-r) +
+      ' L' + x1 + ' ' + (y1+r) +
+      ' Q' + x1 + ' ' + y1 + ' ' + (x1+r) + ' ' + y1 +
+      ' L' + (x2-r) + ' ' + y1 +
+      ' Q' + x2 + ' ' + y1 + ' ' + x2 + ' ' + (y1+r)
+    );
+    // Trailing tail: short visible segment that sweeps around
+    path.setAttribute('pathLength', '100');
+    path.setAttribute('stroke-dasharray', '20 80'); // 20% visible, 80% gap
+    path.setAttribute('stroke-dashoffset', '100'); // start hidden
+    svg.appendChild(path);
     tile.appendChild(svg);
   }
   // Animate counter
@@ -676,12 +687,23 @@ renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 function shimmerMastered() {
   setTimeout(function() {
     document.querySelectorAll('.tile.is-mastered:not(.is-revealed)').forEach(function(tile, i) {
-      var el = tile.querySelector('.tile__border-svg rect');
+      var path = tile.querySelector('.tile__border-svg path');
+      if (!path) return;
       setTimeout(function() {
-        if (el) el.setAttribute('stroke-dashoffset', '0');
+        // Animate: sweep the tail around the border
+        path.style.transition = 'stroke-dashoffset 0.8s ease-in-out';
+        path.setAttribute('stroke-dashoffset', '0');
+        // Second pass — sweep fully through
+        setTimeout(function() {
+          path.style.transition = 'stroke-dashoffset 0.6s ease-in';
+          path.setAttribute('stroke-dashoffset', '-80');
+        }, 800);
+        // Star stamps in, border fades
         setTimeout(function() {
           tile.classList.add('is-revealed');
-        }, 1200);
+          var svg = tile.querySelector('.tile__border-svg');
+          if (svg) { svg.style.transition = 'opacity 0.3s ease'; svg.style.opacity = '0'; }
+        }, 1300);
       }, i * 200);
     });
   }, 600);
