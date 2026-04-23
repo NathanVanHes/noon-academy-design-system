@@ -2766,6 +2766,45 @@ P.bottomsheet = {
   renderCode(k) {
     return `<div class="modal-overlay">\n  <div class="sheet${k.size==='full'?' sheet--full':''}">\n    <div class="sheet__handle"></div>\n    <div class="sheet__header"><div class="sheet__title">Title</div></div>\n    <div class="sheet__body">Content</div>\n    ${k.actions!=='none'?'<div class="sheet__actions">...</div>':''}\n  </div>\n</div>`;
   },
+  afterRender() {
+    var canvas = document.getElementById('canvas');
+    if (!canvas) return;
+    var frame = canvas.querySelector('[style*="border-radius:24px"]');
+    if (!frame) return;
+    var children = frame.children;
+    var scrim = children[1];
+    var sheet = children[2];
+    if (!sheet || !scrim) return;
+    var handleBar = sheet.children[0];
+    function close() {
+      sheet.style.transform = 'translateY(100%)';
+      scrim.style.background = 'rgba(6,9,19,0)';
+      scrim.style.pointerEvents = 'none';
+    }
+    function open() {
+      sheet.style.transform = 'translateY(0)';
+      scrim.style.background = 'rgba(6,9,19,0.5)';
+      scrim.style.pointerEvents = 'auto';
+    }
+    scrim.addEventListener('click', close);
+    if (handleBar) handleBar.style.cursor = 'grab';
+    // Drag down to dismiss
+    var startY = 0, drag = false;
+    sheet.addEventListener('mousedown', function(e) {
+      if (e.target === handleBar || e.target.parentElement === handleBar || e.target === sheet.children[0]) {
+        startY = e.clientY; drag = true;
+      }
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!drag) return;
+      if (e.clientY - startY > 40) { close(); drag = false; }
+    });
+    document.addEventListener('mouseup', function() { drag = false; });
+    // Click scrim to reopen (for demo)
+    frame.children[0].addEventListener('click', function() {
+      if (sheet.style.transform === 'translateY(100%)') open();
+    });
+  },
   sections: `
     <div class="sect"><div class="sect__title">Anatomy</div>
       <div class="grid grid--2">
