@@ -32,7 +32,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 /* Layout */
 .page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
-@media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}.key-inner{padding:10px 16px !important}}
+@media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}.key-inner{padding:10px 16px !important}.mastery-link{margin-left:0 !important;width:100%}}
 
 /* Section header */
 .grid-section__header{display:flex;align-items:baseline;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(20,20,20,0.06)}
@@ -67,6 +67,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile.is-mastered.is-revealed .tile__score{opacity:1;animation:stampIn 0.3s ease}
 .tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
 @keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes tileThrob{0%{transform:scale(1)}15%{transform:scale(1.06)}30%{transform:scale(0.97)}45%{transform:scale(1.04)}60%{transform:scale(0.99)}75%{transform:scale(1.02)}100%{transform:scale(1)}}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -129,10 +130,10 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div style="background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.06);position:sticky;top:64px;z-index:9">
   <div style="max-width:720px;margin:0 auto;padding:10px 40px;display:flex;align-items:center;gap:12px 16px;font-size:11px;color:var(--fg-muted);flex-wrap:wrap" class="key-inner">
-    <span style="display:inline-flex;align-items:center;gap:4px"><span style="font-family:var(--font-mono);font-size:10px">0</span><span style="width:80px;height:24px;border-radius:4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></span><span style="font-family:var(--font-mono);font-size:10px">10</span></span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="font-family:var(--font-mono);font-size:10px">0</span><span style="width:80px;height:24px;border-radius:4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></span><span style="font-family:var(--font-mono);font-size:10px">100</span></span>
     <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:24px;height:24px;border-radius:4px;background:var(--bg-raised);border:1px solid rgba(20,20,20,0.1);position:relative;flex:none;overflow:hidden;display:grid;place-items:center"><span style="position:absolute;inset:0;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(0,0,0,0.4) 3px,rgba(0,0,0,0.4) 4px)"></span><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" style="position:relative;z-index:1"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></span> Mastered</span>
     <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:24px;height:24px;border-radius:4px;background:var(--bg-disabled);flex:none;display:grid;place-items:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--fg-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></span> Not started</span>
-    <button style="margin-left:auto;background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;flex:none" onclick="openMasteryInfo()">How does mastery work?</button>
+    <button class="mastery-link" style="margin-left:auto;background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;flex:none" onclick="openMasteryInfo()">How does mastery work?</button>
   </div>
 </div>
 
@@ -141,7 +142,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Quantitative</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>8+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 1</span></div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>80+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 1</span></div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
@@ -150,7 +151,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Verbal</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>7+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 2</span></div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>70+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 2</span></div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
@@ -247,14 +248,13 @@ function chartBarColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
-// Display score as 0-10 scale
+// Display score as 0-100 scale
 function displayScore(s) {
   if (s === null) return null;
-  var v = s / 10;
-  return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1);
+  return Math.round(s);
 }
 function displayMastery(m) {
-  return (m / 10) % 1 === 0 ? (m / 10).toFixed(0) : (m / 10).toFixed(1);
+  return Math.round(m);
 }
 
 function renderTile(t, section, idx, mastery) {
@@ -287,8 +287,8 @@ function renderTile(t, section, idx, mastery) {
           var start = performance.now();
           function tick(now) {
             var p = Math.min((now - start) / duration, 1);
-            var raw = (1 - Math.pow(1 - p, 2)) * target / 10;
-            var display = raw < 10 ? raw.toFixed(1) : '10';
+            var raw = Math.round((1 - Math.pow(1 - p, 2)) * target);
+            var display = raw;
             if (p >= 1) display = displayScore(target);
             if (display !== last) { el.textContent = display; last = display; }
             if (p < 1) requestAnimationFrame(tick);
@@ -352,7 +352,7 @@ function openDrill(t, section, mastery) {
   var badge = document.getElementById('drillBadge');
   var diff = t.trend[3] - t.trend[2];
   var diffStr = '';
-  var diffDisplay = (Math.abs(diff) / 10).toFixed(1);
+  var diffDisplay = Math.round(Math.abs(diff));
   if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diffDisplay + '</span> <span data-period>this week</span>';
   else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + diffDisplay + '</span> <span data-period>this week</span>';
   else diffStr = '<span style="color:var(--fg-muted)">No change <span data-period>this week</span></span>';
@@ -460,7 +460,7 @@ function renderChart(data, labelTexts, mastered, masteryLine) {
   for (var g = 0; g <= 100; g += 20) {
     var gy = pad.top + ch - (g / 100) * ch;
     svg += '<line x1="' + pad.left + '" y1="' + gy + '" x2="' + (pad.left + cw) + '" y2="' + gy + '" stroke="rgba(20,20,20,0.04)"/>';
-    svg += '<text x="' + (pad.left - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-family="\'JetBrains Mono\',monospace" font-size="8" fill="#BBB8B1">' + (g/10) + '</text>';
+    svg += '<text x="' + (pad.left - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-family="\'JetBrains Mono\',monospace" font-size="8" fill="#BBB8B1">' + g + '</text>';
   }
 
   // Full connected line (grey segments + colored segments)
@@ -658,6 +658,15 @@ function shimmerMastered() {
   setTimeout(function() {
     document.querySelectorAll('.tile.is-mastered:not(.is-revealed)').forEach(function(tile, i) {
       setTimeout(function() {
+        // Throb tile once — kill tileIn first so transform isn't locked
+        tile.style.animation = 'none';
+        tile.style.opacity = '1';
+        tile.style.transform = 'scale(1)';
+        // Force reflow then throb
+        void tile.offsetWidth;
+        tile.style.transition = 'transform 0.2s ease';
+        tile.style.transform = 'scale(1.08)';
+        setTimeout(function() { tile.style.transform = 'scale(1)'; }, 200);
         // Rain confetti down inside tile
         for (var c = 0; c < 20; c++) {
           (function(index) {

@@ -3572,7 +3572,7 @@ P.leaderboard = {
       { rank:8, init:'R', name:'Reem T.', water:'4/18', score:'46', met:false },
       { rank:9, init:'M', name:'Maha J.', water:'3/18', score:'42', met:false },
       { rank:10, init:'T', name:'Tariq B.', water:'3/18', score:'40', met:false },
-      { rank:11, init:'D', name:'Dana W.', water:'2/18', score:'38', met:false },
+      { rank:11, init:'N', name:'Nathan VH', water:'2/18', score:'38', met:false },
       { rank:12, init:'Y', name:'Yara F.', water:'2/18', score:'35', met:false },
       { rank:13, init:'H', name:'Hana Q.', water:'1/18', score:'32', met:false },
       { rank:14, init:'Z', name:'Zain L.', water:'1/18', score:'30', met:false },
@@ -3612,7 +3612,7 @@ P.leaderboard = {
       html += '<div style="text-align:center;padding:var(--sp-2) 0;color:var(--fg-faint);font-family:var(--font-mono);font-size:var(--fs-12)">···</div>';
       const nearby = [
         { rank:10, init:'T', name:'Tariq B.', water:'3/18', score:'40', met:false },
-        { rank:11, init:'D', name:'Dana W. (You)', water:'2/18', score:'38', met:false },
+        { rank:11, init:'D', name:'Nathan VH (You)', water:'2/18', score:'38', met:false },
         { rank:12, init:'Y', name:'Yara F.', water:'2/18', score:'35', met:false },
       ];
       nearby.forEach((p, i) => { html += renderRow(p, i === nearby.length - 1, p.rank === 11); });
@@ -3659,7 +3659,7 @@ P.leaderboard = {
 <!-- "You" row (highlighted background) -->
 <div style="background:rgba(100,216,174,0.06);...">
   <div>11</div>
-  <div>Dana W. (You)</div>
+  <div>Nathan VH (You)</div>
   ...
 </div>
 
@@ -3695,8 +3695,8 @@ P.leaderboard = {
         </div>
         <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);background:rgba(100,216,174,0.06);border-radius:var(--r-1);border-bottom:1px solid var(--divider)">
           <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">11</div>
-          <div class="avatar avatar--sm" style="font-size:var(--fs-11)">D</div>
-          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg);font-weight:var(--fw-600)">Dana W. (You)</div></div>
+          <div class="avatar avatar--sm" style="font-size:var(--fs-11)">N</div>
+          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg);font-weight:var(--fw-600)">Nathan VH (You)</div></div>
           <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--danger)">2/18</div>
         </div>
         <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4)">
@@ -3716,7 +3716,7 @@ P.leaderboard = {
           { rank:8, init:'R', name:'Reem T.', water:'4/18' },
           { rank:9, init:'M', name:'Maha J.', water:'3/18' },
           { rank:10, init:'T', name:'Tariq B.', water:'3/18' },
-          { rank:11, init:'D', name:'Dana W.', water:'2/18' },
+          { rank:11, init:'N', name:'Nathan VH', water:'2/18' },
           { rank:12, init:'Y', name:'Yara F.', water:'2/18' },
         ].map((p, i, a) => `<div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);${i < a.length - 1 ? 'border-bottom:1px solid var(--divider);' : ''}">
           <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">${p.rank}</div>
