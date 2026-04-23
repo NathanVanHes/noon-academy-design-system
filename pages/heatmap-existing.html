@@ -60,7 +60,10 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 @keyframes tileIn{to{opacity:1;transform:translateY(0)}}
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.25);display:flex;align-items:center;gap:2px;z-index:2}
-.tile.is-mastered::after{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(135deg,rgba(0,0,0,0.03),rgba(0,0,0,0.03) 3px,transparent 3px,transparent 8px);pointer-events:none}
+.tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.15),inset 0 1px 2px rgba(0,0,0,0.1)}
+@keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tile__score{animation:countUp 0.4s ease forwards;opacity:0}
+.tile__diff{animation:countUp 0.5s ease forwards;opacity:0}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -261,11 +264,13 @@ function renderTile(t, section, idx) {
     var diffSign = diff > 0 ? '+' : '';
     diffHtml = '<div class="tile__diff">' + diffSign + diff + '</div>';
   }
+  var scoreDelay = ((idx || 0) * 30 + 200) + 'ms';
+  var diffDelay = ((idx || 0) * 30 + 300) + 'ms';
   tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
     (t.score !== null
-      ? '<div class="tile__score">' + (mastered ? starSvg : t.score) + '</div>'
-      : '<div class="tile__score" style="color:var(--fg-muted)">--</div>') +
-    diffHtml;
+      ? '<div class="tile__score" style="animation-delay:' + scoreDelay + '">' + (mastered ? starSvg : t.score) + '</div>'
+      : '<div class="tile__score" style="color:var(--fg-muted);animation:none">--</div>') +
+    (diffHtml ? diffHtml.replace('class="tile__diff"', 'class="tile__diff" style="animation-delay:' + diffDelay + '"') : '');
   if (t.score === null) {
     tile.style.cursor = 'default';
     tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
