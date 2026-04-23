@@ -345,9 +345,9 @@ function openDrill(t, section, mastery) {
   var diff = t.trend[3] - t.trend[2];
   var diffStr = '';
   var diffDisplay = (Math.abs(diff) / 10).toFixed(1);
-  if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diffDisplay + '</span> this week';
-  else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + diffDisplay + '</span> this week';
-  else diffStr = '<span style="color:var(--fg-muted)">No change this week</span>';
+  if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diffDisplay + '</span> <span data-period>this week</span>';
+  else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + diffDisplay + '</span> <span data-period>this week</span>';
+  else diffStr = '<span style="color:var(--fg-muted)">No change <span data-period>this week</span></span>';
   var name = t.name.replace('\n',' ');
 
   if (t.score >= mastery) {
@@ -579,6 +579,10 @@ function wireRangeTabs() {
     var range = btn.dataset.range;
     var d = range === 'week' ? generateThisWeek(t) : generateSemester(t);
     renderChart(d.values, d.labels, window._currentMastered, window._currentMasteryThreshold || 80);
+    // Update diff period label
+    var period = range === 'week' ? 'this week' : 'this semester';
+    var diffEl = document.querySelector('#drillBadge [data-period]');
+    if (diffEl) diffEl.textContent = period;
   });
 }
 wireRangeTabs();
