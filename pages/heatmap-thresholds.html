@@ -276,9 +276,9 @@ function renderTile(t, section, idx, mastery) {
         '<div class="tile__score">' + displayScore(t.score) + '</div>' +
         '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
       '</div>' +
-      '<div class="tile__flip-back" style="background:' + scoreColor(t.score) + '">' +
-        '<div style="display:flex;align-items:center;gap:3px;margin-bottom:3px"><svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(0,0,0,0.5)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span style="font-size:11px;font-weight:600;color:rgba(0,0,0,0.5)">Mastered</span></div>' +
-        '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
+      '<div class="tile__flip-back" style="background:var(--bg-disabled)">' +
+        '<div style="display:flex;align-items:center;gap:3px;margin-bottom:3px"><svg width="12" height="12" viewBox="0 0 12 12" fill="var(--fg-muted)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg><span style="font-size:11px;font-weight:600;color:var(--fg-muted)">Mastered</span></div>' +
+        '<div style="font-size:11px;font-weight:600;color:var(--fg-secondary);text-align:center;line-height:1.2;padding:0 8px">' + t.name.replace('\n','<br>') + '</div>' +
       '</div>' +
     '</div>';
     tile.style.background = 'transparent';
