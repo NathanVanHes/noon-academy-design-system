@@ -25,72 +25,49 @@
 }
 body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);min-height:100vh}
 
-/* Top bar */
 .topbar{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08);position:sticky;top:0;z-index:10}
 .topbar__inner{max-width:720px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px}
 .topbar h1{font-size:20px;font-weight:700;margin:0}
 
-/* Page */
 .page{max-width:720px;margin:0 auto;padding:32px 40px}
 
-/* Countdown banner */
-.countdown{background:var(--bg-raised);border:1px solid rgba(0,132,255,0.12);border-radius:var(--r);padding:24px;margin-bottom:28px;display:flex;align-items:center;gap:20px}
-.countdown__number{font-family:var(--font-mono);font-size:48px;font-weight:700;color:var(--blue);line-height:1}
-.countdown__unit{font-family:var(--font-mono);font-size:13px;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em}
-.countdown__text{flex:1}
-.countdown__title{font-size:16px;font-weight:600;margin:0 0 4px}
-.countdown__sub{font-size:13px;color:var(--fg-secondary);margin:0}
 
-/* Progress summary */
-.summary{display:flex;gap:16px;margin-bottom:28px}
-.summary__card{flex:1;background:var(--bg-raised);border-radius:var(--r);padding:16px;text-align:center}
-.summary__num{font-family:var(--font-mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
-.summary__label{font-size:11px;color:var(--fg-secondary);text-transform:uppercase;letter-spacing:0.08em}
+/* Topic row */
+.topic{background:var(--bg-raised);border-radius:var(--r);margin-bottom:10px;padding:16px 20px;display:flex;align-items:center;gap:16px;opacity:0;transform:translateY(6px);animation:rowIn 0.3s ease forwards}
+@keyframes rowIn{to{opacity:1;transform:translateY(0)}}
+.topic:hover{box-shadow:0 2px 8px rgba(0,0,0,0.04)}
 
-/* Topic card */
-.topic-card{background:var(--bg-raised);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:box-shadow 0.15s}
-.topic-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.topic-card__header{display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer}
-.topic-card__color{width:6px;align-self:stretch;border-radius:3px;flex:none}
-.topic-card__body{flex:1;min-width:0}
-.topic-card__name{font-size:14px;font-weight:600;margin:0}
-.topic-card__meta{font-size:12px;color:var(--fg-secondary);margin-top:2px}
-.topic-card__score{font-family:var(--font-mono);font-size:20px;font-weight:700;flex:none;display:flex;align-items:center;gap:6px}
-.topic-card__mastered{display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;color:var(--fg-secondary)}
+/* Color swatch */
+.topic__swatch{width:36px;height:36px;border-radius:6px;flex:none;display:grid;place-items:center}
+.topic__swatch-num{font-family:var(--font-mono);font-size:12px;font-weight:700}
 
-/* Status badge */
-.status{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em}
-.status--done{background:rgba(39,189,134,0.1);color:#1a8a5e}
-.status--close{background:rgba(255,203,69,0.15);color:#8e7019}
-.status--far{background:rgba(240,61,61,0.08);color:#c53030}
+/* Info */
+.topic__info{flex:1;min-width:0}
+.topic__name{font-size:14px;font-weight:600;margin:0}
+.topic__chapter{font-size:12px;color:var(--fg-muted);margin-top:1px}
 
-/* Tasks */
-.topic-card__tasks{padding:0 20px 16px;margin-left:22px;border-left:2px solid var(--bg-disabled)}
-.task{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:13px;color:var(--fg-secondary)}
-.task__check{width:18px;height:18px;border-radius:50%;border:2px solid var(--bg-disabled);flex:none;display:flex;align-items:center;justify-content:center;margin-top:1px}
-.task__check.is-done{background:var(--green);border-color:var(--green)}
-.task__check.is-done svg{display:block}
-.task__check svg{display:none;width:10px;height:10px}
-.task__text{flex:1}
-.task__text.is-done{text-decoration:line-through;color:var(--fg-muted)}
+/* Gap bar */
+.topic__gap{flex:none;width:140px}
+.topic__bar{height:6px;border-radius:3px;background:var(--bg-disabled);overflow:hidden;margin-bottom:4px}
+.topic__fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+.topic__bar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--fg-muted)}
 
-/* CTA */
-.topic-card__cta{padding:0 20px 16px;margin-left:22px}
-.btn-practice{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;background:var(--btn);color:var(--fg);border:0;border-radius:var(--r);font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
-.btn-practice:hover{opacity:0.9}
+/* Action */
+.topic__action{flex:none}
+.btn-go{height:34px;padding:0 16px;background:var(--btn);color:var(--fg);border:0;border-radius:var(--r);font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
+.btn-go:hover{opacity:0.9}
 
-/* Section label */
-.section-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.section-label__count{font-family:var(--font-mono);background:var(--bg-raised);padding:2px 8px;border-radius:4px;font-size:10px}
+/* Mastered row */
+.topic.is-mastered{opacity:0;animation:rowIn 0.3s ease forwards}
+.topic.is-mastered .topic__swatch{position:relative;overflow:hidden}
+.topic.is-mastered .topic__swatch::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,0.3) 45%,transparent 55%);background-size:300% 300%;background-position:100% 100%;animation:shimOnce 1s ease 0.8s forwards;pointer-events:none}
+@keyframes shimOnce{to{background-position:-50% -50%}}
 
-/* Mastered shimmer */
-.topic-card.is-mastered .topic-card__header{position:relative;overflow:hidden}
-.topic-card.is-mastered .topic-card__header::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.3) 50%,transparent 60%);background-size:200% 200%;animation:shimmer 3s ease-in-out infinite;pointer-events:none}
-@keyframes shimmer{0%{background-position:100% 100%}50%{background-position:0% 0%}100%{background-position:100% 100%}}
+/* Star */
+.star-svg{flex:none}
 
-/* Animate in */
-.topic-card{opacity:0;transform:translateY(8px);animation:cardIn 0.35s ease forwards}
-@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+/* Mastered badge */
+.mastered-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--fg-secondary);background:rgba(39,189,134,0.08);padding:4px 10px;border-radius:20px}
 </style>
 </head>
 <body>
@@ -103,76 +80,30 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div class="page">
-
-  <!-- Countdown -->
-  <div class="countdown">
-    <div style="text-align:center">
-      <div class="countdown__number" id="countdownNum">5</div>
-      <div class="countdown__unit">days</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="var(--fg-secondary)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+        <span style="font-family:var(--font-mono);font-size:14px;font-weight:700" id="masteredNum">1</span>
+        <span style="font-size:12px;color:var(--fg-secondary)">mastered</span>
+      </div>
+      <span style="width:1px;height:16px;background:rgba(20,20,20,0.08)"></span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-family:var(--font-mono);font-size:14px;font-weight:700" id="remainNum">2</span>
+        <span style="font-size:12px;color:var(--fg-secondary)">remaining</span>
+      </div>
     </div>
-    <div class="countdown__text">
-      <p class="countdown__title">Quantitative exam on April 28</p>
-      <p class="countdown__sub">3 topics on this exam. Get each to 80 for mastery before exam day.</p>
-    </div>
+    <span style="font-family:var(--font-mono);font-size:12px;color:var(--blue)">5 days til exam</span>
   </div>
 
-  <!-- Summary cards -->
-  <div class="summary">
-    <div class="summary__card">
-      <div class="summary__num" style="color:var(--green)" id="masteredCount">1</div>
-      <div class="summary__label">Mastered</div>
-    </div>
-    <div class="summary__card">
-      <div class="summary__num" style="color:var(--gold)" id="closeCount">1</div>
-      <div class="summary__label">Close</div>
-    </div>
-    <div class="summary__card">
-      <div class="summary__num" style="color:var(--red)" id="farCount">1</div>
-      <div class="summary__label">Needs work</div>
-    </div>
-  </div>
-
-  <!-- Topic list -->
-  <div id="topicList"></div>
-
+  <div id="topics"></div>
 </div>
 
 <script>
-var examTopics = [
-  {
-    name: 'Topic name',
-    chapter: 'Chapter name',
-    score: 94,
-    diff: 3,
-    tasks: [
-      { text: 'Complete 1 practice set', done: true },
-      { text: 'Score 80%+ on timed quiz', done: true },
-      { text: 'Review 2 weak areas', done: true },
-    ]
-  },
-  {
-    name: 'Topic name',
-    chapter: 'Chapter name',
-    score: 76,
-    diff: 5,
-    tasks: [
-      { text: 'Complete 1 practice set', done: true },
-      { text: 'Score 80%+ on timed quiz', done: false },
-      { text: 'Review flagged questions', done: false },
-    ]
-  },
-  {
-    name: 'Topic name',
-    chapter: 'Chapter name',
-    score: 18,
-    diff: -5,
-    tasks: [
-      { text: 'Start with basics practice', done: false },
-      { text: 'Complete 2 practice sets', done: false },
-      { text: 'Score 60%+ on untimed quiz', done: false },
-      { text: 'Score 80%+ on timed quiz', done: false },
-    ]
-  }
+var topics = [
+  { name: 'Topic name', chapter: 'Chapter name', score: 18 },
+  { name: 'Topic name', chapter: 'Chapter name', score: 76 },
+  { name: 'Topic name', chapter: 'Chapter name', score: 94 },
 ];
 
 function scoreColor(s) {
@@ -188,128 +119,55 @@ function scoreColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
-function getStatus(score) {
-  if (score >= 80) return { cls: 'status--done', text: 'Mastered' };
-  if (score >= 60) return { cls: 'status--close', text: (80 - score) + ' to go' };
-  return { cls: 'status--far', text: (80 - score) + ' to go' };
-}
+// Sort: lowest first
+topics.sort(function(a,b){ return a.score - b.score; });
 
-function render() {
-  var list = document.getElementById('topicList');
-  var html = '';
+var container = document.getElementById('topics');
+var html = '';
 
-  // Sort: needs work first, then close, then mastered
-  var sorted = examTopics.slice().sort(function(a, b) { return a.score - b.score; });
+topics.forEach(function(t, i) {
+  var col = scoreColor(t.score);
+  var mastered = t.score >= 80;
+  var gap = Math.max(0, 80 - t.score);
+  var pct = Math.min(t.score, 100);
+  var delay = i * 80;
 
-  // Sections
-  var needsWork = sorted.filter(function(t) { return t.score < 60; });
-  var close = sorted.filter(function(t) { return t.score >= 60 && t.score < 80; });
-  var mastered = sorted.filter(function(t) { return t.score >= 80; });
+  html += '<div class="topic' + (mastered ? ' is-mastered' : '') + '" style="animation-delay:' + delay + 'ms">';
 
-  var delay = 0;
+  // Swatch with score
+  html += '<div class="topic__swatch" style="background:' + col + '"><span class="topic__swatch-num" style="color:rgba(0,0,0,0.45)">' + t.score + '</span></div>';
 
-  if (needsWork.length) {
-    html += '<div class="section-label">Needs work <span class="section-label__count">' + needsWork.length + '</span></div>';
-    needsWork.forEach(function(t) { html += renderCard(t, delay); delay++; });
-  }
-  if (close.length) {
-    html += '<div class="section-label" style="margin-top:24px">Almost there <span class="section-label__count">' + close.length + '</span></div>';
-    close.forEach(function(t) { html += renderCard(t, delay); delay++; });
-  }
-  if (mastered.length) {
-    html += '<div class="section-label" style="margin-top:24px">Mastered <span class="section-label__count">' + mastered.length + '</span></div>';
-    mastered.forEach(function(t) { html += renderCard(t, delay); delay++; });
-  }
+  // Info
+  html += '<div class="topic__info"><div class="topic__name">' + t.name + '</div><div class="topic__chapter">' + t.chapter + '</div></div>';
 
-  list.innerHTML = html;
-
-  // Counter animations
-  list.querySelectorAll('.topic-card__score-num').forEach(function(el) {
-    var target = parseInt(el.dataset.target);
-    var delayMs = parseInt(el.dataset.delay);
-    var duration = 500 + target * 3;
-    var last = -1;
-    setTimeout(function() {
-      var start = performance.now();
-      function tick(now) {
-        var p = Math.min((now - start) / duration, 1);
-        var val = Math.round((1 - Math.pow(1 - p, 2)) * target);
-        if (val !== last) { el.textContent = val; last = val; }
-        if (p < 1) requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    }, delayMs);
-  });
-}
-
-function renderCard(t, idx) {
-  var isMastered = t.score >= 80;
-  var status = getStatus(t.score);
-  var gap = 80 - t.score;
-  var tasksComplete = t.tasks.filter(function(tk) { return tk.done; }).length;
-  var tasksTotal = t.tasks.length;
-  var delay = idx * 100;
-  var scoreDelay = delay + 300;
-
-  var starSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
-
-  var html = '<div class="topic-card' + (isMastered ? ' is-mastered' : '') + '" style="animation-delay:' + delay + 'ms">';
-  html += '<div class="topic-card__header">';
-  html += '<div class="topic-card__color" style="background:' + scoreColor(t.score) + '"></div>';
-  html += '<div class="topic-card__body">';
-  html += '<div class="topic-card__name">' + t.name + '</div>';
-  html += '<div class="topic-card__meta">' + t.chapter + ' &middot; ' + tasksComplete + '/' + tasksTotal + ' tasks done</div>';
-  html += '</div>';
-
-  if (isMastered) {
-    html += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">';
-    html += '<div class="topic-card__score" style="color:' + scoreColor(t.score) + '">' + starSvg + ' <span class="topic-card__score-num" data-target="' + t.score + '" data-delay="' + scoreDelay + '">0</span></div>';
-    html += '<span style="font-size:10px;color:var(--fg-muted)">Mastery reached</span>';
-    html += '</div>';
+  if (mastered) {
+    // Mastered — star badge
+    html += '<div class="mastered-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" class="star-svg"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
   } else {
-    html += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">';
-    html += '<div class="topic-card__score" style="color:' + scoreColor(t.score) + '"><span class="topic-card__score-num" data-target="' + t.score + '" data-delay="' + scoreDelay + '">0</span></div>';
-    html += '<span class="status ' + status.cls + '">' + status.text + '</span>';
+    // Gap bar
+    html += '<div class="topic__gap">';
+    html += '<div class="topic__bar"><div class="topic__fill" style="width:0%;background:' + col + '" data-target="' + pct + '" data-delay="' + (delay + 300) + '"></div></div>';
+    html += '<div class="topic__bar-label"><span>' + t.score + '</span><span style="color:var(--fg-secondary)">80</span></div>';
     html += '</div>';
+
+    // Practice button
+    html += '<div class="topic__action"><button class="btn-go">Practice</button></div>';
   }
 
   html += '</div>';
+});
 
-  // Tasks
-  html += '<div class="topic-card__tasks">';
-  t.tasks.forEach(function(tk) {
-    var checkCls = tk.done ? 'task__check is-done' : 'task__check';
-    var textCls = tk.done ? 'task__text is-done' : 'task__text';
-    html += '<div class="task"><div class="' + checkCls + '"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 5l2.5 2.5L8 3"/></svg></div><div class="' + textCls + '">' + tk.text + '</div></div>';
-  });
-  html += '</div>';
+container.innerHTML = html;
 
-  // CTA
-  if (!isMastered) {
-    var btnText = t.score < 60 ? 'Start practicing' : 'Close the gap';
-    html += '<div class="topic-card__cta"><button class="btn-practice">' + btnText + '</button></div>';
-  }
-
-  html += '</div>';
-  return html;
-}
-
-// Countdown animation
-(function() {
-  var el = document.getElementById('countdownNum');
-  var target = 5;
-  el.textContent = '0';
+// Animate bars
+document.querySelectorAll('.topic__fill').forEach(function(bar) {
+  var target = parseInt(bar.dataset.target);
+  var delay = parseInt(bar.dataset.delay);
   setTimeout(function() {
-    var i = 0;
-    var interval = setInterval(function() {
-      i++;
-      el.textContent = i;
-      if (i >= target) clearInterval(interval);
-    }, 120);
-  }, 200);
-})();
+    bar.style.width = (target / 80 * 100) + '%';
+  }, delay);
+});
 
-render();
 </script>
 </body>
 </html>
