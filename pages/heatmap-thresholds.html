@@ -647,9 +647,12 @@ var _origDrillBody = document.querySelector('.drill__body').innerHTML;
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false, 80);
 renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 
-// Shimmer on mastered tiles — sweeps top-left to bottom-right, twice
+// Shimmer on mastered tiles
+var masteredTiles = document.querySelectorAll('.tile.is-mastered');
+console.log('Mastered tiles found:', masteredTiles.length);
 setTimeout(function() {
-  document.querySelectorAll('.tile.is-mastered').forEach(function(tile) {
+  document.querySelectorAll('.tile.is-mastered').forEach(function(tile, i) {
+    console.log('Shimmer tile', i, tile.querySelector('.tile__name').textContent);
     var shim = document.createElement('div');
     shim.style.cssText = 'position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:inherit;pointer-events:none';
     var band = document.createElement('div');
@@ -668,8 +671,10 @@ setTimeout(function() {
       });
     }
     setTimeout(function() {
+      console.log('Fading tile', tile.querySelector('.tile__name').textContent, 'classes before:', tile.className);
       shim.remove();
       tile.classList.add('is-faded');
+      console.log('Classes after:', tile.className, 'computed opacity:', getComputedStyle(tile).opacity);
     }, 2200);
     sweep();
   });
