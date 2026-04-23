@@ -134,9 +134,8 @@ topics.forEach(function(t, i) {
   html += '<div class="topic' + (mastered ? ' is-mastered' : '') + '" style="animation-delay:' + delay + 'ms">';
 
   // Score number
-  var starSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
   if (mastered) {
-    html += '<div style="display:flex;flex-direction:column;align-items:center;min-width:48px;flex:none"><div style="display:flex;align-items:center;gap:4px">' + starSvg + '<span style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:' + col + '">' + t.score + '</span></div><span style="font-size:9px;color:var(--fg-muted)">Mastery reached</span></div>';
+    html += '<div style="min-width:48px;text-align:center;flex:none"><div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:' + col + '">' + t.score + '</div><div style="font-size:9px;color:var(--fg-muted)">5 days until exam</div></div>';
   } else {
     html += '<div style="min-width:48px;text-align:center;flex:none"><span style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:' + col + '">' + t.score + '</span></div>';
   }
