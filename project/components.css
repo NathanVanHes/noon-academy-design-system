@@ -530,9 +530,8 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 }
 .video__btn:hover { color: var(--chalk-100); }
 
-/* Playing state */
-.video.is-playing .video__play { opacity: 0; pointer-events: none; }
-.video.is-playing:hover .video__play { opacity: 1; pointer-events: auto; }
+/* Playing state — play button hidden, click video to pause */
+.video.is-playing .video__play { display: none; }
 
 /* Fullscreen */
 .video.is-fullscreen {

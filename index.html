@@ -1076,17 +1076,17 @@ P.contours = {
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On void - chalk ridges</div>
-            <div style="height:200px;position:relative;background:var(--void-300)">
-              <svg viewBox="0 0 480 200" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${Array(14).fill(0).map((_,i)=>{const y=i*14.3;const spacing=Math.abs(i-7)/7;const a=0.06+spacing*0.12;return`<path d="M0,${y} Q120,${y-4} 240,${y+3} T480,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="1"/>`}).join('\n                ')}
+            <div style="width:100%;aspect-ratio:1;position:relative;background:var(--void-300)">
+              <svg viewBox="0 0 400 400" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+                ${(function(){var lines=[];var y=0;for(var i=0;i<18;i++){var gap=8+Math.sin(i*0.4)*6+i*1.2;y+=gap;var a=0.04+gap/30*0.16;lines.push('<path d="M0,'+y+' Q100,'+(y-3)+' 200,'+(y+3)+' T400,'+y+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1"/>');} return lines.join('\n                ');})()}
               </svg>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On paper - ink ridges</div>
-            <div style="height:200px;position:relative;background:var(--paper-200)">
-              <svg viewBox="0 0 480 200" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${Array(14).fill(0).map((_,i)=>{const y=i*14.3;const spacing=Math.abs(i-7)/7;const a=0.08+spacing*0.15;return`<path d="M0,${y} Q120,${y-4} 240,${y+3} T480,${y}" stroke="rgba(10,15,26,${a.toFixed(3)})" stroke-width="1"/>`}).join('\n                ')}
+            <div style="width:100%;aspect-ratio:1;position:relative;background:var(--paper-200)">
+              <svg viewBox="0 0 400 400" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+                ${(function(){var lines=[];var y=0;for(var i=0;i<18;i++){var gap=8+Math.sin(i*0.4)*6+i*1.2;y+=gap;var a=0.06+gap/30*0.18;lines.push('<path d="M0,'+y+' Q100,'+(y-3)+' 200,'+(y+3)+' T400,'+y+'" stroke="rgba(10,15,26,'+a.toFixed(3)+')" stroke-width="1"/>');} return lines.join('\n                ');})()}
               </svg>
             </div>
           </div>
