@@ -3552,103 +3552,185 @@ P.voicechat = {
     </div>`
 };
 
-// ──────── CREW PROGRESS ────────
-P.crewprogress = {
-  title: 'Crew Progress', desc: 'How you see your crew\'s position on the route, and how your own progress compares. Everyone is visible. Nobody travels alone.',
-  sections: `
-    <div class="sect"><div class="sect__title">Crew Route View</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Each crew member's position shown on a shared route. You can see who's ahead, who's stuck, and who can help.</p>
-      <div class="cell" style="max-width:480px;padding:var(--sp-6)">
-        <div class="caps" style="margin-bottom:var(--sp-4)">Qudrat Reading - Route Day 14/28</div>
-        <svg viewBox="0 0 440 24" width="100%" height="24" style="margin-bottom:var(--sp-5)">
-          <line x1="8" y1="12" x2="432" y2="12" stroke="var(--fg-14)" stroke-width="1"/>
-          ${[[0.9,'S','#64D8AE'],[0.65,'F','#c9a227'],[0.65,'L','#c9a227'],[0.4,'O','var(--danger)'],[0.3,'A','var(--danger)']].map(([pos,init,color])=>{
-            const x = 8 + pos * 424;
-            return `<circle cx="${x}" cy="12" r="6" fill="${color}" opacity="0.9"/><text x="${x}" y="15" text-anchor="middle" fill="var(--bg)" font-family="var(--font-sans)" font-size="7" font-weight="600">${init}</text>`;
-          }).join('')}
-        </svg>
-        <div class="col gap-3">
-          ${[
-            ['S','Sarah A.','Arrived','92','var(--accent)','5/5'],
-            ['F','Farida M.','Passage 4','78','var(--signal-bright)','4/5'],
-            ['L','Layla H.','Passage 4','80','var(--signal-bright)','4/5'],
-            ['O','Omar K.','Passage 3','61','var(--danger)','3/5'],
-            ['A','Ahmed R.','Passage 2','55','var(--danger)','2/5'],
-          ].map(([init,name,status,score,color,steps])=>`<div style="display:flex;align-items:center;gap:var(--sp-3)">
-            <div class="avatar avatar--sm" style="font-size:11px">${init}</div>
-            <div style="flex:1"><div style="font-size:13px;color:var(--fg)">${name}</div><div style="font-size:11px;color:var(--fg-subtle)">${status}</div></div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)">${steps}</div>
-            <div style="font-family:var(--font-mono);font-size:13px;color:${color};min-width:28px;text-align:right">${score}</div>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-
-    <div class="sect"><div class="sect__title">Your Position Card</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">How an individual student sees their own progress. Position, predicted score, and water contribution.</p>
-      <div class="card" style="max-width:400px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--sp-4)">
-          <div class="caps">Your position</div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint)">Day 14 of 28</div>
-        </div>
-        <div style="display:flex;gap:var(--sp-6);margin-bottom:var(--sp-5)">
-          <div style="text-align:center">
-            <div style="font-family:var(--font-serif);font-size:var(--fs-32);color:var(--fg);font-weight:500">78</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase">Predicted</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-family:var(--font-serif);font-size:var(--fs-32);color:var(--fg);font-weight:500">4</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase">of 7 passages</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-family:var(--font-serif);font-size:var(--fs-32);color:var(--fg);font-weight:500">14</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase">Jugs filled</div>
-          </div>
-        </div>
-        <div class="steps">${Array(7).fill(0).map((_,i)=>`${i>0?`<div class="steps__line${i<=3?' is-done':''}"></div>`:''}<div class="steps__dot${i<3?' is-done':i===3?' is-now':''}"></div>`).join('')}</div>
-        <div style="font-size:12px;color:var(--fg-subtle);margin-top:var(--sp-3)">You're on pace for 92. Sarah can help with passage 5.</div>
-      </div>
-    </div>
-
-    <div class="sect"><div class="sect__title">Rules</div>
-      <div class="grid grid--2">
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Every crew member is always visible. Nobody is hidden or anonymized. Names, not "Peer 3"</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Show position as steps/waypoints, not percentages. "Passage 4 of 7" not "57%"</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Suggest help connections: "Sarah can help with this passage" - the route enables human connections</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Use predicted scores (mono, large serif number) - certainty about where you'll end up, not vague encouragement</div></div>
-      </div>
-    </div>`
-};
-
 // ──────── LEADERBOARD ────────
 P.leaderboard = {
-  title: 'Leaderboard', desc: 'Not a competition. A crew roster showing who\'s contributing, who needs help, and who can offer it. Ordered by water contribution, not score.',
+  title: 'Leaderboard', desc: 'Ranked crew roster with gold/silver/bronze on top 3. Ordered by water contribution. Shows your position when scrolled off-screen.',
+  knobs: {
+    view: { type:'select', options:['top','my-position','paginated'], default:'top', label:'View' },
+  },
+  renderCanvas(k) {
+    const all = [
+      { rank:1, init:'S', name:'Sarah A.', water:'18/18', score:'92', color:'noon', met:true },
+      { rank:2, init:'L', name:'Layla H.', water:'16/18', score:'80', color:'iris', met:true },
+      { rank:3, init:'F', name:'Farida M.', water:'14/18', score:'78', color:'', met:true },
+      { rank:4, init:'O', name:'Omar K.', water:'8/18', score:'61', met:false },
+      { rank:5, init:'A', name:'Ahmed R.', water:'6/18', score:'55', met:false },
+      { rank:6, init:'N', name:'Nadia S.', water:'5/18', score:'50', met:false },
+      { rank:7, init:'K', name:'Khalid D.', water:'4/18', score:'48', met:false },
+    ];
+    const page2 = [
+      { rank:8, init:'R', name:'Reem T.', water:'4/18', score:'46', met:false },
+      { rank:9, init:'M', name:'Maha J.', water:'3/18', score:'42', met:false },
+      { rank:10, init:'T', name:'Tariq B.', water:'3/18', score:'40', met:false },
+      { rank:11, init:'D', name:'Dana W.', water:'2/18', score:'38', met:false },
+      { rank:12, init:'Y', name:'Yara F.', water:'2/18', score:'35', met:false },
+      { rank:13, init:'H', name:'Hana Q.', water:'1/18', score:'32', met:false },
+      { rank:14, init:'Z', name:'Zain L.', water:'1/18', score:'30', met:false },
+    ];
+    const medalColors = {1:'var(--signal-bright)', 2:'var(--fg-muted)', 3:'#CD7F32'};
+
+    function renderRow(p, isLast, isMe) {
+      const medal = medalColors[p.rank];
+      const rankStyle = medal
+        ? `font-family:var(--font-mono);font-size:var(--fs-12);font-weight:var(--fw-700);color:${medal};min-width:20px`
+        : `font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px`;
+      return `<div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);${!isLast?'border-bottom:1px solid var(--divider);':''}${isMe?'background:rgba(100,216,174,0.06);border-radius:var(--r-1);':''}">
+        <div style="${rankStyle}">${p.rank}</div>
+        <div class="avatar avatar--sm${p.color?' avatar--'+p.color:''}" style="font-size:var(--fs-11)">${p.init}</div>
+        <div style="flex:1">
+          <div style="font-size:var(--fs-13);color:var(--fg);${isMe?'font-weight:var(--fw-600);':''}white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        </div>
+        <div style="text-align:right;min-width:52px">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:${p.met?'var(--accent)':'var(--danger)'}">${p.water}</div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-9);color:var(--fg-faint)">jugs</div>
+        </div>
+        <div style="text-align:right;min-width:32px">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--fg-muted)">${p.score}</div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-9);color:var(--fg-faint)">score</div>
+        </div>
+      </div>`;
+    }
+
+    let html = '<div style="width:100%;max-width:420px">';
+    html += '<div class="caps" style="padding:0 var(--sp-4) var(--sp-2)">Crew - This Cycle</div>';
+
+    if (k.view === 'top') {
+      all.forEach((p, i) => { html += renderRow(p, i === all.length - 1, false); });
+    } else if (k.view === 'my-position') {
+      // Show top 5, then ellipsis, then rows around "me" at rank 11
+      all.slice(0, 5).forEach(p => { html += renderRow(p, false, false); });
+      html += '<div style="text-align:center;padding:var(--sp-2) 0;color:var(--fg-faint);font-family:var(--font-mono);font-size:var(--fs-12)">···</div>';
+      const nearby = [
+        { rank:10, init:'T', name:'Tariq B.', water:'3/18', score:'40', met:false },
+        { rank:11, init:'D', name:'Dana W. (You)', water:'2/18', score:'38', met:false },
+        { rank:12, init:'Y', name:'Yara F.', water:'2/18', score:'35', met:false },
+      ];
+      nearby.forEach((p, i) => { html += renderRow(p, i === nearby.length - 1, p.rank === 11); });
+    } else if (k.view === 'paginated') {
+      page2.forEach((p, i) => { html += renderRow(p, i === page2.length - 1, false); });
+      let pg = '<div class="pagination" data-interactive="pagination" style="margin-top:var(--sp-4);justify-content:center">';
+      pg += '<button>&lt;</button><button>1</button><button class="is-on">2</button><button>3</button><button>&gt;</button>';
+      pg += '</div>';
+      html += pg;
+    }
+
+    html += '</div>';
+    return html;
+  },
+  renderCode(k) {
+    return `<!-- Rank number gets medal color for 1/2/3 -->
+<div style="display:flex;align-items:center;gap:...">
+  <!-- Gold rank -->
+  <div style="color:var(--signal-bright);font-weight:700">1</div>
+  <div class="avatar avatar--sm">S</div>
+  <div>Sarah A.</div>
+  <div>18/18</div>
+  <div>92</div>
+</div>
+
+<!-- Silver rank -->
+<div style="display:flex;...">
+  <div style="color:var(--fg-muted);font-weight:700">2</div>
+  ...
+</div>
+
+<!-- Bronze rank -->
+<div style="display:flex;...">
+  <div style="color:#CD7F32;font-weight:700">3</div>
+  ...
+</div>
+
+<!-- Normal rows (rank 4+) -->
+<div style="display:flex;...">
+  <div style="color:var(--fg-faint)">4</div>
+  ...
+</div>
+
+<!-- "You" row (highlighted background) -->
+<div style="background:rgba(100,216,174,0.06);...">
+  <div>11</div>
+  <div>Dana W. (You)</div>
+  ...
+</div>
+
+<!-- Pagination -->
+<div class="pagination">...</div>`;
+  },
   sections: `
-    <div class="sect"><div class="sect__title">Water Leaderboard</div>
-      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Ranked by water filled (proof of work + helping), not by test score. This rewards contribution to the crew, not individual performance alone.</p>
-      <div class="cell" style="max-width:480px">
-        <div class="caps" style="margin-bottom:var(--sp-4)">Crew - This Cycle</div>
+    <div class="sect"><div class="sect__title">Medal Treatment</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Same list-row layout for everyone. Positions 1/2/3 get gold/silver/bronze color and bold weight on the rank number. That's it — no podiums, no trophies.</p>
+      <div class="grid grid--auto" style="gap:var(--sp-5)">
+        <div class="cell"><div class="cell__label">1st — Gold</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);font-weight:var(--fw-700);color:var(--signal-bright)">1</div></div>
+        <div class="cell"><div class="cell__label">2nd — Silver</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);font-weight:var(--fw-700);color:var(--fg-muted)">2</div></div>
+        <div class="cell"><div class="cell__label">3rd — Bronze</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);font-weight:var(--fw-700);color:#CD7F32">3</div></div>
+        <div class="cell"><div class="cell__label">4+ — Default</div><div style="font-family:var(--font-mono);font-size:var(--fs-14);color:var(--fg-faint)">4</div></div>
+      </div>
+    </div>
+
+    <div class="sect"><div class="sect__title">Your Position (Not in Top View)</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">When you're not in the visible section, the board shows the top rows then an ellipsis break, then your row highlighted with context rows above and below.</p>
+      <div class="cell" style="max-width:420px">
+        <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--divider)">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-12);font-weight:var(--fw-700);color:var(--signal-bright);min-width:20px">1</div>
+          <div class="avatar avatar--sm avatar--noon" style="font-size:var(--fs-11)">S</div>
+          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg)">Sarah A.</div></div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--accent)">18/18</div>
+        </div>
+        <div style="text-align:center;padding:var(--sp-2) 0;color:var(--fg-faint);font-family:var(--font-mono);font-size:var(--fs-12)">···</div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--divider)">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">10</div>
+          <div class="avatar avatar--sm" style="font-size:var(--fs-11)">T</div>
+          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg)">Tariq B.</div></div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--danger)">3/18</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);background:rgba(100,216,174,0.06);border-radius:var(--r-1);border-bottom:1px solid var(--divider)">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">11</div>
+          <div class="avatar avatar--sm" style="font-size:var(--fs-11)">D</div>
+          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg);font-weight:var(--fw-600)">Dana W. (You)</div></div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--danger)">2/18</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4)">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">12</div>
+          <div class="avatar avatar--sm" style="font-size:var(--fs-11)">Y</div>
+          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg)">Yara F.</div></div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--danger)">2/18</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sect"><div class="sect__title">Pagination</div>
+      <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">For large crews or campus-wide boards. Standard pagination component below the list. 7 rows per page.</p>
+      <div class="cell" style="max-width:420px">
+        <div style="font-size:var(--fs-12);color:var(--fg-faint);font-family:var(--font-mono);margin-bottom:var(--sp-3)">Page 2 of 3</div>
         ${[
-          [1,'S','Sarah A.','18/18','92','noon',true],
-          [2,'L','Layla H.','16/18','80','iris',true],
-          [3,'F','Farida M.','14/18','78','',true],
-          [4,'O','Omar K.','8/18','61','',false],
-          [5,'A','Ahmed R.','6/18','55','',false],
-        ].map(([rank,init,name,water,score,color,met])=>`<div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) 0;${rank<5?'border-bottom:1px solid var(--divider);':''}">
-          <div style="font-family:var(--font-mono);font-size:12px;color:var(--fg-faint);min-width:20px">${rank}</div>
-          <div class="avatar avatar--sm${color?' avatar--'+color:''}" style="font-size:11px">${init}</div>
-          <div style="flex:1">
-            <div style="font-size:13px;color:var(--fg)">${name}</div>
-          </div>
-          <div style="text-align:right;min-width:56px">
-            <div style="font-family:var(--font-mono);font-size:13px;color:${met?'var(--accent)':'var(--danger)'}">${water}</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint)">jugs</div>
-          </div>
-          <div style="text-align:right;min-width:36px">
-            <div style="font-family:var(--font-mono);font-size:13px;color:var(--fg-muted)">${score}</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint)">score</div>
-          </div>
+          { rank:8, init:'R', name:'Reem T.', water:'4/18' },
+          { rank:9, init:'M', name:'Maha J.', water:'3/18' },
+          { rank:10, init:'T', name:'Tariq B.', water:'3/18' },
+          { rank:11, init:'D', name:'Dana W.', water:'2/18' },
+          { rank:12, init:'Y', name:'Yara F.', water:'2/18' },
+        ].map((p, i, a) => `<div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);${i < a.length - 1 ? 'border-bottom:1px solid var(--divider);' : ''}">
+          <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">${p.rank}</div>
+          <div class="avatar avatar--sm" style="font-size:var(--fs-11)">${p.init}</div>
+          <div style="flex:1"><div style="font-size:var(--fs-13);color:var(--fg)">${p.name}</div></div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--danger)">${p.water}</div>
         </div>`).join('')}
+        <div class="pagination" data-interactive="pagination" style="margin-top:var(--sp-4);justify-content:center">
+          <button>&lt;</button>
+          <button>1</button>
+          <button class="is-on">2</button>
+          <button>3</button>
+          <button>&gt;</button>
+        </div>
       </div>
     </div>
 
@@ -3662,15 +3744,15 @@ P.leaderboard = {
           [3,'Dune Walkers','82%','13.1 avg','var(--fg-muted)'],
           [4,'Ridge Runners','76%','10.4 avg','var(--fg-muted)'],
         ].map(([rank,name,minMet,avgWater,color])=>`<div style="display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) 0;${rank<4?'border-bottom:1px solid var(--divider);':''}">
-          <div style="font-family:var(--font-mono);font-size:12px;color:var(--fg-faint);min-width:20px">${rank}</div>
+          <div style="font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);min-width:20px">${rank}</div>
           <div class="avatar-stack" style="min-width:56px">${'ABCDE'.slice(0,3).split('').map(c=>`<div class="avatar avatar--xs">${c}</div>`).join('')}</div>
           <div style="flex:1">
-            <div style="font-size:13px;color:var(--fg)">${name}</div>
-            <div style="font-size:11px;color:var(--fg-subtle)">${minMet} met minimum</div>
+            <div style="font-size:var(--fs-13);color:var(--fg)">${name}</div>
+            <div style="font-size:var(--fs-11);color:var(--fg-subtle)">${minMet} met minimum</div>
           </div>
           <div style="text-align:right">
-            <div style="font-family:var(--font-mono);font-size:13px;color:${color}">${avgWater}</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint)">water</div>
+            <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:${color}">${avgWater}</div>
+            <div style="font-family:var(--font-mono);font-size:var(--fs-9);color:var(--fg-faint)">water</div>
           </div>
         </div>`).join('')}
       </div>
@@ -3678,12 +3760,12 @@ P.leaderboard = {
 
     <div class="sect"><div class="sect__title">Rules</div>
       <div class="grid grid--2">
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Rank by water contribution, not score. Rewards helping others, not just being smart</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Score is secondary info (shown smaller, muted). Water is the primary metric (shown larger, colored)</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Below-minimum is shown in danger color. Not punitive, just visible. The crew can see who needs help</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Cross-crew boards show crew names and aggregates, never individual students from other crews</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">No trophies, medals, or gamification chrome. The leaderboard is a crew roster, not a podium</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Always show the full crew. No "top 3 only." Everyone is visible, everyone matters</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Top 3:</b> Gold/silver/bronze color + bold on the rank number. Same row layout as everyone else — no podiums or trophies.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Your position:</b> If you're not visible, show an ellipsis break then your row highlighted with context rows above/below.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Pagination:</b> Standard pagination component below the list. 7 rows per page.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Ranking:</b> By water contribution (proof of work + helping), not score. Score is secondary and muted.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Below minimum:</b> Shown in danger color. Not punitive — the crew can see who needs help.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Cross-crew:</b> Shows crew names and aggregates, never individual students from other crews.</div></div>
       </div>
     </div>`
 };
@@ -4471,7 +4553,6 @@ const NAV = [
   ]},
   { group: 'Patterns', items: [
     { id:'voicechat', label:'Voice Chat' },
-    { id:'crewprogress', label:'Crew Progress' },
     { id:'leaderboard', label:'Leaderboard' },
   ]},
 ];

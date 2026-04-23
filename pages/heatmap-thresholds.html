@@ -42,7 +42,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 /* Legend strip */
 .legend-strip{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08)}
-.legend-strip__inner{max-width:720px;margin:0 auto;padding:14px 40px;display:flex;align-items:center;gap:20px}
+.legend-strip__inner{max-width:720px;margin:0 auto;padding:20px 40px;display:flex;align-items:center;gap:20px}
 .legend-key{flex:1;display:flex;flex-direction:column;gap:8px}
 .legend-key__track{position:relative;width:100%;height:8px}
 .legend-key__bar{width:100%;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
@@ -65,6 +65,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 /* Mastery tile — confetti burst then star */
 .tile.is-mastered .tile__score{opacity:0}
 .tile.is-mastered.is-revealed .tile__score{opacity:1;animation:stampIn 0.3s ease}
+.tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
 @keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
@@ -128,9 +129,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div style="background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.06);position:sticky;top:64px;z-index:9">
   <div style="max-width:720px;margin:0 auto;padding:10px 40px;display:flex;align-items:center;gap:12px 16px;font-size:11px;color:var(--fg-muted);flex-wrap:wrap" class="key-inner">
-    <span style="display:inline-flex;align-items:center;gap:4px"><span style="font-family:var(--font-mono);font-size:10px">0</span><span style="width:50px;height:12px;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></span><span style="font-family:var(--font-mono);font-size:10px">10</span></span>
-    <span style="display:inline-flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</span>
-    <span style="display:inline-flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="var(--fg-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg> Not started</span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="font-family:var(--font-mono);font-size:10px">0</span><span style="width:80px;height:24px;border-radius:4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86)"></span><span style="font-family:var(--font-mono);font-size:10px">10</span></span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:24px;height:24px;border-radius:4px;background:var(--bg-raised);border:1px solid rgba(20,20,20,0.1);position:relative;flex:none;overflow:hidden;display:grid;place-items:center"><span style="position:absolute;inset:0;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(0,0,0,0.4) 3px,rgba(0,0,0,0.4) 4px)"></span><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" style="position:relative;z-index:1"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg></span> Mastered</span>
+    <span style="display:inline-flex;align-items:center;gap:4px"><span style="width:24px;height:24px;border-radius:4px;background:var(--bg-disabled);flex:none;display:grid;place-items:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--fg-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></span> Not started</span>
     <button style="margin-left:auto;background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;flex:none" onclick="openMasteryInfo()">How does mastery work?</button>
   </div>
 </div>
@@ -140,7 +141,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Quantitative</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>8+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 1</span></div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>8+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 1</span></div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
@@ -149,7 +150,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Verbal</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>7+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 2</span></div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>7+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 2</span></div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
@@ -266,13 +267,13 @@ function renderTile(t, section, idx, mastery) {
   // no longer used in score area
   var mastered = t.score !== null && t.score >= mastery;
   if (mastered) tile.classList.add('is-mastered');
-  var starSvg = '<svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  var starSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" class="mastery-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
   var diffHtml = '';
   var scoreDelayMs = (idx || 0) * 30 + 200;
   tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
     (t.score !== null
       ? '<div class="tile__score">' + (mastered ? starSvg : '<span class="tile__counter" data-target="' + t.score + '">0</span>') + '</div>'
-      : '<div class="tile__score" style="color:var(--fg-muted)"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></div>') +
+      : '<div class="tile__score" style="color:var(--fg-muted)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg></div>') +
     diffHtml;
   // confetti container added in shimmerMastered
   // Animate counter
