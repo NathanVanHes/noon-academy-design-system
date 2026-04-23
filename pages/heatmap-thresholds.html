@@ -63,8 +63,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile__score{position:absolute;top:5px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;color:rgba(0,0,0,0.3);display:flex;align-items:center;gap:2px;z-index:2}
 /* Mastered tile — shimmer then fade with star */
 .tile.is-mastered{}
-@keyframes masteredSink{from{opacity:1;transform:scale(1)}to{opacity:0.4;transform:scale(0.94)}}
-.tile.is-mastered.is-faded{animation:masteredSink 1s ease forwards !important}
+.tile.is-mastered.is-faded{opacity:0.4 !important;transform:scale(0.94) !important;transition:opacity 2s ease,transform 2s ease !important}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -664,12 +663,10 @@ function shimmerMastered() {
         requestAnimationFrame(function() {
           band.style.transition = 'transform 2s ease';
           band.style.transform = 'translateX(100%) translateY(100%)';
+          tile.classList.add('is-faded');
         });
       });
-      setTimeout(function() {
-        shim.remove();
-        tile.classList.add('is-faded');
-      }, 2100);
+      setTimeout(function() { shim.remove(); }, 2100);
     });
   }, 500);
 }
