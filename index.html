@@ -2729,12 +2729,12 @@ P.modal = {
 P.bottomsheet = {
   title: 'Bottom Sheet', desc: 'Slides up from the bottom on mobile. Use for contextual actions, filters, and secondary content that doesn\'t need a full page.',
   knobs: {
-    size: { type:'select', options:['auto','capped','full'], default:'auto', label:'Size' },
+    size: { type:'select', options:['auto','full'], default:'auto', label:'Size' },
     actions: { type:'select', options:['none','one','two'], default:'two', label:'Actions' },
     open: { type:'toggle', default:true, label:'Open' },
   },
   renderCanvas(k) {
-    const maxH = k.size === 'full' ? 'max-height:95%' : k.size === 'capped' ? 'max-height:85%' : '';
+    const maxH = k.size === 'full' ? 'max-height:90%;' : '';
     const actionsHTML = k.actions === 'two' ? '<div style="display:flex;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--border)"><button class="btn btn--ghost btn--sm" style="flex:1">Close</button><button class="btn btn--primary btn--sm" style="flex:1">Join class</button></div>' : k.actions === 'one' ? '<div style="padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--border)"><button class="btn btn--primary btn--block">Join class</button></div>' : '';
     const sheetTransform = k.open ? 'transform:translateY(0)' : 'transform:translateY(100%)';
     const scrimOpacity = k.open ? '0.5' : '0';
@@ -2764,7 +2764,7 @@ P.bottomsheet = {
     </div>`;
   },
   renderCode(k) {
-    return `<div class="modal-overlay">\n  <div class="sheet${k.size==='full'?' sheet--full':k.size==='capped'?' sheet--capped':''}">\n    <div class="sheet__handle"></div>\n    <div class="sheet__header"><div class="sheet__title">Title</div></div>\n    <div class="sheet__body">Content</div>\n    ${k.actions!=='none'?'<div class="sheet__actions">...</div>':''}\n  </div>\n</div>`;
+    return `<div class="modal-overlay">\n  <div class="sheet${k.size==='full'?' sheet--full':''}">\n    <div class="sheet__handle"></div>\n    <div class="sheet__header"><div class="sheet__title">Title</div></div>\n    <div class="sheet__body">Content</div>\n    ${k.actions!=='none'?'<div class="sheet__actions">...</div>':''}\n  </div>\n</div>`;
   },
   sections: `
     <div class="sect"><div class="sect__title">Anatomy</div>
@@ -2780,7 +2780,7 @@ P.bottomsheet = {
         <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Mobile only. On tablet/desktop, use a modal or side panel</div></div>
         <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Swipe down to dismiss. Scrim behind at 72%</div></div>
         <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Corner radius r-4 (8px) on top corners only</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Auto-sizes to content. Use .sheet--capped (85vh) or .sheet--full (95vh) to set a ceiling when content is long</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Two sizes: auto (fits content) and full (90vh with scroll). Use auto for short content, full for long content</div></div>
       </div>
     </div>`
 };
