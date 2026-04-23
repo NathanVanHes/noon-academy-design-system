@@ -613,7 +613,7 @@ function openDrillGrey(t, section) {
   document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
   document.getElementById('drillSub').textContent = section;
   var badge = document.getElementById('drillBadge');
-  badge.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><rect x="3" y="8" width="10" height="7" rx="1.5"/><path d="M5 8V5a3 3 0 0 1 6 0v3"/></svg> Not started';
+  badge.innerHTML = 'Not started';
   badge.style.background = 'var(--bg-disabled)';
   badge.style.color = 'var(--fg-muted)';
   badge.style.fontSize = '11px';
