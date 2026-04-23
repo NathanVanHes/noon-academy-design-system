@@ -4079,7 +4079,10 @@ function navigate(id) {
   const page = P[id];
   if (!page) return;
   window.location.hash = id;
-  document.getElementById('tbTitle').textContent = page.title;
+  // Show group name in topbar, page title in the page header
+  var groupName = '';
+  NAV.forEach(function(g) { g.items.forEach(function(item) { if (item.id === id) groupName = g.group; }); });
+  document.getElementById('tbTitle').textContent = groupName || page.title;
 
   // Highlight nav
   sb.querySelectorAll('.sb__item').forEach(el => el.classList.toggle('is-on', el.dataset.page === id));
