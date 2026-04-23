@@ -562,7 +562,7 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
   padding: var(--sp-3) var(--sp-2); margin-block-end: var(--sp-2);
 }
 .cal__month {
-  font-family: var(--font-serif); font-size: var(--fs-16); font-weight: var(--fw-500); color: var(--fg); margin: 0;
+  font-family: var(--font-serif); font-size: var(--fs-20); font-weight: var(--fw-500); color: var(--fg); margin: 0;
 }
 .cal__nav {
   display: flex; align-items: center; gap: var(--sp-1);
