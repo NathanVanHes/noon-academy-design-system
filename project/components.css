@@ -603,10 +603,13 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 .cal__day.is-disabled { color: var(--fg-disabled); pointer-events: none; }
 
 /* Dot indicator for events */
+/* Event dots — container sits below the number */
+.cal__day-dots {
+  position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2px; pointer-events: none;
+}
 .cal__day-dot {
-  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
   width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
-  pointer-events: none;
 }
 .cal__day.is-selected .cal__day-dot { background: var(--accent-fg); }
 

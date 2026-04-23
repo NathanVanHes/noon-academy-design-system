@@ -3749,7 +3749,14 @@ P.calendar = {
     let slideDir = null; // 'left','right', or null
 
     const showDots = currentKnobs && currentKnobs.showEvents !== false;
-    const evtDays = showDots ? [2,5,8,10,15,now.getDate(),now.getDate()+2,now.getDate()-3].filter(d => d > 0 && d <= 31) : [];
+    // Event counts per day — some days have multiple events
+    var evtCounts = {};
+    if (showDots) {
+      [2,5,8,10,15,now.getDate(),now.getDate()+2,now.getDate()-3].filter(function(d){return d>0&&d<=31}).forEach(function(d){ evtCounts[d] = 1; });
+      evtCounts[now.getDate()] = 3;
+      evtCounts[now.getDate()+2] = 2;
+      if (evtCounts[8]) evtCounts[8] = 2;
+    }
 
     function buildWeekRow(week, weekView) {
       return week.map(day => {
@@ -3757,7 +3764,8 @@ P.calendar = {
         if (day.out && !weekView) cls.push('is-outside');
         if (isToday(day.d, day.m)) cls.push('is-today');
         if (isSelected(day.d, day.m)) cls.push('is-selected');
-        const dot = !day.out && evtDays.includes(day.d) ? '<span class="cal__day-dot"></span>' : '';
+        var count = !day.out && evtCounts[day.d] ? evtCounts[day.d] : 0;
+        var dot = count > 0 ? '<span class="cal__day-dots">' + Array(Math.min(count,3)).fill('<span class="cal__day-dot"></span>').join('') + '</span>' : '';
         return '<button class="' + cls.join(' ') + '" data-day="' + day.d + '" data-month="' + day.m + '">' + day.d + dot + '</button>';
       }).join('');
     }
@@ -3912,10 +3920,12 @@ P.calendar = {
     <div class="sect"><div class="sect__title">Day States</div>
       <div class="grid grid--auto">
         <div class="cell"><div class="cell__label">Today</div><button class="cal__day is-today" style="width:40px;height:40px">22</button></div>
-        <div class="cell"><div class="cell__label">Selected</div><button class="cal__day is-selected" style="width:40px;height:40px">15<span class="cal__day-dot"></span></button></div>
+        <div class="cell"><div class="cell__label">Selected</div><button class="cal__day is-selected" style="width:40px;height:40px">15<span class="cal__day-dots"><span class="cal__day-dot"></span></span></button></div>
         <div class="cell"><div class="cell__label">Outside month</div><button class="cal__day is-outside" style="width:40px;height:40px">29</button></div>
         <div class="cell"><div class="cell__label">Disabled</div><button class="cal__day is-disabled" style="width:40px;height:40px">5</button></div>
-        <div class="cell"><div class="cell__label">With event</div><button class="cal__day" style="width:40px;height:40px">8<span class="cal__day-dot"></span></button></div>
+        <div class="cell"><div class="cell__label">1 event</div><button class="cal__day" style="width:40px;height:40px">8<span class="cal__day-dots"><span class="cal__day-dot"></span></span></button></div>
+        <div class="cell"><div class="cell__label">2 events</div><button class="cal__day" style="width:40px;height:40px">10<span class="cal__day-dots"><span class="cal__day-dot"></span><span class="cal__day-dot"></span></span></button></div>
+        <div class="cell"><div class="cell__label">3 events</div><button class="cal__day" style="width:40px;height:40px">22<span class="cal__day-dots"><span class="cal__day-dot"></span><span class="cal__day-dot"></span><span class="cal__day-dot"></span></span></button></div>
       </div>
     </div>`
 };
