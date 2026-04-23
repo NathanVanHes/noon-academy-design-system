@@ -85,7 +85,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .chart__dot:hover .chart__tooltip{opacity:1}
 
 /* Practice CTA */
-.drill__cta{flex:none;padding:20px 28px 28px}
+.drill__cta{flex:none;padding:16px 28px 28px}
+.drill__cta-box{background:var(--bg);border-radius:var(--r);padding:16px;margin-bottom:12px}
 
 /* Buttons */
 .btn-primary{display:block;width:100%;height:48px;background:var(--btn);color:#141414;border:0;border-radius:var(--r);font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
@@ -184,13 +185,14 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
       <div id="chartLabels" style="display:flex;margin-top:8px"></div>
     </div>
 
-    <div id="drillChange" style="display:flex;align-items:center;gap:8px;padding:14px 18px;border-radius:var(--r);font-size:13px;color:var(--fg)"></div>
-    <button style="background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;margin-top:14px;display:block" onclick="openMasteryInfo()">How does mastery work?</button>
+    <div id="drillChange" style="display:flex;align-items:center;gap:6px;margin-top:6px;font-family:var(--font-mono);font-size:11px"></div>
   </div>
   <div class="drill__cta">
-    <div id="drillNudge" style="font-size:12px;color:var(--fg-secondary);line-height:1.5;margin-bottom:12px;padding:0 2px"></div>
-    <button class="btn-primary" id="drillCtaBtn">Practice this topic</button>
-    <div style="font-size:11px;color:var(--fg-muted);text-align:center;margin-top:10px">Your mastery reflects how well you know this topic</div>
+    <div class="drill__cta-box">
+      <div id="drillNudge" style="font-size:13px;color:var(--fg-secondary);line-height:1.5;margin-bottom:14px"></div>
+      <button class="btn-primary" id="drillCtaBtn" style="width:100%">Practice this topic</button>
+    </div>
+    <button style="background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;display:block;width:100%;text-align:center" onclick="openMasteryInfo()">How does mastery work?</button>
   </div>
 </div>
 
@@ -351,24 +353,15 @@ function openDrill(t, section) {
 
   var ch = document.getElementById('drillChange');
   var diff = t.trend[3] - t.trend[2];
-  ch.style.display = 'flex';
-  ch.style.flexDirection = 'column';
-  ch.style.gap = '6px';
-  var isMastered = t.score >= 80;
+  ch.style.background = 'none';
+  ch.style.border = 'none';
+  ch.style.padding = '0';
   if (diff > 0) {
-    ch.style.background = 'rgba(39,189,134,0.08)';
-    ch.style.border = '1px solid rgba(39,189,134,0.2)';
-    var upMsg = isMastered ? 'Still climbing — nice work' : 'Heading in the right direction — keep going';
-    ch.innerHTML = '<div><span style="color:#27BD86;font-family:var(--font-mono);font-weight:600">+' + Math.abs(diff) + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + upMsg + '</div>';
+    ch.innerHTML = '<span style="color:#27BD86;font-weight:600">+' + Math.abs(diff) + '</span><span style="color:var(--fg-muted)">this week</span>';
   } else if (diff < 0) {
-    ch.style.background = 'rgba(240,61,61,0.06)';
-    ch.style.border = '1px solid rgba(240,61,61,0.15)';
-    var downMsg = isMastered ? 'Small dip — a quick session will steady this' : 'A practice session this week will help turn this around';
-    ch.innerHTML = '<div><span style="color:#F03D3D;font-family:var(--font-mono);font-weight:600">-' + Math.abs(diff) + '</span> this week</div><div style="font-size:12px;color:var(--fg-secondary)">' + downMsg + '</div>';
+    ch.innerHTML = '<span style="color:#F03D3D;font-weight:600">-' + Math.abs(diff) + '</span><span style="color:var(--fg-muted)">this week</span>';
   } else {
-    ch.style.background = 'rgba(20,20,20,0.03)';
-    ch.style.border = '1px solid rgba(20,20,20,0.08)';
-    ch.innerHTML = '<div style="color:var(--fg-secondary)">No change this week</div><div style="font-size:12px;color:var(--fg-muted)">Practice to get this moving</div>';
+    ch.innerHTML = '<span style="color:var(--fg-muted)">No change this week</span>';
   }
 
   // Contextual nudge
@@ -574,12 +567,10 @@ function openDrillGrey(t, section) {
   document.getElementById('chartContainer').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:13px;height:140px">No data yet</div>';
   document.getElementById('chartLabels').innerHTML = '';
   var ch = document.getElementById('drillChange');
-  ch.style.display = 'flex';
-  ch.style.background = 'rgba(20,20,20,0.03)';
-  ch.style.border = '1px solid rgba(20,20,20,0.06)';
-  ch.style.flexDirection = 'column';
-  ch.style.gap = '0';
-  ch.innerHTML = 'This topic hasn\'t been covered yet. Start practicing to build your baseline.';
+  ch.style.background = 'none';
+  ch.style.border = 'none';
+  ch.style.padding = '0';
+  ch.innerHTML = '';
 
   // Set nudge and CTA for grey tile
   var nudge = document.getElementById('drillNudge');
