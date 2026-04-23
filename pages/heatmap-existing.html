@@ -136,7 +136,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div class="page">
-  <button style="background:none;border:0;font:inherit;font-size:12px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;margin-bottom:20px;display:block" onclick="document.getElementById('scoreSheet').classList.add('is-open')">How is mastery calculated?</button>
+  <button style="background:none;border:0;font:inherit;font-size:12px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;margin-bottom:20px;display:block" onclick="openMasteryInfo()">How is mastery calculated?</button>
 
   <!-- Math section -->
   <div class="grid-section">
@@ -324,6 +324,7 @@ function renderChapteredGrid(containerId, chapters, section, examOnly) {
 }
 
 function openDrill(t, section) {
+  document.querySelector('.drill__cta').style.display = '';
   document.getElementById('drillTitle').textContent = t.name.replace('\n',' ');
   document.getElementById('drillSub').textContent = section;
   var badge = document.getElementById('drillBadge');
@@ -602,7 +603,7 @@ setTimeout(function() {
       band.style.transform = 'translateX(-100%) translateY(-100%)';
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
-          band.style.transition = 'transform 0.8s ease';
+          band.style.transition = 'transform 1.5s ease';
           band.style.transform = 'translateX(100%) translateY(100%)';
         });
       });
@@ -615,35 +616,34 @@ setTimeout(function() {
     sweep();
   });
 }, 500);
+
+// Open mastery info in the drilldown panel
+function openMasteryInfo() {
+  document.getElementById('drillTitle').textContent = 'How mastery works';
+  document.getElementById('drillSub').textContent = '';
+  var badge = document.getElementById('drillBadge');
+  badge.innerHTML = '<svg width="20" height="20" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  badge.style.background = 'none';
+
+  var body = document.querySelector('.drill__body');
+  body.innerHTML = '<div style="padding:0 4px">' +
+    '<p style="font-size:14px;color:var(--fg-secondary);line-height:1.6;margin:0 0 16px">Your mastery score combines your practice work, in-class activity, and quiz results to measure how well you understand each topic.</p>' +
+    '<div style="background:#E9F4FF;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--fg)"><strong>This is not a prediction of your exam score.</strong> It measures how prepared you are based on what you\'ve done so far.</div>' +
+    '<div style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:rgba(39,189,134,0.06);border-radius:8px;margin-bottom:16px">' +
+      '<svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none;margin-top:2px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>' +
+      '<div><div style="font-weight:600;margin-bottom:2px">80+ means you\'re good to go</div><div style="font-size:13px;color:var(--fg-secondary)">Once you hit 80, you\'ve mastered this topic. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div></div>' +
+    '</div>' +
+    '<p style="margin:0;font-size:13px;color:var(--fg-muted)">Focus on topics below 80. Practice sessions are the fastest way to move your score.</p>' +
+  '</div>';
+
+  // Hide the CTA
+  document.querySelector('.drill__cta').style.display = 'none';
+
+  document.getElementById('drill').classList.add('is-open');
+  document.getElementById('drillOverlay').classList.add('is-open');
+}
 </script>
 
-<!-- Score bottom sheet -->
-<div id="scoreSheet" style="position:fixed;inset:0;z-index:100;pointer-events:none">
-  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.25);opacity:0;transition:opacity 0.25s;pointer-events:none" onclick="document.getElementById('scoreSheet').classList.remove('is-open')"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg-raised);border-radius:12px 12px 0 0;padding:24px 32px 32px;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.22,0.61,0.36,1);max-width:720px;margin:0 auto">
-    <div style="display:flex;justify-content:center;margin-bottom:16px"><div style="width:32px;height:4px;border-radius:2px;background:var(--fg-muted);opacity:0.3"></div></div>
-    <h3 style="font-size:16px;font-weight:700;margin:0 0 12px">How your score works</h3>
-    <div style="font-size:14px;color:var(--fg-secondary);line-height:1.6">
-      <p style="margin:0 0 12px">Your mastery score reflects how well you know each topic. It's based on several factors including:</p>
-      <ul style="margin:0 0 16px;padding-left:20px">
-        <li style="margin-bottom:6px">How accurately you answer practice questions</li>
-        <li style="margin-bottom:6px">How consistently you practice over time</li>
-        <li style="margin-bottom:6px">Your performance on exams and timed quizzes</li>
-        <li style="margin-bottom:6px">How recently you've engaged with the topic</li>
-      </ul>
-      <p style="margin:0 0 16px">The score updates as you practice — the more you engage with a topic, the more accurately it reflects your understanding.</p>
-      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(39,189,134,0.06);border-radius:8px">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="var(--fg-secondary)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-        <span style="font-size:13px">Reach <b>80+</b> to achieve mastery in a topic</span>
-      </div>
-    </div>
-  </div>
-</div>
-<style>
-#scoreSheet.is-open{pointer-events:auto}
-#scoreSheet.is-open > div:first-child{opacity:1;pointer-events:auto}
-#scoreSheet.is-open > div:last-child{transform:translateY(0)}
-</style>
 
 </body>
 </html>
