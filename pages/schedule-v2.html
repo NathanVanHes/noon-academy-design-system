@@ -34,18 +34,6 @@
   flex: none;
 }
 
-/* Header */
-.header {
-  padding: var(--sp-3) var(--sp-6) 0;
-  flex: none;
-}
-.header__title {
-  font-family: var(--font-serif);
-  font-size: var(--fs-16);
-  font-weight: var(--fw-500);
-  color: var(--fg);
-  margin: 0;
-}
 
 /* Calendar wrapper */
 .cal-wrap {
@@ -99,6 +87,7 @@
 
 /* Scrollable content */
 .content { flex: 1; overflow-y: auto; }
+.tabbar { flex: none; }
 
 /* Bottom nav */
 .safe-bottom { height: 22px; flex: none; }
@@ -147,12 +136,7 @@
     </span>
   </div>
 
-  <!-- Header -->
-  <div class="header">
-    <h1 class="header__title" id="headerTitle"></h1>
-  </div>
-
-  <!-- Calendar -->
+  <!-- Calendar (includes header) -->
   <div class="cal-wrap">
     <div id="calRoot"></div>
   </div>
@@ -250,8 +234,6 @@ function renderCal() {
   var title = isWeek
     ? FULL_DAYS[selectedDate.getDay()] + ', ' + MONTHS[selectedDate.getMonth()] + ' ' + selectedDate.getDate()
     : MONTHS[viewMonth] + ' ' + viewYear;
-  document.getElementById('headerTitle').textContent = title;
-
   var header = DAY_NAMES.map(function(d) { return '<span class="cal__weekday">' + d + '</span>'; }).join('');
   var rows = weeks.map(function(week, wi) {
     var hide = isWeek && wi !== aw ? ' style="max-height:0;opacity:0;overflow:hidden"' : '';
@@ -270,7 +252,7 @@ function renderCal() {
   var todayBtn = !isTodaySelected() ? '<button class="btn btn--ghost btn--sm cal__today-btn" style="font-size:var(--fs-11)">Today</button>' : '';
 
   root.innerHTML = '<div class="cal ' + (isWeek ? 'cal--week' : 'cal--month') + '">' +
-    '<div class="cal__header"><h3 class="cal__month" style="display:none"></h3><div class="cal__nav">' +
+    '<div class="cal__header"><h3 class="cal__month">' + title + '</h3><div class="cal__nav">' +
     todayBtn +
     '<button class="icon-btn icon-btn--ghost icon-btn--sm" data-action="prev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>' +
     '<button class="icon-btn icon-btn--ghost icon-btn--sm" data-action="next"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button>' +
@@ -390,6 +372,12 @@ function renderSessions() {
 
   // Show overdue only on today
   document.getElementById('overdue').style.display = isCurrentDay ? 'flex' : 'none';
+
+  // Scroll to live or next upcoming session
+  setTimeout(function() {
+    var live = content.querySelector('.session--live') || content.querySelector('.session--soon') || content.querySelector('.session--upcoming');
+    if (live) live.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
 }
 
 // Bottom sheet
