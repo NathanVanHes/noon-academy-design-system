@@ -102,20 +102,20 @@ var selectedDate = new Date(now);
 
 var sessions = {
   today: [
-    { time:'8:30 - 9:15', name:'Storytelling', subject:'Digital Media', teacher:'Ms. Al-Harbi', state:'done', room:'Room 1B', duration:'45 min' },
-    { time:'10:00 - 10:45', name:'Inference & implied meaning', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'live', room:'Room 3A', duration:'45 min' },
-    { time:'11:30 - 12:15', name:'Quantitative reasoning', subject:'Qudrat Math', teacher:'Ms. Noor', state:'soon', room:'Room 2C', duration:'45 min' },
-    { time:'13:00 - 13:45', name:'Analogy patterns', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'upcoming', room:'Room 3A', duration:'45 min' },
-    { time:'14:30 - 15:15', name:'Crew discussion', subject:'Facilitated', teacher:"Omar's crew", state:'upcoming', room:'Room 4D', duration:'45 min' },
+    { time:'8:30 - 9:15 AM', name:'Storytelling', subject:'Digital Media', teacher:'Ms. Al-Harbi', state:'done', room:'Room 1B', duration:'45 min' },
+    { time:'10:00 - 10:45 AM', name:'Inference & implied meaning', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'live', room:'Room 3A', duration:'45 min' },
+    { time:'11:30 AM - 12:15 PM', name:'Quantitative reasoning', subject:'Qudrat Math', teacher:'Ms. Noor', state:'soon', room:'Room 2C', duration:'45 min' },
+    { time:'1:00 - 1:45 PM', name:'Analogy patterns', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'upcoming', room:'Room 3A', duration:'45 min' },
+    { time:'2:30 - 3:15 PM', name:'Crew discussion', subject:'Facilitated', teacher:"Omar's crew", state:'upcoming', room:'Room 4D', duration:'45 min' },
   ],
   yesterday: [
-    { time:'8:30 - 9:15', name:'Vocabulary building', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'done', room:'Room 3A', duration:'45 min' },
-    { time:'10:00 - 10:45', name:'Algebra foundations', subject:'Qudrat Math', teacher:'Ms. Noor', state:'done', room:'Room 2C', duration:'45 min' },
+    { time:'8:30 - 9:15 AM', name:'Vocabulary building', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'done', room:'Room 3A', duration:'45 min' },
+    { time:'10:00 - 10:45 AM', name:'Algebra foundations', subject:'Qudrat Math', teacher:'Ms. Noor', state:'done', room:'Room 2C', duration:'45 min' },
   ],
   tomorrow: [
-    { time:'8:30 - 9:15', name:'Reading comprehension', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'upcoming', room:'Room 3A', duration:'45 min' },
-    { time:'10:00 - 10:45', name:'Geometry foundations', subject:'Tahsili Math', teacher:'Ms. Noor', state:'upcoming', room:'Room 2C', duration:'45 min' },
-    { time:'13:00 - 13:45', name:'Crew practice session', subject:'Facilitated', teacher:"Omar's crew", state:'upcoming', room:'Room 4D', duration:'45 min' },
+    { time:'8:30 - 9:15 AM', name:'Reading comprehension', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'upcoming', room:'Room 3A', duration:'45 min' },
+    { time:'10:00 - 10:45 AM', name:'Geometry foundations', subject:'Tahsili Math', teacher:'Ms. Noor', state:'upcoming', room:'Room 2C', duration:'45 min' },
+    { time:'1:00 - 1:45 PM', name:'Crew practice session', subject:'Facilitated', teacher:"Omar's crew", state:'upcoming', room:'Room 4D', duration:'45 min' },
   ],
   other: [
     { time:'9:00 - 9:45', name:'Grammar review', subject:'Qudrat Reading', teacher:'Mr. Hassan', state:'upcoming', room:'Room 3A', duration:'45 min' },
@@ -230,8 +230,9 @@ function renderSessions() {
     list.forEach(function(s,i){
       var timeDisplay = s.time.split(' - ')[0];
       var statusChip = s.state==='live'?'<span class="chip chip--signal"><span class="chip__dot"></span> Live</span>'
-        :s.state==='soon'?'<span class="chip chip--signal"><span class="chip__dot"></span> Soon</span>'
+        :s.state==='soon'?'<span class="mono" style="color:var(--fg-subtle)">Soon</span>'
         :s.state==='done'?'<span class="mono">Done</span>'
+        :s.state==='cancelled'?'<span class="mono" style="color:var(--danger-300)">Cancelled</span>'
         :'<span class="mono">'+s.duration+'</span>';
       html += '<div class="session session--'+s.state+'" data-idx="'+i+'" style="animation:fadeIn 0.25s ease '+(i*50)+'ms both">';
       html += '<div class="session__time">'+timeDisplay+'</div>';

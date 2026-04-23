@@ -486,6 +486,124 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 .card-grid--4 { grid-template-columns: repeat(4, 1fr); }
 .card-grid--auto { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 
+/* ============ VIDEO PLAYER ============ */
+.video {
+  position: relative; border-radius: var(--r-3); overflow: hidden;
+  background: var(--void-400); aspect-ratio: 16/9;
+}
+.video__poster {
+  position: absolute; inset: 0; object-fit: cover; width: 100%; height: 100%;
+}
+.video__overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  justify-content: flex-end; background: linear-gradient(transparent 40%, rgba(0,0,0,0.6));
+  padding: var(--sp-4); transition: opacity var(--dur-1) var(--ease);
+}
+.video__play {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 48px; height: 48px; border-radius: 50%; border: 0;
+  background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+  color: var(--chalk-100); cursor: pointer; display: grid; place-items: center;
+  transition: background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+}
+.video__play:hover { background: rgba(255,255,255,0.25); transform: translate(-50%,-50%) scale(1.08); }
+.video__play svg { width: 20px; height: 20px; fill: currentColor; }
+.video__controls {
+  display: flex; align-items: center; gap: var(--sp-3); color: var(--chalk-100);
+}
+.video__time {
+  font-family: var(--font-mono); font-size: var(--fs-11); color: rgba(255,255,255,0.7);
+  flex: none;
+}
+.video__bar {
+  flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2);
+  position: relative; cursor: pointer;
+}
+.video__bar-fill {
+  height: 100%; border-radius: 2px; background: var(--accent); width: 0%;
+  transition: width 0.1s linear;
+}
+.video__btn {
+  background: none; border: 0; color: rgba(255,255,255,0.7); cursor: pointer;
+  padding: 0; display: flex; align-items: center; justify-content: center;
+  transition: color var(--dur-1) var(--ease);
+}
+.video__btn:hover { color: var(--chalk-100); }
+
+/* Playing state */
+.video.is-playing .video__play { opacity: 0; pointer-events: none; }
+.video.is-playing:hover .video__play { opacity: 1; pointer-events: auto; }
+
+/* Fullscreen */
+.video.is-fullscreen {
+  position: fixed; inset: 0; z-index: 100; border-radius: 0;
+  aspect-ratio: auto; width: 100%; height: 100%;
+}
+
+/* Mini/collapsed */
+.video--mini { aspect-ratio: auto; width: 160px; height: 90px; border-radius: var(--r-2); }
+
+/* ============ QUIZ OPTION (SELECTOR) ============ */
+.option {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border); border-radius: var(--r-2);
+  cursor: pointer; background: transparent;
+  font-family: var(--font-sans); font-size: var(--fs-14);
+  color: var(--fg); text-align: start; width: 100%;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.option:hover { background: var(--hover-overlay); border-color: var(--border-strong); }
+
+/* Label (A, B, C, D) */
+.option__label {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--r-1); flex: none;
+  font-family: var(--font-mono); font-size: var(--fs-13); font-weight: var(--fw-600);
+  background: var(--hover-overlay); color: var(--fg-muted);
+  transition: all var(--dur-1) var(--ease);
+}
+
+/* Text — wraps naturally, aligns with label top */
+.option__text {
+  flex: 1; line-height: var(--lh-normal); padding-block-start: 3px;
+  min-width: 0;
+}
+
+/* States */
+
+/* Selected */
+.option.is-selected {
+  border-color: var(--accent-border); background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent-border);
+}
+.option.is-selected .option__label {
+  background: var(--accent); color: var(--accent-fg);
+}
+
+/* Correct */
+.option.is-correct {
+  border-color: var(--ok-border); background: var(--ok-soft);
+  box-shadow: inset 0 0 0 1px var(--ok-border); pointer-events: none;
+}
+.option.is-correct .option__label {
+  background: var(--ok-400); color: var(--chalk-100);
+}
+
+/* Incorrect */
+.option.is-incorrect {
+  border-color: var(--danger-border); background: var(--danger-soft);
+  box-shadow: inset 0 0 0 1px var(--danger-border); pointer-events: none;
+}
+.option.is-incorrect .option__label {
+  background: var(--danger-400); color: var(--chalk-100);
+}
+
+/* Disabled (already answered, not selected) */
+.option.is-disabled {
+  opacity: 0.5; pointer-events: none;
+}
+
 /* ============ EMPTY STATE ============ */
 .empty { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); padding: var(--sp-9) var(--sp-6); text-align: center; }
 .empty__icon { color: var(--fg-faint); margin-block-end: var(--sp-2); }
@@ -534,16 +652,14 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 /* ── States ── */
 
 /* Upcoming (default) */
-.session--upcoming .session__indicator { background: var(--signal); }
+.session--upcoming .session__indicator { background: var(--border-strong); }
 
-/* Starting soon */
+/* Starting soon — same as upcoming but indicator is accent */
 .session--soon .session__indicator { background: var(--accent); }
-.session--soon .session__time { color: var(--accent); }
 
-/* Live — accent indicator + left border */
+/* Live — accent indicator, accent left border */
 .session--live { border-inline-start: 3px solid var(--accent); }
 .session--live .session__indicator { background: var(--accent); }
-.session--live .session__time { color: var(--accent); font-weight: var(--fw-600); }
 
 /* Done — muted with strikethrough time */
 .session--done .session__indicator { background: var(--fg-faint); }

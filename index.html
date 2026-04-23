@@ -3612,10 +3612,10 @@ P.sessioncard = {
   renderCanvas(k) {
     const statusMap = {
       upcoming: '<span class="mono">45 min</span>',
-      soon: '<span class="chip chip--signal"><span class="chip__dot"></span> Soon</span>',
+      soon: '<span class="mono" style="color:var(--fg-subtle)">Soon</span>',
       live: '<span class="chip chip--signal"><span class="chip__dot"></span> Live</span>',
       done: '<span class="mono">Done</span>',
-      cancelled: '<span class="chip chip--danger">Cancelled</span>',
+      cancelled: '<span class="mono" style="color:var(--danger-300)">Cancelled</span>',
     };
     return `<div style="width:100%;max-width:420px">
       <div class="session session--${k.state}">
@@ -3644,7 +3644,7 @@ P.sessioncard = {
     <div class="sect"><div class="sect__title">All States</div>
       <div style="max-width:420px">
         <div class="session session--live">
-          <div class="session__time">8:30</div>
+          <div class="session__time">8:30</div><!-- AM -->
           <div class="session__indicator"></div>
           <div class="session__body"><div class="session__title">Storytelling</div><div class="session__meta">Digital Media - Ms. Al-Harbi</div></div>
           <div class="session__status"><span class="chip chip--signal"><span class="chip__dot"></span> Live</span></div>
@@ -3653,7 +3653,7 @@ P.sessioncard = {
           <div class="session__time">10:00</div>
           <div class="session__indicator"></div>
           <div class="session__body"><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
-          <div class="session__status"><span class="chip chip--signal"><span class="chip__dot"></span> Soon</span></div>
+          <div class="session__status"><span class="mono" style="color:var(--fg-subtle)">Soon</span></div>
         </div>
         <div class="session session--upcoming">
           <div class="session__time">11:30</div>
@@ -3677,7 +3677,7 @@ P.sessioncard = {
           <div class="session__time">14:30</div>
           <div class="session__indicator"></div>
           <div class="session__body"><div class="session__title">Crew discussion</div><div class="session__meta">Facilitated - Omar's crew</div></div>
-          <div class="session__status"><span class="chip chip--danger">Cancelled</span></div>
+          <div class="session__status"><span class="mono" style="color:var(--danger-300)">Cancelled</span></div>
         </div>
       </div>
     </div>
@@ -3733,8 +3733,8 @@ P.sessioncard = {
     <div class="sect"><div class="sect__title">Indicator Color</div>
       <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:50ch">The left indicator bar is status-driven, not subject-driven. It tells the student what's happening now.</p>
       <div class="col gap-2" style="max-width:300px">
-        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--signal)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Upcoming</b> — signal (gold)</span></div>
-        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--accent)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Starting soon / Live</b> — accent (green)</span></div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--border-strong)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Upcoming</b> — neutral</span></div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--accent)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Soon / Live</b> — accent (green). Live also gets a left border.</span></div>
         <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--fg-faint)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Done</b> — faint (grey)</span></div>
         <div style="display:flex;align-items:center;gap:var(--sp-3)"><div style="width:3px;height:20px;border-radius:var(--r-pill);background:var(--danger-400)"></div><span style="font-size:13px;color:var(--fg-muted)"><b>Cancelled</b> — danger (red)</span></div>
       </div>
@@ -3745,6 +3745,176 @@ P.sessioncard = {
         <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>During:</b> Accent indicator + border. Status line shows "Live now" in uppercase. Bottom sheet has "Join class" primary action.</div></div>
         <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>After:</b> Card fades to 55% opacity. Bottom sheet shows attendance + recording availability.</div></div>
         <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Cancelled:</b> 40% opacity, title struck-through, danger indicator. No action in bottom sheet.</div></div>
+      </div>
+    </div>`
+};
+
+// ──────── VIDEO PLAYER ────────
+P.video = {
+  title: 'Video Player', desc: '16:9 video with play/pause, progress bar, timestamp, fullscreen toggle. Collapsible to mini player.',
+  tokens() {
+    return ['--void-400','--chalk-100','--accent','--r-2','--r-3','--sp-3','--sp-4','--dur-1','--ease','--font-mono','--fs-11'];
+  },
+  knobs: {
+    state: { type:'select', options:['paused','playing','ended'], default:'paused', label:'State' },
+    progress: { type:'range', min:0, max:100, step:1, default:35, label:'Progress %' },
+    size: { type:'select', options:['default','mini'], default:'default', label:'Size' },
+  },
+  renderCanvas(k) {
+    const mini = k.size === 'mini' ? ' video--mini' : '';
+    const playing = k.state === 'playing' ? ' is-playing' : '';
+    const mins = Math.floor(k.progress * 12.5 / 100);
+    const secs = Math.floor((k.progress * 12.5 / 100 - mins) * 60);
+    const time = mins + ':' + String(secs).padStart(2,'0') + ' / 12:30';
+    return `<div style="width:100%;max-width:${k.size==='mini'?'160px':'420px'}">
+      <div class="video${mini}${playing}">
+        <div style="position:absolute;inset:0;background:var(--void-300)"></div>
+        <button class="video__play"><svg viewBox="0 0 20 20"><path d="M6 3l12 7-12 7z"/></svg></button>
+        <div class="video__overlay">
+          <div class="video__controls">
+            <button class="video__btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">${k.state==='playing'?'<rect x="3" y="2" width="4" height="12" rx="1"/><rect x="9" y="2" width="4" height="12" rx="1"/>':'<path d="M4 2l10 6-10 6z"/>'}</svg></button>
+            <span class="video__time">${time}</span>
+            <div class="video__bar"><div class="video__bar-fill" style="width:${k.progress}%"></div></div>
+            <button class="video__btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5V2h3M11 2h3v3M14 11v3h-3M5 14H2v-3"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+  renderCode(k) {
+    return `<div class="video${k.size==='mini'?' video--mini':''}">
+  <img class="video__poster" src="..." alt="...">
+  <button class="video__play">▶</button>
+  <div class="video__overlay">
+    <div class="video__controls">
+      <button class="video__btn">⏸</button>
+      <span class="video__time">1:24 / 12:30</span>
+      <div class="video__bar">
+        <div class="video__bar-fill" style="width:35%"></div>
+      </div>
+      <button class="video__btn">⛶</button>
+    </div>
+  </div>
+</div>`;
+  },
+  sections: `
+    <div class="sect"><div class="sect__title">Sizes</div>
+      <div class="row gap-5" style="align-items:flex-start">
+        <div style="flex:1;max-width:360px">
+          <div class="cell__label" style="margin-bottom:8px">Default (16:9)</div>
+          <div class="video">
+            <div style="position:absolute;inset:0;background:var(--void-300)"></div>
+            <button class="video__play"><svg viewBox="0 0 20 20" style="width:20px;height:20px;fill:currentColor"><path d="M6 3l12 7-12 7z"/></svg></button>
+            <div class="video__overlay">
+              <div class="video__controls">
+                <button class="video__btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6z"/></svg></button>
+                <span class="video__time">0:00 / 12:30</span>
+                <div class="video__bar"><div class="video__bar-fill" style="width:0%"></div></div>
+                <button class="video__btn"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5V2h3M11 2h3v3M14 11v3h-3M5 14H2v-3"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="cell__label" style="margin-bottom:8px">Mini (collapsed)</div>
+          <div class="video video--mini">
+            <div style="position:absolute;inset:0;background:var(--void-300)"></div>
+            <button class="video__play" style="width:32px;height:32px"><svg viewBox="0 0 20 20" style="width:14px;height:14px;fill:currentColor"><path d="M6 3l12 7-12 7z"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Rules</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Aspect ratio:</b> 16:9 default. Mini is 160×90px fixed.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Controls:</b> Play/pause, progress bar, timestamp, fullscreen toggle. Overlay fades on idle.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Fullscreen:</b> Expands to fixed position covering viewport. Border-radius drops to 0.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Mini:</b> Collapsed PiP-style. No controls visible, just play button. Click to expand.</div></div>
+      </div>
+    </div>`
+};
+
+// ──────── QUIZ OPTION ────────
+P.quizoption = {
+  title: 'Quiz Option', desc: 'Multiple choice answer selector. A/B/C/D labels with text. States: default, selected, correct, incorrect, disabled.',
+  tokens() {
+    return ['--border','--border-strong','--hover-overlay','--accent','--accent-fg','--accent-soft','--accent-border','--ok-400','--ok-soft','--ok-border','--danger-400','--danger-soft','--danger-border','--r-1','--r-2','--sp-3','--sp-4','--font-mono','--font-sans','--fs-13','--fs-14','--fw-600','--lh-normal'];
+  },
+  knobs: {
+    state: { type:'select', options:['default','selected','correct','incorrect','disabled'], default:'default', label:'State' },
+    label: { type:'text', default:'A', label:'Option label' },
+    text: { type:'text', default:'The author implies that traditional methods are more reliable', label:'Option text' },
+  },
+  renderCanvas(k) {
+    const cls = k.state !== 'default' ? ' is-' + k.state : '';
+    return `<div style="width:100%;max-width:420px">
+      <button class="option${cls}">
+        <span class="option__label">${esc(k.label)}</span>
+        <span class="option__text">${esc(k.text)}</span>
+      </button>
+    </div>`;
+  },
+  renderCode(k) {
+    return `<button class="option${k.state!=='default'?' is-'+k.state:''}">
+  <span class="option__label">${esc(k.label)}</span>
+  <span class="option__text">${esc(k.text)}</span>
+</button>`;
+  },
+  sections: `
+    <div class="sect"><div class="sect__title">All States</div>
+      <div class="col gap-3" style="max-width:420px">
+        <button class="option">
+          <span class="option__label">A</span>
+          <span class="option__text">The author implies that traditional methods are more reliable</span>
+        </button>
+        <button class="option is-selected">
+          <span class="option__label">B</span>
+          <span class="option__text">The passage suggests modern approaches have replaced older techniques</span>
+        </button>
+        <button class="option is-correct">
+          <span class="option__label">C</span>
+          <span class="option__text">Both traditional and modern methods have complementary strengths</span>
+        </button>
+        <button class="option is-incorrect">
+          <span class="option__label">D</span>
+          <span class="option__text">The author is critical of all methodological approaches discussed in the text</span>
+        </button>
+        <button class="option is-disabled">
+          <span class="option__label">A</span>
+          <span class="option__text">This option was not selected (disabled after answer)</span>
+        </button>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Long Text Wrapping</div>
+      <div class="col gap-3" style="max-width:420px">
+        <button class="option">
+          <span class="option__label">A</span>
+          <span class="option__text">According to the passage, the primary reason for the decline in traditional craftsmanship is the introduction of mass-produced alternatives that are both cheaper and more widely available to consumers across all economic classes</span>
+        </button>
+        <button class="option is-selected">
+          <span class="option__label">B</span>
+          <span class="option__text">Short answer</span>
+        </button>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">In Context — Quiz Question</div>
+      <div style="max-width:420px">
+        <div style="font-family:var(--font-serif);font-size:var(--fs-18);color:var(--fg);margin-bottom:var(--sp-2)">What is the implied meaning?</div>
+        <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-5)">Select the best interpretation from the options below.</p>
+        <div class="col gap-3">
+          <button class="option"><span class="option__label">A</span><span class="option__text">The door was slightly open</span></button>
+          <button class="option is-selected"><span class="option__label">B</span><span class="option__text">Someone had recently left</span></button>
+          <button class="option"><span class="option__label">C</span><span class="option__text">The room was unoccupied</span></button>
+          <button class="option"><span class="option__label">D</span><span class="option__text">There was a security concern</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Rules</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Labels:</b> A, B, C, D. Mono font, 28×28px, rounded square. Color changes with state.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Text:</b> Wraps naturally. Left-aligned with label top. Line-height normal (1.5).</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Correct:</b> Green background + label. Applied after submit. Pointer-events disabled.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Incorrect:</b> Red background + label. Only on the wrong answer selected. Other options disabled.</div></div>
       </div>
     </div>`
 };
@@ -4017,6 +4187,7 @@ const NAV = [
   ]},
   { group: 'Selection', items: [
     { id:'chips', label:'Chips' },
+    { id:'quizoption', label:'Quiz Option' },
     { id:'filterbar', label:'Filter Bar' },
     { id:'menu', label:'Menu' },
     { id:'calendar', label:'Calendar' },
@@ -4029,6 +4200,7 @@ const NAV = [
     { id:'badges', label:'Badges' },
     { id:'tables', label:'Tables' },
     { id:'sessioncard', label:'Session Card' },
+    { id:'video', label:'Video Player' },
   ]},
   { group: 'Progress', items: [
     { id:'routesteps', label:'Route Steps' },
