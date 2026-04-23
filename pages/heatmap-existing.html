@@ -618,18 +618,31 @@ function openMasteryInfo() {
   document.getElementById('drillTitle').textContent = 'How mastery works';
   document.getElementById('drillSub').textContent = '';
   var badge = document.getElementById('drillBadge');
-  badge.innerHTML = '<svg width="20" height="20" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+  badge.innerHTML = '';
   badge.style.background = 'none';
 
   var body = document.querySelector('.drill__body');
   body.innerHTML = '<div style="padding:0 4px">' +
-    '<p style="font-size:14px;color:var(--fg-secondary);line-height:1.6;margin:0 0 16px">Your mastery score combines your practice work, in-class activity, and quiz results to measure how well you understand each topic.</p>' +
-    '<div style="background:#E9F4FF;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--fg)"><strong>This is not a prediction of your exam score.</strong> It measures how prepared you are based on what you\'ve done so far.</div>' +
-    '<div style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:rgba(39,189,134,0.06);border-radius:8px;margin-bottom:16px">' +
-      '<svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none;margin-top:2px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>' +
-      '<div><div style="font-weight:600;margin-bottom:2px">80+ means you\'re good to go</div><div style="font-size:13px;color:var(--fg-secondary)">Once you hit 80, you\'ve mastered this topic. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div></div>' +
+    // What is it
+    '<div style="margin-bottom:16px">' +
+      '<div style="font-size:14px;font-weight:600;margin-bottom:6px">What is mastery?</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.6">Your mastery score combines practice work, in-class activity, and quiz results to measure how well you understand each topic.</div>' +
     '</div>' +
-    '<p style="margin:0;font-size:13px;color:var(--fg-muted)">Focus on topics below 80. Practice sessions are the fastest way to move your score.</p>' +
+    // Not a prediction — orange
+    '<div style="background:#FFF3E0;border:1px solid rgba(230,140,30,0.2);border-radius:8px;padding:14px 16px;margin-bottom:16px">' +
+      '<div style="font-size:13px;font-weight:600;color:#9A5B13;margin-bottom:4px">This is not a prediction of your exam score</div>' +
+      '<div style="font-size:13px;color:#9A5B13;line-height:1.5">It measures how prepared you are based on what you\'ve done so far — not what you\'ll get on the day.</div>' +
+    '</div>' +
+    // 80+ is good
+    '<div style="background:rgba(39,189,134,0.06);border-radius:8px;padding:14px 16px;margin-bottom:16px">' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:4px">80+ means you\'re good to go</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you hit 80, you\'ve mastered this topic. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div>' +
+    '</div>' +
+    // What to do
+    '<div style="background:rgba(20,20,20,0.03);border-radius:8px;padding:14px 16px">' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:4px">How to improve</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Focus on topics below 80. Practice sessions are the fastest way to move your score.</div>' +
+    '</div>' +
   '</div>';
 
   // Hide the CTA
