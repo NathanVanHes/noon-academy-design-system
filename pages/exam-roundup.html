@@ -75,6 +75,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 /* Mastery reached badge */
 .mastered-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--fg-secondary);background:rgba(39,189,134,0.08);padding:4px 10px;border-radius:20px}
+#scoreSheet.is-open{pointer-events:auto}
+#scoreSheet.is-open > div:first-child{opacity:1;pointer-events:auto}
+#scoreSheet.is-open > div:last-child{transform:translateY(0)}
 </style>
 </head>
 <body>
@@ -206,11 +209,6 @@ document.querySelectorAll('.topic__fill').forEach(function(bar) {
     </div>
   </div>
 </div>
-<style>
-#scoreSheet.is-open{pointer-events:auto}
-#scoreSheet.is-open > div:first-child{opacity:1;pointer-events:auto}
-#scoreSheet.is-open > div:last-child{transform:translateY(0)}
-</style>
 
 </body>
 </html>
