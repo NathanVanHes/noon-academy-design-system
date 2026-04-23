@@ -1078,7 +1078,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On void - chalk ridges</div>
             <div style="height:200px;position:relative;background:var(--void-300)">
               <svg viewBox="0 0 480 200" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${Array(14).fill(0).map((_,i)=>{const y=i*14.3;const a=0.03+Math.min(i,13-i)*0.005;return`<path d="M0,${y} Q120,${y-3} 240,${y+2} T480,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="0.75"/>`}).join('\n                ')}
+                ${Array(14).fill(0).map((_,i)=>{const y=i*14.3;const spacing=Math.abs(i-7)/7;const a=0.06+spacing*0.12;return`<path d="M0,${y} Q120,${y-4} 240,${y+3} T480,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="1"/>`}).join('\n                ')}
               </svg>
             </div>
           </div>
@@ -1086,7 +1086,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On paper - ink ridges</div>
             <div style="height:200px;position:relative;background:var(--paper-200)">
               <svg viewBox="0 0 480 200" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${Array(14).fill(0).map((_,i)=>{const y=i*14.3;const a=0.04+Math.min(i,13-i)*0.006;return`<path d="M0,${y} Q120,${y-3} 240,${y+2} T480,${y}" stroke="rgba(10,15,26,${a.toFixed(3)})" stroke-width="0.75"/>`}).join('\n                ')}
+                ${Array(14).fill(0).map((_,i)=>{const y=i*14.3;const spacing=Math.abs(i-7)/7;const a=0.08+spacing*0.15;return`<path d="M0,${y} Q120,${y-4} 240,${y+3} T480,${y}" stroke="rgba(10,15,26,${a.toFixed(3)})" stroke-width="1"/>`}).join('\n                ')}
               </svg>
             </div>
           </div>
@@ -1098,7 +1098,7 @@ P.contours = {
         <div class="cell" style="padding:0;overflow:hidden">
           <div style="height:260px;position:relative;background:var(--void-300)">
             <svg viewBox="0 0 600 260" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${Array(28).fill(0).map((_,i)=>{const y=i*9.3;const a=0.02+Math.min(i,27-i)*0.004;const wave=2+Math.sin(i*0.7)*1.5;return`<path d="M0,${y} Q150,${y-wave} 300,${y+wave} T600,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="0.75"/>`}).join('\n              ')}
+              ${Array(28).fill(0).map((_,i)=>{const y=i*9.3;const spacing=Math.abs(i-14)/14;const a=0.04+spacing*0.1;const wave=2+Math.sin(i*0.7)*1.5;return`<path d="M0,${y} Q150,${y-wave} 300,${y+wave} T600,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="1"/>`}).join('\n              ')}
             </svg>
           </div>
         </div>
@@ -1110,7 +1110,7 @@ P.contours = {
           <div style="height:280px;position:relative;background:var(--void-300)">
             <!-- Ridges layer: stretched to fill -->
             <svg viewBox="0 0 600 280" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${Array(20).fill(0).map((_,i)=>{const y=i*14;const a=0.025+Math.min(i,19-i)*0.004;const wave=2+Math.sin(i*0.5)*1.5;return`<path d="M0,${y} Q150,${y-wave} 300,${y+wave} T600,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="0.75"/>`}).join('\n              ')}
+              ${Array(20).fill(0).map((_,i)=>{const y=i*14;const spacing=Math.abs(i-10)/10;const a=0.05+spacing*0.1;const wave=2+Math.sin(i*0.5)*1.5;return`<path d="M0,${y} Q150,${y-wave} 300,${y+wave} T600,${y}" stroke="rgba(232,228,220,${a.toFixed(3)})" stroke-width="1"/>`}).join('\n              ')}
             </svg>
             <!-- Route layer: aspect ratio preserved -->
             <svg viewBox="0 0 600 280" fill="none" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%">
