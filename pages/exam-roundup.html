@@ -46,11 +46,13 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .topic__name{font-size:14px;font-weight:600;margin:0}
 .topic__chapter{font-size:12px;color:var(--fg-muted);margin-top:1px}
 
-/* Gap bar */
-.topic__gap{flex:none;width:140px}
-.topic__bar{height:6px;border-radius:3px;background:var(--bg-disabled);overflow:hidden;margin-bottom:4px}
-.topic__fill{height:100%;border-radius:3px;transition:width 0.6s ease}
-.topic__bar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--fg-muted)}
+/* Gap bar — full gradient with 80 marker */
+.topic__gap{flex:none;width:160px}
+.topic__track{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);margin-bottom:4px}
+.topic__marker{position:absolute;left:80%;top:-2px;width:2px;height:12px;background:var(--fg-secondary);border-radius:1px;transform:translateX(-50%)}
+.topic__dot{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg-raised);transform:translate(-50%,-50%);transition:left 0.6s ease}
+.topic__bar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);position:relative}
+.topic__bar-label .at80{position:absolute;left:80%;transform:translateX(-50%)}
 
 /* Action */
 .topic__action{flex:none}
@@ -80,6 +82,18 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <div class="page">
+  <!-- Countdown block -->
+  <div style="background:var(--bg-raised);border-radius:var(--r);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:20px">
+    <div style="text-align:center;min-width:48px">
+      <div style="font-family:var(--font-mono);font-size:40px;font-weight:700;color:var(--blue);line-height:1">5</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em">days</div>
+    </div>
+    <div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:2px">Quantitative Exam</div>
+      <div style="font-size:12px;color:var(--fg-secondary)">Reach <svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ in all topics before exam day</div>
+    </div>
+  </div>
+
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
     <div style="display:flex;align-items:center;gap:16px">
       <div style="display:flex;align-items:center;gap:6px">
@@ -144,10 +158,10 @@ topics.forEach(function(t, i) {
     // Mastered — star badge
     html += '<div class="mastered-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" class="star-svg"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
   } else {
-    // Gap bar
+    // Gradient bar with position dot and 80 marker
     html += '<div class="topic__gap">';
-    html += '<div class="topic__bar"><div class="topic__fill" style="width:0%;background:' + col + '" data-target="' + pct + '" data-delay="' + (delay + 300) + '"></div></div>';
-    html += '<div class="topic__bar-label"><span>' + t.score + '</span><span style="color:var(--fg-secondary)">80</span></div>';
+    html += '<div class="topic__track"><div class="topic__marker"></div><div class="topic__dot" style="left:0%;background:' + col + '" data-target="' + pct + '" data-delay="' + (delay + 300) + '"></div></div>';
+    html += '<div class="topic__bar-label"><span>' + t.score + '</span><span class="at80"><svg width="6" height="6" viewBox="0 0 12 12" fill="var(--fg-secondary)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80</span><span>100</span></div>';
     html += '</div>';
 
     // Practice button
@@ -159,12 +173,12 @@ topics.forEach(function(t, i) {
 
 container.innerHTML = html;
 
-// Animate bars
-document.querySelectorAll('.topic__fill').forEach(function(bar) {
-  var target = parseInt(bar.dataset.target);
-  var delay = parseInt(bar.dataset.delay);
+// Animate dots
+document.querySelectorAll('.topic__dot').forEach(function(dot) {
+  var target = parseInt(dot.dataset.target);
+  var delay = parseInt(dot.dataset.delay);
   setTimeout(function() {
-    bar.style.width = (target / 80 * 100) + '%';
+    dot.style.left = target + '%';
   }, delay);
 });
 
