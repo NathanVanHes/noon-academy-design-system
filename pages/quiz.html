@@ -16,9 +16,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);
 .topbar__title{font-family:var(--font-sans);font-size:var(--fs-14);font-weight:var(--fw-500);color:var(--fg);flex:1}
 .topbar__count{font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint)}
 
-/* Progress bar */
-.quiz-progress{height:3px;background:var(--border);flex:none}
-.quiz-progress__fill{height:100%;background:var(--accent);transition:width 0.3s ease;border-radius:0 2px 2px 0}
+/* Session progress bar */
+.quiz-progress{padding:0 var(--sp-6);flex:none;margin-top:var(--sp-2)}
 
 /* Question area */
 .quiz-body{flex:1;max-width:560px;margin:0 auto;width:100%;padding:var(--sp-7) var(--sp-6)}
@@ -68,7 +67,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);
   <span class="topbar__title" id="topTitle">Inference & implied meaning</span>
   <span class="topbar__count" id="topCount">1 / 10</span>
 </div>
-<div class="quiz-progress"><div class="quiz-progress__fill" id="progressFill" style="width:10%"></div></div>
+<div class="quiz-progress"><div class="session-bar" id="sessionBar"></div></div>
 
 <!-- Question -->
 <div class="quiz-body" id="quizBody"></div>
@@ -147,12 +146,24 @@ var results = []; // 'correct','incorrect' per question
 
 var labels = ['A','B','C','D'];
 
+function updateSessionBar() {
+  var bar = document.getElementById('sessionBar');
+  var html = '';
+  for (var i = 0; i < questions.length; i++) {
+    var cls = 'session-bar__seg';
+    if (i < results.length) cls += results[i] === 'correct' ? ' is-correct' : ' is-incorrect';
+    else if (i === current) cls += ' is-current';
+    html += '<div class="' + cls + '"></div>';
+  }
+  bar.innerHTML = html;
+}
+
 function renderQuestion() {
   var q = questions[current];
   answered = false;
 
   document.getElementById('topCount').textContent = (current + 1) + ' / ' + questions.length;
-  document.getElementById('progressFill').style.width = ((current + 1) / questions.length * 100) + '%';
+  updateSessionBar();
 
   var html = '<div class="question__number">Question ' + (current + 1) + '</div>';
   html += '<div class="question__text">' + q.text + '</div>';
@@ -207,7 +218,7 @@ function selectAnswer(idx) {
 
 function showResults() {
   document.getElementById('topCount').textContent = 'Complete';
-  document.getElementById('progressFill').style.width = '100%';
+  updateSessionBar();
 
   var pct = Math.round(score / questions.length * 100);
   var html = '<div class="results">';

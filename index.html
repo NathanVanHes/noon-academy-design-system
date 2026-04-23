@@ -2964,6 +2964,66 @@ P.menu = {
 };
 
 // ──────── EMPTY STATE ────────
+P.interstitial = {
+  title: 'Interstitial', desc: 'Full-screen moment card with brand graphic, message, and CTA. Used between sections, for streaks, water alerts, and celebrations.',
+  tokens() {
+    return ['--bg','--fg','--fg-subtle','--accent','--signal','--font-serif','--font-sans','--fs-15','--fs-24','--fw-500','--sp-3','--sp-6','--sp-7','--sp-10','--lh-normal','--r-2'];
+  },
+  knobs: {
+    variant: { type:'select', options:['water','streak','celebration','warning'], default:'water', label:'Variant' },
+  },
+  renderCanvas(k) {
+    const graphics = {
+      water: '<svg width="80" height="100" viewBox="0 0 60 80" fill="none" stroke="var(--signal)" stroke-width="1.5" stroke-linecap="round"><path d="M20 12 L20 4 Q20 2 22 2 L38 2 Q40 2 40 4 L40 12"/><path d="M15 12 Q15 10 17 10 L43 10 Q45 10 45 12 L45 16 Q45 18 43 18 L17 18 Q15 18 15 16Z"/><path d="M18 18 L16 65 Q15 72 22 74 L38 74 Q45 72 44 65 L42 18"/><path d="M20 35 L40 35" opacity="0.3"/><path d="M19 45 L41 45" opacity="0.3"/><path d="M18 55 L42 55" opacity="0.3"/><path d="M30 55 L30 74" stroke="var(--signal)" opacity="0.5"/><circle cx="30" cy="65" r="4" fill="var(--signal)" opacity="0.3"/></svg>',
+      streak: '<svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="36" stroke="var(--signal)" stroke-width="2" opacity="0.2"/><circle cx="40" cy="40" r="28" stroke="var(--signal)" stroke-width="2" stroke-dasharray="4 4" opacity="0.3"/><text x="40" y="46" text-anchor="middle" font-family="var(--font-mono)" font-size="24" font-weight="700" fill="var(--signal)">7</text></svg>',
+      celebration: '<svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="32" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M40 18L43 30.8L56.2 31.6L45.8 40.4L49 53.2L40 46L31 53.2L34.2 40.4L23.8 31.6L37 30.8Z" fill="var(--accent)" opacity="0.8"/></svg>',
+      warning: '<svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="32" stroke="var(--danger-300)" stroke-width="1.5" opacity="0.3"/><path d="M40 25v18M40 50v2" stroke="var(--danger-300)" stroke-width="3" stroke-linecap="round"/></svg>',
+    };
+    const content = {
+      water: {title:'Your water is running low',body:'Complete a practice session to refill. Every question answered adds to your reserves.',btn:'Practice now'},
+      streak: {title:'7 day streak!',body:'You\'ve practiced every day this week. Keep it going — consistency is what builds mastery.',btn:'Continue'},
+      celebration: {title:'You mastered a topic!',body:'Quantitative reasoning is now at mastery. One less thing to worry about before the exam.',btn:'See progress'},
+      warning: {title:'3 assignments overdue',body:'Your teachers have set work that needs completing. Finishing it will help your mastery score.',btn:'View assignments'},
+    };
+    const c = content[k.variant];
+    return `<div style="width:100%;max-width:375px;min-height:500px;background:var(--bg);border-radius:24px;box-shadow:0 0 0 4px var(--border),0 20px 40px -10px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--sp-10) var(--sp-6);position:relative">
+      <div class="interstitial__graphic">${graphics[k.variant]}</div>
+      <div class="interstitial__title">${c.title}</div>
+      <p class="interstitial__body">${c.body}</p>
+      <div class="interstitial__actions">
+        <button class="btn btn--primary btn--block">${c.btn}</button>
+      </div>
+    </div>`;
+  },
+  renderCode(k) {
+    return `<div class="interstitial">
+  <div class="interstitial__graphic"><!-- SVG --></div>
+  <div class="interstitial__title">Title</div>
+  <p class="interstitial__body">Message</p>
+  <div class="interstitial__actions">
+    <button class="btn btn--primary btn--block">CTA</button>
+  </div>
+</div>`;
+  },
+  sections: `
+    <div class="sect"><div class="sect__title">Variants</div>
+      <div class="grid grid--2">
+        <div class="cell"><div class="cell__label">Water alert</div><div style="font-size:13px;color:var(--fg-muted)">Water vessel graphic. Prompts practice to refill.</div></div>
+        <div class="cell"><div class="cell__label">Streak</div><div style="font-size:13px;color:var(--fg-muted)">Day count in a circle. Celebrates consistency.</div></div>
+        <div class="cell"><div class="cell__label">Celebration</div><div style="font-size:13px;color:var(--fg-muted)">Star in accent circle. Topic mastered, exam ready.</div></div>
+        <div class="cell"><div class="cell__label">Warning</div><div style="font-size:13px;color:var(--fg-muted)">Danger circle with exclamation. Overdue work.</div></div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Rules</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Full screen:</b> Takes the entire viewport. Centered vertically. Dismiss via CTA or optional X button.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Graphic:</b> Brand-aligned SVG. Water vessel, streak count, star, or warning icon. 80px target area.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Copy:</b> Serif title (24px), body (15px subtle). Keep it short — one sentence title, two sentence body max.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>When:</b> Between quiz and results, after streaks hit, when water drops below threshold, after mastering a topic.</div></div>
+      </div>
+    </div>`
+};
+
 P.empty = {
   title: 'Empty State', desc: 'Use when a screen or section has no content yet - no passages, no crew members, no results. Always include a next step.',
   knobs: {
@@ -4272,6 +4332,7 @@ const NAV = [
     { id:'popovers', label:'Popovers' },
   ]},
   { group: 'Layout', items: [
+    { id:'interstitial', label:'Interstitial' },
     { id:'formstack', label:'Form Stack' },
     { id:'empty', label:'Empty State' },
     { id:'skeleton', label:'Skeleton' },
