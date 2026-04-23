@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz - Proven Routes</title>
+<link rel="stylesheet" href="../project/tokens.css">
+<link rel="stylesheet" href="../project/components.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);min-height:100vh;display:flex;flex-direction:column}
+
+/* Top bar */
+.topbar{background:var(--bg-overlay);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;padding:0 var(--sp-6);display:flex;align-items:center;height:56px;gap:var(--sp-4)}
+.topbar__back{background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:0;display:flex}
+.topbar__title{font-family:var(--font-sans);font-size:var(--fs-14);font-weight:var(--fw-500);color:var(--fg);flex:1}
+.topbar__count{font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint)}
+
+/* Progress bar */
+.quiz-progress{height:3px;background:var(--border);flex:none}
+.quiz-progress__fill{height:100%;background:var(--accent);transition:width 0.3s ease;border-radius:0 2px 2px 0}
+
+/* Question area */
+.quiz-body{flex:1;max-width:560px;margin:0 auto;width:100%;padding:var(--sp-7) var(--sp-6)}
+
+/* Question */
+.question__number{font-family:var(--font-mono);font-size:var(--fs-12);color:var(--fg-faint);margin-bottom:var(--sp-2)}
+.question__text{font-family:var(--font-serif);font-size:var(--fs-20);font-weight:var(--fw-500);color:var(--fg);line-height:var(--lh-snug);margin:0 0 var(--sp-6)}
+
+/* Options */
+.options{display:flex;flex-direction:column;gap:var(--sp-3)}
+
+/* Feedback after answer */
+.feedback{margin-top:var(--sp-5);padding:var(--sp-4) var(--sp-5);border-radius:var(--r-2);font-size:var(--fs-14);line-height:var(--lh-normal);display:none}
+.feedback.is-correct{display:block;background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--fg)}
+.feedback.is-incorrect{display:block;background:var(--danger-soft);border:1px solid var(--danger-border);color:var(--fg)}
+.feedback__title{font-weight:var(--fw-600);margin-bottom:var(--sp-1)}
+.feedback__text{color:var(--fg-subtle);font-size:var(--fs-13)}
+
+/* Next button */
+.quiz-footer{max-width:560px;margin:0 auto;width:100%;padding:var(--sp-4) var(--sp-6) var(--sp-8)}
+
+/* Results */
+.results{text-align:center;padding:var(--sp-10) var(--sp-6)}
+.results__score{font-family:var(--font-mono);font-size:var(--fs-48);font-weight:var(--fw-700);color:var(--fg);line-height:1}
+.results__label{font-size:var(--fs-14);color:var(--fg-subtle);margin-top:var(--sp-2)}
+.results__breakdown{display:flex;justify-content:center;gap:var(--sp-6);margin-top:var(--sp-6)}
+.results__stat{text-align:center}
+.results__stat-num{font-family:var(--font-mono);font-size:var(--fs-20);font-weight:var(--fw-600)}
+.results__stat-label{font-size:var(--fs-12);color:var(--fg-faint);margin-top:2px}
+
+/* Session bar in results */
+.results__bar{max-width:320px;margin:var(--sp-6) auto 0}
+
+/* Responsive */
+@media(max-width:480px){.quiz-body,.quiz-footer{padding-inline:var(--sp-4)}}
+
+/* Fade transition */
+.quiz-body{animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <button class="topbar__back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4l-6 6 6 6"/></svg></button>
+  <span class="topbar__title" id="topTitle">Inference & implied meaning</span>
+  <span class="topbar__count" id="topCount">1 / 10</span>
+</div>
+<div class="quiz-progress"><div class="quiz-progress__fill" id="progressFill" style="width:10%"></div></div>
+
+<!-- Question -->
+<div class="quiz-body" id="quizBody"></div>
+
+<!-- Footer -->
+<div class="quiz-footer" id="quizFooter"></div>
+
+<script>
+var questions = [
+  {
+    text: 'What does the author imply by describing the landscape as "barren yet promising"?',
+    options: ['The land is completely useless','There is hidden potential despite appearances','The author dislikes the setting','The landscape will change soon'],
+    correct: 1,
+    explanation: 'The contrast between "barren" and "promising" signals implied meaning — the author sees potential where others see emptiness.'
+  },
+  {
+    text: 'Which word best replaces "meticulous" in the passage without changing its meaning?',
+    options: ['Careless','Thorough','Quick','Approximate'],
+    correct: 1,
+    explanation: '"Meticulous" means showing great attention to detail, which is synonymous with "thorough".'
+  },
+  {
+    text: 'The phrase "reading between the lines" in paragraph 3 most likely means:',
+    options: ['Reading very carefully','Understanding hidden meaning','Skipping certain lines','Reading aloud'],
+    correct: 1,
+    explanation: 'This idiom refers to understanding what is implied but not explicitly stated.'
+  },
+  {
+    text: 'Based on the passage, what can be inferred about the character\'s motivation?',
+    options: ['She acts out of fear','She is motivated by financial gain','She seeks knowledge and understanding','She wants to impress others'],
+    correct: 2,
+    explanation: 'The passage describes her persistent questioning and research habits, pointing to a desire for understanding.'
+  },
+  {
+    text: 'What is the primary purpose of the opening paragraph?',
+    options: ['To introduce the main argument','To provide background context','To present a counterargument','To summarise the conclusion'],
+    correct: 1,
+    explanation: 'Opening paragraphs typically establish context before the main argument is presented.'
+  },
+  {
+    text: 'The word "ubiquitous" as used in the passage most nearly means:',
+    options: ['Rare','Everywhere','Beautiful','Dangerous'],
+    correct: 1,
+    explanation: '"Ubiquitous" means present, appearing, or found everywhere.'
+  },
+  {
+    text: 'Which statement best summarises the author\'s view on traditional methods?',
+    options: ['They should be abandoned entirely','They have value when combined with modern approaches','They are superior to all alternatives','They are outdated and irrelevant'],
+    correct: 1,
+    explanation: 'The author advocates for a balanced approach, valuing tradition alongside innovation.'
+  },
+  {
+    text: 'What rhetorical device is the author using in the phrase "the silence was deafening"?',
+    options: ['Simile','Metaphor','Oxymoron','Alliteration'],
+    correct: 2,
+    explanation: 'An oxymoron combines contradictory terms — silence cannot literally be deafening.'
+  },
+  {
+    text: 'The tone of the final paragraph can best be described as:',
+    options: ['Angry and confrontational','Hopeful yet cautious','Indifferent and detached','Humorous and lighthearted'],
+    correct: 1,
+    explanation: 'The measured optimism with acknowledgment of challenges indicates a hopeful yet cautious tone.'
+  },
+  {
+    text: 'What can be concluded about the relationship between the two characters?',
+    options: ['They are close friends','They have a professional rivalry','They share mutual respect despite disagreements','They have never met before'],
+    correct: 2,
+    explanation: 'Their formal interactions combined with genuine interest in each other\'s work suggest mutual respect.'
+  }
+];
+
+var current = 0;
+var score = 0;
+var answered = false;
+var results = []; // 'correct','incorrect' per question
+
+var labels = ['A','B','C','D'];
+
+function renderQuestion() {
+  var q = questions[current];
+  answered = false;
+
+  document.getElementById('topCount').textContent = (current + 1) + ' / ' + questions.length;
+  document.getElementById('progressFill').style.width = ((current + 1) / questions.length * 100) + '%';
+
+  var html = '<div class="question__number">Question ' + (current + 1) + '</div>';
+  html += '<div class="question__text">' + q.text + '</div>';
+  html += '<div class="options" id="options">';
+  q.options.forEach(function(opt, i) {
+    html += '<button class="option" data-idx="' + i + '"><span class="option__label">' + labels[i] + '</span><span class="option__text">' + opt + '</span></button>';
+  });
+  html += '</div>';
+  html += '<div class="feedback" id="feedback"><div class="feedback__title" id="feedbackTitle"></div><div class="feedback__text" id="feedbackText"></div></div>';
+
+  document.getElementById('quizBody').innerHTML = html;
+  document.getElementById('quizFooter').innerHTML = '';
+
+  // Wire option clicks
+  document.querySelectorAll('#options .option').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (answered) return;
+      selectAnswer(parseInt(el.dataset.idx));
+    });
+  });
+}
+
+function selectAnswer(idx) {
+  answered = true;
+  var q = questions[current];
+  var isCorrect = idx === q.correct;
+
+  if (isCorrect) score++;
+  results.push(isCorrect ? 'correct' : 'incorrect');
+
+  // Mark options
+  document.querySelectorAll('#options .option').forEach(function(el, i) {
+    if (i === q.correct) el.classList.add('is-correct');
+    else if (i === idx && !isCorrect) el.classList.add('is-incorrect');
+    else el.classList.add('is-disabled');
+  });
+
+  // Show feedback
+  var fb = document.getElementById('feedback');
+  fb.className = 'feedback ' + (isCorrect ? 'is-correct' : 'is-incorrect');
+  document.getElementById('feedbackTitle').textContent = isCorrect ? 'Correct' : 'Incorrect';
+  document.getElementById('feedbackText').textContent = q.explanation;
+
+  // Show next button
+  var isLast = current >= questions.length - 1;
+  document.getElementById('quizFooter').innerHTML = '<button class="btn btn--primary btn--block" id="nextBtn">' + (isLast ? 'See results' : 'Next question') + '</button>';
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    if (isLast) showResults();
+    else { current++; renderQuestion(); }
+  });
+}
+
+function showResults() {
+  document.getElementById('topCount').textContent = 'Complete';
+  document.getElementById('progressFill').style.width = '100%';
+
+  var pct = Math.round(score / questions.length * 100);
+  var html = '<div class="results">';
+  html += '<div class="results__score">' + score + '/' + questions.length + '</div>';
+  html += '<div class="results__label">' + pct + '% correct</div>';
+  html += '<div class="results__breakdown">';
+  html += '<div class="results__stat"><div class="results__stat-num" style="color:var(--accent)">' + score + '</div><div class="results__stat-label">Correct</div></div>';
+  html += '<div class="results__stat"><div class="results__stat-num" style="color:var(--danger-300)">' + (questions.length - score) + '</div><div class="results__stat-label">Incorrect</div></div>';
+  html += '</div>';
+
+  // Session bar
+  html += '<div class="results__bar"><div class="session-bar session-bar--lg">';
+  results.forEach(function(r) {
+    html += '<div class="session-bar__seg is-' + (r === 'correct' ? 'correct' : 'incorrect') + '"></div>';
+  });
+  html += '</div></div>';
+  html += '</div>';
+
+  document.getElementById('quizBody').innerHTML = html;
+  document.getElementById('quizFooter').innerHTML = '<div style="display:flex;gap:var(--sp-3)"><button class="btn btn--secondary" style="flex:1" onclick="current=0;score=0;results=[];renderQuestion()">Retry</button><button class="btn btn--primary" style="flex:1">Continue</button></div>';
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
