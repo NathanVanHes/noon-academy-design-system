@@ -27,9 +27,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 .topbar{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08);position:sticky;top:0;z-index:10}
 .topbar__inner{max-width:720px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px}
+@media(max-width:480px){.topbar__inner{padding:0 16px}}
 .topbar h1{font-size:20px;font-weight:700;margin:0}
 
 .page{max-width:720px;margin:0 auto;padding:32px 40px}
+@media(max-width:480px){.page{padding:20px 16px}}
 
 
 /* Topic row */
@@ -37,14 +39,23 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 @keyframes rowIn{to{opacity:1;transform:translateY(0)}}
 .topic:hover{box-shadow:0 2px 8px rgba(0,0,0,0.04)}
 
-
 /* Info */
 .topic__info{flex:1;min-width:0}
-.topic__name{font-size:14px;font-weight:600;margin:0}
+.topic__name{font-size:14px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topic__chapter{font-size:12px;color:var(--fg-muted);margin-top:1px}
 
 /* Gap bar — filled gradient up to score, grey remainder */
 .topic__gap{flex:none;width:160px}
+
+/* Mobile: stack topic rows */
+@media(max-width:540px){
+  .topic{flex-wrap:wrap;gap:10px;padding:14px 16px}
+  .topic__info{flex:1 1 auto;min-width:0;order:1}
+  .topic__gap{width:100%;order:3}
+  .topic__action{order:4;width:100%}
+  .topic__action .btn-go{width:100%}
+  .mastered-badge{order:2}
+}
 .topic__track{position:relative;height:8px;border-radius:4px;background:var(--bg-disabled);margin-bottom:4px;overflow:hidden}
 .topic__fill{height:100%;border-radius:4px 0 0 4px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);background-size:160px 100%;transition:width 0.6s ease}
 .topic__marker{position:absolute;left:80%;top:-2px;width:2px;height:12px;background:var(--fg-secondary);border-radius:1px;transform:translateX(-50%);z-index:1}
