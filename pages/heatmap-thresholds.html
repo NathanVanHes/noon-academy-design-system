@@ -118,14 +118,16 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="legend-strip">
   <div class="legend-strip__inner">
-    <div class="legend-key" style="max-width:200px">
+    <div class="legend-key" style="max-width:220px">
       <div class="legend-key__track">
         <div class="legend-key__bar" style="height:6px"></div>
+        <div style="position:absolute;left:70%;top:-2px;width:2px;height:10px;background:var(--fg-muted);border-radius:1px;transform:translateX(-50%);opacity:0.5"></div>
         <div class="legend-key__marker" style="width:2px;height:10px;background:var(--fg-secondary);border-radius:1px"></div>
       </div>
       <div class="legend-key__labels">
         <span>0</span>
-        <span class="legend-key__mastery"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ Mastery</span>
+        <span style="position:absolute;left:70%;transform:translateX(-50%);font-family:var(--font-mono);font-size:8px;color:var(--fg-muted);white-space:nowrap">70</span>
+        <span class="legend-key__mastery"><svg width="8" height="8" viewBox="0 0 12 12" fill="var(--fg-secondary)" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80</span>
       </div>
     </div>
     <div style="margin-left:auto;flex:none" id="examSegment">
@@ -142,7 +144,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Quantitative</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> Level 1</div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <svg width="6" height="6" viewBox="0 0 12 12" fill="var(--fg-muted)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80 · Level 1</div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
   </div>
@@ -151,7 +153,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="grid-section">
     <div class="grid-section__header">
       <div class="grid-section__label">Verbal</div>
-      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> Level 2</div>
+      <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <svg width="6" height="6" viewBox="0 0 12 12" fill="var(--fg-muted)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 70 · Level 2</div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
   </div>
@@ -626,7 +628,7 @@ document.getElementById('examSegment').addEventListener('click', function(e) {
   document.getElementById('quantExam').style.display = examOn ? 'inline' : 'none';
   document.getElementById('verbalExam').style.display = examOn ? 'inline' : 'none';
   renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', examOn, 80);
-  renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal', 80);
+  renderGrid('readingGrid', examOn ? readingTopics.filter(function(t){return t.exam}) : readingTopics, 'Verbal', 70);
 });
 
 // Save original drill body for restoring after mastery info
@@ -634,7 +636,7 @@ var _origDrillBody = document.querySelector('.drill__body').innerHTML;
 
 // Init
 renderChapteredGrid('mathGrid', mathChapters, 'Quantitative', false, 80);
-renderGrid('readingGrid', readingTopics, 'Verbal', 80);
+renderGrid('readingGrid', readingTopics, 'Verbal', 70);
 
 // Shimmer on mastered tiles — sweeps top-left to bottom-right, twice
 setTimeout(function() {
