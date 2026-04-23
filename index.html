@@ -2735,7 +2735,7 @@ P.bottomsheet = {
   },
   renderCanvas(k) {
     const sizeStyle = k.size === 'full' ? 'height:90%;' : '';
-    const actionsHTML = k.actions === 'two' ? '<div style="display:flex;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--border)"><button class="btn btn--ghost btn--sm" style="flex:1">Close</button><button class="btn btn--primary btn--sm" style="flex:1">Join class</button></div>' : k.actions === 'one' ? '<div style="padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--border)"><button class="btn btn--primary btn--block">Join class</button></div>' : '';
+    const actionsHTML = k.actions === 'two' ? '<div style="display:flex;gap:var(--sp-3);padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--border)"><button class="btn btn--ghost" style="flex:1">Close</button><button class="btn btn--primary" style="flex:1">Join class</button></div>' : k.actions === 'one' ? '<div style="padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--border)"><button class="btn btn--primary btn--block">Join class</button></div>' : '';
     const sheetTransform = k.open ? 'transform:translateY(0)' : 'transform:translateY(100%)';
     const scrimOpacity = k.open ? '0.5' : '0';
     return `<div style="width:100%;max-width:375px;height:600px;position:relative;border-radius:24px;overflow:hidden;background:var(--bg);box-shadow:0 0 0 4px var(--border),0 20px 40px -10px rgba(0,0,0,0.3)">
