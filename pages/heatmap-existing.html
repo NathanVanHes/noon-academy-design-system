@@ -61,9 +61,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile__name{font-size:11px;font-weight:600;color:rgba(0,0,0,0.55);text-align:center;line-height:1.2;padding:0 8px}
 .tile__score{position:absolute;top:6px;right:6px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:rgba(0,0,0,0.25);display:flex;align-items:center;gap:2px;z-index:2}
 .tile.is-mastered{box-shadow:inset 0 2px 6px rgba(0,0,0,0.15),inset 0 1px 2px rgba(0,0,0,0.1)}
-@keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.tile__score{animation:countUp 0.4s ease forwards;opacity:0}
-.tile__diff{animation:countUp 0.5s ease forwards;opacity:0}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
 /* Chapter subheader */
 .chapter-label{font-size:10px;font-weight:500;color:var(--fg-muted);padding:8px 0 4px;grid-column:1/-1}
@@ -262,13 +259,30 @@ function renderTile(t, section, idx) {
     var diffSign = diff > 0 ? '+' : '';
     diffHtml = '<div class="tile__diff">' + diffSign + diff + '</div>';
   }
-  var scoreDelay = ((idx || 0) * 30 + 200) + 'ms';
-  var diffDelay = ((idx || 0) * 30 + 300) + 'ms';
+  var scoreDelayMs = (idx || 0) * 30 + 200;
   tile.innerHTML = '<div class="tile__name">' + t.name.replace('\n','<br>') + '</div>' +
     (t.score !== null
-      ? '<div class="tile__score" style="animation-delay:' + scoreDelay + '">' + (mastered ? starSvg : t.score) + '</div>'
-      : '<div class="tile__score" style="color:var(--fg-muted);animation:none">--</div>') +
-    (diffHtml ? diffHtml.replace('class="tile__diff"', 'class="tile__diff" style="animation-delay:' + diffDelay + '"') : '');
+      ? '<div class="tile__score">' + (mastered ? starSvg : '<span class="tile__counter" data-target="' + t.score + '">0</span>') + '</div>'
+      : '<div class="tile__score" style="color:var(--fg-muted)">--</div>') +
+    diffHtml;
+  // Animate counter
+  if (t.score !== null && !mastered) {
+    var counterEl = tile.querySelector('.tile__counter');
+    if (counterEl) {
+      var target = t.score;
+      var duration = 600;
+      setTimeout(function() {
+        var start = performance.now();
+        function tick(now) {
+          var p = Math.min((now - start) / duration, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          counterEl.textContent = Math.round(eased * target);
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }, scoreDelayMs);
+    }
+  }
   if (t.score === null) {
     tile.style.cursor = 'default';
     tile.style.boxShadow = 'inset 0 0 0 1px rgba(20,20,20,0.06)';
