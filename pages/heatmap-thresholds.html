@@ -678,10 +678,14 @@ function shimmerMastered() {
             setTimeout(function() { dot.remove(); }, delay + duration + 100);
           })(c);
         }
-        // Star stamps in after confetti starts falling
+        // Star stamps in after confetti starts falling, then fade
         setTimeout(function() {
           tile.classList.add('is-revealed');
         }, 500);
+        setTimeout(function() {
+          tile.style.transition = 'opacity 0.8s ease';
+          tile.style.opacity = '0.4';
+        }, 1200);
       }, i * 250);
     });
   }, 600);
