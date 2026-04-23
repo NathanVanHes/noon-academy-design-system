@@ -42,7 +42,7 @@
 
 /* ── Playground (canvas + knobs) ── */
 .play{display:grid;grid-template-columns:1fr 300px;border-block-end:1px solid var(--border);min-height:260px}
-.play__canvas{padding:var(--sp-8);display:grid;place-items:center;position:sticky;top:48px;overflow:hidden;max-height:70vh;background:
+.play__canvas{padding:var(--sp-8);display:grid;place-items:center;position:sticky;top:48px;overflow:auto;max-height:80vh;background:
   linear-gradient(rgba(232,228,220,0.015) 1px,transparent 1px) 0 0/24px 24px,
   linear-gradient(90deg,rgba(232,228,220,0.015) 1px,transparent 1px) 0 0/24px 24px,
   var(--bg)}
@@ -2772,10 +2772,23 @@ P.bottomsheet = {
     return `<div style="width:100%;max-width:375px;height:600px;position:relative;border-radius:24px;overflow:hidden;background:var(--bg);box-shadow:0 0 0 4px var(--border),0 20px 40px -10px rgba(0,0,0,0.3)">
       <div style="padding:var(--sp-5) var(--sp-6)">
         <div class="caps" style="margin-bottom:var(--sp-4)">Today</div>
-        <div class="col gap-3">
-          <div class="session session--live"><div class="session__indicator"></div><div class="session__body"><div class="session__status-line">Live now</div><div class="session__title">Storytelling</div><div class="session__meta">Digital Media</div></div></div>
-          <div class="session session--upcoming"><div class="session__indicator"></div><div class="session__body"><div class="session__status-line">10:00 - 10:45</div><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading</div></div></div>
-          <div class="session session--upcoming"><div class="session__indicator"></div><div class="session__body"><div class="session__status-line">13:00 - 13:45</div><div class="session__title">Quantitative reasoning</div><div class="session__meta">Qudrat Math</div></div></div>
+        <div class="session session--live">
+          <div class="session__time">8:30</div>
+          <div class="session__indicator"></div>
+          <div class="session__body"><div class="session__title">Storytelling</div><div class="session__meta">Digital Media - Ms. Al-Harbi</div></div>
+          <div class="session__status"><span class="chip chip--signal"><span class="chip__dot"></span> Live</span></div>
+        </div>
+        <div class="session session--upcoming">
+          <div class="session__time">10:00</div>
+          <div class="session__indicator"></div>
+          <div class="session__body"><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
+          <div class="session__status"><span class="mono">45 min</span></div>
+        </div>
+        <div class="session session--upcoming">
+          <div class="session__time">1:00</div>
+          <div class="session__indicator"></div>
+          <div class="session__body"><div class="session__title">Quantitative reasoning</div><div class="session__meta">Qudrat Math - Ms. Noor</div></div>
+          <div class="session__status"><span class="mono">45 min</span></div>
         </div>
       </div>
       <div style="position:absolute;inset:0;background:rgba(6,9,19,${scrimOpacity});border-radius:inherit;transition:background 0.32s var(--ease);pointer-events:${k.open?'auto':'none'}"></div>
@@ -3000,6 +3013,9 @@ P.interstitial = {
   tokens() {
     return ['--bg','--fg','--fg-subtle','--accent','--accent-soft','--font-serif','--font-sans','--font-mono','--fs-13','--fs-15','--fs-24','--fs-32','--fw-500','--fw-600','--sp-3','--sp-4','--sp-6','--sp-10','--lh-normal','--r-2'];
   },
+  knobs: {
+    topic: { type:'text', default:'Quantitative Reasoning', label:'Topic name' },
+  },
   renderCanvas(k) {
     return `<div style="width:100%;max-width:375px;height:667px;background:var(--bg);border-radius:24px;box-shadow:0 0 0 4px var(--border),0 20px 40px -10px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--sp-10) var(--sp-6);position:relative;overflow:hidden" data-interstitial>
       <!-- Confetti container -->
@@ -3017,7 +3033,7 @@ P.interstitial = {
 
       <!-- Copy -->
       <div style="font-family:var(--font-serif);font-size:var(--fs-32);font-weight:var(--fw-500);color:var(--fg);line-height:1.2;letter-spacing:-0.01em;margin-bottom:var(--sp-3)">You mastered it!</div>
-      <div style="font-family:var(--font-sans);font-size:var(--fs-15);color:var(--fg-subtle);line-height:var(--lh-normal);max-width:280px;margin-bottom:var(--sp-4)">Quantitative Reasoning is locked in. One less thing to worry about before the exam.</div>
+      <div style="font-family:var(--font-sans);font-size:var(--fs-15);color:var(--fg-subtle);line-height:var(--lh-normal);max-width:280px;margin-bottom:var(--sp-4)">${esc(k.topic)} is locked in. One less thing to worry about before the exam.</div>
       <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--accent);font-weight:var(--fw-600);margin-bottom:var(--sp-10)">12 of 18 topics mastered</div>
 
       <!-- CTA -->
@@ -4654,7 +4670,7 @@ function updatePlayground(page, skipKnobs) {
   const knobsEl = document.getElementById('knobsInner');
   const codeEl = document.getElementById('codeOut');
   if (canvas) canvas.innerHTML = page.renderCanvas(currentKnobs);
-  if (page.afterRender) page.afterRender();
+  if (page.afterRender) page.afterRender(canvas);
   if (knobsEl && !skipKnobs) knobsEl.innerHTML = buildKnobsHTML(page.knobs);
   if (codeEl && page.renderCode) {
     const tokenList = page.tokens ? (typeof page.tokens === 'function' ? page.tokens(currentKnobs) : page.tokens) : null;
