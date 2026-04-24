@@ -909,8 +909,8 @@ P.gridpaper = {
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Journey / route overview</div>
-            <div style="background:${voidMajor};padding:var(--sp-5) var(--sp-4)">
-              <div class="steps">
+            <div style="background:${voidMajor};padding:var(--sp-6) var(--sp-5);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100px">
+              <div class="steps" style="justify-content:center">
                 <div class="steps__dot is-done"></div>
                 <div class="steps__line is-done"></div>
                 <div class="steps__dot is-done"></div>
@@ -921,7 +921,7 @@ P.gridpaper = {
                 <div class="steps__line"></div>
                 <div class="steps__dot"></div>
               </div>
-              <div style="display:flex;justify-content:space-between;margin-top:var(--sp-2)">
+              <div style="display:flex;gap:var(--sp-4);margin-top:var(--sp-3)">
                 <span class="mono" style="font-size:9px;color:var(--fg-faint)">3 of 5</span>
                 <span class="mono" style="font-size:9px;color:var(--accent)">In progress</span>
               </div>
@@ -4487,9 +4487,14 @@ P.video = {
   renderCanvas(k) {
     const mini = k.size === 'mini' ? ' video--mini' : '';
     const playing = k.state === 'playing' ? ' is-playing' : '';
-    const mins = Math.floor(k.progress * 12.5 / 100);
-    const secs = Math.floor((k.progress * 12.5 / 100 - mins) * 60);
-    const time = mins + ':' + String(secs).padStart(2,'0') + ' / 12:30';
+    const totalMins = 12.5;
+    const elapsed = k.progress * totalMins / 100;
+    const remaining = totalMins - elapsed;
+    const eMins = Math.floor(elapsed); const eSecs = Math.floor((elapsed - eMins) * 60);
+    const rMins = Math.floor(remaining); const rSecs = Math.floor((remaining - rMins) * 60);
+    const time = k.size === 'mini'
+      ? '-' + rMins + ':' + String(rSecs).padStart(2,'0')
+      : eMins + ':' + String(eSecs).padStart(2,'0') + ' / 12:30';
     return `<div style="width:100%;max-width:${k.size==='mini'?'160px':'420px'}">
       <div class="video${mini}${playing}">
         <div style="position:absolute;inset:0;background:var(--void-300)"></div>

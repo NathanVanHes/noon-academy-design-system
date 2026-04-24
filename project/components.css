@@ -379,9 +379,9 @@ body.rtl .progress.is-indeterminate .progress__bar { animation-direction: revers
 
 /* Stepper / route progress */
 .steps { display: flex; align-items: center; gap: 0; }
-.steps__dot { inline-size: 10px; block-size: 10px; background: var(--fg-14); transform: rotate(45deg); flex: none; }
-.steps__dot.is-done { background: var(--signal); }
-.steps__dot.is-now { background: var(--signal-bright); box-shadow: 0 0 0 3px var(--signal-glow); }
+.steps__dot { inline-size: 10px; block-size: 10px; background: transparent; box-shadow: inset 0 0 0 1px var(--fg-muted); transform: rotate(45deg); flex: none; opacity: 0.55; }
+.steps__dot.is-done { background: var(--signal); box-shadow: none; opacity: 1; }
+.steps__dot.is-now { background: var(--signal-bright); box-shadow: 0 0 0 3px var(--signal-glow); opacity: 1; }
 .steps__line { block-size: 1.5px; inline-size: 24px; background: var(--border); }
 .steps__line.is-done { background: var(--signal); }
 
@@ -490,6 +490,7 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 .video {
   position: relative; border-radius: var(--r-3); overflow: hidden;
   background: var(--void-400); aspect-ratio: 16/9;
+  border: 1px solid var(--border);
 }
 .video__poster {
   position: absolute; inset: 0; object-fit: cover; width: 100%; height: 100%;
