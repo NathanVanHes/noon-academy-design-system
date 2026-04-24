@@ -909,7 +909,7 @@ P.gridpaper = {
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Journey / route overview</div>
-            <div style="background:${voidMajor};padding:var(--sp-6) var(--sp-5);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100px">
+            <div style="background:${voidMajor};height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center">
               <div class="steps" style="justify-content:center">
                 <div class="steps__dot is-done"></div>
                 <div class="steps__line is-done"></div>
@@ -929,9 +929,9 @@ P.gridpaper = {
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ In-class slides</div>
-            <div style="background:var(--void-300);padding:var(--sp-4);display:grid;place-items:center">
+            <div style="background:var(--void-300);height:180px;display:grid;place-items:center;padding:var(--sp-4)">
               <div style="width:100%;aspect-ratio:16/9;background:${voidGrid16};border-radius:var(--r-2);box-shadow:0 2px 12px rgba(0,0,0,0.2);display:grid;place-items:center;overflow:hidden">
-                <img src="reference/equation.svg" style="width:70%;height:auto;opacity:0.9" alt="Hand-drawn equation">
+                <img src="reference/equation.svg" style="width:40%;height:auto;opacity:0.9" alt="Hand-drawn equation">
               </div>
             </div>
           </div>
@@ -943,21 +943,23 @@ P.gridpaper = {
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Quiz / practice sessions</div>
-            <div style="background:var(--bg);padding:var(--sp-3) var(--sp-4)">
-              <button class="option" style="pointer-events:none;margin:0"><span class="option__label">A</span><span class="option__text">The land is completely useless</span></button>
-              <button class="option is-selected" style="pointer-events:none;margin:var(--sp-2) 0 0"><span class="option__label">B</span><span class="option__text">There is hidden potential</span></button>
+            <div style="background:var(--bg);height:180px;display:grid;place-items:center;padding:0 var(--sp-5)">
+              <div style="width:100%;max-width:320px">
+                <button class="option" style="pointer-events:none;margin:0"><span class="option__label">A</span><span class="option__text">The land is completely useless</span></button>
+                <button class="option is-selected" style="pointer-events:none;margin:var(--sp-2) 0 0"><span class="option__label">B</span><span class="option__text">There is hidden potential</span></button>
+              </div>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Heatmap / mastery grid</div>
-            <div style="background:var(--bg);display:flex;gap:5px;flex-wrap:wrap;padding:var(--sp-4) var(--sp-5)">
-              ${[65,42,88,35,76,91,22,70].map(function(s){var t=Math.max(0,Math.min(100,s))/100;var r,g,b;if(t<0.5){var p=t/0.5;r=240+(255-240)*p;g=61+(203-61)*p;b=61+(69-61)*p}else{var p=(t-0.5)/0.5;r=255+(39-255)*p;g=203+(189-203)*p;b=69+(134-69)*p}return '<div style="width:36px;height:36px;border-radius:4px;background:rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')"></div>'}).join('')}
+            <div style="background:var(--bg);height:180px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;align-content:center;justify-content:center;padding:var(--sp-5)">
+              ${[65,42,88,35,76,91,22,70,55,80].map(function(s){var t=Math.max(0,Math.min(100,s))/100;var r,g,b;if(t<0.5){var p=t/0.5;r=240+(255-240)*p;g=61+(203-61)*p;b=61+(69-61)*p}else{var p=(t-0.5)/0.5;r=255+(39-255)*p;g=203+(189-203)*p;b=69+(134-69)*p}return '<div style="width:40px;height:40px;border-radius:6px;background:rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')"></div>'}).join('')}
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Cards and raised surfaces</div>
-            <div style="background:var(--bg);padding:var(--sp-4) var(--sp-5)">
-              <div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:var(--sp-4) var(--sp-5)">
+            <div style="background:var(--bg);height:180px;display:grid;place-items:center;padding:0 var(--sp-5)">
+              <div style="width:100%;max-width:280px;background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:var(--sp-4) var(--sp-5)">
                 <div class="caps" style="margin-bottom:4px">Topic</div>
                 <div style="font-size:15px;color:var(--fg);font-weight:600">Inference & implied meaning</div>
                 <div style="font-size:12px;color:var(--fg-subtle);margin-top:2px">Qudrat Reading - Mr. Hassan</div>
@@ -966,7 +968,7 @@ P.gridpaper = {
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Schedule / session lists</div>
-            <div style="background:var(--bg)">
+            <div style="background:var(--bg);height:180px;display:flex;flex-direction:column;justify-content:center">
               <div class="session session--live" style="pointer-events:none">
                 <div class="session__time">8:30</div>
                 <div class="session__indicator"></div>
@@ -1434,7 +1436,12 @@ P.contours = {
         baseShape = smoothed;
       }
 
-      var lines = []; var y = -30;
+      // Offset base shape so mean is ~0
+      var baseSum = 0; for (var bs = 0; bs < baseShape.length; bs++) baseSum += baseShape[bs];
+      var baseMean = baseSum / baseShape.length;
+      for (var bs = 0; bs < baseShape.length; bs++) baseShape[bs] -= baseMean;
+
+      var lines = []; var y = -20;
       for (var i = 0; i < gaps.length && y < h + 10; i++) {
         var nextGap = gaps[Math.min(i + 1, gaps.length - 1)];
         var a = baseOpacity + (nextGap / maxGap) * opacityRange;
