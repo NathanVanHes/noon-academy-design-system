@@ -66,6 +66,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .tile.is-mastered .tile__score{opacity:0}
 .tile.is-mastered.is-revealed .tile__score{opacity:1;animation:stampIn 0.3s ease}
 .tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
+.tile.is-mastered.is-revealed .tile__score{z-index:3}
+.tile.is-mastered::after{content:'';position:absolute;inset:0;background:var(--bg);opacity:0;transition:opacity 0.8s ease;border-radius:inherit;pointer-events:none;z-index:2}
+.tile.is-mastered.is-faded::after{opacity:0.6}
 @keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes tileThrob{0%{transform:scale(1)}15%{transform:scale(1.06)}30%{transform:scale(0.97)}45%{transform:scale(1.04)}60%{transform:scale(0.99)}75%{transform:scale(1.02)}100%{transform:scale(1)}}
 .tile__diff{position:absolute;bottom:4px;right:5px;display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(0,0,0,0.2);z-index:2}
@@ -746,8 +749,7 @@ function shimmerMastered() {
           tile.classList.add('is-revealed');
         }, 500);
         setTimeout(function() {
-          tile.style.transition = 'opacity 0.8s ease';
-          tile.style.opacity = '0.4';
+          tile.classList.add('is-faded');
         }, 1200);
       }, i * 250);
     });
