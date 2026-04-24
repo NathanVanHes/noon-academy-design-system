@@ -9,6 +9,28 @@
 <style>
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;overflow:hidden}
 
+/* ── Mobile hamburger ── */
+.tb__menu{display:none;background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:4px}
+.sb__close{display:none;background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:4px;position:absolute;top:16px;right:12px}
+
+@media(max-width:768px){
+  .shell{grid-template-columns:1fr}
+  .sb{position:fixed;inset:0;z-index:100;transform:translateX(-100%);transition:transform 0.25s ease;width:280px}
+  .sb.is-open{transform:translateX(0)}
+  .sb__scrim{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,0.4)}
+  .sb__scrim.is-open{display:block}
+  .sb__close{display:flex}
+  .tb__menu{display:flex}
+  .tb{padding:var(--sp-3) var(--sp-4)}
+  .pg__head{padding:var(--sp-5) var(--sp-4) var(--sp-4)}
+  .pg__title{font-size:var(--fs-24)}
+  .play{grid-template-columns:1fr;min-height:auto}
+  .play__canvas{position:relative;top:auto;max-height:none;padding:var(--sp-5)}
+  .play__knobs{border-inline-start:0;border-block-start:1px solid var(--border)}
+  .sects{padding-inline:var(--sp-4) !important}
+  .grid.grid--2{grid-template-columns:1fr !important}
+}
+
 /* ── Shell ── */
 .shell{display:grid;grid-template-columns:250px 1fr;height:100vh}
 
@@ -120,9 +142,13 @@
 </head>
 <body>
 <div class="shell">
-<aside class="sb" id="sidebar"></aside>
+<div class="sb__scrim" id="sbScrim"></div>
+<aside class="sb" id="sidebar">
+  <button class="sb__close" id="sbClose"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+</aside>
 <div class="mn" id="main">
   <div class="tb">
+    <button class="tb__menu" id="tbMenu"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
     <div class="tb__title" id="tbTitle">Overview</div>
     <div class="tb__toggle" id="themeToggle"><button class="is-on" data-v="void">Void</button><button data-v="paper">Paper</button></div>
     <div class="tb__toggle" id="dirToggle"><button class="is-on" data-v="ltr">LTR</button><button data-v="rtl">RTL</button></div>
@@ -4619,8 +4645,19 @@ const NAV = [
 
 // Build sidebar
 const sb = document.getElementById('sidebar');
+const sbClose = sb.querySelector('.sb__close');
 sb.innerHTML = `<div class="sb__brand"><strong>Proven Routes</strong><em>v1.0</em></div>` +
   NAV.map(g => `<div class="sb__group"><div class="sb__heading">${g.group}</div>${g.items.map(i=>`<a class="sb__item" href="#${i.id}" data-page="${i.id}">${i.label}</a>`).join('')}</div>`).join('');
+if (sbClose) sb.appendChild(sbClose);
+
+// Mobile nav toggle
+var scrim = document.getElementById('sbScrim');
+function openSb() { sb.classList.add('is-open'); scrim.classList.add('is-open'); }
+function closeSb() { sb.classList.remove('is-open'); scrim.classList.remove('is-open'); }
+document.getElementById('tbMenu').addEventListener('click', openSb);
+document.getElementById('sbClose').addEventListener('click', closeSb);
+scrim.addEventListener('click', closeSb);
+sb.addEventListener('click', function(e) { if (e.target.closest('.sb__item')) closeSb(); });
 
 // ════════════════════════════════════════════════════════════════════════════
 // ROUTING & RENDERING
