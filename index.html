@@ -9,29 +9,10 @@
 <style>
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;overflow:hidden}
 
-/* ── Mobile hamburger ── */
+/* ── Mobile (desktop defaults below, mobile overrides at end of style block) ── */
 .tb__menu{display:none;background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:4px}
 .sb__close{display:none;background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:4px;position:absolute;top:16px;right:12px}
 .sb__scrim{display:none}
-
-@media(max-width:768px){
-  .shell{grid-template-columns:1fr}
-  .sb{position:fixed;inset:0;z-index:100;transform:translateX(-100%);transition:transform 0.25s ease;width:280px}
-  .sb.is-open{transform:translateX(0)}
-  .sb__scrim{display:block;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity 0.25s ease}
-  .sb__scrim.is-open{opacity:1;pointer-events:auto}
-  body{overflow:auto}
-  .sb__close{display:flex}
-  .tb__menu{display:flex}
-  .tb{padding:var(--sp-3) var(--sp-4)}
-  .pg__head{padding:var(--sp-5) var(--sp-4) var(--sp-4)}
-  .pg__title{font-size:var(--fs-24)}
-  .play{grid-template-columns:1fr;min-height:auto}
-  .play__canvas{position:relative;top:auto;max-height:none;padding:var(--sp-5)}
-  .play__knobs{border-inline-start:0;border-block-start:1px solid var(--border)}
-  .sects{padding-inline:var(--sp-4) !important}
-  .grid.grid--2{grid-template-columns:1fr !important}
-}
 
 /* ── Shell ── */
 .shell{display:grid;grid-template-columns:250px 1fr;height:100vh}
@@ -140,6 +121,27 @@
 .shell.paper-mode .sb__item.is-on{background:rgba(10,15,26,0.08)}
 /* Voice tutor mockups always use void tokens regardless of theme */
 .vt-mock{--bg:var(--void-300);--fg:rgba(232,228,220,1);--fg-muted:rgba(232,228,220,0.7);--fg-faint:rgba(232,228,220,0.35);--border:rgba(232,228,220,0.10);--border-strong:rgba(232,228,220,0.22);--divider:rgba(232,228,220,0.06);--accent:#64D8AE;--accent-fg:#0a3326;--accent-soft:rgba(100,216,174,0.14);--danger-400:#c55a4e;--ok-400:#7a8e64}
+
+/* ── Mobile breakpoint — must be last to override base rules ── */
+@media(max-width:768px){
+  body{overflow:auto}
+  .shell{grid-template-columns:1fr !important;height:auto;min-height:100vh}
+  .sb{position:fixed;inset:0;z-index:100;transform:translateX(-100%);transition:transform 0.25s ease;width:280px}
+  .sb.is-open{transform:translateX(0)}
+  .sb__scrim{display:block;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity 0.25s ease}
+  .sb__scrim.is-open{opacity:1;pointer-events:auto}
+  .sb__close{display:flex}
+  .tb__menu{display:flex}
+  .mn{overflow-y:auto;height:auto}
+  .tb{padding:var(--sp-3) var(--sp-4)}
+  .pg__head{padding:var(--sp-5) var(--sp-4) var(--sp-4)}
+  .pg__title{font-size:var(--fs-24)}
+  .play{grid-template-columns:1fr !important;min-height:auto}
+  .play__canvas{position:relative;top:auto;max-height:none;padding:var(--sp-5)}
+  .play__knobs{border-inline-start:0;border-block-start:1px solid var(--border)}
+  .sects{padding-inline:var(--sp-4) !important}
+  .grid.grid--2{grid-template-columns:1fr !important}
+}
 </style>
 </head>
 <body>
