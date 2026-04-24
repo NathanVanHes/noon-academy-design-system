@@ -632,9 +632,11 @@ P.motion = {
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=box-shadow]');el.style.transition='none';el.style.transform='translateY(100%)';void el.offsetWidth;el.style.transition='transform 320ms cubic-bezier(.22,.61,.36,1)';el.style.transform='translateY(0)';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Bottom sheet — slide up</div>
-            <div style="margin:8px 0 10px;height:48px;background:var(--bg);border-radius:var(--r-2) var(--r-2) 0 0;position:relative;overflow:hidden;box-shadow:0 -2px 8px rgba(0,0,0,0.1)">
-              <div style="display:flex;justify-content:center;padding:6px 0"><div style="width:24px;height:3px;background:var(--fg-faint);border-radius:99px;opacity:0.4"></div></div>
-              <div style="padding:0 12px;font-size:11px;color:var(--fg);font-weight:600">Session details</div>
+            <div style="margin:8px 0 10px;height:48px;position:relative;overflow:hidden">
+              <div class="sheet" style="position:absolute;bottom:0;left:0;right:0;border-radius:var(--r-2) var(--r-2) 0 0;padding:var(--sp-2) var(--sp-3)">
+                <div class="sheet__handle" style="margin-bottom:var(--sp-1)"><div class="sheet__handle-bar"></div></div>
+                <div style="font-size:11px;color:var(--fg);font-weight:600">Session details</div>
+              </div>
             </div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">translateY(100%) → 0</div>
             <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Scrim fades in simultaneously.</div>
@@ -642,8 +644,11 @@ P.motion = {
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=border-radius]');el.style.transition='none';el.style.transform='scale(0.95)';el.style.opacity='0';void el.offsetWidth;el.style.transition='all 200ms cubic-bezier(.22,.61,.36,1)';el.style.transform='scale(1)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Modal / dialog — scale up</div>
-            <div style="margin:8px 0 10px;height:48px;background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);display:flex;align-items:center;justify-content:center">
-              <span style="font-size:11px;color:var(--fg)">Are you sure?</span>
+            <div style="margin:8px 0 10px">
+              <div class="dialog" style="padding:var(--sp-3) var(--sp-4);max-width:200px">
+                <div class="dialog__title" style="font-size:12px">Are you sure?</div>
+                <div class="dialog__body" style="font-size:10px;margin-top:2px">This can't be undone.</div>
+              </div>
             </div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">scale(0.95) → 1, opacity 0 → 1</div>
             <div style="font-size:12px;color:var(--fg-faint)">200ms ease. Centered on screen.</div>
@@ -659,8 +664,10 @@ P.motion = {
           </div>
           <div class="cell">
             <div class="cell__label">Drilldown panel — slide in</div>
-            <div style="margin:8px 0 10px;height:48px;background:var(--bg-overlay);border-radius:var(--r-2);border-inline-start:3px solid var(--accent);display:flex;align-items:center;padding:0 12px">
-              <span style="font-size:11px;color:var(--fg)">Topic detail →</span>
+            <div style="margin:8px 0 10px">
+              <div class="card" style="padding:var(--sp-3) var(--sp-4);border-inline-start:3px solid var(--accent)">
+                <div style="font-size:11px;color:var(--fg);font-weight:500">Topic detail →</div>
+              </div>
             </div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">translateX(100%) → 0</div>
             <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Overlay fades in behind.</div>
@@ -728,10 +735,10 @@ P.motion = {
           </div>
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var el=document.getElementById('motionBar');el.style.transition='none';el.style.width='0%';void el.offsetWidth;el.style.transition='width 600ms cubic-bezier(.22,.61,.36,1)';el.style.width='76%';})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Progress bar fill</div>
-            <div style="margin:8px 0 10px;height:6px;border-radius:3px;background:var(--bg-sunken);overflow:hidden"><div id="motionBar" style="height:100%;width:76%;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);background-size:300px 100%;transition:width 600ms cubic-bezier(.22,.61,.36,1)"></div></div>
+            <div class="cell__label">Linear progress fill</div>
+            <div style="margin:8px 0 10px"><div class="progress"><div class="progress__fill" id="motionBar" style="width:76%;transition:width 600ms cubic-bezier(.22,.61,.36,1)"></div></div></div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → target%, 600ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Gradient bar grows from left.</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Used in exam roundup topic rows.</div>
           </div>
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s){s.style.transition='none';s.style.transform='scaleX(0)';});void document.getElementById('motionSessionBar').offsetWidth;document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s,i){setTimeout(function(){s.style.transition='transform 200ms cubic-bezier(.22,.61,.36,1)';s.style.transform='scaleX(1)';},i*80);});})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
@@ -749,21 +756,31 @@ P.motion = {
             <div class="mono" style="font-size:11px;margin-bottom:4px">scaleX(0) → 1, 200ms ease, staggered</div>
             <div style="font-size:12px;color:var(--fg-faint)">Each segment grows from left. 80ms stagger.</div>
           </div>
-          <div class="cell">
-            <div class="cell__label">Chart line draw</div>
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var dots=document.querySelectorAll('#motionSteps .steps__dot, #motionSteps .steps__line');dots.forEach(function(d){d.style.transition='none';d.style.opacity='0';});void document.getElementById('motionSteps').offsetWidth;dots.forEach(function(d,i){setTimeout(function(){d.style.transition='opacity 200ms ease';d.style.opacity='1';},i*100);});})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
+            <div class="cell__label">Route steps entrance</div>
             <div style="margin:8px 0 10px">
-              <svg width="100%" height="40" viewBox="0 0 200 40"><path d="M10,35 C40,30 60,10 100,15 C140,20 160,8 190,5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="10" cy="35" r="3" fill="var(--accent)"/><circle cx="100" cy="15" r="3" fill="var(--accent)"/><circle cx="190" cy="5" r="3" fill="var(--accent)"/></svg>
+              <div class="steps" id="motionSteps">
+                <div class="steps__dot is-done"></div>
+                <div class="steps__line is-done"></div>
+                <div class="steps__dot is-done"></div>
+                <div class="steps__line is-done"></div>
+                <div class="steps__dot is-now"></div>
+                <div class="steps__line"></div>
+                <div class="steps__dot"></div>
+              </div>
             </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">stroke-dashoffset, 800ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">SVG line draws left to right. Points appear after.</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity 0 → 1, 200ms ease, 100ms stagger</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Each dot and line fades in sequentially.</div>
           </div>
         </div>
       </div>
 
       <div class="sect"><div class="sect__title">Celebrations</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Reserved for mastery moments. These are the only animations that should feel dramatic — the student earned it. <button class="btn btn--ghost btn--sm" style="margin-left:8px" onclick="(function(){var tile=document.getElementById('motionTile');var star=document.getElementById('motionStar');tile.style.opacity='1';tile.style.transform='scale(1)';tile.style.transition='none';star.style.opacity='0';star.style.transform='scale(1.8)';star.style.transition='none';void tile.offsetWidth;tile.style.transition='transform 0.2s ease';tile.style.transform='scale(1.08)';setTimeout(function(){tile.style.transform='scale(1)';},200);var colors=['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];for(var c=0;c<15;c++){(function(){var dot=document.createElement('div');var sz=2+Math.random()*3;dot.style.cssText='position:absolute;width:'+sz+'px;height:'+sz+'px;border-radius:'+(Math.random()>0.5?'50%':'1px')+';background:'+colors[Math.floor(Math.random()*colors.length)]+';left:'+(5+Math.random()*90)+'%;top:-3px;z-index:5;pointer-events:none;opacity:1';tile.appendChild(dot);var dur=400+Math.random()*300;setTimeout(function(){dot.style.transition='transform '+dur+'ms ease-in, opacity '+(dur*0.4)+'ms ease '+(dur*0.6)+'ms';dot.style.transform='translateY(80px) rotate('+Math.floor(Math.random()*360)+'deg)';dot.style.opacity='0';},Math.random()*300);setTimeout(function(){dot.remove();},dur+400);})();}setTimeout(function(){star.style.transition='all 300ms cubic-bezier(.34,1.56,.64,1)';star.style.opacity='1';star.style.transform='scale(1)';},500);setTimeout(function(){tile.style.transition='opacity 0.8s ease';tile.style.opacity='0.4';},1200);})()">Replay</button></p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Reserved for mastery moments. These are the only animations that should feel dramatic — the student earned it.</p>
         <div class="grid grid--2">
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var tile=document.getElementById('motionTile');var star=document.getElementById('motionStar');tile.style.opacity='1';tile.style.transform='scale(1)';tile.style.transition='none';star.style.opacity='0';star.style.transition='none';void tile.offsetWidth;tile.style.transition='transform 0.2s ease';tile.style.transform='scale(1.08)';setTimeout(function(){tile.style.transform='scale(1)';},200);var colors=['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];for(var c=0;c<15;c++){(function(){var dot=document.createElement('div');var sz=2+Math.random()*3;dot.style.cssText='position:absolute;width:'+sz+'px;height:'+sz+'px;border-radius:'+(Math.random()>0.5?'50%':'1px')+';background:'+colors[Math.floor(Math.random()*colors.length)]+';left:'+(5+Math.random()*90)+'%;top:-3px;z-index:5;pointer-events:none;opacity:1';tile.appendChild(dot);var dur=400+Math.random()*300;setTimeout(function(){dot.style.transition='transform '+dur+'ms ease-in, opacity '+(dur*0.4)+'ms ease '+(dur*0.6)+'ms';dot.style.transform='translateY(60px) rotate('+Math.floor(Math.random()*360)+'deg)';dot.style.opacity='0';},Math.random()*300);setTimeout(function(){dot.remove();},dur+400);})();}setTimeout(function(){star.style.transition='all 300ms cubic-bezier(.34,1.56,.64,1)';star.style.opacity='1';},500);setTimeout(function(){tile.style.transition='opacity 0.8s ease';tile.style.opacity='0.4';},1200);})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Mastery confetti</div>
             <div style="margin:8px 0 10px;display:flex;gap:8px;align-items:center">
               <div style="width:48px;height:48px;border-radius:6px;position:relative;overflow:hidden;flex:none" id="motionTile">
