@@ -623,10 +623,25 @@ function wireRangeTabs() {
     var range = btn.dataset.range;
     var d = range === 'week' ? generateThisWeek(t) : generateSemester(t);
     renderChart(d.values, d.labels, window._currentMastered, window._currentMasteryThreshold || 80);
-    // Update diff period label
-    var period = range === 'week' ? 'this week' : 'this semester';
-    var diffEl = document.querySelector('#drillBadge [data-period]');
-    if (diffEl) diffEl.textContent = period;
+    // Update diff value and period label
+    var diff, period;
+    if (range === 'week') {
+      diff = (t.score !== null && t.weekStart !== null) ? t.score - t.weekStart : 0;
+      period = 'this week';
+    } else {
+      diff = (t.score !== null && t.semStart !== null) ? t.score - t.semStart : 0;
+      period = 'this semester';
+    }
+    var diffDisplay = Math.round(Math.abs(diff));
+    var diffStr = '';
+    if (diff > 0) diffStr = '<span style="color:#27BD86;font-weight:600">+' + diffDisplay + '</span> <span data-period>' + period + '</span>';
+    else if (diff < 0) diffStr = '<span style="color:#F03D3D;font-weight:600">-' + diffDisplay + '</span> <span data-period>' + period + '</span>';
+    else diffStr = '<span style="color:var(--fg-muted)">No change <span data-period>' + period + '</span></span>';
+    var badge = document.getElementById('drillBadge');
+    var scoreSpan = badge.querySelector('span:first-child');
+    if (scoreSpan) {
+      scoreSpan.nextElementSibling.innerHTML = diffStr;
+    }
   });
 }
 wireRangeTabs();
