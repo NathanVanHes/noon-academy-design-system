@@ -811,7 +811,7 @@ P.waypoints = {
     }
 
     const statusColor = pos===n-1?'color:#64D8AE':'color:var(--fg-faint)';
-    return `<div style="width:100%;max-width:520px">${h}<div style="display:flex;justify-content:space-between;margin-top:var(--sp-3)"><span class="mono" style="font-size:10px;color:var(--fg-faint)">Waypoint ${pos+1} of ${n}</span><span class="mono" style="font-size:10px;${statusColor}">${pos===n-1?'Arrived':pos===0?'Starting':'In progress'}</span></div></div>`;
+    return `<div style="width:100%;max-width:520px">${h}<div style="display:flex;justify-content:space-between;margin-top:var(--sp-3)"><span class="mono" style="font-size:10px;color:var(--fg-faint)">${pos+1} of ${n}</span><span class="mono" style="font-size:10px;${statusColor}">${pos===n-1?'Arrived':pos===0?'Starting':'In progress'}</span></div></div>`;
   },
   renderCode(k) {
     return `<!-- Waypoint route with ${k.count} stops, position ${Number(k.position)+1} -->\n<svg viewBox="0 0 500 60">\n  <!-- Dashed remaining -->\n  <line stroke="#c9a227" stroke-dasharray="4 3" opacity="0.4"/>\n  <!-- Solid completed -->\n  <line stroke="#c9a227" stroke-width="2" opacity="0.85"/>\n  <!-- Markers: passed/current/incomplete/arrival -->\n</svg>`;
@@ -1099,60 +1099,91 @@ P.watervessel = {
 
 // ──────── CONTOUR LINES ────────
 P.contours = {
-  title: 'Terrain Patterns', desc: 'The Empty Quarter geometry - parallel dune ridges, mathematical wind patterns. Used as brand texture on section backgrounds and the atlas.',
+  title: 'Terrain Patterns', desc: 'Flowing topographic contour lines — organic curves that bunch and spread like real terrain elevation. Used as brand texture on backgrounds and the atlas.',
   render() {
+    // Seeded pseudo-random for consistent output
+    function seeded(s){return function(){s=Math.sin(s)*10000;return s-Math.floor(s)};}
+    // Generate a flowing contour line with multiple control points
+    function contourLine(baseY, w, h, seed, amplitude) {
+      var rng = seeded(seed);
+      var pts = 12;
+      var step = w / (pts - 1);
+      var coords = [];
+      for (var i = 0; i < pts; i++) {
+        var x = i * step;
+        var noise = (rng() - 0.5) * amplitude;
+        // Layer multiple frequencies for organic feel
+        var slow = Math.sin(i * 0.4 + seed * 0.3) * amplitude * 0.6;
+        var med = Math.sin(i * 0.9 + seed * 1.7) * amplitude * 0.3;
+        var y = baseY + slow + med + noise * 0.4;
+        coords.push([Math.round(x), Math.round(y * 10) / 10]);
+      }
+      // Build smooth cubic bezier path
+      var d = 'M' + coords[0][0] + ',' + coords[0][1];
+      for (var i = 1; i < coords.length; i++) {
+        var prev = coords[i-1];
+        var cur = coords[i];
+        var cpx = (prev[0] + cur[0]) / 2;
+        d += ' C' + cpx + ',' + prev[1] + ' ' + cpx + ',' + cur[1] + ' ' + cur[0] + ',' + cur[1];
+      }
+      return d;
+    }
+
+    function renderTerrain(w, h, color, baseOpacity, opacityRange, maxGap) {
+      var gaps = [8,10,6,5,4,3,3,4,5,7,12,18,28,22,14,9,6,4,3,3,4,5,8,11,16,24,18,12,8,5,4,3,4,6,10];
+      var lines = []; var y = -10;
+      for (var i = 0; i < gaps.length && y < h + 10; i++) {
+        var nextGap = gaps[Math.min(i + 1, gaps.length - 1)];
+        var a = baseOpacity + (nextGap / maxGap) * opacityRange;
+        var amp = 8 + nextGap * 0.8;
+        var path = contourLine(y, w, h, i * 7.3 + 42, amp);
+        lines.push('<path d="' + path + '" stroke="' + color.replace('ALPHA', a.toFixed(3)) + '" stroke-width="1" fill="none"/>');
+        y += gaps[i];
+      }
+      return lines.join('\n');
+    }
+
     return `<div class="sects">
-      <div class="sect"><div class="sect__title">Dune Ridges</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Parallel lines with a gentle wave - the Empty Quarter seen from above. Sharp, mathematical, repeating. Knife-edge precision, not organic topography.</p>
+      <div class="sect"><div class="sect__title">Contour Lines</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Flowing topographic lines that bunch together at elevation changes and spread apart on flat ground. Organic curves, not rigid geometry.</p>
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On void - chalk ridges</div>
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On void</div>
             <div style="width:100%;aspect-ratio:1;position:relative;background:var(--void-300)">
-              <svg viewBox="0 0 400 400" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${(function(){
-                  // Define gaps between lines — varied to show elevation
-                  var gaps = [10,12,8,6,5,5,4,4,5,6,8,14,22,30,24,16,10,8,6,5,5,6,8,12];
-                  var lines=[]; var y=10;
-                  for(var i=0;i<gaps.length;i++){
-                    var nextGap = gaps[Math.min(i+1,gaps.length-1)];
-                    var a = 0.03 + (nextGap/30)*0.15;
-                    var wave = 2+Math.sin(i*0.6)*1.5;
-                    lines.push('<path d="M0,'+y+' Q100,'+(y-wave)+' 200,'+(y+wave)+' T400,'+y+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1"/>');
-                    y+=gaps[i];
-                  }
-                  return lines.join('\n                ');
-                })()}
+              <svg viewBox="0 0 400 400" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
+                ${renderTerrain(400, 400, 'rgba(232,228,220,ALPHA)', 0.04, 0.18, 28)}
               </svg>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On paper - ink ridges</div>
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On paper</div>
             <div style="width:100%;aspect-ratio:1;position:relative;background:var(--paper-200)">
-              <svg viewBox="0 0 400 400" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${(function(){
-                  var gaps = [10,12,8,6,5,5,4,4,5,6,8,14,22,30,24,16,10,8,6,5,5,6,8,12];
-                  var lines=[]; var y=10;
-                  for(var i=0;i<gaps.length;i++){
-                    var nextGap = gaps[Math.min(i+1,gaps.length-1)];
-                    var a = 0.05 + (nextGap/30)*0.2;
-                    var wave = 2+Math.sin(i*0.6)*1.5;
-                    lines.push('<path d="M0,'+y+' Q100,'+(y-wave)+' 200,'+(y+wave)+' T400,'+y+'" stroke="rgba(10,15,26,'+a.toFixed(3)+')" stroke-width="1"/>');
-                    y+=gaps[i];
-                  }
-                  return lines.join('\n                ');
-                })()}
+              <svg viewBox="0 0 400 400" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
+                ${renderTerrain(400, 400, 'rgba(10,15,26,ALPHA)', 0.06, 0.22, 28)}
               </svg>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="sect"><div class="sect__title">Dramatic - Dense Ridges</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">When terrain needs presence - hero backgrounds, atlas headers. Tighter spacing, higher contrast, more lines.</p>
+      <div class="sect"><div class="sect__title">Dense — Hero Backgrounds</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Tighter spacing for atlas headers and hero sections. More lines, higher contrast.</p>
         <div class="cell" style="padding:0;overflow:hidden">
-          <div style="height:260px;position:relative;background:var(--void-300)">
-            <svg viewBox="0 0 600 260" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${(function(){var gaps=[6,6,5,4,4,3,3,3,4,5,7,10,14,18,14,10,7,5,4,3,3,3,4,4,5,6,6,6];var lines=[];var y=5;for(var i=0;i<gaps.length;i++){var ng=gaps[Math.min(i+1,gaps.length-1)];var a=0.03+(ng/18)*0.12;var w=1.5+Math.sin(i*0.7)*1;lines.push('<path d="M0,'+y+' Q150,'+(y-w)+' 300,'+(y+w)+' T600,'+y+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1"/>');y+=gaps[i];}return lines.join('\n              ');})()}
+          <div style="height:280px;position:relative;background:var(--void-300)">
+            <svg viewBox="0 0 600 280" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
+              ${(function(){
+                var gaps=[5,5,4,3,3,3,3,4,5,7,10,14,10,7,5,3,3,3,4,5,7,12,18,12,7,5,3,3,3,4,5,6];
+                var lines=[];var y=-5;
+                for(var i=0;i<gaps.length&&y<290;i++){
+                  var ng=gaps[Math.min(i+1,gaps.length-1)];
+                  var a=0.05+(ng/18)*0.15;
+                  var amp=6+ng*0.7;
+                  var path=contourLine(y,600,280,i*5.1+17,amp);
+                  lines.push('<path d="'+path+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1" fill="none"/>');
+                  y+=gaps[i];
+                }
+                return lines.join('\n');
+              })()}
             </svg>
           </div>
         </div>
@@ -1162,9 +1193,9 @@ P.contours = {
         <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">The golden route follows the terrain elevation - rising through difficult passages, descending into mastered ground. It's not a straight line. The journey has topography.</p>
         <div class="cell" style="padding:0;overflow:hidden">
           <div style="height:280px;position:relative;background:var(--void-300)">
-            <!-- Ridges layer: stretched to fill -->
-            <svg viewBox="0 0 600 280" fill="none" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${(function(){var gaps=[12,10,8,6,5,4,4,5,7,10,14,18,14,10,7,5,4,5,8,12];var lines=[];var y=10;for(var i=0;i<gaps.length;i++){var ng=gaps[Math.min(i+1,gaps.length-1)];var a=0.04+(ng/18)*0.1;var w=2+Math.sin(i*0.5)*1.5;lines.push('<path d="M0,'+y+' Q150,'+(y-w)+' 300,'+(y+w)+' T600,'+y+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1"/>');y+=gaps[i];}return lines.join('\n              ');})()}
+            <!-- Contour lines layer -->
+            <svg viewBox="0 0 600 280" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
+              ${(function(){var gaps=[10,8,6,5,4,4,5,7,12,18,14,10,7,5,4,5,8,12,8,5];var lines=[];var y=5;for(var i=0;i<gaps.length&&y<285;i++){var ng=gaps[Math.min(i+1,gaps.length-1)];var a=0.04+(ng/18)*0.12;var amp=6+ng*0.6;var path=contourLine(y,600,280,i*6.2+33,amp);lines.push('<path d="'+path+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1" fill="none"/>');y+=gaps[i];}return lines.join('\n');})()}
             </svg>
             <!-- Route layer: aspect ratio preserved -->
             <svg viewBox="0 0 600 280" fill="none" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%">
@@ -1209,28 +1240,30 @@ P.contours = {
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Wide gap to next line → dark line.</b> Represents a ridge or peak. The line is prominent because it's isolated — the eye reads it as elevation.</div></div>
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Narrow gap to next line → light line.</b> Represents a slope or valley. Lines cluster together and fade, like contours on steep terrain.</div></div>
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Opacity formula:</b> <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">opacity = base + (nextGap / maxGap) × range</code></div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Wave:</b> Gentle Q-curve wobble (2-4px amplitude). Mathematical, not organic. Like wind-formed dune ridges.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Curves:</b> Organic flowing lines with multi-frequency noise (slow + medium + random). 12 control points per line, cubic bezier smoothing.</div></div>
         </div>
-        <div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre><span class="c">/* Define variable gaps — these shape the terrain */</span>
-gaps = [10, 12, 8, 6, 5, 5, 4, 4, 5, 6, 8, 14, 22, 30, 24, 16, 10, 8, 6, 5]
+        <div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre><span class="c">/* Variable gaps define terrain elevation */</span>
+gaps = [8, 10, 6, 5, 4, 3, 3, 4, 5, 7, 12, 18, 28, ...]
 
-<span class="c">/* For each line, look ahead to the next gap */</span>
+<span class="c">/* Each line: organic curve with noise */</span>
 for each line i:
   nextGap = gaps[i + 1]
-  opacity = 0.03 + (nextGap / 30) × 0.15  <span class="c">// void theme</span>
-  opacity = 0.05 + (nextGap / 30) × 0.20  <span class="c">// paper theme</span>
+  opacity = base + (nextGap / maxGap) × range
+  amplitude = 8 + nextGap × 0.8  <span class="c">// wider gaps → bigger curves</span>
+  path = cubicBezier(12 control points, multi-frequency noise)
 
 <span class="c">/* Key parameters */</span>
 Stroke width:   1px
-Wave amplitude: 1.5 - 3px
-Gap range:      3px (tight cluster) to 30px (wide ridge)
-Opacity range:  0.03 - 0.18 (void) / 0.05 - 0.25 (paper)
+Control points: 12 per line (cubic bezier)
+Amplitude:      8 - 30px (driven by gap size)
+Gap range:      3px (tight cluster) to 28px (wide ridge)
+Opacity range:  0.04 - 0.22 (void) / 0.06 - 0.28 (paper)
 Color:          chalk on void, ink on paper</pre></div>
       </div>
 
       <div class="sect"><div class="sect__title">Rules</div>
         <div class="grid grid--2">
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Lines are parallel with gentle wave - like wind-formed dune ridges, not topographic contours</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Lines flow organically with multi-frequency curves — like real topographic contours, not rigid geometry</div></div>
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Edges fade out, center is strongest. Creates depth without a hard boundary</div></div>
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">0.75px stroke max. Thinner than component icon strokes - these are texture, not UI</div></div>
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Single color - chalk on void, ink on paper. Gold only for the route line itself</div></div>
@@ -1524,7 +1557,6 @@ P.voicetutor = {
     </div>`
 };
 
-// ──────── DATA VISUALIZATION ────────
 P.dataviz = {
   title: 'Data Visualization', desc: 'How charts, heatmaps, and quantitative displays should look. The atlas is topography, not a dashboard.',
   render() {
@@ -4580,7 +4612,6 @@ const NAV = [
     { id:'watervessel', label:'Water Vessel' },
     { id:'contours', label:'Terrain Patterns' },
     { id:'voicetutor', label:'Voice Tutor' },
-    { id:'dataviz', label:'Data Visualization' },
   ]},
   { group: 'Actions', items: [
     { id:'buttons', label:'Buttons' },
