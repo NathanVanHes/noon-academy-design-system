@@ -724,7 +724,7 @@ P.motion = {
       </div>
 
       <div class="sect"><div class="sect__title">Data &amp; Progress</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes — scores, fill bars, charts. These are slower and more deliberate. <button class="btn btn--ghost btn--sm" style="margin-left:8px" onclick="(function(){document.getElementById('motionCounter').textContent='0';document.getElementById('motionBar').style.width='0%';document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s){s.style.transform='scaleX(0)';});setTimeout(function(){var el=document.getElementById('motionCounter');var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);document.getElementById('motionBar').style.width='76%';document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s,i){setTimeout(function(){s.style.transform='scaleX(1)';},i*80);});},200);})()">Replay all</button></p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes — scores, fill bars, charts. These are slower and more deliberate. <button class="btn btn--ghost btn--sm" style="margin-left:8px" onclick="(function(){document.getElementById('motionCounter').textContent='0';var w=document.getElementById('motionSessionWrap');w.style.transition='none';w.style.width='0%';var c=document.getElementById('motionCircle');var circ=2*Math.PI*18;c.style.transition='none';c.style.strokeDashoffset=circ;void w.offsetWidth;setTimeout(function(){var el=document.getElementById('motionCounter');var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);w.style.transition='width 800ms cubic-bezier(.22,.61,.36,1)';w.style.width='100%';c.style.transition='stroke-dashoffset 800ms cubic-bezier(.22,.61,.36,1)';c.style.strokeDashoffset=circ*0.24;},200);})()">Replay all</button></p>
         <div class="grid grid--2">
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var el=document.getElementById('motionCounter');el.textContent='0';setTimeout(function(){var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);},100);})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
@@ -734,27 +734,29 @@ P.motion = {
             <div style="font-size:12px;color:var(--fg-faint)">Decelerates near the end. Staggered per tile (30ms).</div>
           </div>
           <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var el=document.getElementById('motionBar');el.style.transition='none';el.style.width='0%';void el.offsetWidth;el.style.transition='width 600ms cubic-bezier(.22,.61,.36,1)';el.style.width='76%';})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Linear progress fill</div>
-            <div style="margin:8px 0 10px"><div class="progress"><div class="progress__fill" id="motionBar" style="width:76%;transition:width 600ms cubic-bezier(.22,.61,.36,1)"></div></div></div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → target%, 600ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Used in exam roundup topic rows.</div>
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var c=document.getElementById('motionCircle');var circ=2*Math.PI*18;c.style.transition='none';c.style.strokeDashoffset=circ;void c.offsetWidth;c.style.transition='stroke-dashoffset 800ms cubic-bezier(.22,.61,.36,1)';c.style.strokeDashoffset=circ*0.24;})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
+            <div class="cell__label">Circular progress</div>
+            <div style="margin:8px 0 10px">
+              <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--border)" stroke-width="3"/><circle id="motionCircle" cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${2*Math.PI*18}" stroke-dashoffset="${2*Math.PI*18*0.24}" transform="rotate(-90 22 22)" style="transition:stroke-dashoffset 800ms cubic-bezier(.22,.61,.36,1)"/></svg>
+            </div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">stroke-dashoffset, 800ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Ring fills clockwise from top.</div>
           </div>
           <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s){s.style.transition='none';s.style.transform='scaleX(0)';});void document.getElementById('motionSessionBar').offsetWidth;document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s,i){setTimeout(function(){s.style.transition='transform 200ms cubic-bezier(.22,.61,.36,1)';s.style.transform='scaleX(1)';},i*80);});})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Session bar segments</div>
-            <div style="margin:8px 0 10px">
-              <div class="session-bar" id="motionSessionBar">
-                <div class="session-bar__seg is-correct" style="transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
-                <div class="session-bar__seg is-correct" style="transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
-                <div class="session-bar__seg is-incorrect" style="transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
-                <div class="session-bar__seg is-correct" style="transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
-                <div class="session-bar__seg" style="transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
-                <div class="session-bar__seg" style="transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var w=document.getElementById('motionSessionWrap');w.style.transition='none';w.style.width='0%';void w.offsetWidth;w.style.transition='width 800ms cubic-bezier(.22,.61,.36,1)';w.style.width='100%';})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
+            <div class="cell__label">Session bar unfurl</div>
+            <div style="margin:8px 0 10px;overflow:hidden;width:100%;transition:width 800ms cubic-bezier(.22,.61,.36,1)" id="motionSessionWrap">
+              <div class="session-bar" id="motionSessionBar" style="min-width:200px">
+                <div class="session-bar__seg is-correct"></div>
+                <div class="session-bar__seg is-correct"></div>
+                <div class="session-bar__seg is-incorrect"></div>
+                <div class="session-bar__seg is-correct"></div>
+                <div class="session-bar__seg"></div>
+                <div class="session-bar__seg"></div>
               </div>
             </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scaleX(0) → 1, 200ms ease, staggered</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Each segment grows from left. 80ms stagger.</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → 100%, 800ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Bar unfurls left to right as one unit.</div>
           </div>
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var dots=document.querySelectorAll('#motionSteps .steps__dot, #motionSteps .steps__line');dots.forEach(function(d){d.style.transition='none';d.style.opacity='0';});void document.getElementById('motionSteps').offsetWidth;dots.forEach(function(d,i){setTimeout(function(){d.style.transition='opacity 200ms ease';d.style.opacity='1';},i*100);});})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
