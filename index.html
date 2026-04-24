@@ -3009,104 +3009,112 @@ P.menu = {
 
 // ──────── EMPTY STATE ────────
 P.interstitial = {
-  title: 'Interstitial', desc: 'Full-screen mastery celebration. Shown after a topic is mastered. Confetti, green star, personality.',
+  title: 'Interstitial', desc: 'Full-screen mastery celebration. Image, title, description, button. Confetti rains over everything.',
   tokens() {
-    return ['--bg','--fg','--fg-subtle','--accent','--accent-soft','--font-serif','--font-sans','--font-mono','--fs-13','--fs-15','--fs-24','--fs-32','--fw-500','--fw-600','--sp-3','--sp-4','--sp-6','--sp-10','--lh-normal','--r-2'];
+    return ['--bg','--fg','--fg-subtle','--accent','--accent-soft','--font-serif','--font-sans','--fs-15','--fs-32','--fw-500','--sp-3','--sp-6','--sp-8','--sp-10','--lh-normal'];
   },
-  knobs: {
-    topic: { type:'text', default:'Quantitative Reasoning', label:'Topic name' },
-  },
-  renderCanvas(k) {
-    return `<div style="width:100%;max-width:375px;height:667px;background:var(--bg);border-radius:24px;box-shadow:0 0 0 4px var(--border),0 20px 40px -10px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--sp-10) var(--sp-6);position:relative;overflow:hidden" data-interstitial>
-      <!-- Confetti container -->
-      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden" data-confetti></div>
+  render() {
+    return `<div style="display:flex;justify-content:center;padding:var(--sp-8)">
+      <div style="width:375px;height:667px;background:var(--bg);border-radius:24px;box-shadow:0 0 0 4px var(--border),0 20px 40px -10px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;text-align:center;padding:var(--sp-6);position:relative;overflow:hidden" id="interstitialFrame">
+        <!-- Confetti layer -->
+        <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2" id="interstitialConfetti"></div>
 
-      <!-- Close -->
-      <button class="icon-btn icon-btn--ghost" style="position:absolute;top:16px;right:16px;z-index:2">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l10 10M15 5L5 15"/></svg>
-      </button>
+        <!-- Content — pushed to center with flex spacers -->
+        <div style="flex:1"></div>
 
-      <!-- Star -->
-      <div style="width:96px;height:96px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:var(--sp-6);animation:starPulse 2s ease infinite;position:relative">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--accent)" style="filter:drop-shadow(0 2px 4px rgba(39,189,134,0.3))"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.9L12 17.3l-6.1 3.4 1.4-6.9L2.2 9.1l6.9-.8Z"/></svg>
-      </div>
+        <!-- Image -->
+        <div style="width:120px;height:120px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:var(--sp-6);animation:starPulse 2s ease infinite">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="var(--accent)" style="filter:drop-shadow(0 4px 8px rgba(39,189,134,0.4))"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.9L12 17.3l-6.1 3.4 1.4-6.9L2.2 9.1l6.9-.8Z"/></svg>
+        </div>
 
-      <!-- Copy -->
-      <div style="font-family:var(--font-serif);font-size:var(--fs-32);font-weight:var(--fw-500);color:var(--fg);line-height:1.2;letter-spacing:-0.01em;margin-bottom:var(--sp-3)">You mastered it!</div>
-      <div style="font-family:var(--font-sans);font-size:var(--fs-15);color:var(--fg-subtle);line-height:var(--lh-normal);max-width:280px;margin-bottom:var(--sp-4)">${esc(k.topic)} is locked in. One less thing to worry about before the exam.</div>
-      <div style="font-family:var(--font-mono);font-size:var(--fs-13);color:var(--accent);font-weight:var(--fw-600);margin-bottom:var(--sp-10)">12 of 18 topics mastered</div>
+        <!-- Title -->
+        <div style="font-family:var(--font-serif);font-size:var(--fs-32);font-weight:var(--fw-500);color:var(--fg);line-height:1.2;margin-bottom:var(--sp-3)">You mastered it!</div>
 
-      <!-- CTA -->
-      <div style="width:100%;max-width:280px">
-        <button class="btn btn--primary btn--block">See your progress</button>
+        <!-- Description -->
+        <div style="font-family:var(--font-sans);font-size:var(--fs-15);color:var(--fg-subtle);line-height:var(--lh-normal);max-width:280px">Quantitative Reasoning is locked in. One less thing to worry about before the exam.</div>
+
+        <div style="flex:1"></div>
+
+        <!-- Button pinned to bottom -->
+        <div style="width:100%;padding:0 var(--sp-6) var(--sp-6)">
+          <button class="btn btn--primary btn--block">See your progress</button>
+        </div>
       </div>
     </div>`;
   },
-  afterRender(root) {
-    const container = root.querySelector('[data-confetti]');
+  afterRender() {
+    const container = document.getElementById('interstitialConfetti');
     if (!container) return;
-    const colors = ['var(--accent)','#FFCB45','#D4A017','#64D8AE','#fff','rgba(100,216,174,0.6)'];
-    function spawnConfetti() {
-      for (let i = 0; i < 40; i++) {
+    const colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff','#A8E6CF','#FFD93D','#6BCB77'];
+    function spawnWave(count, delayBase) {
+      for (let i = 0; i < count; i++) {
         const dot = document.createElement('div');
-        const size = 3 + Math.random() * 5;
+        const size = 4 + Math.random() * 8;
         const left = Math.random() * 100;
-        const delay = Math.random() * 1500;
-        const duration = 2000 + Math.random() * 2000;
-        const drift = (Math.random() - 0.5) * 60;
+        const delay = delayBase + Math.random() * 1200;
+        const duration = 2500 + Math.random() * 2500;
+        const drift = (Math.random() - 0.5) * 80;
         const rotation = Math.floor(Math.random() * 720);
         const color = colors[Math.floor(Math.random() * colors.length)];
-        const shape = Math.random() > 0.4 ? '50%' : (Math.random() > 0.5 ? '2px' : '0');
-        dot.style.cssText = `position:absolute;width:${size}px;height:${size * (Math.random() > 0.5 ? 1 : 0.5)}px;border-radius:${shape};background:${color};left:${left}%;top:-10px;opacity:0;pointer-events:none`;
+        const isRect = Math.random() > 0.5;
+        const w = isRect ? size : size;
+        const h = isRect ? size * 0.4 : size;
+        const br = isRect ? '2px' : '50%';
+        dot.style.cssText = `position:absolute;width:${w}px;height:${h}px;border-radius:${br};background:${color};left:${left}%;top:-12px;opacity:0;pointer-events:none;z-index:2`;
         container.appendChild(dot);
         setTimeout(() => {
-          dot.style.transition = `transform ${duration}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${duration * 0.4}ms ease ${duration * 0.6}ms`;
-          dot.style.transform = `translateY(${container.offsetHeight + 20}px) translateX(${drift}px) rotate(${rotation}deg)`;
+          dot.style.transition = `transform ${duration}ms cubic-bezier(0.15,0.6,0.35,1), opacity ${duration * 0.3}ms ease ${duration * 0.7}ms`;
+          dot.style.transform = `translateY(${700}px) translateX(${drift}px) rotate(${rotation}deg)`;
           dot.style.opacity = '1';
         }, delay);
-        setTimeout(() => {
-          dot.style.opacity = '0';
-        }, delay + duration * 0.6);
-        setTimeout(() => { dot.remove(); }, delay + duration + 200);
+        setTimeout(() => { dot.style.opacity = '0'; }, delay + duration * 0.7);
+        setTimeout(() => { dot.remove(); }, delay + duration + 300);
       }
     }
-    spawnConfetti();
+    // Big burst immediately
+    spawnWave(60, 0);
     // Second wave
-    setTimeout(spawnConfetti, 1800);
+    setTimeout(() => spawnWave(40, 0), 2000);
+    // Third wave — lingering
+    setTimeout(() => spawnWave(25, 0), 4000);
   },
-  renderCode(k) {
-    return `<div class="interstitial">
-  <!-- Full-screen mobile overlay -->
-  <button class="icon-btn icon-btn--ghost interstitial__close">×</button>
-  <div class="interstitial__confetti"></div>
-  <div class="interstitial__star">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--accent)">
-      <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.9L12 17.3l-6.1 3.4 1.4-6.9L2.2 9.1l6.9-.8Z"/>
-    </svg>
+  renderCode() {
+    return `<!-- Full-screen mobile interstitial -->
+<div class="interstitial">
+  <div class="interstitial__confetti">
+    <!-- JS-spawned confetti particles -->
+  </div>
+  <div class="interstitial__image">
+    <!-- Star / celebration graphic -->
   </div>
   <div class="interstitial__title">You mastered it!</div>
   <p class="interstitial__body">Topic name is locked in.</p>
-  <div class="interstitial__progress">12 of 18 topics mastered</div>
   <div class="interstitial__actions">
-    <button class="btn btn--primary btn--block">See your progress</button>
+    <button class="btn btn--primary btn--block">CTA</button>
   </div>
 </div>`;
   },
   sections: `
-    <div class="sect"><div class="sect__title">Anatomy</div>
+    <div class="sect"><div class="sect__title">Structure</div>
       <div class="grid grid--2">
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Star:</b> 96px green circle with accent-soft background. Star pulses gently on loop. Communicates achievement without being garish.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Confetti:</b> Two waves of falling particles in accent/gold/white. First burst on mount, second 1.8s later. Varied sizes, shapes, and drift.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Copy:</b> Serif title "You mastered it!" (32px). Sans body with topic name and reassurance. Mono progress count in accent.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Dismiss:</b> Primary CTA goes to progress view. Ghost X button top-right to close without navigating.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Image:</b> Centered graphic — star, badge, or illustration. Pulses gently. This is the hero moment.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Title:</b> Serif, 32px. Short and celebratory. "You mastered it!" — one line.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Description:</b> Sans, 15px, subtle. Names the topic and gives reassurance. Two lines max.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Button:</b> Primary, full-width, pinned to bottom of screen. Single clear action.</div></div>
+      </div>
+    </div>
+    <div class="sect"><div class="sect__title">Confetti</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Three waves:</b> Big burst on mount (60 particles), second wave at 2s (40), third at 4s (25). Rains over everything.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Particles:</b> Mix of circles and rectangles in accent/gold/white. Varied sizes (4-12px), drift, and rotation. Falls with gravity curve.</div></div>
       </div>
     </div>
     <div class="sect"><div class="sect__title">Rules</div>
       <div class="grid grid--2">
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Full screen:</b> Takes the entire mobile viewport. Centered vertically. No scroll.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>When:</b> Immediately after a topic crosses the mastery threshold. One per topic, never repeated.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Tone:</b> Warm and genuine, not gamified. "Locked in" not "Level up!" — the surveyor voice, not the hype coach.</div></div>
-        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Duration:</b> Confetti runs ~4s then stops. Screen persists until user dismisses. No auto-close.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Full screen:</b> Takes the entire mobile viewport. Content centered, button at bottom.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>When:</b> After a topic crosses the mastery threshold. One per topic, never repeated.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Tone:</b> Big song and dance. This is the payoff moment — make the student feel it.</div></div>
+        <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Keep it simple:</b> Image, title, description, button. Nothing else. The confetti does the heavy lifting.</div></div>
       </div>
     </div>`
 };
@@ -4662,6 +4670,11 @@ function navigate(id) {
   if (page.knobs && page.renderCanvas) {
     updatePlayground(page);
     wireKnobs(page);
+  }
+
+  // afterRender for non-playground pages
+  if (page.afterRender && !(page.knobs && page.renderCanvas)) {
+    page.afterRender();
   }
 }
 
