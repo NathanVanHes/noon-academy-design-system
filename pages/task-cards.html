@@ -16,7 +16,6 @@
   --green:#27BD86;
   --red:#F03D3D;
   --blue:#0084FF;
-  --btn:#64D8AE;
   --font-sans:'Inter',system-ui,sans-serif;
   --font-mono:'JetBrains Mono','Inter',monospace;
   --r:8px;
@@ -24,10 +23,10 @@
 body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);min-height:100vh}
 
 .page{max-width:480px;margin:0 auto;padding:32px 24px}
-.section-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px;margin-top:24px}
+.section-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:12px;margin-top:28px}
 .section-label:first-child{margin-top:0}
 
-/* Task card — matches homework style */
+/* Task card */
 .task{background:var(--bg-raised);border-radius:var(--r);margin-bottom:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow 0.15s;opacity:0;transform:translateY(6px);animation:cardIn 0.35s ease forwards}
 .task:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06)}
 @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
@@ -37,7 +36,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .task__title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .task__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px}
 
-/* Right side — checkbox for homework, countdown for exams */
 .task__check{width:28px;height:28px;border-radius:50%;border:2px solid var(--fg-muted);flex:none}
 .task__check.is-done{background:var(--green);border-color:var(--green);display:grid;place-items:center}
 
@@ -45,7 +43,6 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .task__countdown-num{font-family:var(--font-mono);font-size:20px;font-weight:700;line-height:1}
 .task__countdown-unit{font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:0.08em;margin-top:1px}
 
-/* Status pills */
 .task__status{margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .pill{display:inline-flex;align-items:center;gap:3px;font-family:var(--font-mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px}
 .pill--muted{background:rgba(20,20,20,0.04);color:var(--fg-secondary)}
@@ -54,60 +51,56 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .pill--red{background:rgba(240,61,61,0.06);color:var(--red)}
 
 .task__arrow{flex:none;color:var(--fg-muted)}
-
-/* Variant toggle */
-.variant-btn{position:fixed;top:20px;right:20px;z-index:20;background:var(--fg);color:var(--bg);border:0;font:inherit;font-size:10px;font-weight:600;letter-spacing:0.06em;padding:8px 14px;border-radius:var(--r);cursor:pointer;opacity:0.8}
-.variant-btn:hover{opacity:1}
 </style>
 </head>
 <body>
 
-<button class="variant-btn" onclick="document.querySelectorAll('[data-variant]').forEach(function(el){el.style.display=el.style.display==='none'?'':'none'})">Variant states</button>
-
 <div class="page">
-
-  <div class="section-label">Homework</div>
-
-  <!-- Homework — due soon -->
-  <div class="task" style="animation-delay:0ms">
-    <div class="task__body">
-      <div class="task__due" style="color:var(--blue)">Due in 12h</div>
-      <div class="task__title">Passage comprehension</div>
-      <div class="task__sub">Qudrat Reading</div>
-    </div>
-    <div class="task__check"></div>
-  </div>
-
-  <!-- Homework — due later -->
-  <div class="task" style="animation-delay:60ms">
-    <div class="task__body">
-      <div class="task__due" style="color:var(--fg-muted)">Due Thursday</div>
-      <div class="task__title">Algebra practice set</div>
-      <div class="task__sub">Qudrat Math</div>
-    </div>
-    <div class="task__check"></div>
-  </div>
-
-  <!-- Homework — done -->
-  <div class="task" style="animation-delay:120ms;opacity:0.6">
-    <div class="task__body">
-      <div class="task__due" style="color:var(--fg-muted)">Completed</div>
-      <div class="task__title" style="color:var(--fg-muted)">Vocabulary in context</div>
-      <div class="task__sub">Qudrat Reading</div>
-    </div>
-    <div class="task__check is-done"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 8.5l3 3 5-6"/></svg></div>
-  </div>
 
   <div class="section-label">Upcoming exams</div>
 
-  <!-- Exam — preparing -->
-  <div class="task" style="animation-delay:180ms">
+  <!-- TOMORROW — urgent, unresolved -->
+  <div class="task" style="animation-delay:200ms;border-inline-start:3px solid var(--red)">
     <div class="task__body">
-      <div class="task__due" style="color:var(--blue)">Sun 29 Apr · 9:00 AM</div>
+      <div class="task__due" style="color:var(--red)">Tomorrow · 9:00 AM</div>
       <div class="task__title">Qudrat — Quantitative</div>
       <div class="task__status">
-        <span class="pill pill--red">3 unresolved</span>
-        <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 2</span>
+        <span class="pill pill--red">1 unresolved</span>
+        <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 4</span>
+      </div>
+    </div>
+    <div class="task__countdown" style="color:var(--red)">
+      <div class="task__countdown-num">1</div>
+      <div class="task__countdown-unit">day</div>
+    </div>
+    <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+  </div>
+
+  <!-- 3 DAYS — all mastered, mock taken -->
+  <div class="task" style="animation-delay:250ms">
+    <div class="task__body">
+      <div class="task__due" style="color:var(--fg-secondary)">Wednesday · 9:00 AM</div>
+      <div class="task__title">Qudrat — Verbal</div>
+      <div class="task__status">
+        <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
+        <span class="pill pill--muted">Mock: 88%</span>
+      </div>
+    </div>
+    <div class="task__countdown" style="color:var(--green)">
+      <div class="task__countdown-num">3</div>
+      <div class="task__countdown-unit">days</div>
+    </div>
+    <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+  </div>
+
+  <!-- 5 DAYS — preparing, some mastered -->
+  <div class="task" style="animation-delay:300ms">
+    <div class="task__body">
+      <div class="task__due" style="color:var(--fg-secondary)">Friday · 2:00 PM</div>
+      <div class="task__title">GAT — General Aptitude</div>
+      <div class="task__status">
+        <span class="pill pill--red">14 unresolved</span>
+        <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 28</span>
       </div>
     </div>
     <div class="task__countdown" style="color:var(--blue)">
@@ -117,58 +110,37 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
     <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
   </div>
 
-  <!-- Exam — all mastered -->
-  <div class="task" style="animation-delay:240ms">
+  <!-- 2 DAYS — all mastered, mock available but not taken -->
+  <div class="task" style="animation-delay:350ms">
     <div class="task__body">
-      <div class="task__due" style="color:var(--fg-muted)">Tue 1 May · 9:00 AM</div>
-      <div class="task__title">Qudrat — Verbal</div>
+      <div class="task__due" style="color:var(--fg-secondary)">Tuesday · 11:00 AM</div>
+      <div class="task__title">Biology — Final</div>
       <div class="task__status">
         <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
         <span class="pill pill--blue">Mock available</span>
       </div>
     </div>
     <div class="task__countdown" style="color:var(--green)">
-      <div class="task__countdown-num">7</div>
+      <div class="task__countdown-num">2</div>
       <div class="task__countdown-unit">days</div>
     </div>
     <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
   </div>
 
-  <!-- VARIANT: ≤5 days urgent -->
-  <div data-variant style="display:none">
-    <div class="section-label">≤ 5 days — urgent variant</div>
-
-    <div class="task" style="animation-delay:0ms;border-inline-start:3px solid var(--red)">
-      <div class="task__body">
-        <div class="task__due" style="color:var(--red)">Mon 28 Apr · 9:00 AM</div>
-        <div class="task__title">Qudrat — Quantitative</div>
-        <div class="task__status">
-          <span class="pill pill--red">1 unresolved</span>
-          <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 4</span>
-        </div>
+  <!-- TODAY — exam today, all mastered -->
+  <div class="task" style="animation-delay:400ms;border-inline-start:3px solid var(--green)">
+    <div class="task__body">
+      <div class="task__due" style="color:var(--green)">Today · 2:00 PM</div>
+      <div class="task__title">Physics — Midterm</div>
+      <div class="task__status">
+        <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
+        <span class="pill pill--muted">Mock: 92%</span>
       </div>
-      <div class="task__countdown" style="color:var(--red)">
-        <div class="task__countdown-num">2</div>
-        <div class="task__countdown-unit">days</div>
-      </div>
-      <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
     </div>
-
-    <div class="task" style="animation-delay:60ms">
-      <div class="task__body">
-        <div class="task__due" style="color:var(--fg-muted)">Wed 30 Apr · 9:00 AM</div>
-        <div class="task__title">Qudrat — Verbal</div>
-        <div class="task__status">
-          <span class="pill pill--green"><svg width="7" height="7" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
-          <span class="pill pill--muted">Mock: 88%</span>
-        </div>
-      </div>
-      <div class="task__countdown" style="color:var(--green)">
-        <div class="task__countdown-num">4</div>
-        <div class="task__countdown-unit">days</div>
-      </div>
-      <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+    <div class="task__countdown" style="color:var(--green)">
+      <div class="task__countdown-num" style="font-size:14px">Today</div>
     </div>
+    <div class="task__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
   </div>
 
 </div>
