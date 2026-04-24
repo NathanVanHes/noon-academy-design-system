@@ -976,6 +976,36 @@ P.gridpaper = {
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>The rule:</b> Grid is baked into the surface — it's the material, not a decoration. If you wouldn't draw grid lines on graph paper in that context, don't use it.</div></div>
         </div>
       </div>
+
+      <div class="sect"><div class="sect__title">Two Grid Densities</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">There are two distinct grid applications. They look different on purpose — one is a content surface, the other is an alignment aid.</p>
+        <div class="grid grid--2">
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Brand grid — 16px, 4% opacity</div>
+            <div style="width:100%;height:120px;background:${voidGrid16}"></div>
+            <div style="padding:var(--sp-3) var(--sp-5) var(--sp-4);font-size:12px;color:var(--fg-faint)">The graph paper texture. Used on journey screens, in-class slides, atlas views. This is the brand surface.</div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Canvas grid — 24px, 1.5% opacity</div>
+            <div style="width:100%;height:120px;background:
+              linear-gradient(rgba(232,228,220,0.015) 1px,transparent 1px) 0 0/24px 24px,
+              linear-gradient(90deg,rgba(232,228,220,0.015) 1px,transparent 1px) 0 0/24px 24px,
+              var(--void-300)"></div>
+            <div style="padding:var(--sp-3) var(--sp-5) var(--sp-4);font-size:12px;color:var(--fg-faint)">Alignment aid for design tools and component previews. Barely visible. Not a brand surface — just helps with spatial awareness.</div>
+          </div>
+        </div>
+        <div class="codeblock" style="margin-top:var(--sp-4)"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre><span class="c">/* Brand grid — the graph paper surface */</span>
+background:
+  linear-gradient(rgba(232,228,220,0.04) 1px, transparent 1px) 0 0 / 16px 16px,
+  linear-gradient(90deg, rgba(232,228,220,0.04) 1px, transparent 1px) 0 0 / 16px 16px,
+  var(--bg);
+
+<span class="c">/* Canvas grid — alignment aid only */</span>
+background:
+  linear-gradient(rgba(232,228,220,0.015) 1px, transparent 1px) 0 0 / 24px 24px,
+  linear-gradient(90deg, rgba(232,228,220,0.015) 1px, transparent 1px) 0 0 / 24px 24px,
+  var(--bg);</pre></div>
+      </div>
     </div>`;
   }
 };
