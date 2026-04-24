@@ -59,8 +59,9 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .topic__tile.is-mastered{}
 .topic__tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
 .topic__tile.is-mastered .topic__tile-score{display:none}
-.topic__tile-star{position:relative;z-index:2;opacity:0;transform:scale(1.8);transition:all 300ms cubic-bezier(0.34,1.56,0.64,1)}
-.topic__tile-star.is-stamped{opacity:1;transform:scale(1)}
+.topic__tile-star{position:relative;z-index:2;opacity:0}
+.topic__tile-star.is-stamped{opacity:1;animation:stampIn 0.3s ease}
+@keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
 .topic__tile::after{content:'';position:absolute;inset:0;background:var(--bg);opacity:0;transition:opacity 0.8s ease;border-radius:inherit;pointer-events:none}
 .topic__tile.is-faded::after{opacity:0.55}
 
@@ -210,46 +211,44 @@ container.innerHTML = html;
 document.getElementById('masteredCount').textContent = masteredN;
 document.getElementById('remainingCount').textContent = topics.length - masteredN;
 
-// Mastery celebration on tiles: confetti → star stamp → fade
+// Mastery celebration — matches heatmap shimmerMastered exactly
 var colors = ['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];
 setTimeout(function() {
   document.querySelectorAll('.topic__tile.is-mastered').forEach(function(tile, i) {
-    var delay = 400 + i * 300;
-    // Throb
     setTimeout(function() {
+      // Throb
       tile.style.transition = 'transform 0.2s ease';
       tile.style.transform = 'scale(1.08)';
       setTimeout(function() { tile.style.transform = 'scale(1)'; }, 200);
-      // Confetti inside tile
-      for (var c = 0; c < 15; c++) {
+      // Rain confetti down inside tile
+      for (var c = 0; c < 20; c++) {
         (function() {
           var dot = document.createElement('div');
-          var sz = 2 + Math.random() * 3;
+          var size = 2 + Math.random() * 3;
           var left = 5 + Math.random() * 90;
-          var d = Math.random() * 300;
-          var dur = 400 + Math.random() * 300;
-          var rot = Math.floor(Math.random() * 360);
-          var col = colors[Math.floor(Math.random() * colors.length)];
-          dot.style.cssText = 'position:absolute;width:' + sz + 'px;height:' + sz + 'px;border-radius:' + (Math.random() > 0.5 ? '50%' : '1px') + ';background:' + col + ';left:' + left + '%;top:-3px;z-index:5;pointer-events:none;opacity:1';
+          var delay = Math.random() * 400;
+          var duration = 500 + Math.random() * 400;
+          var rotate = Math.floor(Math.random() * 360);
+          var color = colors[Math.floor(Math.random() * colors.length)];
+          var shape = Math.random() > 0.5 ? '50%' : '1px';
+          dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;border-radius:' + shape + ';background:' + color + ';left:' + left + '%;top:-4px;z-index:5;pointer-events:none;opacity:1';
           tile.appendChild(dot);
           setTimeout(function() {
-            dot.style.transition = 'transform ' + dur + 'ms ease-in, opacity ' + (dur * 0.4) + 'ms ease ' + (dur * 0.6) + 'ms';
-            dot.style.transform = 'translateY(' + (tile.offsetHeight + 6) + 'px) rotate(' + rot + 'deg)';
+            dot.style.transition = 'transform ' + duration + 'ms ease-in, opacity ' + (duration * 0.6) + 'ms ease ' + (duration * 0.4) + 'ms';
+            dot.style.transform = 'translateY(' + (tile.offsetHeight + 8) + 'px) rotate(' + rotate + 'deg)';
             dot.style.opacity = '0';
-          }, d);
-          setTimeout(function() { dot.remove(); }, d + dur + 100);
+          }, delay);
+          setTimeout(function() { dot.remove(); }, delay + duration + 100);
         })();
       }
-    }, delay);
-    // Star stamps after confetti starts
-    var star = tile.querySelector('.topic__tile-star');
-    if (star) setTimeout(function() { star.classList.add('is-stamped'); }, delay + 400);
-    // Fade tile background after sequence (star stays bright)
-    setTimeout(function() {
-      tile.classList.add('is-faded');
-    }, delay + 900);
+      // Star stamps in after confetti starts falling
+      var star = tile.querySelector('.topic__tile-star');
+      if (star) setTimeout(function() { star.classList.add('is-stamped'); }, 500);
+      // Fade tile background
+      setTimeout(function() { tile.classList.add('is-faded'); }, 1200);
+    }, i * 250);
   });
-}, 300);
+}, 600);
 </script>
 
 <!-- Mastery info bottom sheet -->
