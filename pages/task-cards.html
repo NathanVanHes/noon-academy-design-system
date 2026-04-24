@@ -33,19 +33,29 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .exam-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06)}
 @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 
-.exam-card__top{padding:16px 20px;display:flex;align-items:center;gap:14px}
-.exam-card__ring{width:48px;height:48px;flex:none;position:relative}
-.exam-card__ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--fg)}
+.exam-card__inner{padding:16px 20px;display:flex;align-items:center;gap:16px}
+.exam-card__countdown{text-align:center;min-width:48px;flex:none}
+.exam-card__days{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--blue);line-height:1}
+.exam-card__unit{font-family:var(--font-mono);font-size:9px;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em}
 .exam-card__body{flex:1;min-width:0}
 .exam-card__title{font-size:14px;font-weight:600;margin:0}
-.exam-card__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px}
-.exam-card__countdown{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px;flex:none}
+.exam-card__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;gap:4px}
 .exam-card__arrow{flex:none;color:var(--fg-muted)}
 
-.exam-card__bottom{padding:0 20px 14px;display:flex;align-items:center;justify-content:space-between}
+/* Bottom stat row */
+.exam-card__stats{padding:0 20px 14px;display:flex;align-items:center;justify-content:space-between}
 .exam-card__stat{font-family:var(--font-mono);font-size:11px;color:var(--fg-secondary);display:flex;align-items:center;gap:4px}
 
-.section-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-muted);margin-bottom:12px;margin-top:8px}
+/* All mastered variant */
+.exam-card--mastered .exam-card__countdown{color:var(--green)}
+.exam-card--mastered .exam-card__days{color:var(--green)}
+.exam-card--mastered .exam-card__unit{color:var(--green)}
+
+/* Has results variant */
+.exam-card__result{padding:0 20px 14px}
+.exam-card__result-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--fg-secondary)}
+.exam-card__result-score{font-family:var(--font-mono);font-size:16px;font-weight:700;min-width:32px}
+.exam-card__result-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;margin-left:auto}
 </style>
 </head>
 <body>
@@ -54,80 +64,71 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
   <div class="page-title">Upcoming exams</div>
 
-  <div class="exam-card" style="animation-delay:0ms" id="exam1"></div>
-  <div class="exam-card" style="animation-delay:80ms" id="exam2"></div>
-  <div class="exam-card" style="animation-delay:160ms" id="exam3"></div>
+  <!-- State 1: Preparing — has unresolved topics -->
+  <div class="exam-card" style="animation-delay:0ms">
+    <div class="exam-card__inner">
+      <div class="exam-card__countdown">
+        <div class="exam-card__days">5</div>
+        <div class="exam-card__unit">days</div>
+      </div>
+      <div class="exam-card__body">
+        <div class="exam-card__title">Qudrat — Quantitative</div>
+        <div class="exam-card__sub">Sunday 29 April · 9:00 AM</div>
+      </div>
+      <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+    </div>
+    <div class="exam-card__stats">
+      <div class="exam-card__stat" style="color:var(--fg);font-weight:600">3 unresolved</div>
+      <div class="exam-card__stat"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 2 mastered</div>
+    </div>
+  </div>
+
+  <!-- State 2: All mastered — ready for mock -->
+  <div class="exam-card exam-card--mastered" style="animation-delay:80ms">
+    <div class="exam-card__inner">
+      <div class="exam-card__countdown">
+        <div class="exam-card__days">7</div>
+        <div class="exam-card__unit">days</div>
+      </div>
+      <div class="exam-card__body">
+        <div class="exam-card__title">Qudrat — Verbal</div>
+        <div class="exam-card__sub">Tuesday 1 May · 9:00 AM</div>
+      </div>
+      <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+    </div>
+    <div class="exam-card__stats">
+      <div class="exam-card__stat" style="color:var(--green);font-weight:600"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--green)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All 3 mastered</div>
+      <div class="exam-card__stat" style="color:var(--blue);font-weight:500">Mock available</div>
+    </div>
+  </div>
+
+  <!-- State 3: Has mock results -->
+  <div class="exam-card" style="animation-delay:160ms">
+    <div class="exam-card__inner">
+      <div class="exam-card__countdown">
+        <div class="exam-card__days">21</div>
+        <div class="exam-card__unit">days</div>
+      </div>
+      <div class="exam-card__body">
+        <div class="exam-card__title">GAT — General Aptitude</div>
+        <div class="exam-card__sub">Thursday 15 May · 2:00 PM</div>
+      </div>
+      <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+    </div>
+    <div class="exam-card__result">
+      <div class="exam-card__result-row">
+        <span style="color:var(--fg-muted)">Last mock:</span>
+        <span class="exam-card__result-score" style="color:var(--green)">88</span>
+        <span>5/5 correct · 42 min</span>
+        <span class="exam-card__result-badge" style="background:rgba(39,189,134,0.08);color:var(--green)">Best</span>
+      </div>
+    </div>
+    <div class="exam-card__stats">
+      <div class="exam-card__stat"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 28 of 42 mastered</div>
+      <div class="exam-card__stat" style="color:var(--fg);font-weight:600">14 unresolved</div>
+    </div>
+  </div>
 
 </div>
-
-<script>
-var starIcon = '<svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
-
-function progressRing(mastered, total, size) {
-  var pct = total > 0 ? mastered / total : 0;
-  var r = (size - 6) / 2;
-  var circ = 2 * Math.PI * r;
-  var offset = circ * (1 - pct);
-  var color = pct >= 1 ? '#27BD86' : pct > 0.5 ? '#27BD86' : pct > 0.25 ? '#FFCB45' : '#F03D3D';
-  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
-    '<circle cx="' + size/2 + '" cy="' + size/2 + '" r="' + r + '" fill="none" stroke="rgba(20,20,20,0.06)" stroke-width="3"/>' +
-    '<circle cx="' + size/2 + '" cy="' + size/2 + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="3" stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '" transform="rotate(-90 ' + size/2 + ' ' + size/2 + ')"/>' +
-    '</svg>';
-}
-
-function renderExamCard(id, opts) {
-  var el = document.getElementById(id);
-  var unresolved = opts.total - opts.mastered;
-  el.innerHTML =
-    '<div class="exam-card__top">' +
-      '<div class="exam-card__ring">' +
-        progressRing(opts.mastered, opts.total, 48) +
-        '<div class="exam-card__ring-text">' + opts.mastered + '/' + opts.total + '</div>' +
-      '</div>' +
-      '<div class="exam-card__body">' +
-        '<div class="exam-card__title">' + opts.name + '</div>' +
-        '<div class="exam-card__sub">' + opts.date + '</div>' +
-      '</div>' +
-      '<div class="exam-card__countdown">' +
-        '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>' +
-        opts.days + 'd' +
-      '</div>' +
-      '<div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>' +
-    '</div>' +
-    '<div class="exam-card__bottom">' +
-      '<div class="exam-card__stat">' + starIcon + ' ' + opts.mastered + ' mastered</div>' +
-      (unresolved > 0
-        ? '<div class="exam-card__stat" style="color:var(--fg)">' + unresolved + ' unresolved</div>'
-        : '<div class="exam-card__stat" style="color:var(--green)">All mastered</div>') +
-    '</div>';
-}
-
-// 5 topics, 2 mastered
-renderExamCard('exam1', {
-  name: 'Qudrat — Quantitative',
-  date: 'Sunday 29 April · 9:00 AM',
-  days: 5,
-  total: 5,
-  mastered: 2
-});
-
-// 3 topics, 2 mastered (verbal)
-renderExamCard('exam2', {
-  name: 'Qudrat — Verbal',
-  date: 'Tuesday 1 May · 9:00 AM',
-  days: 7,
-  total: 3,
-  mastered: 2
-});
-
-// Many topics example — scales fine
-renderExamCard('exam3', {
-  name: 'GAT — General Aptitude',
-  date: 'Thursday 15 May · 2:00 PM',
-  days: 21,
-  total: 42,
-  mastered: 28
-});
-</script>
 </body>
 </html>
