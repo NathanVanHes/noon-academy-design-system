@@ -1376,10 +1376,10 @@ P.contours = {
       var rng = seeded(seedBase || 42);
       var baseShape = [];
       for (var p = 0; p < pts; p++) {
-        var s1 = Math.sin(p * 0.22 + 1.2) * 14;
-        var s2 = Math.sin(p * 0.51 + 3.8) * 8;
-        var s3 = Math.sin(p * 0.95 + 0.5) * 4;
-        var irregularity = (rng() - 0.5) * 10; // break the pure sine pattern
+        var s1 = Math.sin(p * 0.18 + 1.2) * 8;
+        var s2 = Math.sin(p * 0.42 + 3.8) * 4;
+        var s3 = Math.sin(p * 0.85 + 0.5) * 2;
+        var irregularity = (rng() - 0.5) * 5; // break the pure sine pattern
         baseShape.push(s1 + s2 + s3 + irregularity);
       }
       // Smooth the base shape so irregularity blends in
@@ -1393,20 +1393,19 @@ P.contours = {
         baseShape = smoothed;
       }
 
-      var lines = []; var y = -8;
+      var lines = []; var y = -30;
       for (var i = 0; i < gaps.length && y < h + 10; i++) {
         var nextGap = gaps[Math.min(i + 1, gaps.length - 1)];
         var a = baseOpacity + (nextGap / maxGap) * opacityRange;
         var lineRng = seeded(seedBase + i * 3.7);
 
-        var drift = (lineRng() - 0.5) * 5;
+        var drift = (lineRng() - 0.5) * 3;
         var coords = [];
         for (var p = 0; p < pts; p++) {
           var x = p * step;
           var baseOffset = baseShape[p];
-          // Per-line: growing divergence from base + noise
-          var lineNoise = (lineRng() - 0.5) * 3;
-          var diverge = Math.sin((p * 0.35) + i * 0.5) * (3 + i * 0.3);
+          var lineNoise = (lineRng() - 0.5) * 1.5;
+          var diverge = Math.sin((p * 0.3) + i * 0.4) * (1.5 + i * 0.12);
           var ly = y + baseOffset + diverge + drift + lineNoise;
           coords.push([Math.round(x * 10) / 10, Math.round(ly * 10) / 10]);
         }
@@ -1428,7 +1427,7 @@ P.contours = {
     // Repeat gaps to fill any container height
     function extendGaps(g, targetH) {
       var result = []; var total = 0;
-      while (total < targetH + 40) {
+      while (total < targetH + 80) {
         for (var i = 0; i < g.length && total < targetH + 40; i++) { result.push(g[i]); total += g[i]; }
       }
       return result;
