@@ -37,18 +37,18 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .practice-card__due{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);flex:none;margin-top:2px}
 .practice-card__due.is-urgent{color:var(--red)}
 
-/* Topic chips */
-.practice-card__topics{padding:0 20px 12px;display:flex;flex-wrap:wrap;gap:6px}
-.topic-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:500;background:rgba(20,20,20,0.03);border:1px solid rgba(20,20,20,0.06);color:var(--fg-secondary)}
-.topic-chip__dot{width:8px;height:8px;border-radius:2px;flex:none}
-.topic-chip__score{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--fg-muted)}
-.topic-chip__gap{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--fg-secondary)}
-
-/* Gap indicator */
-.practice-card__gap{padding:0 20px 14px}
-.practice-card__gap-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--fg-secondary)}
-.practice-card__gap-bar{height:4px;border-radius:2px;background:var(--bg-disabled);overflow:hidden;margin-top:6px}
-.practice-card__gap-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);background-size:200px 100%;transition:width 0.6s ease}
+/* Topic row inside card */
+.practice-card__topics{padding:0 20px 14px;display:flex;flex-direction:column;gap:8px}
+.topic-row{display:flex;align-items:center;gap:10px}
+.topic-row__tile{width:32px;height:32px;border-radius:5px;flex:none;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.topic-row__tile-score{font-family:var(--font-mono);font-size:10px;font-weight:700;color:rgba(0,0,0,0.3)}
+.topic-row__tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 4px,rgba(0,0,0,0.4) 4px,rgba(0,0,0,0.4) 5px)}
+.topic-row__tile.is-mastered::after{content:'';position:absolute;inset:0;background:var(--bg);opacity:0.5;border-radius:inherit}
+.topic-row__tile.is-mastered .topic-row__tile-score{display:none}
+.topic-row__star{position:relative;z-index:2}
+.topic-row__info{flex:1;min-width:0}
+.topic-row__name{font-size:13px;font-weight:500;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topic-row__sub{font-size:11px;color:var(--fg-secondary);font-family:var(--font-mono);margin-top:1px;display:flex;align-items:center;gap:3px}
 
 /* CTA */
 .practice-card__cta{padding:0 20px 16px}
@@ -70,13 +70,12 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .roundup-card__title{font-size:14px;font-weight:600;margin:0}
 .roundup-card__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;gap:4px}
 .roundup-card__arrow{flex:none;color:var(--fg-muted)}
-.roundup-card__dots{padding:0 20px 14px;display:flex;gap:4px}
-.roundup-card__dot{height:6px;border-radius:3px;flex:1}
+.roundup-card__tiles{padding:0 20px 14px;display:flex;gap:4px}
+.roundup-card__tile{height:6px;border-radius:3px;flex:1;position:relative;overflow:hidden}
+.roundup-card__tile.is-mastered::before{content:'';position:absolute;inset:0;background:var(--bg);opacity:0.5}
 
 .divider{height:1px;background:rgba(20,20,20,0.06);margin:24px 0}
 .section-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-muted);margin-bottom:12px;margin-top:8px}
-
-.star-icon{flex:none}
 </style>
 </head>
 <body>
@@ -85,138 +84,21 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
   <div class="page-title">Today's tasks</div>
 
-  <!-- Single topic practice — needs to reach ★80+ -->
-  <div class="practice-card" style="animation-delay:0ms">
-    <div class="practice-card__header">
-      <div>
-        <div class="practice-card__type">Practice · Quantitative</div>
-        <div class="practice-card__title">Algebraic expressions</div>
-      </div>
-      <div class="practice-card__due">Due today</div>
-    </div>
-    <div class="practice-card__topics">
-      <div class="topic-chip">
-        <div class="topic-chip__dot" style="background:rgb(255,178,65)"></div>
-        <span>Algebraic expressions</span>
-        <span class="topic-chip__score">35</span>
-      </div>
-    </div>
-    <div class="practice-card__gap">
-      <div class="practice-card__gap-row">
-        <span>35 → <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+</span>
-        <span style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg)">45 to go</span>
-      </div>
-      <div class="practice-card__gap-bar"><div class="practice-card__gap-fill" style="width:0%" data-target="44"></div></div>
-    </div>
-    <div class="practice-card__cta">
-      <button class="btn-start">Start practice</button>
-    </div>
-  </div>
+  <!-- Single topic practice -->
+  <div class="practice-card" style="animation-delay:0ms" id="card1"></div>
 
-  <!-- Multi topic practice — mixed gaps -->
-  <div class="practice-card" style="animation-delay:80ms">
-    <div class="practice-card__header">
-      <div>
-        <div class="practice-card__type">Practice · Quantitative</div>
-        <div class="practice-card__title">Mixed practice</div>
-      </div>
-      <div class="practice-card__due is-urgent">Due tomorrow</div>
-    </div>
-    <div class="practice-card__topics">
-      <div class="topic-chip">
-        <div class="topic-chip__dot" style="background:rgb(248,210,65)"></div>
-        <span>Ratios</span>
-        <span class="topic-chip__gap">58 → 80</span>
-      </div>
-      <div class="topic-chip">
-        <div class="topic-chip__dot" style="background:rgb(255,178,65)"></div>
-        <span>Geometry</span>
-        <span class="topic-chip__gap">42 → 80</span>
-      </div>
-      <div class="topic-chip">
-        <div class="topic-chip__dot" style="background:rgb(39,189,134)"></div>
-        <span>Data analysis</span>
-        <svg class="star-icon" width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-      </div>
-    </div>
-    <div class="practice-card__cta">
-      <button class="btn-start">Start practice</button>
-    </div>
-  </div>
+  <!-- Multi topic practice -->
+  <div class="practice-card" style="animation-delay:80ms" id="card2"></div>
 
-  <!-- Completed practice — score improved -->
-  <div class="practice-card is-done" style="animation-delay:160ms">
-    <div class="practice-card__header">
-      <div>
-        <div class="practice-card__type">Practice · Done</div>
-        <div class="practice-card__title">Number theory</div>
-      </div>
-      <div style="font-family:var(--font-mono);font-size:11px;color:var(--green)">+8 this session</div>
-    </div>
-    <div class="practice-card__topics">
-      <div class="topic-chip">
-        <div class="topic-chip__dot" style="background:rgb(180,210,100)"></div>
-        <span>Number theory</span>
-        <span class="topic-chip__score">73</span>
-      </div>
-    </div>
-    <div class="practice-card__gap">
-      <div class="practice-card__gap-row">
-        <span>73 → <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+</span>
-        <span style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg)">7 to go</span>
-      </div>
-      <div class="practice-card__gap-bar"><div class="practice-card__gap-fill" style="width:0%" data-target="91"></div></div>
-    </div>
-    <div class="practice-card__cta">
-      <button class="btn-start">Completed</button>
-    </div>
-  </div>
+  <!-- Completed practice -->
+  <div class="practice-card is-done" style="animation-delay:160ms" id="card3"></div>
 
   <div class="divider"></div>
 
-  <div class="section-label">Upcoming exams</div>
+  <div class="section-label">Upcoming exam</div>
 
-  <!-- Exam roundup card — Quantitative, 5 days -->
-  <div class="roundup-card" style="animation-delay:240ms">
-    <div class="roundup-card__inner">
-      <div class="roundup-card__countdown">
-        <div class="roundup-card__days">5</div>
-        <div class="roundup-card__unit">days</div>
-      </div>
-      <div class="roundup-card__body">
-        <div class="roundup-card__title">Qudrat Quantitative</div>
-        <div class="roundup-card__sub">
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-          <span>2 of 5 topics at ★80+</span>
-        </div>
-      </div>
-      <div class="roundup-card__arrow">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
-      </div>
-    </div>
-    <div class="roundup-card__dots" id="examDots1"></div>
-  </div>
-
-  <!-- Exam roundup card — Verbal, 7 days -->
-  <div class="roundup-card" style="animation-delay:320ms">
-    <div class="roundup-card__inner">
-      <div class="roundup-card__countdown">
-        <div class="roundup-card__days">7</div>
-        <div class="roundup-card__unit">days</div>
-      </div>
-      <div class="roundup-card__body">
-        <div class="roundup-card__title">Qudrat Verbal</div>
-        <div class="roundup-card__sub">
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-          <span>2 of 3 topics at ★70+</span>
-        </div>
-      </div>
-      <div class="roundup-card__arrow">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
-      </div>
-    </div>
-    <div class="roundup-card__dots" id="examDots2"></div>
-  </div>
+  <!-- Exam roundup entry -->
+  <div class="roundup-card" style="animation-delay:240ms" id="examCard"></div>
 
 </div>
 
@@ -224,44 +106,82 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 function scoreColor(s) {
   var t = Math.max(0, Math.min(100, s)) / 100;
   var r, g, b;
-  if (t < 0.5) {
-    var p = t / 0.5;
-    r = 240 + (255-240)*p; g = 61 + (203-61)*p; b = 61 + (69-61)*p;
-  } else {
-    var p = (t - 0.5) / 0.5;
-    r = 255 + (39-255)*p; g = 203 + (189-203)*p; b = 69 + (134-69)*p;
-  }
+  if (t < 0.5) { var p = t / 0.5; r = 240+(255-240)*p; g = 61+(203-61)*p; b = 61+(69-61)*p; }
+  else { var p = (t-0.5)/0.5; r = 255+(39-255)*p; g = 203+(189-203)*p; b = 69+(134-69)*p; }
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
-// Animate gap fills
-setTimeout(function() {
-  document.querySelectorAll('.practice-card__gap-fill').forEach(function(bar) {
-    bar.style.width = bar.dataset.target + '%';
-  });
-}, 400);
+var starSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="rgba(0,0,0,0.3)" class="topic-row__star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+var starInline = '<svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+var mastery = 80;
 
-// Exam 1 dots — Quantitative ★80+: [94(mastered), 76, 35, 18, 85(mastered)]
-var exam1Scores = [94, 76, 35, 18, 85];
-var dots1 = document.getElementById('examDots1');
-exam1Scores.forEach(function(s) {
-  var d = document.createElement('div');
-  d.className = 'roundup-card__dot';
-  d.style.background = scoreColor(s);
-  if (s >= 80) d.style.opacity = '0.5';
-  dots1.appendChild(d);
-});
+function topicRow(name, score) {
+  var mastered = score >= mastery;
+  var gap = mastery - score;
+  var col = scoreColor(score);
+  var h = '<div class="topic-row">';
+  if (mastered) {
+    h += '<div class="topic-row__tile is-mastered" style="background:' + col + '">' + starSvg + '</div>';
+    h += '<div class="topic-row__info"><div class="topic-row__name">' + name + '</div>';
+    h += '<div class="topic-row__sub">' + starInline + ' Mastered</div></div>';
+  } else {
+    h += '<div class="topic-row__tile" style="background:' + col + '"><span class="topic-row__tile-score">' + score + '</span></div>';
+    h += '<div class="topic-row__info"><div class="topic-row__name">' + name + '</div>';
+    h += '<div class="topic-row__sub">Reach ' + starInline + ' 80+ (' + gap + ' remaining)</div></div>';
+  }
+  h += '</div>';
+  return h;
+}
 
-// Exam 2 dots — Verbal ★70+: [82(mastered), 30, 91(mastered)]
-var exam2Scores = [82, 30, 91];
-var dots2 = document.getElementById('examDots2');
-exam2Scores.forEach(function(s) {
-  var d = document.createElement('div');
-  d.className = 'roundup-card__dot';
-  d.style.background = scoreColor(s);
-  if (s >= 70) d.style.opacity = '0.5';
-  dots2.appendChild(d);
+// Card 1 — single topic
+document.getElementById('card1').innerHTML =
+  '<div class="practice-card__header"><div><div class="practice-card__type">Practice · Quantitative</div><div class="practice-card__title">Algebraic expressions</div></div><div class="practice-card__due">Due today</div></div>' +
+  '<div class="practice-card__topics">' + topicRow('Algebraic expressions', 35) + '</div>' +
+  '<div class="practice-card__cta"><button class="btn-start">Start practice</button></div>';
+
+// Card 2 — multi topic
+document.getElementById('card2').innerHTML =
+  '<div class="practice-card__header"><div><div class="practice-card__type">Practice · Quantitative</div><div class="practice-card__title">Mixed practice</div></div><div class="practice-card__due is-urgent">Due tomorrow</div></div>' +
+  '<div class="practice-card__topics">' +
+    topicRow('Ratios', 58) +
+    topicRow('Geometry', 42) +
+    topicRow('Data analysis', 94) +
+  '</div>' +
+  '<div class="practice-card__cta"><button class="btn-start">Start practice</button></div>';
+
+// Card 3 — completed
+document.getElementById('card3').innerHTML =
+  '<div class="practice-card__header"><div><div class="practice-card__type">Practice · Done</div><div class="practice-card__title">Number theory</div></div><div style="font-family:var(--font-mono);font-size:11px;color:var(--green)">+8 this session</div></div>' +
+  '<div class="practice-card__topics">' + topicRow('Number theory', 73) + '</div>' +
+  '<div class="practice-card__cta"><button class="btn-start">Completed</button></div>';
+
+// Exam roundup entry card
+var examTopics = [
+  { name: 'Data analysis', score: 94 },
+  { name: 'Ratios', score: 85 },
+  { name: 'Number theory', score: 76 },
+  { name: 'Algebraic expressions', score: 35 },
+  { name: 'Geometry basics', score: 18 },
+];
+var masteredN = examTopics.filter(function(t){ return t.score >= mastery; }).length;
+var unresolved = examTopics.length - masteredN;
+
+var tilesHtml = '<div class="roundup-card__tiles">';
+examTopics.forEach(function(t) {
+  var m = t.score >= mastery;
+  tilesHtml += '<div class="roundup-card__tile' + (m ? ' is-mastered' : '') + '" style="background:' + scoreColor(t.score) + '"></div>';
 });
+tilesHtml += '</div>';
+
+document.getElementById('examCard').innerHTML =
+  '<div class="roundup-card__inner">' +
+    '<div class="roundup-card__countdown"><div class="roundup-card__days">5</div><div class="roundup-card__unit">days</div></div>' +
+    '<div class="roundup-card__body">' +
+      '<div class="roundup-card__title">Qudrat — Quantitative</div>' +
+      '<div class="roundup-card__sub">' + unresolved + ' unresolved · ' + starInline + ' ' + masteredN + ' mastered</div>' +
+    '</div>' +
+    '<div class="roundup-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>' +
+  '</div>' + tilesHtml;
 </script>
 </body>
 </html>
