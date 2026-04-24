@@ -3046,30 +3046,26 @@ P.interstitial = {
     var container = document.getElementById('interstitialConfetti');
     if (!container) return;
     var colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff','#A8E6CF','#FFD93D','#6BCB77'];
-    // Explosion — lots of pieces, all at once, short fall
-    var totalPieces = 150;
+    // Rain confetti — same style as heatmap tiles, scaled up
+    var totalPieces = 50;
     for (var i = 0; i < totalPieces; i++) {
       (function() {
         var dot = document.createElement('div');
-        var size = 4 + Math.random() * 10;
-        var left = Math.random() * 100;
-        var delay = Math.random() * 400;
-        var fallTime = 1200 + Math.random() * 1000;
-        var drift = (Math.random() - 0.5) * 80;
-        var rotation = Math.floor(Math.random() * 720);
+        var size = 3 + Math.random() * 5;
+        var left = 5 + Math.random() * 90;
+        var delay = Math.random() * 600;
+        var duration = 1200 + Math.random() * 1000;
+        var rotate = Math.floor(Math.random() * 360);
         var color = colors[Math.floor(Math.random() * colors.length)];
-        var isRect = Math.random() > 0.5;
-        var h = isRect ? size * 0.4 : size;
-        var br = isRect ? '2px' : '50%';
-        dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + h + 'px;border-radius:' + br + ';background:' + color + ';left:' + left + '%;top:-12px;opacity:1;pointer-events:none;z-index:2';
+        var shape = Math.random() > 0.5 ? '50%' : '1px';
+        dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;border-radius:' + shape + ';background:' + color + ';left:' + left + '%;top:-6px;z-index:2;pointer-events:none;opacity:1';
         container.appendChild(dot);
         setTimeout(function() {
-          var fadeDur = Math.round(fallTime * 0.5);
-          dot.style.transition = 'transform ' + fallTime + 'ms cubic-bezier(0.15,0.6,0.35,1), opacity ' + fadeDur + 'ms ease-in';
-          dot.style.transform = 'translateY(700px) translateX(' + drift + 'px) rotate(' + rotation + 'deg)';
+          dot.style.transition = 'transform ' + duration + 'ms ease-in, opacity ' + (duration * 0.4) + 'ms ease ' + (duration * 0.6) + 'ms';
+          dot.style.transform = 'translateY(' + (container.offsetHeight * 0.7) + 'px) rotate(' + rotate + 'deg)';
           dot.style.opacity = '0';
         }, delay);
-        setTimeout(function() { dot.remove(); }, delay + fallTime + 100);
+        setTimeout(function() { dot.remove(); }, delay + duration + 100);
       })();
     }
   },
