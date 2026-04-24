@@ -878,7 +878,7 @@ P.gridpaper = {
 
     return `<div class="sects">
       <div class="sect"><div class="sect__title">Grid Variants</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Three levels of grid. Standard for most surfaces. Major lines for atlas/hero. Plain background when grid would compete with content.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Two levels of grid across both themes. Standard 16px for most surfaces. Major + minor (64px gold over 8px) for atlas and hero views.</p>
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Standard — 16px on void</div>
@@ -893,8 +893,13 @@ P.gridpaper = {
             <div style="width:100%;height:180px;background:${voidMajor}"></div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">No grid — plain surface</div>
-            <div style="width:100%;height:180px;background:var(--void-300)"></div>
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Major + minor — on paper</div>
+            <div style="width:100%;height:180px;background:
+              linear-gradient(rgba(122,96,20,0.06) 1px,transparent 1px) 0 0/64px 64px,
+              linear-gradient(90deg,rgba(122,96,20,0.06) 1px,transparent 1px) 0 0/64px 64px,
+              linear-gradient(rgba(10,15,26,0.05) 1px,transparent 1px) 0 0/8px 8px,
+              linear-gradient(90deg,rgba(10,15,26,0.05) 1px,transparent 1px) 0 0/8px 8px,
+              var(--paper-200)"></div>
           </div>
         </div>
       </div>
