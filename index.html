@@ -3043,40 +3043,37 @@ P.interstitial = {
     </div>`;
   },
   afterRender() {
-    const container = document.getElementById('interstitialConfetti');
+    var container = document.getElementById('interstitialConfetti');
     if (!container) return;
-    const colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff','#A8E6CF','#FFD93D','#6BCB77'];
+    var colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff','#A8E6CF','#FFD93D','#6BCB77'];
     function spawnWave(count, delayBase) {
-      for (let i = 0; i < count; i++) {
-        const dot = document.createElement('div');
-        const size = 4 + Math.random() * 8;
-        const left = Math.random() * 100;
-        const delay = delayBase + Math.random() * 1200;
-        const duration = 2500 + Math.random() * 2500;
-        const drift = (Math.random() - 0.5) * 80;
-        const rotation = Math.floor(Math.random() * 720);
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const isRect = Math.random() > 0.5;
-        const w = isRect ? size : size;
-        const h = isRect ? size * 0.4 : size;
-        const br = isRect ? '2px' : '50%';
-        dot.style.cssText = `position:absolute;width:${w}px;height:${h}px;border-radius:${br};background:${color};left:${left}%;top:-12px;opacity:0;pointer-events:none;z-index:2`;
-        container.appendChild(dot);
-        setTimeout(() => {
-          dot.style.transition = `transform ${duration}ms cubic-bezier(0.15,0.6,0.35,1), opacity ${duration * 0.3}ms ease ${duration * 0.7}ms`;
-          dot.style.transform = `translateY(${700}px) translateX(${drift}px) rotate(${rotation}deg)`;
-          dot.style.opacity = '1';
-        }, delay);
-        setTimeout(() => { dot.style.opacity = '0'; }, delay + duration * 0.7);
-        setTimeout(() => { dot.remove(); }, delay + duration + 300);
+      for (var i = 0; i < count; i++) {
+        (function() {
+          var dot = document.createElement('div');
+          var size = 4 + Math.random() * 8;
+          var left = Math.random() * 100;
+          var delay = delayBase + Math.random() * 1200;
+          var duration = 2500 + Math.random() * 2500;
+          var drift = (Math.random() - 0.5) * 80;
+          var rotation = Math.floor(Math.random() * 720);
+          var color = colors[Math.floor(Math.random() * colors.length)];
+          var isRect = Math.random() > 0.5;
+          var h = isRect ? size * 0.4 : size;
+          var br = isRect ? '2px' : '50%';
+          dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + h + 'px;border-radius:' + br + ';background:' + color + ';left:' + left + '%;top:-12px;opacity:1;pointer-events:none;z-index:2';
+          container.appendChild(dot);
+          setTimeout(function() {
+            dot.style.transition = 'transform ' + duration + 'ms cubic-bezier(0.15,0.6,0.35,1), opacity 400ms ease ' + (duration - 400) + 'ms';
+            dot.style.transform = 'translateY(700px) translateX(' + drift + 'px) rotate(' + rotation + 'deg)';
+            dot.style.opacity = '0';
+          }, delay);
+          setTimeout(function() { dot.remove(); }, delay + duration + 100);
+        })();
       }
     }
-    // Big burst immediately
     spawnWave(60, 0);
-    // Second wave
-    setTimeout(() => spawnWave(40, 0), 2000);
-    // Third wave — lingering
-    setTimeout(() => spawnWave(25, 0), 4000);
+    setTimeout(function() { spawnWave(40, 0); }, 2000);
+    setTimeout(function() { spawnWave(25, 0); }, 4000);
   },
   renderCode() {
     return `<!-- Full-screen mobile interstitial -->
