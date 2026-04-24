@@ -517,14 +517,10 @@ function renderChart(data, labelTexts, mastered, masteryLine) {
   }
 
   // Mastery threshold line (full width)
-  svg += '<line x1="' + pad.left + '" y1="' + masteryY + '" x2="' + (pad.left + cw) + '" y2="' + masteryY + '" stroke="rgba(39,189,134,0.25)" stroke-dasharray="4,3"/>';
+  svg += '<line x1="' + pad.left + '" y1="' + masteryY + '" x2="' + (pad.left + cw) + '" y2="' + masteryY + '" stroke="rgba(20,20,20,0.2)" stroke-dasharray="4,3"/>';
 
-  // Mastery label — pill on the right end of the line
-  var labelText = '★ ' + displayMastery(masteryLine) + '+';
-  var labelX = pad.left + cw;
-  var labelY = masteryY;
-  svg += '<rect x="' + (labelX - 42) + '" y="' + (labelY - 10) + '" width="42" height="20" rx="4" fill="rgba(39,189,134,0.1)" stroke="rgba(39,189,134,0.25)" stroke-width="0.5"/>';
-  svg += '<text x="' + (labelX - 21) + '" y="' + (labelY + 4) + '" text-anchor="middle" font-family="\'JetBrains Mono\',monospace" font-size="9" font-weight="600" fill="#27BD86">' + labelText + '</text>';
+  // Mastery label — above the line, left aligned
+  svg += '<text x="' + pad.left + '" y="' + (masteryY - 7) + '" font-family="\'JetBrains Mono\',monospace" font-size="10" font-weight="600" fill="#74716C">★ ' + displayMastery(masteryLine) + '+</text>';
 
   // Area fill for mastered
   if (mastered && points.length > 1) {
