@@ -614,126 +614,114 @@ P.motion = {
       </div>
 
       <div class="sect"><div class="sect__title">Component Entrances</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">How components arrive on screen. Direction communicates spatial relationship — content comes from below, overlays from the side or bottom.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">How components arrive on screen. Click "Replay" to see each animation.</p>
+        <div style="margin-bottom:var(--sp-5)">
+          <div class="cell__label">Cards / list items — staggered fade up</div>
+          <div style="background:var(--bg);border-radius:var(--r-2);padding:var(--sp-4);max-width:420px;position:relative;min-height:160px;overflow:hidden" id="motionCards">
+            <div class="session session--live" style="opacity:0;transform:translateY(6px);transition:all 350ms cubic-bezier(.22,.61,.36,1)">
+              <div class="session__time">8:30</div><div class="session__indicator"></div>
+              <div class="session__body"><div class="session__title">Storytelling</div><div class="session__meta">Digital Media</div></div>
+              <div class="session__status"><span class="chip chip--signal"><span class="chip__dot"></span> Live</span></div>
+            </div>
+            <div class="session session--soon" style="opacity:0;transform:translateY(6px);transition:all 350ms cubic-bezier(.22,.61,.36,1)">
+              <div class="session__time">10:00</div><div class="session__indicator"></div>
+              <div class="session__body"><div class="session__title">Inference</div><div class="session__meta">Qudrat Reading</div></div>
+              <div class="session__status"><span class="mono" style="color:var(--signal-bright)">Soon</span></div>
+            </div>
+            <div class="session session--upcoming" style="opacity:0;transform:translateY(6px);transition:all 350ms cubic-bezier(.22,.61,.36,1)">
+              <div class="session__time">11:30</div><div class="session__indicator"></div>
+              <div class="session__body"><div class="session__title">Quantitative reasoning</div><div class="session__meta">Qudrat Math</div></div>
+              <div class="session__status"><span class="mono">3:00</span></div>
+            </div>
+          </div>
+          <button class="btn btn--ghost btn--sm" style="margin-top:var(--sp-3)" onclick="(function(){var c=document.getElementById('motionCards');c.querySelectorAll('.session').forEach(function(s){s.style.opacity='0';s.style.transform='translateY(6px)';});setTimeout(function(){c.querySelectorAll('.session').forEach(function(s,i){setTimeout(function(){s.style.opacity='1';s.style.transform='translateY(0)';},i*80);});},100);})()">Replay</button>
+        </div>
         <div class="grid grid--2">
-          <div class="cell">
-            <div class="cell__label">Cards / list items — fade up</div>
-            <div class="mono" style="font-size:11px;margin-bottom:8px">translateY(6px) → 0, opacity 0 → 1, 350ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Used by: session cards, practice cards, topic rows, heatmap tiles. Stagger delay: 30-80ms per item.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Bottom sheet — slide up</div>
-            <div class="mono" style="font-size:11px;margin-bottom:8px">translateY(100%) → 0, 320ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Sheet slides from below viewport. Scrim fades in simultaneously. Dismiss reverses with ease-in.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Drilldown panel — slide in</div>
-            <div class="mono" style="font-size:11px;margin-bottom:8px">translateX(100%) → 0, 320ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Panel slides from the inline-end edge. Overlay fades in. Used for topic detail, mastery info.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Modal / dialog — scale up</div>
-            <div class="mono" style="font-size:11px;margin-bottom:8px">scale(0.95) → 1, opacity 0 → 1, 200ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Subtle scale with fade. Centered on screen. Scrim fades in behind.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Toast / alert — slide down</div>
-            <div class="mono" style="font-size:11px;margin-bottom:8px">translateY(-100%) → 0, 320ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Enters from top. Auto-dismisses after 4s with ease-in slide up.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Tooltip / popover — fade in</div>
-            <div class="mono" style="font-size:11px;margin-bottom:8px">opacity 0 → 1, 120ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">No movement, just opacity. Appears instantly at the trigger point. Disappears on 120ms ease-in.</div>
-          </div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Cards / list items:</b> translateY(6px) → 0, opacity 0 → 1, 350ms ease. Stagger: 80ms.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Bottom sheet:</b> translateY(100%) → 0, 320ms ease. Scrim fades simultaneously.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Modal:</b> scale(0.95) → 1, opacity 0 → 1, 200ms ease.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Toast:</b> translateY(-100%) → 0, 320ms ease. Auto-dismiss after 4s.</div></div>
         </div>
       </div>
 
       <div class="sect"><div class="sect__title">Interaction Feedback</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Micro-animations that respond to user input. These are fast (120ms) and subtle — the student should feel them, not see them.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Micro-animations that respond to user input. Try hovering and clicking the components below.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--sp-4);align-items:center;margin-bottom:var(--sp-5)">
+          <button class="btn btn--primary">Primary</button>
+          <button class="btn btn--secondary">Secondary</button>
+          <button class="btn btn--ghost">Ghost</button>
+          <div class="seg" data-interactive="seg"><button class="is-on">Day</button><button>Week</button><button>Month</button></div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label>
+          <label class="checkbox"><input type="checkbox" checked><span class="checkbox__box"></span></label>
+          <label class="checkbox"><input type="checkbox"><span class="checkbox__box"></span></label>
+        </div>
+        <div style="max-width:320px;margin-bottom:var(--sp-5)">
+          <div class="card card--interactive" style="cursor:pointer;padding:var(--sp-4) var(--sp-5)">
+            <div class="caps" style="margin-bottom:4px">Hover me</div>
+            <div style="font-size:15px;color:var(--fg);font-weight:600">Interactive card lift</div>
+          </div>
+        </div>
         <div class="grid grid--2">
-          <div class="cell">
-            <div class="cell__label">Button hover/press</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.9, 120ms</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Slight dim on hover. No scale, no shadow change. Primary, secondary, ghost all behave the same.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Tab / segmented switch</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">background + color, 120ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Active indicator slides or cross-fades. Text color transitions simultaneously.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Toggle / switch</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">translateX + background, 200ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Thumb slides to new position. Track color transitions. Both animate together.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Checkbox / radio</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(0) → 1, 200ms spring</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Check mark or dot pops in with a tiny spring overshoot. Uncheck is instant.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Card hover</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">box-shadow + translateY(-1px), 120ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Interactive cards lift slightly on hover. Shadow deepens. Only for clickable cards.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Input focus</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">border-color + ring, 120ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Border transitions to accent. Focus ring appears via box-shadow. Label floats if applicable.</div>
-          </div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Buttons:</b> opacity 1 → 0.9 on hover, 120ms. No scale.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Segmented:</b> background + color cross-fade, 120ms ease.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Toggle/switch:</b> thumb translateX + track color, 200ms ease.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Card hover:</b> translateY(-1px) + shadow deepen, 120ms ease.</div></div>
         </div>
       </div>
 
       <div class="sect"><div class="sect__title">Data &amp; Progress</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes — scores, fill bars, charts. These are slower and more deliberate.</p>
-        <div class="grid grid--2">
-          <div class="cell">
-            <div class="cell__label">Score counter roll-up</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">0 → target, 600ms ease-out</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Numbers count up from 0 to final value. Eased so it decelerates near the end. Staggered per tile (30ms delay).</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes. Click "Replay" to see fills and counters animate.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--sp-5);align-items:flex-start;margin-bottom:var(--sp-5)">
+          <div style="text-align:center">
+            <div class="cell__label">Counter roll-up</div>
+            <div style="font-family:var(--font-mono);font-size:var(--fs-32);font-weight:700;color:var(--fg)" id="motionCounter">0</div>
           </div>
-          <div class="cell">
+          <div style="flex:1;min-width:200px">
             <div class="cell__label">Progress bar fill</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → target%, 600ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Gradient bar grows from left. Triggered after card entrance animation completes. Linear for loading, eased for scores.</div>
+            <div style="height:6px;border-radius:3px;background:var(--bg-sunken);overflow:hidden;margin-top:8px"><div id="motionBar" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);background-size:300px 100%;transition:width 600ms cubic-bezier(.22,.61,.36,1)"></div></div>
           </div>
-          <div class="cell">
-            <div class="cell__label">Chart line draw</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">stroke-dashoffset, 800ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">SVG line draws from left to right using dash offset. Points appear after line reaches them.</div>
+          <div style="min-width:200px">
+            <div class="cell__label">Session bar</div>
+            <div class="session-bar" id="motionSessionBar" style="margin-top:8px">
+              <div class="session-bar__seg is-correct" style="transform:scaleX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+              <div class="session-bar__seg is-correct" style="transform:scaleX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+              <div class="session-bar__seg is-incorrect" style="transform:scaleX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+              <div class="session-bar__seg is-correct" style="transform:scaleX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+              <div class="session-bar__seg" style="transform:scaleX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+              <div class="session-bar__seg" style="transform:scaleX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)"></div>
+            </div>
           </div>
-          <div class="cell">
-            <div class="cell__label">Session bar segments</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scaleX(0) → 1, 200ms ease, staggered</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Each segment grows from left edge. 50ms stagger per segment. Green/red color is immediate, not transitioned.</div>
-          </div>
+        </div>
+        <button class="btn btn--ghost btn--sm" style="margin-bottom:var(--sp-4)" onclick="(function(){document.getElementById('motionCounter').textContent='0';document.getElementById('motionBar').style.width='0%';document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s){s.style.transform='scaleX(0)';});setTimeout(function(){var el=document.getElementById('motionCounter');var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);document.getElementById('motionBar').style.width='76%';document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s,i){setTimeout(function(){s.style.transform='scaleX(1)';},i*80);});},200);})()">Replay</button>
+        <div class="grid grid--2">
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Counter:</b> 0 → target, 600ms ease-out. Decelerates at end.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Progress bar:</b> width 0% → target%, 600ms ease.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Session bar:</b> scaleX(0) → 1, 200ms ease, 80ms stagger.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Chart line:</b> stroke-dashoffset draw, 800ms ease.</div></div>
         </div>
       </div>
 
       <div class="sect"><div class="sect__title">Celebrations</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Reserved for mastery moments. These are the only animations that should feel dramatic — the student earned it.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Reserved for mastery moments. Click "Replay" to see the full sequence.</p>
+        <div style="display:flex;gap:var(--sp-4);align-items:flex-start;margin-bottom:var(--sp-5)">
+          <div style="width:80px;height:80px;border-radius:8px;position:relative;overflow:hidden;flex:none" id="motionTile">
+            <div style="position:absolute;inset:0;background:rgb(39,189,134);display:flex;align-items:center;justify-content:center">
+              <div style="font-size:11px;font-weight:600;color:rgba(0,0,0,0.5);text-align:center;line-height:1.2">Topic<br>name</div>
+              <svg id="motionStar" width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="position:absolute;top:5px;right:6px;opacity:0;transform:scale(1.8);transition:all 300ms cubic-bezier(.34,1.56,.64,1)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+            </div>
+            <div style="position:absolute;inset:0;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);pointer-events:none"></div>
+          </div>
+          <div style="flex:1">
+            <div class="cell__label">Mastery celebration sequence</div>
+            <div style="font-size:12px;color:var(--fg-faint);margin-top:4px">1. Tile throbs (scale 1→1.08→1, 200ms)<br>2. Confetti rains (20 particles, 1s)<br>3. Star stamps in (scale 1.8→1, 300ms spring)<br>4. Tile fades to 40% (800ms ease)</div>
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--sm" style="margin-bottom:var(--sp-4)" onclick="(function(){var tile=document.getElementById('motionTile');var star=document.getElementById('motionStar');tile.style.opacity='1';tile.style.transform='scale(1)';tile.style.transition='none';star.style.opacity='0';star.style.transform='scale(1.8)';star.style.transition='none';void tile.offsetWidth;tile.style.transition='transform 0.2s ease';tile.style.transform='scale(1.08)';setTimeout(function(){tile.style.transform='scale(1)';},200);var container=tile;var colors=['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];for(var c=0;c<20;c++){(function(){var dot=document.createElement('div');var sz=2+Math.random()*3;var left=5+Math.random()*90;var delay=Math.random()*400;var dur=500+Math.random()*400;var rot=Math.floor(Math.random()*360);var col=colors[Math.floor(Math.random()*colors.length)];dot.style.cssText='position:absolute;width:'+sz+'px;height:'+sz+'px;border-radius:'+(Math.random()>0.5?'50%':'1px')+';background:'+col+';left:'+left+'%;top:-4px;z-index:5;pointer-events:none;opacity:1';container.appendChild(dot);setTimeout(function(){dot.style.transition='transform '+dur+'ms ease-in, opacity '+(dur*0.4)+'ms ease '+(dur*0.6)+'ms';dot.style.transform='translateY(90px) rotate('+rot+'deg)';dot.style.opacity='0';},delay);setTimeout(function(){dot.remove();},delay+dur+100);})();}setTimeout(function(){star.style.transition='all 300ms cubic-bezier(.34,1.56,.64,1)';star.style.opacity='1';star.style.transform='scale(1)';},500);setTimeout(function(){tile.style.transition='opacity 0.8s ease';tile.style.opacity='0.4';},1200);})()">Replay</button>
         <div class="grid grid--2">
-          <div class="cell">
-            <div class="cell__label">Mastery confetti</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">50-80 particles, 3s stream, fade by 75%</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Particles fall from top with drift and rotation. Mix of circles and rectangles in accent/gold/white. Heatmap tiles: 20 particles, 1s. Interstitial: 80 particles, 3s.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Star stamp</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(1.8) → 0.95 → 1, 300ms spring</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Star icon appears by scaling in large then bouncing to rest. Triggered after confetti starts falling.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Tile throb</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(1) → 1.08 → 1, 200ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Quick pulse when mastery confetti fires. Single throb, not a loop. Draws attention to the tile.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Mastered tile fade</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.4, 800ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">After confetti + star, the tile fades to 40% to deprioritise it visually. Stripe pattern stays visible.</div>
-          </div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Confetti:</b> 20–80 particles in accent/gold/white. Heatmap: 20 pieces, 1s. Interstitial: 80 pieces, 3s.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Star stamp:</b> scale(1.8) → 0.95 → 1, 300ms spring curve.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Tile throb:</b> scale(1) → 1.08 → 1, 200ms ease. Single pulse.</div></div>
+          <div class="cell"><div style="font-size:12px;color:var(--fg-faint)"><b>Mastered fade:</b> opacity 1 → 0.4, 800ms ease. Stripe stays.</div></div>
         </div>
       </div>
 
