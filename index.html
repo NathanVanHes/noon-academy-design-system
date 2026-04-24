@@ -12,13 +12,15 @@
 /* ── Mobile hamburger ── */
 .tb__menu{display:none;background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:4px}
 .sb__close{display:none;background:none;border:0;color:var(--fg-muted);cursor:pointer;padding:4px;position:absolute;top:16px;right:12px}
+.sb__scrim{display:none}
 
 @media(max-width:768px){
   .shell{grid-template-columns:1fr}
   .sb{position:fixed;inset:0;z-index:100;transform:translateX(-100%);transition:transform 0.25s ease;width:280px}
   .sb.is-open{transform:translateX(0)}
-  .sb__scrim{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,0.4)}
-  .sb__scrim.is-open{display:block}
+  .sb__scrim{display:block;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity 0.25s ease}
+  .sb__scrim.is-open{opacity:1;pointer-events:auto}
+  body{overflow:auto}
   .sb__close{display:flex}
   .tb__menu{display:flex}
   .tb{padding:var(--sp-3) var(--sp-4)}
@@ -141,8 +143,8 @@
 </style>
 </head>
 <body>
-<div class="shell">
 <div class="sb__scrim" id="sbScrim"></div>
+<div class="shell">
 <aside class="sb" id="sidebar">
   <button class="sb__close" id="sbClose"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
 </aside>
