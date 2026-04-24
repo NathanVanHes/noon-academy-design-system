@@ -651,9 +651,9 @@ P.motion = {
           <button class="btn btn--secondary">Secondary</button>
           <button class="btn btn--ghost">Ghost</button>
           <div class="seg" data-interactive="seg"><button class="is-on">Day</button><button>Week</button><button>Month</button></div>
-          <label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label>
-          <label class="checkbox"><input type="checkbox" checked><span class="checkbox__box"></span></label>
-          <label class="checkbox"><input type="checkbox"><span class="checkbox__box"></span></label>
+          <label class="switch" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="switch__track"></span></label>
+          <label class="checkbox" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="checkbox__box"></span></label>
+          <label class="checkbox" onclick="event.stopPropagation()"><input type="checkbox"><span class="checkbox__box"></span></label>
         </div>
         <div style="max-width:320px;margin-bottom:var(--sp-5)">
           <div class="card card--interactive" style="cursor:pointer;padding:var(--sp-4) var(--sp-5)">
