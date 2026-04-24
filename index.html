@@ -616,7 +616,8 @@ P.motion = {
       <div class="sect"><div class="sect__title">Component Entrances</div>
         <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">How components arrive on screen. Direction communicates spatial relationship — content comes from below, overlays from the side or bottom.</p>
         <div class="grid grid--2">
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('.session');el.style.transition='none';el.style.opacity='0';el.style.transform='translateY(6px)';void el.offsetWidth;el.style.transition='all 350ms cubic-bezier(.22,.61,.36,1)';el.style.opacity='1';el.style.transform='translateY(0)';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Cards / list items — fade up</div>
             <div style="margin:8px 0 10px">
               <div class="session session--live" style="pointer-events:none;font-size:12px">
@@ -628,7 +629,8 @@ P.motion = {
             <div class="mono" style="font-size:11px;margin-bottom:4px">translateY(6px) → 0, opacity 0 → 1</div>
             <div style="font-size:12px;color:var(--fg-faint)">350ms ease. Stagger delay: 30-80ms per item.</div>
           </div>
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=box-shadow]');el.style.transition='none';el.style.transform='translateY(100%)';void el.offsetWidth;el.style.transition='transform 320ms cubic-bezier(.22,.61,.36,1)';el.style.transform='translateY(0)';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Bottom sheet — slide up</div>
             <div style="margin:8px 0 10px;height:48px;background:var(--bg);border-radius:var(--r-2) var(--r-2) 0 0;position:relative;overflow:hidden;box-shadow:0 -2px 8px rgba(0,0,0,0.1)">
               <div style="display:flex;justify-content:center;padding:6px 0"><div style="width:24px;height:3px;background:var(--fg-faint);border-radius:99px;opacity:0.4"></div></div>
@@ -637,7 +639,8 @@ P.motion = {
             <div class="mono" style="font-size:11px;margin-bottom:4px">translateY(100%) → 0</div>
             <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Scrim fades in simultaneously.</div>
           </div>
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=border-radius]');el.style.transition='none';el.style.transform='scale(0.95)';el.style.opacity='0';void el.offsetWidth;el.style.transition='all 200ms cubic-bezier(.22,.61,.36,1)';el.style.transform='scale(1)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Modal / dialog — scale up</div>
             <div style="margin:8px 0 10px;height:48px;background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);display:flex;align-items:center;justify-content:center">
               <span style="font-size:11px;color:var(--fg)">Are you sure?</span>
@@ -645,7 +648,8 @@ P.motion = {
             <div class="mono" style="font-size:11px;margin-bottom:4px">scale(0.95) → 1, opacity 0 → 1</div>
             <div style="font-size:12px;color:var(--fg-faint)">200ms ease. Centered on screen.</div>
           </div>
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('.alert');el.style.transition='none';el.style.transform='translateY(-100%)';el.style.opacity='0';void el.offsetWidth;el.style.transition='all 320ms cubic-bezier(.22,.61,.36,1)';el.style.transform='translateY(0)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Toast / alert — slide down</div>
             <div style="margin:8px 0 10px">
               <div class="alert alert--ok" style="font-size:11px;padding:8px 12px"><div>Practice session saved</div></div>
@@ -661,7 +665,8 @@ P.motion = {
             <div class="mono" style="font-size:11px;margin-bottom:4px">translateX(100%) → 0</div>
             <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Overlay fades in behind.</div>
           </div>
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=inline-block]');el.style.transition='none';el.style.opacity='0';void el.offsetWidth;el.style.transition='opacity 120ms cubic-bezier(.22,.61,.36,1)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Tooltip / popover — fade in</div>
             <div style="margin:8px 0 10px;display:inline-block;background:var(--fg);color:var(--bg);font-size:10px;padding:4px 8px;border-radius:4px">Score: 76</div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">opacity 0 → 1</div>
@@ -714,19 +719,22 @@ P.motion = {
       <div class="sect"><div class="sect__title">Data &amp; Progress</div>
         <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes — scores, fill bars, charts. These are slower and more deliberate. <button class="btn btn--ghost btn--sm" style="margin-left:8px" onclick="(function(){document.getElementById('motionCounter').textContent='0';document.getElementById('motionBar').style.width='0%';document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s){s.style.transform='scaleX(0)';});setTimeout(function(){var el=document.getElementById('motionCounter');var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);document.getElementById('motionBar').style.width='76%';document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s,i){setTimeout(function(){s.style.transform='scaleX(1)';},i*80);});},200);})()">Replay all</button></p>
         <div class="grid grid--2">
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var el=document.getElementById('motionCounter');el.textContent='0';setTimeout(function(){var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);},100);})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Score counter roll-up</div>
             <div style="margin:8px 0 10px;font-family:var(--font-mono);font-size:var(--fs-24);font-weight:700;color:var(--fg)" id="motionCounter">76</div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">0 → target, 600ms ease-out</div>
             <div style="font-size:12px;color:var(--fg-faint)">Decelerates near the end. Staggered per tile (30ms).</div>
           </div>
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var el=document.getElementById('motionBar');el.style.transition='none';el.style.width='0%';void el.offsetWidth;el.style.transition='width 600ms cubic-bezier(.22,.61,.36,1)';el.style.width='76%';})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Progress bar fill</div>
             <div style="margin:8px 0 10px;height:6px;border-radius:3px;background:var(--bg-sunken);overflow:hidden"><div id="motionBar" style="height:100%;width:76%;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);background-size:300px 100%;transition:width 600ms cubic-bezier(.22,.61,.36,1)"></div></div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → target%, 600ms ease</div>
             <div style="font-size:12px;color:var(--fg-faint)">Gradient bar grows from left.</div>
           </div>
-          <div class="cell">
+          <div class="cell" style="position:relative">
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s){s.style.transition='none';s.style.transform='scaleX(0)';});void document.getElementById('motionSessionBar').offsetWidth;document.querySelectorAll('#motionSessionBar .session-bar__seg').forEach(function(s,i){setTimeout(function(){s.style.transition='transform 200ms cubic-bezier(.22,.61,.36,1)';s.style.transform='scaleX(1)';},i*80);});})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Session bar segments</div>
             <div style="margin:8px 0 10px">
               <div class="session-bar" id="motionSessionBar">
