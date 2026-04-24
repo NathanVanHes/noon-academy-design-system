@@ -3046,16 +3046,15 @@ P.interstitial = {
     var container = document.getElementById('interstitialConfetti');
     if (!container) return;
     var colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff','#A8E6CF','#FFD93D','#6BCB77'];
-    // Steady stream over 3 seconds
-    var totalPieces = 80;
-    var streamDuration = 3000;
+    // Explosion — lots of pieces, all at once, short fall
+    var totalPieces = 150;
     for (var i = 0; i < totalPieces; i++) {
       (function() {
         var dot = document.createElement('div');
-        var size = 4 + Math.random() * 8;
+        var size = 4 + Math.random() * 10;
         var left = Math.random() * 100;
-        var delay = Math.random() * streamDuration;
-        var fallTime = 1800 + Math.random() * 1500;
+        var delay = Math.random() * 400;
+        var fallTime = 1200 + Math.random() * 1000;
         var drift = (Math.random() - 0.5) * 80;
         var rotation = Math.floor(Math.random() * 720);
         var color = colors[Math.floor(Math.random() * colors.length)];
