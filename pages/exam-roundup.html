@@ -204,21 +204,19 @@ function renderAllMastered() {
 function renderResults() {
   var h = '<div class="exam-info">';
   h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div><div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div><div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div></div>';
-  h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>Exam in 5 days</span></div></div>';
+  h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>Exam in 5 days</span></div>';
 
-  // Mock CTA + best result + collapsible history — all in one block
-  h += '<div class="mock-card">';
-  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
-  h += '<div class="mock-card__title">Mock Exam</div>';
-  h += '<div style="display:flex;align-items:center;gap:6px"><span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-muted)">Best:</span><span style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--green)">88</span><span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-muted)">/100</span></div>';
+  // Best result hero
+  h += '<div style="border-top:1px solid rgba(20,20,20,0.06);margin-top:16px;padding-top:16px;display:flex;align-items:center;gap:16px">';
+  h += '<div style="text-align:center;flex:none"><div style="font-family:var(--font-mono);font-size:36px;font-weight:700;color:var(--green);line-height:1">88</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-muted);margin-top:4px;letter-spacing:0.08em;text-transform:uppercase">Best mock</div></div>';
+  h += '<div style="flex:1"><div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">5/5 correct · 42 min<br>2 attempts taken</div></div>';
+  h += '<button class="btn-mock" style="flex:none">Retake</button>';
   h += '</div>';
-  h += '<button class="btn-mock" style="width:100%;margin-bottom:14px">Take another mock</button>';
 
   // Collapsible history
-  h += '<div>';
+  h += '<div style="border-top:1px solid rgba(20,20,20,0.06);margin-top:14px;padding-top:12px">';
   h += '<button style="background:none;border:0;font:inherit;font-size:12px;color:var(--fg-muted);cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;width:100%" onclick="var el=this.nextElementSibling;var arrow=this.querySelector(\'svg\');if(el.style.display===\'none\'){el.style.display=\'block\';arrow.style.transform=\'rotate(180deg)\';}else{el.style.display=\'none\';arrow.style.transform=\'\';}">Previous attempts <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="transition:transform 0.15s"><path d="M4 6l4 4 4-4"/></svg></button>';
   h += '<div style="display:none;margin-top:10px">';
-  // Result rows
   h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(20,20,20,0.06)">';
   h += '<span style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--green);min-width:28px">88</span>';
   h += '<span style="font-size:12px;color:var(--fg-secondary);flex:1">5/5 correct · 42 min</span>';
@@ -232,7 +230,13 @@ function renderResults() {
   h += '</div></div>';
   h += '</div>';
 
+  // Show mastered topics
+  h += '<div style="margin-top:24px"><div class="section-head"><div class="section-title">On the exam</div><div class="section-target" style="color:var(--green)">' + starInline + ' All at 80+</div></div>';
+  allMasteredTopics.forEach(function(t) { h += topicRow(t, true); });
+  h += '</div>';
+
   document.getElementById('content').innerHTML = h;
+  runMasteryAnimation();
 }
 
 // Mastery tile animation (reusable)
