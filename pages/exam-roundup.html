@@ -59,7 +59,8 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .topic__tile.is-mastered{opacity:0.5}
 .topic__tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
 .topic__tile.is-mastered .topic__tile-score{display:none}
-.topic__tile-star{position:relative;z-index:2}
+.topic__tile-star{position:relative;z-index:2;opacity:0;transform:scale(1.8);transition:all 300ms cubic-bezier(0.34,1.56,0.64,1)}
+.topic__tile-star.is-stamped{opacity:1;transform:scale(1)}
 
 /* Action */
 .topic__action{flex:none}
@@ -92,27 +93,36 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="page">
 
-  <!-- Summary — emphasise remaining -->
-  <div class="header">
-    <div class="header-card" style="flex:2;background:rgba(20,20,20,0.03)">
-      <div class="header-card__num" style="color:var(--red)" id="remainingCount">0</div>
-      <div class="header-card__label" style="font-weight:600;color:var(--fg)">Topics remaining</div>
+  <!-- Exam info -->
+  <div style="background:var(--bg-raised);border-radius:var(--r);padding:20px 24px;margin-bottom:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div>
+        <div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div>
+        <div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div>
+      </div>
+      <span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue)">5 days</span>
     </div>
-    <div class="header-card" style="background:rgba(39,189,134,0.06)">
-      <div class="header-card__num" style="color:var(--green)" id="masteredCount">0</div>
-      <div class="header-card__label">
-        <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-        Mastered
+    <!-- Summary — emphasise remaining -->
+    <div style="display:flex;gap:12px">
+      <div style="flex:2;background:rgba(20,20,20,0.03);border-radius:6px;padding:14px;text-align:center">
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--fg)" id="remainingCount">0</div>
+        <div style="font-size:11px;color:var(--fg);font-weight:600;margin-top:2px">Topics remaining</div>
+      </div>
+      <div style="flex:1;background:rgba(39,189,134,0.06);border-radius:6px;padding:14px;text-align:center">
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green)" id="masteredCount">0</div>
+        <div style="font-size:11px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;justify-content:center;gap:3px">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Quantitative section -->
+  <!-- Section header — matches heatmap -->
   <div class="section-head">
-    <div class="section-title">Quantitative</div>
+    <div class="section-title">Topics</div>
     <div class="section-target">
       <svg width="14" height="14" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-      80+ Level 1
+      <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span>
     </div>
   </div>
   <div id="quantTopics"></div>
@@ -181,7 +191,7 @@ topics.forEach(function(t, i) {
   if (mastered) {
     html += '<div class="topic__sub" style="color:var(--green)"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--green)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
   } else {
-    html += '<div class="topic__sub">' + t.score + ' → ★80+ <span style="color:var(--fg-muted);margin-left:4px">(' + gap + ' to go)</span></div>';
+    html += '<div class="topic__sub">Reach <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ <span style="color:var(--fg-muted);margin-left:4px">(' + gap + ' remaining)</span></div>';
   }
   html += '</div>';
 
@@ -199,12 +209,12 @@ container.innerHTML = html;
 document.getElementById('masteredCount').textContent = masteredN;
 document.getElementById('remainingCount').textContent = topics.length - masteredN;
 
-// Animate fills
+// Stamp stars on mastered tiles
 setTimeout(function() {
-  document.querySelectorAll('.topic__fill').forEach(function(bar) {
-    bar.style.width = bar.dataset.target + '%';
+  document.querySelectorAll('.topic__tile-star').forEach(function(star, i) {
+    setTimeout(function() { star.classList.add('is-stamped'); }, 400 + i * 200);
   });
-}, 100);
+}, 300);
 </script>
 
 <!-- Mastery info bottom sheet -->
