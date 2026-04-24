@@ -3955,9 +3955,9 @@ P.sessioncard = {
   renderCanvas(k) {
     const statusMap = {
       upcoming: '<span class="mono">45 min</span>',
-      soon: '<span class="mono" style="color:var(--fg-subtle)">Soon</span>',
+      soon: '<span class="mono" style="color:var(--signal-bright)">Soon</span>',
       live: '<span class="chip chip--signal"><span class="chip__dot"></span> Live</span>',
-      done: '<span class="mono">Done</span>',
+      done: '<span class="mono">Ended</span>',
       cancelled: '<span class="mono" style="color:var(--danger-300)">Cancelled</span>',
     };
     return `<div style="width:100%;max-width:420px">
@@ -3996,7 +3996,7 @@ P.sessioncard = {
           <div class="session__time">10:00</div>
           <div class="session__indicator"></div>
           <div class="session__body"><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
-          <div class="session__status"><span class="mono" style="color:var(--fg-subtle)">Soon</span></div>
+          <div class="session__status"><span class="mono" style="color:var(--signal-bright)">Soon</span></div>
         </div>
         <div class="session session--upcoming">
           <div class="session__time">11:30</div>
@@ -4014,7 +4014,7 @@ P.sessioncard = {
           <div class="session__time">7:00</div>
           <div class="session__indicator"></div>
           <div class="session__body"><div class="session__title">Reading comprehension</div><div class="session__meta">Qudrat Reading - Mr. Hassan</div></div>
-          <div class="session__status"><span class="mono">Done</span></div>
+          <div class="session__status"><span class="mono">Ended</span></div>
         </div>
         <div class="session session--cancelled">
           <div class="session__time">14:30</div>

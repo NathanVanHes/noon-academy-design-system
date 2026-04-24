@@ -230,8 +230,8 @@ function renderSessions() {
     list.forEach(function(s,i){
       var timeDisplay = s.time.split(' - ')[0];
       var statusChip = s.state==='live'?'<span class="chip chip--signal"><span class="chip__dot"></span> Live</span>'
-        :s.state==='soon'?'<span class="mono" style="color:var(--fg-subtle)">Soon</span>'
-        :s.state==='done'?'<span class="mono">Done</span>'
+        :s.state==='soon'?'<span class="mono" style="color:var(--signal-bright)">Soon</span>'
+        :s.state==='done'?'<span class="mono">Ended</span>'
         :s.state==='cancelled'?'<span class="mono" style="color:var(--danger-300)">Cancelled</span>'
         :'<span class="mono">'+s.duration+'</span>';
       html += '<div class="session session--'+s.state+'" data-idx="'+i+'" style="animation:fadeIn 0.25s ease '+(i*50)+'ms both">';

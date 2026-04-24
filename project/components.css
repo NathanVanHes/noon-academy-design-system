@@ -753,8 +753,7 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 /* Starting soon — same as upcoming but indicator is accent */
 .session--soon .session__indicator { background: var(--accent); }
 
-/* Live — accent indicator, accent left border */
-.session--live { border-inline-start: 3px solid var(--accent); }
+/* Live — accent indicator only */
 .session--live .session__indicator { background: var(--accent); }
 
 /* Done — muted with strikethrough time */
