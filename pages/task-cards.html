@@ -27,7 +27,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .page-title{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:16px}
 
 /* Exam card — one consistent shape for all states */
-.exam-card{background:var(--bg-raised);border-radius:var(--r);margin-bottom:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow 0.15s;opacity:0;transform:translateY(6px);animation:cardIn 0.35s ease forwards}
+.exam-card{background:var(--bg-raised);border-radius:var(--r);margin-bottom:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow 0.15s;opacity:0;transform:translateY(6px);animation:cardIn 0.35s ease forwards}
 .exam-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06)}
 @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 
@@ -57,10 +57,45 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="page">
 
+  <button style="position:fixed;top:20px;right:20px;z-index:20;background:var(--fg);color:var(--bg);border:0;font:inherit;font-size:10px;font-weight:600;letter-spacing:0.06em;padding:8px 14px;border-radius:var(--r);cursor:pointer;opacity:0.8" onclick="document.querySelectorAll('.exam-card--urgent').forEach(function(c){c.style.display=c.style.display==='none'?'flex':'none'});document.querySelectorAll('.exam-card--normal').forEach(function(c){c.style.display=c.style.display==='none'?'flex':'none'})">Toggle ≤5 days</button>
+
   <div class="page-title">Upcoming exams</div>
 
-  <!-- Preparing — unresolved topics -->
-  <div class="exam-card" style="animation-delay:0ms">
+  <!-- URGENT: ≤5 days — exam is imminent -->
+  <div class="exam-card exam-card--urgent" style="animation-delay:0ms;display:none;border-left:3px solid var(--red)">
+    <div class="exam-card__countdown" style="color:var(--red)">
+      <div class="exam-card__days">2</div>
+      <div class="exam-card__unit">days</div>
+    </div>
+    <div class="exam-card__body">
+      <div class="exam-card__title">Qudrat — Quantitative</div>
+      <div class="exam-card__meta">Mon 28 Apr · 9:00 AM</div>
+      <div class="exam-card__status">
+        <span class="pill pill--red">1 unresolved</span>
+        <span class="pill pill--green"><svg width="8" height="8" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 4 mastered</span>
+      </div>
+    </div>
+    <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+  </div>
+
+  <div class="exam-card exam-card--urgent" style="animation-delay:80ms;display:none;border-left:3px solid var(--green)">
+    <div class="exam-card__countdown" style="color:var(--green)">
+      <div class="exam-card__days">4</div>
+      <div class="exam-card__unit">days</div>
+    </div>
+    <div class="exam-card__body">
+      <div class="exam-card__title">Qudrat — Verbal</div>
+      <div class="exam-card__meta">Wed 30 Apr · 9:00 AM</div>
+      <div class="exam-card__status">
+        <span class="pill pill--green"><svg width="8" height="8" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
+        <span class="pill pill--muted">Mock: 88%</span>
+      </div>
+    </div>
+    <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+  </div>
+
+  <!-- NORMAL: >5 days -->
+  <div class="exam-card exam-card--normal" style="animation-delay:0ms">
     <div class="exam-card__countdown" style="color:var(--blue)">
       <div class="exam-card__days">5</div>
       <div class="exam-card__unit">days</div>
@@ -77,7 +112,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   </div>
 
   <!-- All mastered — mock available -->
-  <div class="exam-card" style="animation-delay:80ms">
+  <div class="exam-card exam-card--normal" style="animation-delay:80ms">
     <div class="exam-card__countdown" style="color:var(--green)">
       <div class="exam-card__days">7</div>
       <div class="exam-card__unit">days</div>
@@ -94,7 +129,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   </div>
 
   <!-- Has mock result -->
-  <div class="exam-card" style="animation-delay:160ms">
+  <div class="exam-card exam-card--normal" style="animation-delay:160ms">
     <div class="exam-card__countdown" style="color:var(--green)">
       <div class="exam-card__days">21</div>
       <div class="exam-card__unit">days</div>
@@ -111,7 +146,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   </div>
 
   <!-- Preparing — many topics -->
-  <div class="exam-card" style="animation-delay:240ms">
+  <div class="exam-card exam-card--normal" style="animation-delay:240ms">
     <div class="exam-card__countdown" style="color:var(--blue)">
       <div class="exam-card__days">14</div>
       <div class="exam-card__unit">days</div>

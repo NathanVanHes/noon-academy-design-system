@@ -173,7 +173,7 @@ function renderPreparing() {
   var h = '<div class="exam-info">';
   h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div><div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div><div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div></div>';
   h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>Exam in 5 days</span></div>';
-  h += '<div style="display:flex;gap:12px"><div style="flex:2;background:rgba(20,20,20,0.03);border-radius:6px;padding:14px;text-align:center"><div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--fg)">' + unresolved + '</div><div style="font-size:11px;color:var(--fg);font-weight:600;margin-top:2px">Unresolved</div></div>';
+  h += '<div style="display:flex;gap:12px"><div style="flex:2;background:rgba(240,61,61,0.04);border-radius:6px;padding:14px;text-align:center"><div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--red)">' + unresolved + '</div><div style="font-size:11px;color:var(--red);font-weight:600;margin-top:2px">Unresolved</div></div>';
   h += '<div style="flex:1;background:rgba(39,189,134,0.06);border-radius:6px;padding:14px;text-align:center"><div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green)">' + masteredN + '</div><div style="font-size:11px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;justify-content:center;gap:3px">' + starInline + ' Mastered</div></div></div></div>';
 
   h += '<div class="section-head"><div class="section-title">On the exam</div><div class="section-target">' + starInline + ' <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span></div></div>';
@@ -223,10 +223,12 @@ function renderResults() {
   h += '<div id="prevAttempts" style="display:none;margin-top:8px">';
   h += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(20,20,20,0.04)">';
   h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green)">88%</span>';
-  h += '<span style="font-size:9px;font-weight:600;color:var(--green);background:rgba(39,189,134,0.08);padding:2px 6px;border-radius:8px;margin-left:auto">Best</span>';
+  h += '<span style="font-size:10px;color:var(--fg-muted);margin-left:auto">Today</span>';
+  h += '<span style="font-size:9px;font-weight:600;color:var(--green);background:rgba(39,189,134,0.08);padding:2px 6px;border-radius:8px">Best</span>';
   h += '</div>';
   h += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0">';
   h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--fg-muted)">72%</span>';
+  h += '<span style="font-size:10px;color:var(--fg-muted);margin-left:auto">Yesterday</span>';
   h += '</div>';
   h += '</div>';
   h += '</div></div>';
