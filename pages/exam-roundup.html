@@ -56,7 +56,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .topic__tile{width:44px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;position:relative;overflow:hidden}
 .topic__tile-score{font-family:var(--font-mono);font-size:14px;font-weight:700;color:rgba(0,0,0,0.35);position:relative;z-index:1}
 /* Mastered tile — striped, star, faded like heatmap */
-.topic__tile.is-mastered{opacity:0.5}
+.topic__tile.is-mastered{}
 .topic__tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
 .topic__tile.is-mastered .topic__tile-score{display:none}
 .topic__tile-star{position:relative;z-index:2;opacity:0;transform:scale(1.8);transition:all 300ms cubic-bezier(0.34,1.56,0.64,1)}
@@ -118,7 +118,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
   <!-- Section header — matches heatmap -->
   <div class="section-head">
-    <div class="section-title">Topics</div>
+    <div class="section-title">On the exam</div>
     <div class="section-target">
       <svg width="14" height="14" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
       <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span>
@@ -208,10 +208,45 @@ container.innerHTML = html;
 document.getElementById('masteredCount').textContent = masteredN;
 document.getElementById('remainingCount').textContent = topics.length - masteredN;
 
-// Stamp stars on mastered tiles
+// Mastery celebration on tiles: confetti → star stamp → fade
+var colors = ['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];
 setTimeout(function() {
-  document.querySelectorAll('.topic__tile-star').forEach(function(star, i) {
-    setTimeout(function() { star.classList.add('is-stamped'); }, 400 + i * 200);
+  document.querySelectorAll('.topic__tile.is-mastered').forEach(function(tile, i) {
+    var delay = 400 + i * 300;
+    // Throb
+    setTimeout(function() {
+      tile.style.transition = 'transform 0.2s ease';
+      tile.style.transform = 'scale(1.08)';
+      setTimeout(function() { tile.style.transform = 'scale(1)'; }, 200);
+      // Confetti inside tile
+      for (var c = 0; c < 15; c++) {
+        (function() {
+          var dot = document.createElement('div');
+          var sz = 2 + Math.random() * 3;
+          var left = 5 + Math.random() * 90;
+          var d = Math.random() * 300;
+          var dur = 400 + Math.random() * 300;
+          var rot = Math.floor(Math.random() * 360);
+          var col = colors[Math.floor(Math.random() * colors.length)];
+          dot.style.cssText = 'position:absolute;width:' + sz + 'px;height:' + sz + 'px;border-radius:' + (Math.random() > 0.5 ? '50%' : '1px') + ';background:' + col + ';left:' + left + '%;top:-3px;z-index:5;pointer-events:none;opacity:1';
+          tile.appendChild(dot);
+          setTimeout(function() {
+            dot.style.transition = 'transform ' + dur + 'ms ease-in, opacity ' + (dur * 0.4) + 'ms ease ' + (dur * 0.6) + 'ms';
+            dot.style.transform = 'translateY(' + (tile.offsetHeight + 6) + 'px) rotate(' + rot + 'deg)';
+            dot.style.opacity = '0';
+          }, d);
+          setTimeout(function() { dot.remove(); }, d + dur + 100);
+        })();
+      }
+    }, delay);
+    // Star stamps after confetti starts
+    var star = tile.querySelector('.topic__tile-star');
+    if (star) setTimeout(function() { star.classList.add('is-stamped'); }, delay + 400);
+    // Fade tile after sequence
+    setTimeout(function() {
+      tile.style.transition = 'opacity 0.8s ease';
+      tile.style.opacity = '0.5';
+    }, delay + 900);
   });
 }, 300);
 </script>
