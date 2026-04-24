@@ -1099,59 +1099,74 @@ P.watervessel = {
 
 // ──────── CONTOUR LINES ────────
 P.contours = {
-  title: 'Terrain Patterns', desc: 'Flowing topographic contour lines — organic curves that bunch and spread like real terrain elevation. Used as brand texture on backgrounds and the atlas.',
+  title: 'Terrain Patterns', desc: 'Topographic contour lines as brand texture. Lines flow together coherently — each follows the one above with slight variation, like real elevation contours.',
   render() {
-    // Seeded pseudo-random for consistent output
+    // Seeded pseudo-random
     function seeded(s){return function(){s=Math.sin(s)*10000;return s-Math.floor(s)};}
-    // Generate a flowing contour line with multiple control points
-    function contourLine(baseY, w, h, seed, amplitude) {
-      var rng = seeded(seed);
-      var pts = 12;
-      var step = w / (pts - 1);
-      var coords = [];
-      for (var i = 0; i < pts; i++) {
-        var x = i * step;
-        var noise = (rng() - 0.5) * amplitude;
-        // Layer multiple frequencies for organic feel
-        var slow = Math.sin(i * 0.4 + seed * 0.3) * amplitude * 0.6;
-        var med = Math.sin(i * 0.9 + seed * 1.7) * amplitude * 0.3;
-        var y = baseY + slow + med + noise * 0.4;
-        coords.push([Math.round(x), Math.round(y * 10) / 10]);
-      }
-      // Build smooth cubic bezier path
-      var d = 'M' + coords[0][0] + ',' + coords[0][1];
-      for (var i = 1; i < coords.length; i++) {
-        var prev = coords[i-1];
-        var cur = coords[i];
-        var cpx = (prev[0] + cur[0]) / 2;
-        d += ' C' + cpx + ',' + prev[1] + ' ' + cpx + ',' + cur[1] + ' ' + cur[0] + ',' + cur[1];
-      }
-      return d;
-    }
 
-    function renderTerrain(w, h, color, baseOpacity, opacityRange, maxGap) {
-      var gaps = [8,10,6,5,4,3,3,4,5,7,12,18,28,22,14,9,6,4,3,3,4,5,8,11,16,24,18,12,8,5,4,3,4,6,10];
-      var lines = []; var y = -10;
+    // Generate terrain as a coherent field — each line inherits the shape of the previous
+    function renderTerrain(w, h, color, baseOpacity, opacityRange, maxGap, gapSet, seedBase) {
+      var gaps = gapSet || [8,10,7,5,4,3,3,3,4,5,7,10,16,24,18,12,8,6,4,3,3,4,6,9,14,20,14,8,5,4,3,3,4,6,10];
+      var pts = 20; // more control points = smoother
+      var step = w / (pts - 1);
+
+      // Build a base shape — the "terrain profile" all lines follow
+      var rng = seeded(seedBase || 42);
+      var baseShape = [];
+      for (var p = 0; p < pts; p++) {
+        // Two slow sine waves create the main terrain undulation
+        var s1 = Math.sin(p * 0.25 + 1.2) * 12;
+        var s2 = Math.sin(p * 0.55 + 3.8) * 6;
+        var s3 = Math.sin(p * 1.1 + 0.5) * 3;
+        baseShape.push(s1 + s2 + s3);
+      }
+
+      var lines = []; var y = -8;
       for (var i = 0; i < gaps.length && y < h + 10; i++) {
         var nextGap = gaps[Math.min(i + 1, gaps.length - 1)];
         var a = baseOpacity + (nextGap / maxGap) * opacityRange;
-        var amp = 8 + nextGap * 0.8;
-        var path = contourLine(y, w, h, i * 7.3 + 42, amp);
-        lines.push('<path d="' + path + '" stroke="' + color.replace('ALPHA', a.toFixed(3)) + '" stroke-width="1" fill="none"/>');
+        var lineRng = seeded(seedBase + i * 3.7);
+
+        // Each line = baseShape + small per-line drift that evolves slowly
+        var drift = (lineRng() - 0.5) * 4; // slight vertical offset per line
+        var phaseShift = i * 0.08; // lines shift phase slightly → organic divergence
+        var coords = [];
+        for (var p = 0; p < pts; p++) {
+          var x = p * step;
+          var baseOffset = baseShape[p];
+          // Per-line variation: tiny noise + phase-shifted copy of base
+          var lineNoise = (lineRng() - 0.5) * 2;
+          var shifted = Math.sin((p + i * 0.6) * 0.3) * (2 + i * 0.15);
+          var ly = y + baseOffset + shifted + drift + lineNoise;
+          coords.push([Math.round(x * 10) / 10, Math.round(ly * 10) / 10]);
+        }
+
+        // Smooth cubic bezier
+        var d = 'M' + coords[0][0] + ',' + coords[0][1];
+        for (var j = 1; j < coords.length; j++) {
+          var prev = coords[j-1], cur = coords[j];
+          var cpx = (prev[0] + cur[0]) / 2;
+          d += ' C' + cpx + ',' + prev[1] + ' ' + cpx + ',' + cur[1] + ' ' + cur[0] + ',' + cur[1];
+        }
+
+        lines.push('<path d="' + d + '" stroke="' + color.replace('ALPHA', a.toFixed(3)) + '" stroke-width="0.8" fill="none"/>');
         y += gaps[i];
       }
       return lines.join('\n');
     }
 
+    var standardGaps = [7,9,6,5,4,3,3,3,4,5,7,10,16,24,18,12,8,6,4,3,3,4,6,9,14,20,14,8,5,4,3,3,4,6,9];
+    var denseGaps = [4,4,3,3,3,3,4,5,7,10,7,5,3,3,3,4,5,8,12,8,5,3,3,3,4,5,7,10,14,10,7,4,3,3,3,4,5];
+
     return `<div class="sects">
       <div class="sect"><div class="sect__title">Contour Lines</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Flowing topographic lines that bunch together at elevation changes and spread apart on flat ground. Organic curves, not rigid geometry.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Lines flow together — each follows the one above with slight drift, like real topographic contours. They bunch at elevation changes and spread on flat ground.</p>
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On void</div>
             <div style="width:100%;aspect-ratio:1;position:relative;background:var(--void-300)">
               <svg viewBox="0 0 400 400" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${renderTerrain(400, 400, 'rgba(232,228,220,ALPHA)', 0.04, 0.18, 28)}
+                ${renderTerrain(400, 400, 'rgba(232,228,220,ALPHA)', 0.05, 0.2, 24, standardGaps, 42)}
               </svg>
             </div>
           </div>
@@ -1159,7 +1174,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On paper</div>
             <div style="width:100%;aspect-ratio:1;position:relative;background:var(--paper-200)">
               <svg viewBox="0 0 400 400" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${renderTerrain(400, 400, 'rgba(10,15,26,ALPHA)', 0.06, 0.22, 28)}
+                ${renderTerrain(400, 400, 'rgba(10,15,26,ALPHA)', 0.06, 0.24, 24, standardGaps, 42)}
               </svg>
             </div>
           </div>
@@ -1167,108 +1182,62 @@ P.contours = {
       </div>
 
       <div class="sect"><div class="sect__title">Dense — Hero Backgrounds</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Tighter spacing for atlas headers and hero sections. More lines, higher contrast.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Tighter spacing for headers and hero sections. More lines, higher contrast, same coherent flow.</p>
         <div class="cell" style="padding:0;overflow:hidden">
           <div style="height:280px;position:relative;background:var(--void-300)">
             <svg viewBox="0 0 600 280" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${(function(){
-                var gaps=[5,5,4,3,3,3,3,4,5,7,10,14,10,7,5,3,3,3,4,5,7,12,18,12,7,5,3,3,3,4,5,6];
-                var lines=[];var y=-5;
-                for(var i=0;i<gaps.length&&y<290;i++){
-                  var ng=gaps[Math.min(i+1,gaps.length-1)];
-                  var a=0.05+(ng/18)*0.15;
-                  var amp=6+ng*0.7;
-                  var path=contourLine(y,600,280,i*5.1+17,amp);
-                  lines.push('<path d="'+path+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1" fill="none"/>');
-                  y+=gaps[i];
-                }
-                return lines.join('\n');
-              })()}
+              ${renderTerrain(600, 280, 'rgba(232,228,220,ALPHA)', 0.06, 0.18, 14, denseGaps, 17)}
             </svg>
           </div>
         </div>
       </div>
 
-      <div class="sect"><div class="sect__title">Route Through Terrain</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">The golden route follows the terrain elevation - rising through difficult passages, descending into mastered ground. It's not a straight line. The journey has topography.</p>
-        <div class="cell" style="padding:0;overflow:hidden">
-          <div style="height:280px;position:relative;background:var(--void-300)">
-            <!-- Contour lines layer -->
-            <svg viewBox="0 0 600 280" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${(function(){var gaps=[10,8,6,5,4,4,5,7,12,18,14,10,7,5,4,5,8,12,8,5];var lines=[];var y=5;for(var i=0;i<gaps.length&&y<285;i++){var ng=gaps[Math.min(i+1,gaps.length-1)];var a=0.04+(ng/18)*0.12;var amp=6+ng*0.6;var path=contourLine(y,600,280,i*6.2+33,amp);lines.push('<path d="'+path+'" stroke="rgba(232,228,220,'+a.toFixed(3)+')" stroke-width="1" fill="none"/>');y+=gaps[i];}return lines.join('\n');})()}
-            </svg>
-            <!-- Route layer: aspect ratio preserved -->
-            <svg viewBox="0 0 600 280" fill="none" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%">
-              <!-- Solid: start to passed -->
-              <path d="M46,209 C100,200 140,180 174,152" stroke="#c9a227" stroke-width="2" opacity="0.85" fill="none" stroke-linecap="round"/>
-              <!-- Solid: passed to current -->
-              <path d="M186,148 C220,120 250,90 294,81" stroke="#c9a227" stroke-width="2" opacity="0.85" fill="none" stroke-linecap="round"/>
-              <!-- Dashed: current to incomplete (gap at both ends) -->
-              <path d="M306,79 C340,72 380,100 414,119" stroke="#c9a227" stroke-width="1" stroke-dasharray="4 3" opacity="0.35" fill="none"/>
-              <!-- Dashed: incomplete to destination (gap at both ends) -->
-              <path d="M426,121 C460,140 500,110 554,72" stroke="#c9a227" stroke-width="1" stroke-dasharray="4 3" opacity="0.35" fill="none"/>
-              <!-- Start -->
-              <rect x="36" y="206" width="8" height="8" transform="rotate(45 40 210)" fill="#8e7019"/>
-              <circle cx="40" cy="210" r="1.5" fill="var(--bg)"/>
-              <!-- Passed -->
-              <rect x="176" y="146" width="8" height="8" transform="rotate(45 180 150)" fill="#8e7019"/>
-              <circle cx="180" cy="150" r="1.5" fill="var(--bg)"/>
-              <!-- Current -->
-              <rect x="296" y="76" width="8" height="8" transform="rotate(45 300 80)" fill="#c9a227"/>
-              <line x1="300" y1="68" x2="300" y2="74" stroke="#c9a227" stroke-width="0.75"/>
-              <line x1="300" y1="86" x2="300" y2="92" stroke="#c9a227" stroke-width="0.75"/>
-              <line x1="290" y1="80" x2="296" y2="80" stroke="#c9a227" stroke-width="0.75"/>
-              <line x1="304" y1="80" x2="310" y2="80" stroke="#c9a227" stroke-width="0.75"/>
-              <!-- Incomplete -->
-              <rect x="416" y="116" width="8" height="8" transform="rotate(45 420 120)" fill="none" stroke="rgba(232,228,220,0.55)" stroke-width="1"/>
-              <!-- Destination -->
-              <rect x="556" y="66" width="8" height="8" transform="rotate(45 560 70)" fill="none" stroke="rgba(232,228,220,0.55)" stroke-width="1"/>
-              <!-- Labels -->
-              <text x="34" y="230" fill="#8e7019" font-family="var(--font-mono)" font-size="7">START</text>
-              <text x="164" y="170" fill="#8e7019" font-family="var(--font-mono)" font-size="7">PASSAGE 1</text>
-              <text x="276" y="100" fill="#c9a227" font-family="var(--font-mono)" font-size="7">CURRENT</text>
-              <text x="404" y="140" fill="rgba(232,228,220,0.55)" font-family="var(--font-mono)" font-size="7">HARD PASSAGE</text>
-              <text x="540" y="60" fill="rgba(232,228,220,0.55)" font-family="var(--font-mono)" font-size="7">DESTINATION</text>
-            </svg>
+      <div class="sect"><div class="sect__title">Brand Application</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">The terrain pattern is abstract brand symbolism — the journey has topography. Use as background texture in marketing, onboarding, and brand moments. Not as literal map imagery.</p>
+        <div class="grid grid--2">
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Section header</div>
+            <div style="height:120px;position:relative;background:var(--void-300);display:flex;align-items:flex-end;padding:20px 24px">
+              <svg viewBox="0 0 600 120" fill="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.7">
+                ${renderTerrain(600, 120, 'rgba(232,228,220,ALPHA)', 0.04, 0.14, 14, denseGaps, 55)}
+              </svg>
+              <div style="position:relative;z-index:1">
+                <div style="font-family:var(--font-serif);font-size:22px;color:var(--fg);letter-spacing:-0.01em">Your Route</div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-top:4px">WEEK 6 OF 10</div>
+              </div>
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Card background</div>
+            <div style="height:120px;position:relative;background:var(--void-300);border-radius:var(--r-2);display:flex;align-items:center;justify-content:center">
+              <svg viewBox="0 0 400 120" fill="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.5">
+                ${renderTerrain(400, 120, 'rgba(232,228,220,ALPHA)', 0.03, 0.12, 14, denseGaps, 88)}
+              </svg>
+              <div style="position:relative;z-index:1;text-align:center">
+                <div style="font-family:var(--font-serif);font-size:36px;color:var(--fg);font-weight:500">78</div>
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase">Predicted score</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="sect"><div class="sect__title">How the System Works</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Lines are not evenly spaced. The gap between each line varies to create the illusion of terrain elevation — like a topographic map viewed from above.</p>
+      <div class="sect"><div class="sect__title">How It Works</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">A shared base shape defines the terrain. Each line inherits this shape with slight drift — so neighbouring lines flow coherently, like real contour maps.</p>
         <div class="grid grid--2" style="margin-bottom:var(--sp-5)">
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Wide gap to next line → dark line.</b> Represents a ridge or peak. The line is prominent because it's isolated — the eye reads it as elevation.</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Narrow gap to next line → light line.</b> Represents a slope or valley. Lines cluster together and fade, like contours on steep terrain.</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Opacity formula:</b> <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">opacity = base + (nextGap / maxGap) × range</code></div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Curves:</b> Organic flowing lines with multi-frequency noise (slow + medium + random). 12 control points per line, cubic bezier smoothing.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Coherent flow:</b> All lines share a base terrain profile (layered sine waves). Each line adds tiny per-line drift and phase shift, so they move together but aren't identical.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Density = elevation:</b> Variable gaps between lines. Tight clusters (3-4px) = steep slopes. Wide gaps (16-24px) = ridges/plateaus. The eye reads this as topography.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Opacity:</b> Darker lines where gaps are wider (isolated = prominent). Lighter where clustered (many lines fade together). Formula: <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">base + (nextGap / maxGap) × range</code></div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Smoothing:</b> 20 control points per line, cubic bezier interpolation. 0.8px stroke. Single colour — chalk on void, ink on paper.</div></div>
         </div>
-        <div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre><span class="c">/* Variable gaps define terrain elevation */</span>
-gaps = [8, 10, 6, 5, 4, 3, 3, 4, 5, 7, 12, 18, 28, ...]
-
-<span class="c">/* Each line: organic curve with noise */</span>
-for each line i:
-  nextGap = gaps[i + 1]
-  opacity = base + (nextGap / maxGap) × range
-  amplitude = 8 + nextGap × 0.8  <span class="c">// wider gaps → bigger curves</span>
-  path = cubicBezier(12 control points, multi-frequency noise)
-
-<span class="c">/* Key parameters */</span>
-Stroke width:   1px
-Control points: 12 per line (cubic bezier)
-Amplitude:      8 - 30px (driven by gap size)
-Gap range:      3px (tight cluster) to 28px (wide ridge)
-Opacity range:  0.04 - 0.22 (void) / 0.06 - 0.28 (paper)
-Color:          chalk on void, ink on paper</pre></div>
       </div>
 
       <div class="sect"><div class="sect__title">Rules</div>
         <div class="grid grid--2">
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Lines flow organically with multi-frequency curves — like real topographic contours, not rigid geometry</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Edges fade out, center is strongest. Creates depth without a hard boundary</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">0.75px stroke max. Thinner than component icon strokes - these are texture, not UI</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Single color - chalk on void, ink on paper. Gold only for the route line itself</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Use on section backgrounds and the atlas. Never on cards, buttons, inputs, or chrome</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Clip to container. The partial reveal of ridges is more powerful than showing the full pattern</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Brand texture only.</b> Section headers, hero backgrounds, marketing. Never on cards, buttons, inputs, or interactive chrome.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Abstract symbolism.</b> Represents the journey, not a literal map. Don't try to make routes follow the contours — that's forced.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Clip to container.</b> Partial reveals are more powerful than showing the full pattern. Let it bleed off edges.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Low opacity on content.</b> When text/numbers sit on top, reduce terrain opacity to 50-70% so it stays as texture, not noise.</div></div>
         </div>
       </div>
     </div>`;
