@@ -3046,35 +3046,33 @@ P.interstitial = {
     var container = document.getElementById('interstitialConfetti');
     if (!container) return;
     var colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff','#A8E6CF','#FFD93D','#6BCB77'];
-    function spawnWave(count, delayBase) {
-      for (var i = 0; i < count; i++) {
-        (function() {
-          var dot = document.createElement('div');
-          var size = 4 + Math.random() * 8;
-          var left = Math.random() * 100;
-          var delay = delayBase + Math.random() * 1200;
-          var duration = 2500 + Math.random() * 2500;
-          var drift = (Math.random() - 0.5) * 80;
-          var rotation = Math.floor(Math.random() * 720);
-          var color = colors[Math.floor(Math.random() * colors.length)];
-          var isRect = Math.random() > 0.5;
-          var h = isRect ? size * 0.4 : size;
-          var br = isRect ? '2px' : '50%';
-          dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + h + 'px;border-radius:' + br + ';background:' + color + ';left:' + left + '%;top:-12px;opacity:1;pointer-events:none;z-index:2';
-          container.appendChild(dot);
-          setTimeout(function() {
-            var fadeDur = Math.round(duration * 0.5);
-            dot.style.transition = 'transform ' + duration + 'ms cubic-bezier(0.15,0.6,0.35,1), opacity ' + fadeDur + 'ms ease-in';
-            dot.style.transform = 'translateY(700px) translateX(' + drift + 'px) rotate(' + rotation + 'deg)';
-            dot.style.opacity = '0';
-          }, delay);
-          setTimeout(function() { dot.remove(); }, delay + duration + 100);
-        })();
-      }
+    // Steady stream over 3 seconds
+    var totalPieces = 80;
+    var streamDuration = 3000;
+    for (var i = 0; i < totalPieces; i++) {
+      (function() {
+        var dot = document.createElement('div');
+        var size = 4 + Math.random() * 8;
+        var left = Math.random() * 100;
+        var delay = Math.random() * streamDuration;
+        var fallTime = 1800 + Math.random() * 1500;
+        var drift = (Math.random() - 0.5) * 80;
+        var rotation = Math.floor(Math.random() * 720);
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        var isRect = Math.random() > 0.5;
+        var h = isRect ? size * 0.4 : size;
+        var br = isRect ? '2px' : '50%';
+        dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + h + 'px;border-radius:' + br + ';background:' + color + ';left:' + left + '%;top:-12px;opacity:1;pointer-events:none;z-index:2';
+        container.appendChild(dot);
+        setTimeout(function() {
+          var fadeDur = Math.round(fallTime * 0.5);
+          dot.style.transition = 'transform ' + fallTime + 'ms cubic-bezier(0.15,0.6,0.35,1), opacity ' + fadeDur + 'ms ease-in';
+          dot.style.transform = 'translateY(700px) translateX(' + drift + 'px) rotate(' + rotation + 'deg)';
+          dot.style.opacity = '0';
+        }, delay);
+        setTimeout(function() { dot.remove(); }, delay + fallTime + 100);
+      })();
     }
-    spawnWave(60, 0);
-    setTimeout(function() { spawnWave(40, 0); }, 2000);
-    setTimeout(function() { spawnWave(25, 0); }, 4000);
   },
   renderCode() {
     return `<!-- Full-screen mobile interstitial -->
