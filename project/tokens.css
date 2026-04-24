@@ -183,6 +183,15 @@
   /* Radii — engineered, tight */
   --r-0: 0; --r-1: 2px; --r-2: 4px; --r-3: 6px; --r-4: 8px; --r-pill: 999px;
 
+  /* Icon sizes */
+  --icon-xs:  6px;   /* chip dots, decorative diamonds */
+  --icon-sm:  10px;  /* close x, small indicators */
+  --icon-md:  14px;  /* spinner, small button icons */
+  --icon-lg:  18px;  /* default inline icons */
+  --icon-xl:  20px;  /* standard icons, play button */
+  --icon-tab: 22px;  /* bottom tab bar icons */
+  --icon-2xl: 28px;  /* fullscreen video play */
+
   /* Sizes (control heights) */
   --h-xs: 24px;
   --h-sm: 32px;
