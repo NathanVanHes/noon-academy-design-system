@@ -939,35 +939,34 @@ P.gridpaper = {
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Quiz / practice sessions</div>
-            <div style="height:100px;background:var(--void-300);display:grid;place-items:center;padding:0 20px">
-              <div style="width:100%;background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:10px 16px;font-size:13px;color:var(--fg)">What does the author imply by...</div>
+            <div style="height:auto;background:var(--bg);padding:12px 16px">
+              <button class="option" style="pointer-events:none"><span class="option__label">A</span><span class="option__text">The land is completely useless</span></button>
+              <button class="option is-selected" style="pointer-events:none;margin-top:8px"><span class="option__label">B</span><span class="option__text">There is hidden potential</span></button>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Heatmap / mastery grid</div>
-            <div style="height:100px;background:var(--paper-200);display:flex;gap:4px;align-items:center;justify-content:center;padding:0 20px">
+            <div style="height:100px;background:var(--bg);display:flex;gap:4px;align-items:center;justify-content:center;padding:0 20px">
               ${[65,42,88,35,76,91].map(function(s){var t=Math.max(0,Math.min(100,s))/100;var r,g,b;if(t<0.5){var p=t/0.5;r=240+(255-240)*p;g=61+(203-61)*p;b=61+(69-61)*p}else{var p=(t-0.5)/0.5;r=255+(39-255)*p;g=203+(189-203)*p;b=69+(134-69)*p}return '<div style="width:32px;height:32px;border-radius:4px;background:rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')"></div>'}).join('')}
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Cards and raised surfaces</div>
-            <div style="height:100px;background:var(--void-300);display:grid;place-items:center">
-              <div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:16px 20px;width:200px">
-                <div style="font-size:11px;color:var(--fg-faint);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Topic</div>
+            <div style="height:100px;background:var(--bg);display:grid;place-items:center">
+              <div class="card" style="width:200px;padding:16px 20px">
+                <div class="caps" style="margin-bottom:4px">Topic</div>
                 <div style="font-size:15px;color:var(--fg);font-weight:600">Inference</div>
               </div>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Schedule / session lists</div>
-            <div style="height:100px;background:var(--void-300);padding:12px 16px">
-              <div style="display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border)">
-                <span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)">10:00</span>
-                <span style="font-size:13px;color:var(--fg)">Inference & implied meaning</span>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;padding:8px 12px">
-                <span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)">11:30</span>
-                <span style="font-size:13px;color:var(--fg)">Quantitative reasoning</span>
+            <div style="background:var(--bg)">
+              <div class="session session--soon" style="pointer-events:none">
+                <div class="session__time">10:00</div>
+                <div class="session__indicator"></div>
+                <div class="session__body"><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading</div></div>
+                <div class="session__status"><span class="mono" style="color:var(--signal-bright)">Soon</span></div>
               </div>
             </div>
           </div>
@@ -1426,8 +1425,16 @@ P.contours = {
       return lines.join('\n');
     }
 
-    var standardGaps = [7,9,6,5,4,3,3,3,4,5,7,10,16,24,18,12,8,6,4,3,3,4,6,9,14,20,14,8,5,4,3,3,4,6,9];
-    var denseGaps = [4,4,3,3,3,3,4,5,7,10,7,5,3,3,3,4,5,8,12,8,5,3,3,3,4,5,7,10,14,10,7,4,3,3,3,4,5];
+    // Repeat gaps to fill any container height
+    function extendGaps(g, targetH) {
+      var result = []; var total = 0;
+      while (total < targetH + 40) {
+        for (var i = 0; i < g.length && total < targetH + 40; i++) { result.push(g[i]); total += g[i]; }
+      }
+      return result;
+    }
+    var standardBase = [7,9,6,5,4,3,3,3,4,5,7,10,16,24,18,12,8,6,4,3,3,4,6,9,14,20,14,8,5,4,3,3,4,6,9];
+    var denseBase = [4,4,3,3,3,3,4,5,7,10,7,5,3,3,3,4,5,8,12,8,5,3,3,3,4,5,7,10,14,10,7,4,3,3,3,4,5];
 
     return `<div class="sects">
       <div class="sect"><div class="sect__title">Contour Lines</div>
@@ -1437,7 +1444,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On void</div>
             <div style="width:100%;aspect-ratio:1;position:relative;background:var(--void-300)">
               <svg viewBox="0 0 400 400" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${renderTerrain(400, 400, 'rgba(232,228,220,ALPHA)', 0.05, 0.2, 24, standardGaps, 42)}
+                ${renderTerrain(400, 400, 'rgba(232,228,220,ALPHA)', 0.05, 0.2, 24, extendGaps(standardBase, 400), 42)}
               </svg>
             </div>
           </div>
@@ -1445,7 +1452,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">On paper</div>
             <div style="width:100%;aspect-ratio:1;position:relative;background:var(--paper-200)">
               <svg viewBox="0 0 400 400" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-                ${renderTerrain(400, 400, 'rgba(10,15,26,ALPHA)', 0.06, 0.24, 24, standardGaps, 42)}
+                ${renderTerrain(400, 400, 'rgba(10,15,26,ALPHA)', 0.06, 0.24, 24, extendGaps(standardBase, 400), 42)}
               </svg>
             </div>
           </div>
@@ -1457,7 +1464,7 @@ P.contours = {
         <div class="cell" style="padding:0;overflow:hidden">
           <div style="height:280px;position:relative;background:var(--void-300)">
             <svg viewBox="0 0 600 280" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
-              ${renderTerrain(600, 280, 'rgba(232,228,220,ALPHA)', 0.06, 0.18, 14, denseGaps, 17)}
+              ${renderTerrain(600, 280, 'rgba(232,228,220,ALPHA)', 0.06, 0.18, 14, extendGaps(denseBase, 280), 17)}
             </svg>
           </div>
         </div>
@@ -1470,7 +1477,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Section header</div>
             <div style="height:120px;position:relative;background:var(--void-300);display:flex;align-items:flex-end;padding:20px 24px">
               <svg viewBox="0 0 600 120" fill="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.7">
-                ${renderTerrain(600, 120, 'rgba(232,228,220,ALPHA)', 0.04, 0.14, 14, denseGaps, 55)}
+                ${renderTerrain(600, 120, 'rgba(232,228,220,ALPHA)', 0.04, 0.14, 14, extendGaps(denseBase, 120), 55)}
               </svg>
               <div style="position:relative;z-index:1">
                 <div style="font-family:var(--font-serif);font-size:22px;color:var(--fg);letter-spacing:-0.01em">Your Route</div>
@@ -1482,7 +1489,7 @@ P.contours = {
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Card background</div>
             <div style="height:120px;position:relative;background:var(--void-300);border-radius:var(--r-2);display:flex;align-items:center;justify-content:center">
               <svg viewBox="0 0 400 120" fill="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.5">
-                ${renderTerrain(400, 120, 'rgba(232,228,220,ALPHA)', 0.03, 0.12, 14, denseGaps, 88)}
+                ${renderTerrain(400, 120, 'rgba(232,228,220,ALPHA)', 0.03, 0.12, 14, extendGaps(denseBase, 120), 88)}
               </svg>
               <div style="position:relative;z-index:1;text-align:center">
                 <div style="font-family:var(--font-serif);font-size:36px;color:var(--fg);font-weight:500">78</div>
@@ -1503,12 +1510,30 @@ P.contours = {
         </div>
       </div>
 
+      <div class="sect"><div class="sect__title">When to Use</div>
+        <div class="grid grid--2">
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--accent)">✓</b> Section headers and hero backgrounds</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--accent)">✓</b> Marketing and onboarding screens</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--accent)">✓</b> Atlas overview / route map backgrounds</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--accent)">✓</b> Interstitial / celebration backgrounds</div></div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">When NOT to Use</div>
+        <div class="grid grid--2">
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--danger-300)">✗</b> Behind quiz options or practice content — competes with readability</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--danger-300)">✗</b> On cards, buttons, or interactive chrome — terrain is texture, not UI</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--danger-300)">✗</b> Schedule / session lists — too busy behind row content</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b style="color:var(--danger-300)">✗</b> Heatmap / mastery grids — the tile colours ARE the data, don't add noise</div></div>
+        </div>
+      </div>
+
       <div class="sect"><div class="sect__title">Rules</div>
         <div class="grid grid--2">
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Brand texture only.</b> Section headers, hero backgrounds, marketing. Never on cards, buttons, inputs, or interactive chrome.</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Abstract symbolism.</b> Represents the journey, not a literal map. Don't try to make routes follow the contours — that's forced.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Abstract symbolism.</b> Represents the journey, not a literal map. Don't try to make routes follow the contours.</div></div>
           <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Clip to container.</b> Partial reveals are more powerful than showing the full pattern. Let it bleed off edges.</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Low opacity on content.</b> When text/numbers sit on top, reduce terrain opacity to 50-70% so it stays as texture, not noise.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Low opacity on content.</b> When text sits on top, reduce terrain opacity to 50-70% so it stays as texture.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Single colour.</b> Chalk on void, ink on paper. No gradient fills, no coloured lines.</div></div>
         </div>
       </div>
     </div>`;
