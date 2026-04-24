@@ -33,11 +33,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .page{max-width:720px;margin:0 auto;padding:32px 40px}
 @media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}}
 
-/* Header cards */
-.header-cards{display:flex;gap:12px;margin-bottom:24px}
-.header-card{flex:1;background:var(--bg-raised);border-radius:var(--r);padding:16px;text-align:center}
-.header-card__num{font-family:var(--font-mono);font-size:28px;font-weight:700;line-height:1}
-.header-card__label{font-size:11px;color:var(--fg-secondary);margin-top:4px;display:flex;align-items:center;justify-content:center;gap:3px}
+/* Header */
+.header{display:flex;gap:16px;margin-bottom:28px}
+.header-card{flex:1;background:var(--bg-raised);border-radius:var(--r);padding:20px;text-align:center}
+.header-card__num{font-family:var(--font-mono);font-size:32px;font-weight:700;line-height:1}
+.header-card__label{font-size:11px;color:var(--fg-secondary);margin-top:6px}
 
 /* Section */
 .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(20,20,20,0.06)}
@@ -47,40 +47,34 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 /* Topic row */
 .topic{background:var(--bg-raised);border-radius:var(--r);margin-bottom:10px;padding:16px 20px;display:flex;align-items:center;gap:16px;opacity:0;transform:translateY(6px);animation:rowIn 0.3s ease forwards}
 @keyframes rowIn{to{opacity:1;transform:translateY(0)}}
-.topic:hover{box-shadow:0 2px 8px rgba(0,0,0,0.04)}
 
-.topic__score{min-width:48px;text-align:center;flex:none}
-.topic__score-num{font-family:var(--font-mono);font-size:24px;font-weight:700}
 .topic__info{flex:1;min-width:0}
 .topic__name{font-size:14px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.topic__gap-text{font-size:12px;color:var(--fg-secondary);margin-top:2px;font-family:var(--font-mono)}
+.topic__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px;font-family:var(--font-mono);display:flex;align-items:center;gap:4px}
 
-/* Gap bar */
-.topic__gap{flex:none;width:140px}
-.topic__track{position:relative;height:6px;border-radius:3px;background:var(--bg-disabled);overflow:hidden}
-.topic__fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#F03D3D,#FFCB45,#27BD86);background-size:200px 100%;transition:width 0.6s ease}
+/* Score tile — matches heatmap */
+.topic__tile{width:44px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;position:relative;overflow:hidden}
+.topic__tile-score{font-family:var(--font-mono);font-size:14px;font-weight:700;color:rgba(0,0,0,0.35);position:relative;z-index:1}
+/* Mastered tile — striped, star, faded like heatmap */
+.topic__tile.is-mastered{opacity:0.5}
+.topic__tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
+.topic__tile.is-mastered .topic__tile-score{display:none}
+.topic__tile-star{position:relative;z-index:2}
 
 /* Action */
 .topic__action{flex:none}
 .btn-go{height:34px;padding:0 16px;background:var(--btn);color:var(--fg);border:0;border-radius:var(--r);font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
 .btn-go:hover{opacity:0.9}
 
-/* Mastered */
-.mastered-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--fg-secondary);background:rgba(39,189,134,0.08);padding:4px 10px;border-radius:20px}
-
 /* Mobile */
 @media(max-width:540px){
-  .header-cards{flex-direction:column}
+  .header{flex-direction:column}
   .topic{flex-wrap:wrap;gap:10px;padding:14px 16px}
-  .topic__info{flex:1 1 auto;min-width:0;order:1}
-  .topic__score{order:0}
-  .topic__gap{width:100%;order:3}
-  .topic__action{order:4;width:100%}
+  .topic__info{flex:1 1 auto;min-width:0}
+  .topic__action{width:100%}
   .topic__action .btn-go{width:100%}
-  .mastered-badge{order:2}
 }
 
-/* Mastery info link */
 .mastery-link{background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;display:block;text-align:center;margin-top:24px}
 </style>
 </head>
@@ -98,22 +92,18 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="page">
 
-  <!-- Summary cards -->
-  <div class="header-cards">
+  <!-- Summary — emphasise remaining -->
+  <div class="header">
+    <div class="header-card" style="flex:2;background:rgba(20,20,20,0.03)">
+      <div class="header-card__num" style="color:var(--red)" id="remainingCount">0</div>
+      <div class="header-card__label" style="font-weight:600;color:var(--fg)">Topics remaining</div>
+    </div>
     <div class="header-card" style="background:rgba(39,189,134,0.06)">
       <div class="header-card__num" style="color:var(--green)" id="masteredCount">0</div>
       <div class="header-card__label">
-        <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
         Mastered
       </div>
-    </div>
-    <div class="header-card">
-      <div class="header-card__num" style="color:var(--fg)" id="remainingCount">0</div>
-      <div class="header-card__label">Remaining</div>
-    </div>
-    <div class="header-card">
-      <div class="header-card__num" style="color:var(--fg)" id="totalCount">0</div>
-      <div class="header-card__label">Total topics</div>
     </div>
   </div>
 
@@ -121,23 +111,11 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <div class="section-head">
     <div class="section-title">Quantitative</div>
     <div class="section-target">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-      80+ to master
+      <svg width="14" height="14" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+      80+ Level 1
     </div>
   </div>
   <div id="quantTopics"></div>
-
-  <div style="height:24px"></div>
-
-  <!-- Verbal section -->
-  <div class="section-head">
-    <div class="section-title">Verbal</div>
-    <div class="section-target">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-      70+ to master
-    </div>
-  </div>
-  <div id="verbalTopics"></div>
 
   <button class="mastery-link" onclick="document.getElementById('scoreSheet').classList.add('is-open')">How does mastery work?</button>
 
@@ -157,84 +135,74 @@ function scoreColor(s) {
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
-var quantTopics = [
-  { name: 'Algebraic expressions', chapter: 'Algebra', score: 35 },
-  { name: 'Number theory', chapter: 'Fundamentals', score: 76 },
-  { name: 'Data analysis', chapter: 'Statistics', score: 94 },
-  { name: 'Geometry basics', chapter: 'Geometry', score: 18 },
-  { name: 'Ratios & proportions', chapter: 'Algebra', score: 85 },
-];
-var verbalTopics = [
-  { name: 'Inference & implied meaning', chapter: 'Reading', score: 82 },
-  { name: 'Vocabulary in context', chapter: 'Reading', score: 30 },
-  { name: 'Passage structure', chapter: 'Reading', score: 91 },
+var starSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="rgba(0,0,0,0.3)" class="topic__tile-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+
+var topics = [
+  { name: 'Geometry basics', score: 18 },
+  { name: 'Algebraic expressions', score: 35 },
+  { name: 'Number theory', score: 76 },
+  { name: 'Data analysis', score: 94 },
+  { name: 'Ratios & proportions', score: 85 },
 ];
 
-var quantMastery = 80;
-var verbalMastery = 70;
+var mastery = 80;
 
-function renderSection(topics, containerId, mastery) {
-  // Sort: not mastered first (lowest score first), then mastered
-  topics.sort(function(a,b) {
-    var aM = a.score >= mastery ? 1 : 0;
-    var bM = b.score >= mastery ? 1 : 0;
-    if (aM !== bM) return aM - bM;
-    return a.score - b.score;
-  });
+// Sort: not mastered first (lowest), then mastered
+topics.sort(function(a,b) {
+  var aM = a.score >= mastery ? 1 : 0;
+  var bM = b.score >= mastery ? 1 : 0;
+  if (aM !== bM) return aM - bM;
+  return a.score - b.score;
+});
 
-  var container = document.getElementById(containerId);
-  var html = '';
+var container = document.getElementById('quantTopics');
+var html = '';
+var masteredN = 0;
 
-  topics.forEach(function(t, i) {
-    var col = scoreColor(t.score);
-    var mastered = t.score >= mastery;
-    var gap = Math.max(0, mastery - t.score);
-    var pct = Math.min((t.score / mastery) * 100, 100);
-    var delay = i * 80;
+topics.forEach(function(t, i) {
+  var col = scoreColor(t.score);
+  var mastered = t.score >= mastery;
+  var gap = Math.max(0, mastery - t.score);
+  var delay = i * 80;
 
-    html += '<div class="topic" style="animation-delay:' + delay + 'ms">';
-    html += '<div class="topic__score"><div class="topic__score-num" style="color:' + col + '">' + t.score + '</div></div>';
-    html += '<div class="topic__info"><div class="topic__name">' + t.name + '</div>';
+  if (mastered) masteredN++;
 
-    if (mastered) {
-      html += '<div class="topic__gap-text" style="color:var(--green)">Mastered</div>';
-    } else {
-      html += '<div class="topic__gap-text">' + gap + ' to reach ★' + mastery + '+</div>';
-    }
-    html += '</div>';
+  html += '<div class="topic" style="animation-delay:' + delay + 'ms">';
 
-    if (mastered) {
-      html += '<div class="mastered-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> ★' + mastery + '+</div>';
-    } else {
-      html += '<div class="topic__gap"><div class="topic__track"><div class="topic__fill" style="width:0%" data-target="' + Math.round(pct) + '" data-delay="' + (delay + 300) + '"></div></div></div>';
-      html += '<div class="topic__action"><button class="btn-go">Practice</button></div>';
-    }
+  // Tile — matches heatmap visual treatment
+  if (mastered) {
+    html += '<div class="topic__tile is-mastered" style="background:' + col + '">' + starSvg + '</div>';
+  } else {
+    html += '<div class="topic__tile" style="background:' + col + '"><span class="topic__tile-score">' + t.score + '</span></div>';
+  }
 
-    html += '</div>';
-  });
+  // Info
+  html += '<div class="topic__info"><div class="topic__name">' + t.name + '</div>';
+  if (mastered) {
+    html += '<div class="topic__sub" style="color:var(--green)"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--green)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
+  } else {
+    html += '<div class="topic__sub">' + t.score + ' → ★80+ <span style="color:var(--fg-muted);margin-left:4px">(' + gap + ' to go)</span></div>';
+  }
+  html += '</div>';
 
-  container.innerHTML = html;
-}
+  // Action — only for non-mastered
+  if (!mastered) {
+    html += '<div class="topic__action"><button class="btn-go">Practice</button></div>';
+  }
 
-renderSection(quantTopics, 'quantTopics', quantMastery);
-renderSection(verbalTopics, 'verbalTopics', verbalMastery);
+  html += '</div>';
+});
+
+container.innerHTML = html;
 
 // Summary counts
-var allTopics = quantTopics.concat(verbalTopics);
-var masteredQ = quantTopics.filter(function(t){ return t.score >= quantMastery; }).length;
-var masteredV = verbalTopics.filter(function(t){ return t.score >= verbalMastery; }).length;
-var totalMastered = masteredQ + masteredV;
-var total = allTopics.length;
-document.getElementById('masteredCount').textContent = totalMastered;
-document.getElementById('remainingCount').textContent = total - totalMastered;
-document.getElementById('totalCount').textContent = total;
+document.getElementById('masteredCount').textContent = masteredN;
+document.getElementById('remainingCount').textContent = topics.length - masteredN;
 
 // Animate fills
 setTimeout(function() {
   document.querySelectorAll('.topic__fill').forEach(function(bar) {
-    var target = parseInt(bar.dataset.target);
-    var delay = parseInt(bar.dataset.delay);
-    setTimeout(function() { bar.style.width = target + '%'; }, delay);
+    bar.style.width = bar.dataset.target + '%';
   });
 }, 100);
 </script>
