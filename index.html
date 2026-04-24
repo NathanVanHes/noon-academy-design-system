@@ -613,153 +613,27 @@ P.motion = {
         </div>
       </div>
 
-      <div class="sect"><div class="sect__title">Component Entrances</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">How components arrive on screen. Direction communicates spatial relationship — content comes from below, overlays from the side or bottom.</p>
-        <div class="grid grid--2">
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('.session');el.style.transition='none';el.style.opacity='0';el.style.transform='translateY(6px)';void el.offsetWidth;el.style.transition='all 350ms cubic-bezier(.22,.61,.36,1)';el.style.opacity='1';el.style.transform='translateY(0)';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Cards / list items — fade up</div>
-            <div style="margin:8px 0 10px">
-              <div class="session session--live" style="pointer-events:none;font-size:12px">
-                <div class="session__time" style="font-size:10px">8:30</div><div class="session__indicator"></div>
-                <div class="session__body"><div class="session__title" style="font-size:12px">Storytelling</div></div>
-                <div class="session__status"><span class="chip chip--signal" style="font-size:10px"><span class="chip__dot"></span> Live</span></div>
-              </div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">translateY(6px) → 0, opacity 0 → 1</div>
-            <div style="font-size:12px;color:var(--fg-faint)">350ms ease. Stagger delay: 30-80ms per item.</div>
-          </div>
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=box-shadow]');el.style.transition='none';el.style.transform='translateY(100%)';void el.offsetWidth;el.style.transition='transform 320ms cubic-bezier(.22,.61,.36,1)';el.style.transform='translateY(0)';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Bottom sheet — slide up</div>
-            <div style="margin:8px 0 10px;height:48px;position:relative;overflow:hidden">
-              <div class="sheet" style="position:absolute;bottom:0;left:0;right:0;border-radius:var(--r-2) var(--r-2) 0 0;padding:var(--sp-2) var(--sp-3)">
-                <div class="sheet__handle" style="margin-bottom:var(--sp-1)"><div class="sheet__handle-bar"></div></div>
-                <div style="font-size:11px;color:var(--fg);font-weight:600">Session details</div>
-              </div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">translateY(100%) → 0</div>
-            <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Scrim fades in simultaneously.</div>
-          </div>
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=border-radius]');el.style.transition='none';el.style.transform='scale(0.95)';el.style.opacity='0';void el.offsetWidth;el.style.transition='all 200ms cubic-bezier(.22,.61,.36,1)';el.style.transform='scale(1)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Modal / dialog — scale up</div>
-            <div style="margin:8px 0 10px">
-              <div class="dialog" style="padding:var(--sp-3) var(--sp-4);max-width:200px">
-                <div class="dialog__title" style="font-size:12px">Are you sure?</div>
-                <div class="dialog__body" style="font-size:10px;margin-top:2px">This can't be undone.</div>
-              </div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(0.95) → 1, opacity 0 → 1</div>
-            <div style="font-size:12px;color:var(--fg-faint)">200ms ease. Centered on screen.</div>
-          </div>
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('.alert');el.style.transition='none';el.style.transform='translateY(-100%)';el.style.opacity='0';void el.offsetWidth;el.style.transition='all 320ms cubic-bezier(.22,.61,.36,1)';el.style.transform='translateY(0)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Toast / alert — slide down</div>
-            <div style="margin:8px 0 10px">
-              <div class="alert alert--ok" style="font-size:11px;padding:8px 12px"><div>Practice session saved</div></div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">translateY(-100%) → 0</div>
-            <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Auto-dismisses after 4s.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Drilldown panel — slide in</div>
-            <div style="margin:8px 0 10px">
-              <div class="card" style="padding:var(--sp-3) var(--sp-4);border-inline-start:3px solid var(--accent)">
-                <div style="font-size:11px;color:var(--fg);font-weight:500">Topic detail →</div>
-              </div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">translateX(100%) → 0</div>
-            <div style="font-size:12px;color:var(--fg-faint)">320ms ease. Overlay fades in behind.</div>
-          </div>
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(b){var el=b.closest('.cell').querySelector('[style*=inline-block]');el.style.transition='none';el.style.opacity='0';void el.offsetWidth;el.style.transition='opacity 120ms cubic-bezier(.22,.61,.36,1)';el.style.opacity='1';})(this)"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Tooltip / popover — fade in</div>
-            <div style="margin:8px 0 10px;display:inline-block;background:var(--fg);color:var(--bg);font-size:10px;padding:4px 8px;border-radius:4px">Score: 76</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity 0 → 1</div>
-            <div style="font-size:12px;color:var(--fg-faint)">120ms ease. No movement, just opacity.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sect"><div class="sect__title">Interaction Feedback</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Micro-animations that respond to user input. These are fast (120ms) and subtle — the student should feel them, not see them.</p>
-        <div class="grid grid--2">
-          <div class="cell">
-            <div class="cell__label">Button hover/press</div>
-            <div style="margin:8px 0 10px;display:flex;gap:8px">
-              <button class="btn btn--primary btn--sm">Hover me</button>
-              <button class="btn btn--ghost btn--sm">Hover me</button>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.9, 120ms</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Slight dim on hover. No scale, no shadow change.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Tab / segmented switch</div>
-            <div style="margin:8px 0 10px">
-              <div class="seg" data-interactive="seg"><button class="is-on">Day</button><button>Week</button><button>Month</button></div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">background + color, 120ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Active indicator cross-fades. Click to see.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Card hover</div>
-            <div style="margin:8px 0 10px">
-              <div class="card card--interactive" style="padding:var(--sp-3) var(--sp-4);cursor:pointer">
-                <div style="font-size:12px;color:var(--fg);font-weight:600">Hover this card</div>
-              </div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">box-shadow + translateY(-1px), 120ms</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Interactive cards lift slightly on hover.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Input focus</div>
-            <div style="margin:8px 0 10px">
-              <input class="input" style="font-size:12px;padding:6px 10px" placeholder="Click to focus">
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">border-color + ring, 120ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Border transitions to accent on focus.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sect"><div class="sect__title">Data &amp; Progress</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes — scores, fill bars, charts. These are slower and more deliberate. <button class="btn btn--ghost btn--sm" style="margin-left:8px" onclick="(function(){document.getElementById('motionCounter').textContent='0';var w=document.getElementById('motionSessionWrap');w.style.transition='none';w.style.width='0%';var c=document.getElementById('motionCircle');var circ=2*Math.PI*18;c.style.transition='none';c.style.strokeDashoffset=circ;void w.offsetWidth;setTimeout(function(){var el=document.getElementById('motionCounter');var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);w.style.transition='width 800ms cubic-bezier(.22,.61,.36,1)';w.style.width='100%';c.style.transition='stroke-dashoffset 800ms cubic-bezier(.22,.61,.36,1)';c.style.strokeDashoffset=circ*0.24;},200);})()">Replay all</button></p>
+      <div class="sect"><div class="sect__title">Examples</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Key animations with real components. Full motion specs are baked into each component page.</p>
         <div class="grid grid--2">
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var el=document.getElementById('motionCounter');el.textContent='0';setTimeout(function(){var start=performance.now();(function tick(now){var p=Math.min((now-start)/600,1);el.textContent=Math.round(76*(1-Math.pow(1-p,2)));if(p<1)requestAnimationFrame(tick);})(start);},100);})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Score counter roll-up</div>
             <div style="margin:8px 0 10px;font-family:var(--font-mono);font-size:var(--fs-24);font-weight:700;color:var(--fg)" id="motionCounter">76</div>
             <div class="mono" style="font-size:11px;margin-bottom:4px">0 → target, 600ms ease-out</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Decelerates near the end. Staggered per tile (30ms).</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Decelerates near the end. Staggered per tile.</div>
           </div>
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var c=document.getElementById('motionCircle');var circ=2*Math.PI*18;c.style.transition='none';c.style.strokeDashoffset=circ;void c.offsetWidth;c.style.transition='stroke-dashoffset 800ms cubic-bezier(.22,.61,.36,1)';c.style.strokeDashoffset=circ*0.24;})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Circular progress</div>
-            <div style="margin:8px 0 10px">
-              <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="var(--border)" stroke-width="3"/><circle id="motionCircle" cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${2*Math.PI*18}" stroke-dashoffset="${2*Math.PI*18*0.24}" transform="rotate(-90 22 22)" style="transition:stroke-dashoffset 800ms cubic-bezier(.22,.61,.36,1)"/></svg>
+          <div class="cell">
+            <div class="cell__label">Hover feedback</div>
+            <div style="margin:8px 0 10px;display:flex;gap:8px">
+              <button class="btn btn--primary btn--sm">Hover me</button>
+              <button class="btn btn--ghost btn--sm">Hover me</button>
             </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">stroke-dashoffset, 800ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Ring fills clockwise from top.</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.9, 120ms</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Same behaviour across all button variants.</div>
           </div>
           <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var w=document.getElementById('motionSessionWrap');w.style.transition='none';w.style.width='0%';void w.offsetWidth;w.style.transition='width 800ms cubic-bezier(.22,.61,.36,1)';w.style.width='100%';})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Session bar unfurl</div>
-            <div style="margin:8px 0 10px;overflow:hidden;width:100%;transition:width 800ms cubic-bezier(.22,.61,.36,1)" id="motionSessionWrap">
-              <div class="session-bar" id="motionSessionBar" style="min-width:200px">
-                <div class="session-bar__seg is-correct"></div>
-                <div class="session-bar__seg is-correct"></div>
-                <div class="session-bar__seg is-incorrect"></div>
-                <div class="session-bar__seg is-correct"></div>
-                <div class="session-bar__seg"></div>
-                <div class="session-bar__seg"></div>
-              </div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → 100%, 800ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Bar unfurls left to right as one unit.</div>
-          </div>
-          <div class="cell" style="position:relative">
-            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var dots=document.querySelectorAll('#motionSteps .steps__dot, #motionSteps .steps__line');dots.forEach(function(d){d.style.transition='none';d.style.opacity='0';});void document.getElementById('motionSteps').offsetWidth;dots.forEach(function(d,i){setTimeout(function(){d.style.transition='opacity 200ms ease';d.style.opacity='1';},i*100);});})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
+            <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var dots=document.querySelectorAll('#motionSteps .steps__dot, #motionSteps .steps__line');dots.forEach(function(d){d.style.transition='none';d.style.opacity='0';});void document.getElementById('motionSteps').offsetWidth;dots.forEach(function(d,i){setTimeout(function(){d.style.transition='opacity 200ms ease';d.style.opacity='1';},i*100);})})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
             <div class="cell__label">Route steps entrance</div>
             <div style="margin:8px 0 10px">
               <div class="steps" id="motionSteps">
@@ -775,45 +649,20 @@ P.motion = {
             <div class="mono" style="font-size:11px;margin-bottom:4px">opacity 0 → 1, 200ms ease, 100ms stagger</div>
             <div style="font-size:12px;color:var(--fg-faint)">Each dot and line fades in sequentially.</div>
           </div>
-        </div>
-      </div>
-
-      <div class="sect"><div class="sect__title">Celebrations</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Reserved for mastery moments. These are the only animations that should feel dramatic — the student earned it.</p>
-        <div class="grid grid--2">
           <div class="cell" style="position:relative">
             <button style="position:absolute;top:8px;right:8px;background:var(--hover-overlay);border:0;width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;opacity:0.5;transition:opacity 0.12s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" onclick="(function(){var tile=document.getElementById('motionTile');var star=document.getElementById('motionStar');tile.style.opacity='1';tile.style.transform='scale(1)';tile.style.transition='none';star.style.opacity='0';star.style.transition='none';void tile.offsetWidth;tile.style.transition='transform 0.2s ease';tile.style.transform='scale(1.08)';setTimeout(function(){tile.style.transform='scale(1)';},200);var colors=['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];for(var c=0;c<15;c++){(function(){var dot=document.createElement('div');var sz=2+Math.random()*3;dot.style.cssText='position:absolute;width:'+sz+'px;height:'+sz+'px;border-radius:'+(Math.random()>0.5?'50%':'1px')+';background:'+colors[Math.floor(Math.random()*colors.length)]+';left:'+(5+Math.random()*90)+'%;top:-3px;z-index:5;pointer-events:none;opacity:1';tile.appendChild(dot);var dur=400+Math.random()*300;setTimeout(function(){dot.style.transition='transform '+dur+'ms ease-in, opacity '+(dur*0.4)+'ms ease '+(dur*0.6)+'ms';dot.style.transform='translateY(60px) rotate('+Math.floor(Math.random()*360)+'deg)';dot.style.opacity='0';},Math.random()*300);setTimeout(function(){dot.remove();},dur+400);})();}setTimeout(function(){star.style.transition='all 300ms cubic-bezier(.34,1.56,.64,1)';star.style.opacity='1';},500);setTimeout(function(){tile.style.transition='opacity 0.8s ease';tile.style.opacity='0.4';},1200);})()"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--fg-muted)"><path d="M4 2l10 6-10 6z"/></svg></button>
-            <div class="cell__label">Mastery confetti</div>
+            <div class="cell__label">Mastery celebration</div>
             <div style="margin:8px 0 10px;display:flex;gap:8px;align-items:center">
               <div style="width:48px;height:48px;border-radius:6px;position:relative;overflow:hidden;flex:none" id="motionTile">
                 <div style="position:absolute;inset:0;background:rgb(39,189,134);display:flex;align-items:center;justify-content:center">
-                  <svg id="motionStar" width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="opacity:0;transform:scale(1.8);transition:all 300ms cubic-bezier(.34,1.56,.64,1)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
+                  <svg id="motionStar" width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="opacity:0;transition:all 300ms cubic-bezier(.34,1.56,.64,1)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
                 </div>
                 <div style="position:absolute;inset:0;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 4px,rgba(0,0,0,0.4) 4px,rgba(0,0,0,0.4) 5px);pointer-events:none"></div>
               </div>
               <div style="font-size:11px;color:var(--fg-faint)">Throb → confetti → star → fade</div>
             </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">20–80 particles, accent/gold/white</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Heatmap: 20 pieces, 1s. Interstitial: 80, 3s.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Star stamp</div>
-            <div style="margin:8px 0 10px;display:flex;gap:6px;align-items:center">
-              <svg width="24" height="24" viewBox="0 0 12 12" fill="var(--accent)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-              <div style="font-size:11px;color:var(--fg-faint)">Pops in with spring overshoot</div>
-            </div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(1.8) → 0.95 → 1, 300ms spring</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Triggered after confetti starts falling.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Tile throb</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(1) → 1.08 → 1, 200ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">Quick pulse when mastery confetti fires. Single throb, not a loop.</div>
-          </div>
-          <div class="cell">
-            <div class="cell__label">Mastered tile fade</div>
-            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.4, 800ms ease</div>
-            <div style="font-size:12px;color:var(--fg-faint)">After confetti + star, tile fades to deprioritise. Stripe stays visible.</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">Full sequence, 1.2s total</div>
+            <div style="font-size:12px;color:var(--fg-faint)">See heatmap and exam roundup for live examples.</div>
           </div>
         </div>
       </div>
