@@ -677,46 +677,112 @@ P.gridsystem = {
 
 // ──────── GRID PAPER ────────
 P.gridpaper = {
-  title: 'Grid Paper', desc: 'The signature background texture. Grid lines at the spacing scale - the surveyor\'s field notebook.',
+  title: 'Grid Paper', desc: 'The signature background texture. Graph paper from the surveyor\'s field notebook. Gives surfaces a tactile, measured quality.',
   render() {
+    var voidGrid16 = 'linear-gradient(rgba(232,228,220,0.04) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,rgba(232,228,220,0.04) 1px,transparent 1px) 0 0/16px 16px,var(--void-300)';
+    var paperGrid16 = 'linear-gradient(rgba(10,15,26,0.05) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,rgba(10,15,26,0.05) 1px,transparent 1px) 0 0/16px 16px,var(--paper-200)';
+    var voidMajor = 'linear-gradient(rgba(201,162,39,0.06) 1px,transparent 1px) 0 0/64px 64px,linear-gradient(90deg,rgba(201,162,39,0.06) 1px,transparent 1px) 0 0/64px 64px,linear-gradient(rgba(232,228,220,0.04) 1px,transparent 1px) 0 0/8px 8px,linear-gradient(90deg,rgba(232,228,220,0.04) 1px,transparent 1px) 0 0/8px 8px,var(--void-300)';
+
     return `<div class="sects">
-      <div class="sect"><div class="sect__title">Void Grid</div>
-        <div class="cell">
-          <div style="width:100%;max-width:480px;height:240px;background:
-            linear-gradient(rgba(232,228,220,0.04) 1px, transparent 1px) 0 0 / 16px 16px,
-            linear-gradient(90deg, rgba(232,228,220,0.04) 1px, transparent 1px) 0 0 / 16px 16px,
-            var(--void-300);border-radius:var(--r-2);box-shadow:inset 0 0 0 1px var(--border)"></div>
-          <div class="cell__label" style="margin-top:var(--sp-3)">Chalk 16px grid on void - default field-notebook surface</div>
-        </div>
-      </div>
-      <div class="sect"><div class="sect__title">Paper Grid</div>
-        <div class="cell">
-          <div style="width:100%;max-width:480px;height:240px;background:
-            linear-gradient(rgba(10,15,26,0.05) 1px, transparent 1px) 0 0 / 16px 16px,
-            linear-gradient(90deg, rgba(10,15,26,0.05) 1px, transparent 1px) 0 0 / 16px 16px,
-            var(--paper-200);border-radius:var(--r-2);box-shadow:inset 0 0 0 1px rgba(10,15,26,0.12)"></div>
-          <div class="cell__label" style="margin-top:var(--sp-3)">Ink 16px grid on paper - graph paper stock</div>
-        </div>
-      </div>
-      <div class="sect"><div class="sect__title">Void with Major Lines</div>
-        <div class="cell">
-          <div style="width:100%;max-width:480px;height:240px;background:
-            linear-gradient(rgba(201,162,39,0.06) 1px, transparent 1px) 0 0 / 64px 64px,
-            linear-gradient(90deg, rgba(201,162,39,0.06) 1px, transparent 1px) 0 0 / 64px 64px,
-            linear-gradient(rgba(232,228,220,0.04) 1px, transparent 1px) 0 0 / 8px 8px,
-            linear-gradient(90deg, rgba(232,228,220,0.04) 1px, transparent 1px) 0 0 / 8px 8px,
-            var(--void-300);border-radius:var(--r-2);box-shadow:inset 0 0 0 1px var(--border)"></div>
-          <div class="cell__label" style="margin-top:var(--sp-3)">Gold 64px major lines over chalk 8px minor - use sparingly for atlas surfaces</div>
-        </div>
-      </div>
-      <div class="sect"><div class="sect__title">Usage Rules</div>
+      <div class="sect"><div class="sect__title">Grid Variants</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 20px;max-width:55ch">Three levels of grid. Standard for most surfaces. Major lines for atlas/hero. Plain background when grid would compete with content.</p>
         <div class="grid grid--2">
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Grid paper is for surfaces, not overlays</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Default grid is uniform 8px - no visible hierarchy</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Major 64px lines in gold - reserved for atlas and terrain views</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Grid is for page surfaces and hero sections - not on cards</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Never use grid lines as decorative borders</div></div>
-          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)">Grid is baked into surfaces, not drawn on top</div></div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Standard — 16px on void</div>
+            <div style="width:100%;height:180px;background:${voidGrid16}"></div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Standard — 16px on paper</div>
+            <div style="width:100%;height:180px;background:${paperGrid16}"></div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">Major + minor — atlas surfaces</div>
+            <div style="width:100%;height:180px;background:${voidMajor}"></div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0">No grid — plain surface</div>
+            <div style="width:100%;height:180px;background:var(--void-300)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">When to Use Grid</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Grid adds a sense of measurement and structure. Use it where the student is working or navigating. Remove it where the focus should be entirely on content.</p>
+        <div class="grid grid--2">
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Explorer / design system canvas</div>
+            <div style="height:100px;background:${voidGrid16};display:grid;place-items:center">
+              <div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:12px 20px;font-size:13px;color:var(--fg)">Component preview area</div>
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Atlas / route overview</div>
+            <div style="height:100px;background:${voidMajor};display:flex;align-items:center;padding:0 20px">
+              <svg width="200" height="20" viewBox="0 0 200 20">
+                <line x1="10" y1="10" x2="190" y2="10" stroke="#c9a227" stroke-width="1.5" opacity="0.6"/>
+                <rect x="6" y="6" width="8" height="8" transform="rotate(45 10 10)" fill="#8e7019"/>
+                <rect x="76" y="6" width="8" height="8" transform="rotate(45 80 10)" fill="#c9a227"/>
+                <rect x="146" y="6" width="8" height="8" transform="rotate(45 150 10)" fill="none" stroke="rgba(232,228,220,0.55)" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Empty states</div>
+            <div style="height:100px;background:${voidGrid16};display:grid;place-items:center;text-align:center">
+              <div><div style="font-size:13px;color:var(--fg-muted)">No sessions today</div><div style="font-size:11px;color:var(--fg-faint);margin-top:4px">Check back tomorrow</div></div>
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Schedule / calendar background</div>
+            <div style="height:100px;background:${voidGrid16};padding:12px 16px">
+              <div style="display:flex;gap:8px;align-items:center;padding:8px 12px;background:var(--bg-overlay);border-radius:var(--r-1);border-left:3px solid var(--accent)">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--fg-faint)">10:00</span>
+                <span style="font-size:13px;color:var(--fg)">Inference & implied meaning</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">When NOT to Use Grid</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Grid competes with dense content. Remove it when the surface is already busy or when the focus needs to be entirely on what's shown.</p>
+        <div class="grid grid--2">
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Quiz / practice sessions</div>
+            <div style="height:100px;background:var(--void-300);display:grid;place-items:center;padding:0 20px">
+              <div style="width:100%;background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:10px 16px;font-size:13px;color:var(--fg)">What does the author imply by...</div>
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Heatmap / mastery grid</div>
+            <div style="height:100px;background:var(--paper-200);display:flex;gap:4px;align-items:center;justify-content:center;padding:0 20px">
+              ${[65,42,88,35,76,91].map(function(s){var t=Math.max(0,Math.min(100,s))/100;var r,g,b;if(t<0.5){var p=t/0.5;r=240+(255-240)*p;g=61+(203-61)*p;b=61+(69-61)*p}else{var p=(t-0.5)/0.5;r=255+(39-255)*p;g=203+(189-203)*p;b=69+(134-69)*p}return '<div style="width:32px;height:32px;border-radius:4px;background:rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')"></div>'}).join('')}
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Cards and raised surfaces</div>
+            <div style="height:100px;background:var(--void-300);display:grid;place-items:center">
+              <div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:16px 20px;width:200px">
+                <div style="font-size:11px;color:var(--fg-faint);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Topic</div>
+                <div style="font-size:15px;color:var(--fg);font-weight:600">Inference</div>
+              </div>
+            </div>
+          </div>
+          <div class="cell" style="padding:0;overflow:hidden">
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Interstitials / celebrations</div>
+            <div style="height:100px;background:var(--void-300);display:grid;place-items:center;text-align:center">
+              <div><div style="font-family:var(--font-serif);font-size:20px;color:var(--fg)">You mastered it!</div><div style="font-size:12px;color:var(--fg-subtle);margin-top:4px">Clean background, no noise</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Specs</div>
+        <div class="grid grid--2">
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Standard grid:</b> 16px × 16px. 1px lines. Chalk at 4% on void, ink at 5% on paper.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Major + minor:</b> 64px gold at 6% over 8px chalk at 4%. Atlas and terrain views only.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Implementation:</b> CSS <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">linear-gradient</code> on <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">background</code>. In RN, use a tiling SVG or shader.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>The rule:</b> Grid is baked into the surface — it's the material, not a decoration. If you wouldn't draw grid lines on graph paper in that context, don't use it.</div></div>
         </div>
       </div>
     </div>`;
@@ -1110,15 +1176,25 @@ P.contours = {
       var pts = 20; // more control points = smoother
       var step = w / (pts - 1);
 
-      // Build a base shape — the "terrain profile" all lines follow
+      // Build a base shape with seeded randomness for irregularity
       var rng = seeded(seedBase || 42);
       var baseShape = [];
       for (var p = 0; p < pts; p++) {
-        // Two slow sine waves create the main terrain undulation
-        var s1 = Math.sin(p * 0.25 + 1.2) * 12;
-        var s2 = Math.sin(p * 0.55 + 3.8) * 6;
-        var s3 = Math.sin(p * 1.1 + 0.5) * 3;
-        baseShape.push(s1 + s2 + s3);
+        var s1 = Math.sin(p * 0.22 + 1.2) * 14;
+        var s2 = Math.sin(p * 0.51 + 3.8) * 8;
+        var s3 = Math.sin(p * 0.95 + 0.5) * 4;
+        var irregularity = (rng() - 0.5) * 10; // break the pure sine pattern
+        baseShape.push(s1 + s2 + s3 + irregularity);
+      }
+      // Smooth the base shape so irregularity blends in
+      for (var pass = 0; pass < 2; pass++) {
+        var smoothed = [];
+        for (var p = 0; p < pts; p++) {
+          var prev = p > 0 ? baseShape[p-1] : baseShape[p];
+          var next = p < pts-1 ? baseShape[p+1] : baseShape[p];
+          smoothed.push(prev * 0.25 + baseShape[p] * 0.5 + next * 0.25);
+        }
+        baseShape = smoothed;
       }
 
       var lines = []; var y = -8;
@@ -1127,17 +1203,15 @@ P.contours = {
         var a = baseOpacity + (nextGap / maxGap) * opacityRange;
         var lineRng = seeded(seedBase + i * 3.7);
 
-        // Each line = baseShape + small per-line drift that evolves slowly
-        var drift = (lineRng() - 0.5) * 4; // slight vertical offset per line
-        var phaseShift = i * 0.08; // lines shift phase slightly → organic divergence
+        var drift = (lineRng() - 0.5) * 5;
         var coords = [];
         for (var p = 0; p < pts; p++) {
           var x = p * step;
           var baseOffset = baseShape[p];
-          // Per-line variation: tiny noise + phase-shifted copy of base
-          var lineNoise = (lineRng() - 0.5) * 2;
-          var shifted = Math.sin((p + i * 0.6) * 0.3) * (2 + i * 0.15);
-          var ly = y + baseOffset + shifted + drift + lineNoise;
+          // Per-line: growing divergence from base + noise
+          var lineNoise = (lineRng() - 0.5) * 3;
+          var diverge = Math.sin((p * 0.35) + i * 0.5) * (3 + i * 0.3);
+          var ly = y + baseOffset + diverge + drift + lineNoise;
           coords.push([Math.round(x * 10) / 10, Math.round(ly * 10) / 10]);
         }
 
@@ -1215,7 +1289,7 @@ P.contours = {
               </svg>
               <div style="position:relative;z-index:1;text-align:center">
                 <div style="font-family:var(--font-serif);font-size:36px;color:var(--fg);font-weight:500">78</div>
-                <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase">Predicted score</div>
+                <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase">Mastery score</div>
               </div>
             </div>
           </div>
@@ -1601,7 +1675,7 @@ P.dataviz = {
         <div class="grid grid--3">
           <div class="cell" style="text-align:center">
             <div style="font-family:var(--font-serif);font-size:var(--fs-40);color:var(--fg);font-weight:500">92</div>
-            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-faint)">PREDICTED SCORE</div>
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-faint)">MASTERY SCORE</div>
             <div style="font-family:var(--font-mono);font-size:11px;color:var(--ok-400);margin-top:var(--sp-2)">&#9650; +3</div>
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);margin-top:var(--sp-1)">vs last week</div>
           </div>
