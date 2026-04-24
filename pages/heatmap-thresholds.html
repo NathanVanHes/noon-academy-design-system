@@ -32,7 +32,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 /* Layout */
 .page{max-width:720px;margin:0 auto;padding:32px 40px;position:relative}
-@media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}.key-inner{padding:10px 16px !important}.mastery-link{margin-left:0 !important;width:100%}}
+@media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}.key-inner{padding:10px 16px !important}.mastery-link{margin-left:0 !important;width:100%;text-align:left}}
 
 /* Section header */
 .grid-section__header{display:flex;align-items:baseline;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(20,20,20,0.06)}
@@ -722,15 +722,15 @@ function openMasteryInfo() {
       '<div style="font-size:13px;font-weight:600;color:#9A5B13;margin-bottom:4px">This is not a prediction of your exam score</div>' +
       '<div style="font-size:13px;color:#9A5B13;line-height:1.5">It measures how prepared you are based on what you\'ve done so far — not what you\'ll get on the day.</div>' +
     '</div>' +
-    // 80+ is good
+    // 80+ / 70+ thresholds
     '<div style="background:rgba(39,189,134,0.06);border-radius:8px;padding:14px 16px;margin-bottom:16px">' +
-      '<div style="font-size:13px;font-weight:600;margin-bottom:4px">Reaching your target means you\'re good to go</div>' +
-      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you reach your target, you\'ve mastered this topic. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div>' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Reach 80+ for Quantitative, 70+ for Verbal</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you hit <b>★ 80+</b> on a Quantitative topic or <b>★ 70+</b> on a Verbal topic, you\'ve mastered it. You can stop here — we\'ll let you know if you need to revisit it before the exam.</div>' +
     '</div>' +
     // What to do
     '<div style="background:rgba(20,20,20,0.03);border-radius:8px;padding:14px 16px">' +
       '<div style="font-size:13px;font-weight:600;margin-bottom:4px">How to improve</div>' +
-      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Focus on topics below their target. Practice sessions are the fastest way to move your score.</div>' +
+      '<div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Focus on topics below <b>★ 80+</b> or <b>★ 70+</b>. Practice sessions are the fastest way to move your score.</div>' +
     '</div>' +
   '</div>';
 
