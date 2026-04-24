@@ -10,15 +10,13 @@
 :root{
   --bg:#F8F5EF;
   --bg-raised:#FFFFFF;
-  --bg-disabled:#EDEAE3;
   --fg:#141414;
   --fg-secondary:#74716C;
   --fg-muted:#BBB8B1;
   --green:#27BD86;
-  --gold:#FFCB45;
   --red:#F03D3D;
-  --btn:#64D8AE;
   --blue:#0084FF;
+  --btn:#64D8AE;
   --font-sans:'Inter',system-ui,sans-serif;
   --font-mono:'JetBrains Mono','Inter',monospace;
   --r:8px;
@@ -28,34 +26,31 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .page{max-width:480px;margin:0 auto;padding:32px 24px}
 .page-title{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;color:var(--fg-secondary);margin-bottom:16px}
 
-/* Exam card */
-.exam-card{background:var(--bg-raised);border-radius:var(--r);overflow:hidden;margin-bottom:16px;cursor:pointer;transition:box-shadow 0.15s;opacity:0;transform:translateY(6px);animation:cardIn 0.35s ease forwards}
+/* Exam card — one consistent shape for all states */
+.exam-card{background:var(--bg-raised);border-radius:var(--r);margin-bottom:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow 0.15s;opacity:0;transform:translateY(6px);animation:cardIn 0.35s ease forwards}
 .exam-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.06)}
 @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 
-.exam-card__inner{padding:16px 20px;display:flex;align-items:center;gap:16px}
-.exam-card__countdown{text-align:center;min-width:48px;flex:none}
-.exam-card__days{font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--blue);line-height:1}
-.exam-card__unit{font-family:var(--font-mono);font-size:9px;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em}
+/* Countdown — the hero */
+.exam-card__countdown{min-width:44px;text-align:center;flex:none}
+.exam-card__days{font-family:var(--font-mono);font-size:24px;font-weight:700;line-height:1}
+.exam-card__unit{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+
+/* Body */
 .exam-card__body{flex:1;min-width:0}
-.exam-card__title{font-size:14px;font-weight:600;margin:0}
-.exam-card__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;gap:4px}
+.exam-card__title{font-size:14px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exam-card__meta{font-size:11px;color:var(--fg-muted);margin-top:2px}
+.exam-card__status{font-size:12px;margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* Arrow */
 .exam-card__arrow{flex:none;color:var(--fg-muted)}
 
-/* Bottom stat row */
-.exam-card__stats{padding:0 20px 14px;display:flex;align-items:center;justify-content:space-between}
-.exam-card__stat{font-family:var(--font-mono);font-size:11px;color:var(--fg-secondary);display:flex;align-items:center;gap:4px}
-
-/* All mastered variant */
-.exam-card--mastered .exam-card__countdown{color:var(--green)}
-.exam-card--mastered .exam-card__days{color:var(--green)}
-.exam-card--mastered .exam-card__unit{color:var(--green)}
-
-/* Has results variant */
-.exam-card__result{padding:0 20px 14px}
-.exam-card__result-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--fg-secondary)}
-.exam-card__result-score{font-family:var(--font-mono);font-size:16px;font-weight:700;min-width:32px}
-.exam-card__result-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;margin-left:auto}
+/* Status pills — small inline indicators */
+.pill{display:inline-flex;align-items:center;gap:3px;font-family:var(--font-mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
+.pill--muted{background:rgba(20,20,20,0.04);color:var(--fg-secondary)}
+.pill--green{background:rgba(39,189,134,0.08);color:var(--green)}
+.pill--blue{background:rgba(0,132,255,0.08);color:var(--blue)}
+.pill--red{background:rgba(240,61,61,0.06);color:var(--red)}
 </style>
 </head>
 <body>
@@ -64,69 +59,72 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
   <div class="page-title">Upcoming exams</div>
 
-  <!-- State 1: Preparing — has unresolved topics -->
+  <!-- Preparing — unresolved topics -->
   <div class="exam-card" style="animation-delay:0ms">
-    <div class="exam-card__inner">
-      <div class="exam-card__countdown">
-        <div class="exam-card__days">5</div>
-        <div class="exam-card__unit">days</div>
-      </div>
-      <div class="exam-card__body">
-        <div class="exam-card__title">Qudrat — Quantitative</div>
-        <div class="exam-card__sub">Sunday 29 April · 9:00 AM</div>
-      </div>
-      <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+    <div class="exam-card__countdown" style="color:var(--blue)">
+      <div class="exam-card__days">5</div>
+      <div class="exam-card__unit">days</div>
     </div>
-    <div class="exam-card__stats">
-      <div class="exam-card__stat" style="color:var(--fg);font-weight:600">3 unresolved</div>
-      <div class="exam-card__stat"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 2 mastered</div>
+    <div class="exam-card__body">
+      <div class="exam-card__title">Qudrat — Quantitative</div>
+      <div class="exam-card__meta">Sun 29 Apr · 9:00 AM</div>
+      <div class="exam-card__status">
+        <span class="pill pill--red">3 unresolved</span>
+        <span class="pill pill--green"><svg width="8" height="8" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 2 mastered</span>
+      </div>
     </div>
+    <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
   </div>
 
-  <!-- State 2: All mastered — ready for mock -->
-  <div class="exam-card exam-card--mastered" style="animation-delay:80ms">
-    <div class="exam-card__inner">
-      <div class="exam-card__countdown">
-        <div class="exam-card__days">7</div>
-        <div class="exam-card__unit">days</div>
-      </div>
-      <div class="exam-card__body">
-        <div class="exam-card__title">Qudrat — Verbal</div>
-        <div class="exam-card__sub">Tuesday 1 May · 9:00 AM</div>
-      </div>
-      <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+  <!-- All mastered — mock available -->
+  <div class="exam-card" style="animation-delay:80ms">
+    <div class="exam-card__countdown" style="color:var(--green)">
+      <div class="exam-card__days">7</div>
+      <div class="exam-card__unit">days</div>
     </div>
-    <div class="exam-card__stats">
-      <div class="exam-card__stat" style="color:var(--green);font-weight:600"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--green)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All 3 mastered</div>
-      <div class="exam-card__stat" style="color:var(--blue);font-weight:500">Mock available</div>
+    <div class="exam-card__body">
+      <div class="exam-card__title">Qudrat — Verbal</div>
+      <div class="exam-card__meta">Tue 1 May · 9:00 AM</div>
+      <div class="exam-card__status">
+        <span class="pill pill--green"><svg width="8" height="8" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
+        <span class="pill pill--blue">Mock available</span>
+      </div>
     </div>
+    <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
   </div>
 
-  <!-- State 3: Has mock results -->
+  <!-- Has mock result -->
   <div class="exam-card" style="animation-delay:160ms">
-    <div class="exam-card__inner">
-      <div class="exam-card__countdown">
-        <div class="exam-card__days">21</div>
-        <div class="exam-card__unit">days</div>
-      </div>
-      <div class="exam-card__body">
-        <div class="exam-card__title">GAT — General Aptitude</div>
-        <div class="exam-card__sub">Thursday 15 May · 2:00 PM</div>
-      </div>
-      <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+    <div class="exam-card__countdown" style="color:var(--green)">
+      <div class="exam-card__days">21</div>
+      <div class="exam-card__unit">days</div>
     </div>
-    <div class="exam-card__result">
-      <div class="exam-card__result-row">
-        <span style="color:var(--fg-muted)">Last mock:</span>
-        <span class="exam-card__result-score" style="color:var(--green)">88</span>
-        <span>5/5 correct · 42 min</span>
-        <span class="exam-card__result-badge" style="background:rgba(39,189,134,0.08);color:var(--green)">Best</span>
+    <div class="exam-card__body">
+      <div class="exam-card__title">GAT — General Aptitude</div>
+      <div class="exam-card__meta">Thu 15 May · 2:00 PM</div>
+      <div class="exam-card__status">
+        <span class="pill pill--green"><svg width="8" height="8" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> All mastered</span>
+        <span class="pill pill--muted">Mock: 88 · Best</span>
       </div>
     </div>
-    <div class="exam-card__stats">
-      <div class="exam-card__stat"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 28 of 42 mastered</div>
-      <div class="exam-card__stat" style="color:var(--fg);font-weight:600">14 unresolved</div>
+    <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
+  </div>
+
+  <!-- Preparing — many topics -->
+  <div class="exam-card" style="animation-delay:240ms">
+    <div class="exam-card__countdown" style="color:var(--blue)">
+      <div class="exam-card__days">14</div>
+      <div class="exam-card__unit">days</div>
     </div>
+    <div class="exam-card__body">
+      <div class="exam-card__title">Biology — Final Exam</div>
+      <div class="exam-card__meta">Mon 5 May · 11:00 AM</div>
+      <div class="exam-card__status">
+        <span class="pill pill--red">14 unresolved</span>
+        <span class="pill pill--green"><svg width="8" height="8" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 28 mastered</span>
+      </div>
+    </div>
+    <div class="exam-card__arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></div>
   </div>
 
 </div>
