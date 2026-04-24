@@ -545,15 +545,208 @@ P.elevation = {
 
 // ──────── MOTION ────────
 P.motion = {
-  title: 'Motion', desc: 'Easing curves and durations. Applied to transitions, entries, and progress animations.',
+  title: 'Motion', desc: 'How things move. Every transition, entrance, and animation follows these curves, durations, and principles.',
   render() {
-    return `<div class="sects"><div class="sect"><div class="sect__title">Easing &amp; Duration</div>
-      <div class="grid grid--3">
-        <div class="cell"><div class="cell__label">Ease (default)</div><div class="mono" style="margin-bottom:12px">cubic-bezier(0.22, 0.61, 0.36, 1)</div><div style="height:4px;background:var(--accent-soft);border-radius:999px;overflow:hidden"><div style="width:0;height:100%;background:var(--accent);border-radius:inherit;animation:motionD 2s cubic-bezier(.22,.61,.36,1) infinite alternate"></div></div></div>
-        <div class="cell"><div class="cell__label">Ease-In (exit)</div><div class="mono" style="margin-bottom:12px">cubic-bezier(0.4, 0, 1, 1)</div><div style="height:4px;background:var(--accent-soft);border-radius:999px;overflow:hidden"><div style="width:0;height:100%;background:var(--accent);border-radius:inherit;animation:motionD 2s cubic-bezier(.4,0,1,1) infinite alternate"></div></div></div>
-        <div class="cell"><div class="cell__label">Durations</div><div class="mono">120ms - fast (dur-1)</div><div class="mono">200ms - normal (dur-2)</div><div class="mono">320ms - slow (dur-3)</div></div>
+    return `<div class="sects">
+
+      <div class="sect"><div class="sect__title">Principles</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Motion should feel purposeful and calm — the surveyor, not the showman. Things arrive, settle, and leave without drawing attention to the mechanics.</p>
+        <div class="grid grid--2">
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Meaningful:</b> Every animation communicates something — entry direction, state change, spatial relationship. Never animate just because you can.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Quick:</b> Interactions respond immediately. Most transitions are 120-200ms. Longer animations (300ms+) are reserved for page-level entrances and celebrations.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Consistent:</b> Same type of motion = same curve and duration everywhere. A bottom sheet always slides the same way. A card always fades in the same way.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Reducible:</b> All animations must respect <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">prefers-reduced-motion</code>. Replace with instant state changes — never remove the state change itself.</div></div>
+        </div>
       </div>
-    </div></div>`;
+
+      <div class="sect"><div class="sect__title">Easing Curves</div>
+        <div class="grid grid--2">
+          <div class="cell">
+            <div class="cell__label">Ease — default for everything</div>
+            <div class="mono" style="margin-bottom:12px;font-size:11px">cubic-bezier(0.22, 0.61, 0.36, 1)</div>
+            <div style="height:4px;background:var(--accent-soft);border-radius:999px;overflow:hidden"><div style="width:0;height:100%;background:var(--accent);border-radius:inherit;animation:motionD 2s cubic-bezier(.22,.61,.36,1) infinite alternate"></div></div>
+            <div style="font-size:12px;color:var(--fg-faint);margin-top:8px">Fast start, gentle deceleration. Used for entries, hovers, toggles, expansions.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Ease-In — exits only</div>
+            <div class="mono" style="margin-bottom:12px;font-size:11px">cubic-bezier(0.4, 0, 1, 1)</div>
+            <div style="height:4px;background:var(--accent-soft);border-radius:999px;overflow:hidden"><div style="width:0;height:100%;background:var(--accent);border-radius:inherit;animation:motionD 2s cubic-bezier(.4,0,1,1) infinite alternate"></div></div>
+            <div style="font-size:12px;color:var(--fg-faint);margin-top:8px">Slow start, accelerates away. Used for dismissals, close, slide-out.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Spring — celebrations</div>
+            <div class="mono" style="margin-bottom:12px;font-size:11px">cubic-bezier(0.34, 1.56, 0.64, 1)</div>
+            <div style="height:4px;background:var(--accent-soft);border-radius:999px;overflow:hidden"><div style="width:0;height:100%;background:var(--accent);border-radius:inherit;animation:motionD 2s cubic-bezier(.34,1.56,.64,1) infinite alternate"></div></div>
+            <div style="font-size:12px;color:var(--fg-faint);margin-top:8px">Overshoots then settles. Mastery star stamp, confetti, achievement moments only.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Linear — progress bars</div>
+            <div class="mono" style="margin-bottom:12px;font-size:11px">linear</div>
+            <div style="height:4px;background:var(--accent-soft);border-radius:999px;overflow:hidden"><div style="width:0;height:100%;background:var(--accent);border-radius:inherit;animation:motionD 2s linear infinite alternate"></div></div>
+            <div style="font-size:12px;color:var(--fg-faint);margin-top:8px">Constant speed. Only for progress fills and loading indicators.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Durations</div>
+        <div class="grid grid--auto" style="gap:var(--sp-4)">
+          <div class="cell" style="text-align:center">
+            <div style="font-family:var(--font-mono);font-size:var(--fs-24);color:var(--fg);font-weight:600">120</div>
+            <div class="caps" style="margin-top:4px">Fast</div>
+            <div style="font-size:11px;color:var(--fg-faint);margin-top:4px">Hovers, toggles, focus rings, color changes</div>
+          </div>
+          <div class="cell" style="text-align:center">
+            <div style="font-family:var(--font-mono);font-size:var(--fs-24);color:var(--fg);font-weight:600">200</div>
+            <div class="caps" style="margin-top:4px">Normal</div>
+            <div style="font-size:11px;color:var(--fg-faint);margin-top:4px">Tabs, chips, segmented, expand/collapse</div>
+          </div>
+          <div class="cell" style="text-align:center">
+            <div style="font-family:var(--font-mono);font-size:var(--fs-24);color:var(--fg);font-weight:600">320</div>
+            <div class="caps" style="margin-top:4px">Slow</div>
+            <div style="font-size:11px;color:var(--fg-faint);margin-top:4px">Bottom sheets, modals, page transitions, route steps</div>
+          </div>
+          <div class="cell" style="text-align:center">
+            <div style="font-family:var(--font-mono);font-size:var(--fs-24);color:var(--fg);font-weight:600">600+</div>
+            <div class="caps" style="margin-top:4px">Dramatic</div>
+            <div style="font-size:11px;color:var(--fg-faint);margin-top:4px">Confetti, mastery reveal, counter roll-up, chart draw</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Component Entrances</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">How components arrive on screen. Direction communicates spatial relationship — content comes from below, overlays from the side or bottom.</p>
+        <div class="grid grid--2">
+          <div class="cell">
+            <div class="cell__label">Cards / list items — fade up</div>
+            <div class="mono" style="font-size:11px;margin-bottom:8px">translateY(6px) → 0, opacity 0 → 1, 350ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Used by: session cards, practice cards, topic rows, heatmap tiles. Stagger delay: 30-80ms per item.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Bottom sheet — slide up</div>
+            <div class="mono" style="font-size:11px;margin-bottom:8px">translateY(100%) → 0, 320ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Sheet slides from below viewport. Scrim fades in simultaneously. Dismiss reverses with ease-in.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Drilldown panel — slide in</div>
+            <div class="mono" style="font-size:11px;margin-bottom:8px">translateX(100%) → 0, 320ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Panel slides from the inline-end edge. Overlay fades in. Used for topic detail, mastery info.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Modal / dialog — scale up</div>
+            <div class="mono" style="font-size:11px;margin-bottom:8px">scale(0.95) → 1, opacity 0 → 1, 200ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Subtle scale with fade. Centered on screen. Scrim fades in behind.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Toast / alert — slide down</div>
+            <div class="mono" style="font-size:11px;margin-bottom:8px">translateY(-100%) → 0, 320ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Enters from top. Auto-dismisses after 4s with ease-in slide up.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Tooltip / popover — fade in</div>
+            <div class="mono" style="font-size:11px;margin-bottom:8px">opacity 0 → 1, 120ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">No movement, just opacity. Appears instantly at the trigger point. Disappears on 120ms ease-in.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Interaction Feedback</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Micro-animations that respond to user input. These are fast (120ms) and subtle — the student should feel them, not see them.</p>
+        <div class="grid grid--2">
+          <div class="cell">
+            <div class="cell__label">Button hover/press</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.9, 120ms</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Slight dim on hover. No scale, no shadow change. Primary, secondary, ghost all behave the same.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Tab / segmented switch</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">background + color, 120ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Active indicator slides or cross-fades. Text color transitions simultaneously.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Toggle / switch</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">translateX + background, 200ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Thumb slides to new position. Track color transitions. Both animate together.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Checkbox / radio</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(0) → 1, 200ms spring</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Check mark or dot pops in with a tiny spring overshoot. Uncheck is instant.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Card hover</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">box-shadow + translateY(-1px), 120ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Interactive cards lift slightly on hover. Shadow deepens. Only for clickable cards.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Input focus</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">border-color + ring, 120ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Border transitions to accent. Focus ring appears via box-shadow. Label floats if applicable.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Data &amp; Progress</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Animations that communicate data changes — scores, fill bars, charts. These are slower and more deliberate.</p>
+        <div class="grid grid--2">
+          <div class="cell">
+            <div class="cell__label">Score counter roll-up</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">0 → target, 600ms ease-out</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Numbers count up from 0 to final value. Eased so it decelerates near the end. Staggered per tile (30ms delay).</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Progress bar fill</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">width: 0% → target%, 600ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Gradient bar grows from left. Triggered after card entrance animation completes. Linear for loading, eased for scores.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Chart line draw</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">stroke-dashoffset, 800ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">SVG line draws from left to right using dash offset. Points appear after line reaches them.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Session bar segments</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">scaleX(0) → 1, 200ms ease, staggered</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Each segment grows from left edge. 50ms stagger per segment. Green/red color is immediate, not transitioned.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">Celebrations</div>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Reserved for mastery moments. These are the only animations that should feel dramatic — the student earned it.</p>
+        <div class="grid grid--2">
+          <div class="cell">
+            <div class="cell__label">Mastery confetti</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">50-80 particles, 3s stream, fade by 75%</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Particles fall from top with drift and rotation. Mix of circles and rectangles in accent/gold/white. Heatmap tiles: 20 particles, 1s. Interstitial: 80 particles, 3s.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Star stamp</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(1.8) → 0.95 → 1, 300ms spring</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Star icon appears by scaling in large then bouncing to rest. Triggered after confetti starts falling.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Tile throb</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">scale(1) → 1.08 → 1, 200ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">Quick pulse when mastery confetti fires. Single throb, not a loop. Draws attention to the tile.</div>
+          </div>
+          <div class="cell">
+            <div class="cell__label">Mastered tile fade</div>
+            <div class="mono" style="font-size:11px;margin-bottom:4px">opacity: 1 → 0.4, 800ms ease</div>
+            <div style="font-size:12px;color:var(--fg-faint)">After confetti + star, the tile fades to 40% to deprioritise it visually. Stripe pattern stays visible.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect"><div class="sect__title">RN Implementation Notes</div>
+        <div class="grid grid--2">
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Reanimated:</b> Use <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">withTiming</code> for most transitions. <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">withSpring</code> for celebrations (damping: 12, stiffness: 180).</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Native driver:</b> Always animate transform and opacity on the native thread. Never animate layout properties (width, height, padding).</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Gesture handler:</b> Bottom sheet drag uses <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">PanGestureHandler</code> with velocity-based snap points. Calendar drag the same.</div></div>
+          <div class="cell"><div style="font-size:13px;color:var(--fg-muted)"><b>Reduced motion:</b> Check <code style="font-family:var(--font-mono);font-size:11px;background:var(--hover-overlay);padding:2px 4px;border-radius:2px">AccessibilityInfo.isReduceMotionEnabled</code>. Set all durations to 0, keep state changes.</div></div>
+        </div>
+      </div>
+
+    </div>`;
   }
 };
 
