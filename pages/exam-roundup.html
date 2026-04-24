@@ -196,7 +196,7 @@ function renderAllMastered() {
   h += '<button class="btn-mock" style="flex:none">Start</button>';
   h += '</div></div>';
 
-  h += '<div style="margin-top:24px"><div class="section-head"><div class="section-title">On the exam</div><div class="section-target" style="color:var(--green)">' + starInline + ' All at 80+</div></div>';
+  h += '<div style="margin-top:24px"><div class="section-head"><div class="section-title">On the exam</div><div class="section-target">' + starInline + ' <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span></div></div>';
   allMasteredTopics.forEach(function(t) { h += topicRow(t, true); });
   h += '</div>';
 
@@ -234,7 +234,7 @@ function renderResults() {
   h += '</div>';
 
   // Show mastered topics
-  h += '<div style="margin-top:24px"><div class="section-head"><div class="section-title">On the exam</div><div class="section-target" style="color:var(--green)">' + starInline + ' All at 80+</div></div>';
+  h += '<div style="margin-top:24px"><div class="section-head"><div class="section-title">On the exam</div><div class="section-target">' + starInline + ' <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span></div></div>';
   allMasteredTopics.forEach(function(t) { h += topicRow(t, true); });
   h += '</div>';
 
