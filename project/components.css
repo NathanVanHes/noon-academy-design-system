@@ -1,6 +1,36 @@
 /* Noon Academy — component library CSS. Load after tokens.css.
    Every component exposes every state: default, hover, focus, active, selected,
    disabled, loading, error. Uses logical properties for RTL.
+
+   REACT NATIVE NOTES:
+   The following CSS features need RN-specific implementations:
+
+   Pseudo-elements (::before / ::after) — RN has no pseudo-elements.
+   Each must become a real child <View> in the RN component:
+     • .btn.is-loading::after        → <ActivityIndicator> child in Button
+     • .field__err::before            → <View style={styles.errDot}> diamond
+     • .check input + .check__box::after → <View style={styles.checkmark}> rotated border
+     • .check.is-indeterminate::after → <View style={styles.dash}> horizontal bar
+     • .switch__track::after          → <Animated.View style={styles.thumb}> circle
+     • .tabbar__item.is-on::before   → <View style={styles.indicator}> top bar
+     • .tooltip::after               → <View style={styles.arrow}> rotated square
+     • .sheet__handle::before        → <View style={styles.handleBar}> pill
+
+   backdrop-filter — not supported in RN. Use:
+     • Semi-transparent background without blur, or
+     • expo-blur / @react-native-community/blur
+
+   :hover states — no native hover on touch. Use:
+     • Pressable with onPressIn/onPressOut for press feedback
+     • No hover states on mobile
+
+   :focus-visible — use AccessibilityInfo for keyboard nav detection
+
+   box-shadow: inset — not supported in RN. Use:
+     • borderWidth + borderColor for inset borders
+     • elevation (Android) / shadowX (iOS) for drop shadows
+
+   transition — use react-native-reanimated withTiming/withSpring
 */
 
 /* ============ SHARED PATTERNS ============ */
@@ -505,7 +535,7 @@ body.rtl .identity__name { font-family: var(--font-arabic); font-weight: var(--f
 .video__play {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   width: var(--sp-9); height: var(--sp-9); border-radius: 50%; border: 0;
-  background: var(--video-overlay); backdrop-filter: blur(8px);
+  background: var(--video-overlay); backdrop-filter: blur(8px); /* RN: drop backdrop-filter, use opaque bg */
   color: var(--chalk-100); cursor: pointer; display: grid; place-items: center;
   transition: background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
 }
