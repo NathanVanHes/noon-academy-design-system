@@ -188,7 +188,7 @@ topics.forEach(function(t, i) {
   // Info
   html += '<div class="topic__info"><div class="topic__name">' + t.name + '</div>';
   if (mastered) {
-    html += '<div class="topic__sub" style="color:var(--green)"><svg width="10" height="10" viewBox="0 0 12 12" fill="var(--green)"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
+    html += '<div class="topic__sub"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
   } else {
     html += '<div class="topic__sub">Reach <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ <span style="color:var(--fg-muted);margin-left:4px">(' + gap + ' remaining)</span></div>';
   }
