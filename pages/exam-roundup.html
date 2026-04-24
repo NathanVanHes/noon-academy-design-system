@@ -28,16 +28,17 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .topbar{background:var(--bg-raised);border-bottom:1px solid rgba(20,20,20,0.08);position:sticky;top:0;z-index:10}
 .topbar__inner{max-width:720px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px}
 .topbar h1{font-size:20px;font-weight:700;margin:0}
-.topbar__countdown{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:6px}
 
 .page{max-width:720px;margin:0 auto;padding:32px 40px}
 @media(max-width:480px){.page{padding:20px 16px}.topbar__inner{padding:0 16px}}
 
-/* Header */
-.header{display:flex;gap:16px;margin-bottom:28px}
-.header-card{flex:1;background:var(--bg-raised);border-radius:var(--r);padding:20px;text-align:center}
-.header-card__num{font-family:var(--font-mono);font-size:32px;font-weight:700;line-height:1}
-.header-card__label{font-size:11px;color:var(--fg-secondary);margin-top:6px}
+/* State switcher (for prototype only) */
+.state-switcher{display:flex;gap:4px;background:var(--bg-raised);padding:4px;border-radius:var(--r);margin-bottom:24px;border:1px solid rgba(20,20,20,0.06)}
+.state-switcher button{flex:1;background:none;border:0;font:inherit;font-size:11px;font-weight:600;color:var(--fg-muted);padding:8px;border-radius:6px;cursor:pointer}
+.state-switcher button.is-on{background:var(--fg);color:var(--bg)}
+
+/* Exam info card */
+.exam-info{background:var(--bg-raised);border-radius:var(--r);padding:20px 24px;margin-bottom:24px}
 
 /* Section */
 .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(20,20,20,0.06)}
@@ -45,41 +46,53 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 .section-target{font-size:11px;font-family:var(--font-mono);font-weight:600;color:var(--fg-secondary);display:flex;align-items:center;gap:4px}
 
 /* Topic row */
-.topic{background:var(--bg-raised);border-radius:var(--r);margin-bottom:10px;padding:16px 20px;display:flex;align-items:center;gap:16px;opacity:0;transform:translateY(6px);animation:rowIn 0.3s ease forwards}
-@keyframes rowIn{to{opacity:1;transform:translateY(0)}}
-
+.topic{background:var(--bg-raised);border-radius:var(--r);margin-bottom:10px;padding:16px 20px;display:flex;align-items:center;gap:16px}
 .topic__info{flex:1;min-width:0}
 .topic__name{font-size:14px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.topic__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px;font-family:var(--font-mono);display:flex;align-items:center;gap:4px}
-
-/* Score tile — matches heatmap */
+.topic__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px;font-family:var(--font-mono);display:flex;align-items:center;gap:3px}
 .topic__tile{width:44px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;position:relative;overflow:hidden}
 .topic__tile-score{font-family:var(--font-mono);font-size:14px;font-weight:700;color:rgba(0,0,0,0.35);position:relative;z-index:1}
-/* Mastered tile — striped, star, faded like heatmap */
-.topic__tile.is-mastered{}
 .topic__tile.is-mastered::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.15;background:repeating-linear-gradient(135deg,transparent,transparent 5px,rgba(0,0,0,0.4) 5px,rgba(0,0,0,0.4) 6.5px);border-radius:inherit}
 .topic__tile.is-mastered .topic__tile-score{display:none}
-.topic__tile-star{position:relative;z-index:2;opacity:0}
+.topic__tile-star{position:relative;z-index:3;opacity:0}
 .topic__tile-star.is-stamped{opacity:1;animation:stampIn 0.3s ease}
-@keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
-.topic__tile::after{content:'';position:absolute;inset:0;background:var(--bg);opacity:0;transition:opacity 0.8s ease;border-radius:inherit;pointer-events:none}
+.topic__tile::after{content:'';position:absolute;inset:0;background:var(--bg);opacity:0;transition:opacity 0.8s ease;border-radius:inherit;pointer-events:none;z-index:2}
 .topic__tile.is-faded::after{opacity:0.55}
+@keyframes stampIn{0%{transform:scale(1.8);opacity:0}70%{transform:scale(0.95);opacity:1}100%{transform:scale(1);opacity:1}}
 
-/* Action */
 .topic__action{flex:none}
 .btn-go{height:34px;padding:0 16px;background:var(--btn);color:var(--fg);border:0;border-radius:var(--r);font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
 .btn-go:hover{opacity:0.9}
 
-/* Mobile */
+/* Celebration */
+.celebration{text-align:center;padding:40px 24px}
+.celebration__icon{width:80px;height:80px;border-radius:50%;background:rgba(39,189,134,0.08);display:grid;place-items:center;margin:0 auto 20px;animation:starPulse 2s ease infinite}
+@keyframes starPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.celebration__title{font-size:20px;font-weight:700;margin:0 0 8px}
+.celebration__sub{font-size:14px;color:var(--fg-secondary);max-width:320px;margin:0 auto;line-height:1.5}
+
+/* Mock exam card */
+.mock-card{background:var(--bg-raised);border-radius:var(--r);padding:24px;margin-top:24px;text-align:center}
+.mock-card__title{font-size:15px;font-weight:600;margin:0 0 4px}
+.mock-card__sub{font-size:13px;color:var(--fg-secondary);margin:0 0 16px;line-height:1.5}
+.btn-mock{display:inline-block;height:44px;padding:0 28px;background:var(--btn);color:var(--fg);border:0;border-radius:var(--r);font:inherit;font-size:14px;font-weight:600;cursor:pointer;line-height:44px;transition:opacity 0.15s}
+.btn-mock:hover{opacity:0.9}
+
+/* Results */
+.result-row{background:var(--bg-raised);border-radius:var(--r);padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px}
+.result-row__score{font-family:var(--font-mono);font-size:28px;font-weight:700;min-width:56px;text-align:center;flex:none}
+.result-row__info{flex:1}
+.result-row__title{font-size:14px;font-weight:600}
+.result-row__sub{font-size:12px;color:var(--fg-secondary);margin-top:2px}
+.result-row__badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;flex:none}
+
+.mastery-link{background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;display:block;text-align:center;margin-top:24px}
+
 @media(max-width:540px){
-  .header{flex-direction:column}
   .topic{flex-wrap:wrap;gap:10px;padding:14px 16px}
-  .topic__info{flex:1 1 auto;min-width:0}
   .topic__action{width:100%}
   .topic__action .btn-go{width:100%}
 }
-
-.mastery-link{background:none;border:0;font:inherit;font-size:11px;color:var(--fg-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;display:block;text-align:center;margin-top:24px}
 </style>
 </head>
 <body>
@@ -92,44 +105,14 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 
 <div class="page">
 
-  <!-- Exam info -->
-  <div style="background:var(--bg-raised);border-radius:var(--r);padding:20px 24px;margin-bottom:24px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div>
-        <div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div>
-        <div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div>
-      </div>
-      <span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>
-        Exam in 5 days
-      </span>
-    </div>
-    <!-- Summary — emphasise remaining -->
-    <div style="display:flex;gap:12px">
-      <div style="flex:2;background:rgba(20,20,20,0.03);border-radius:6px;padding:14px;text-align:center">
-        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--fg)" id="remainingCount">0</div>
-        <div style="font-size:11px;color:var(--fg);font-weight:600;margin-top:2px">Unresolved</div>
-      </div>
-      <div style="flex:1;background:rgba(39,189,134,0.06);border-radius:6px;padding:14px;text-align:center">
-        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green)" id="masteredCount">0</div>
-        <div style="font-size:11px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;justify-content:center;gap:3px">
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered
-        </div>
-      </div>
-    </div>
+  <!-- Prototype state switcher -->
+  <div class="state-switcher" id="stateSwitcher">
+    <button class="is-on" data-state="preparing">Preparing</button>
+    <button data-state="mastered">All Mastered</button>
+    <button data-state="results">Mock Results</button>
   </div>
 
-  <!-- Section header — matches heatmap -->
-  <div class="section-head">
-    <div class="section-title">On the exam</div>
-    <div class="section-target">
-      <svg width="14" height="14" viewBox="0 0 12 12" fill="#141414"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>
-      <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span>
-    </div>
-  </div>
-  <div id="quantTopics"></div>
-
-  <button class="mastery-link" onclick="document.getElementById('scoreSheet').classList.add('is-open')">How does mastery work?</button>
+  <div id="content"></div>
 
 </div>
 
@@ -137,17 +120,14 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 function scoreColor(s) {
   var t = Math.max(0, Math.min(100, s)) / 100;
   var r, g, b;
-  if (t < 0.5) {
-    var p = t / 0.5;
-    r = 240 + (255-240)*p; g = 61 + (203-61)*p; b = 61 + (69-61)*p;
-  } else {
-    var p = (t - 0.5) / 0.5;
-    r = 255 + (39-255)*p; g = 203 + (189-203)*p; b = 69 + (134-69)*p;
-  }
+  if (t < 0.5) { var p = t / 0.5; r = 240+(255-240)*p; g = 61+(203-61)*p; b = 61+(69-61)*p; }
+  else { var p = (t-0.5)/0.5; r = 255+(39-255)*p; g = 203+(189-203)*p; b = 69+(134-69)*p; }
   return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
 }
 
 var starSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" class="topic__tile-star"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+var starInline = '<svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>';
+var mastery = 80;
 
 var topics = [
   { name: 'Geometry basics', score: 18 },
@@ -157,98 +137,195 @@ var topics = [
   { name: 'Ratios & proportions', score: 85 },
 ];
 
-var mastery = 80;
+var allMasteredTopics = [
+  { name: 'Geometry basics', score: 88 },
+  { name: 'Algebraic expressions', score: 82 },
+  { name: 'Number theory', score: 91 },
+  { name: 'Data analysis', score: 94 },
+  { name: 'Ratios & proportions', score: 85 },
+];
 
-// Sort: not mastered first (lowest), then mastered
-topics.sort(function(a,b) {
-  var aM = a.score >= mastery ? 1 : 0;
-  var bM = b.score >= mastery ? 1 : 0;
-  if (aM !== bM) return aM - bM;
-  return a.score - b.score;
-});
-
-var container = document.getElementById('quantTopics');
-var html = '';
-var masteredN = 0;
-
-topics.forEach(function(t, i) {
+function topicRow(t, mastered) {
   var col = scoreColor(t.score);
-  var mastered = t.score >= mastery;
-  var gap = Math.max(0, mastery - t.score);
-  var delay = i * 80;
-
-  if (mastered) masteredN++;
-
-  html += '<div class="topic" style="animation-delay:' + delay + 'ms">';
-
-  // Tile — matches heatmap visual treatment
+  var gap = mastery - t.score;
+  var h = '<div class="topic">';
   if (mastered) {
-    html += '<div class="topic__tile is-mastered" style="background:' + col + '">' + starSvg + '</div>';
+    h += '<div class="topic__tile is-mastered" style="background:' + col + '">' + starSvg + '</div>';
+    h += '<div class="topic__info"><div class="topic__name">' + t.name + '</div><div class="topic__sub">' + starInline + ' Mastered</div></div>';
   } else {
-    html += '<div class="topic__tile" style="background:' + col + '"><span class="topic__tile-score">' + t.score + '</span></div>';
+    h += '<div class="topic__tile" style="background:' + col + '"><span class="topic__tile-score">' + t.score + '</span></div>';
+    h += '<div class="topic__info"><div class="topic__name">' + t.name + '</div><div class="topic__sub">Reach ' + starInline + ' 80+ (' + gap + ' remaining)</div></div>';
+    h += '<div class="topic__action"><button class="btn-go">Practice</button></div>';
   }
+  return h + '</div>';
+}
 
-  // Info
-  html += '<div class="topic__info"><div class="topic__name">' + t.name + '</div>';
-  if (mastered) {
-    html += '<div class="topic__sub"><svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> Mastered</div>';
-  } else {
-    html += '<div class="topic__sub">Reach <svg width="10" height="10" viewBox="0 0 12 12" fill="#141414" style="vertical-align:-1px"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg> 80+ <span style="color:var(--fg-muted);margin-left:4px">(' + gap + ' remaining)</span></div>';
-  }
-  html += '</div>';
+function renderPreparing() {
+  topics.sort(function(a,b) { var am = a.score >= mastery ? 1 : 0; var bm = b.score >= mastery ? 1 : 0; if (am !== bm) return am - bm; return a.score - b.score; });
+  var masteredN = topics.filter(function(t){ return t.score >= mastery; }).length;
+  var unresolved = topics.length - masteredN;
 
-  // Action — only for non-mastered
-  if (!mastered) {
-    html += '<div class="topic__action"><button class="btn-go">Practice</button></div>';
-  }
+  var h = '<div class="exam-info">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div><div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div><div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div></div>';
+  h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>Exam in 5 days</span></div>';
+  h += '<div style="display:flex;gap:12px"><div style="flex:2;background:rgba(20,20,20,0.03);border-radius:6px;padding:14px;text-align:center"><div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--fg)">' + unresolved + '</div><div style="font-size:11px;color:var(--fg);font-weight:600;margin-top:2px">Unresolved</div></div>';
+  h += '<div style="flex:1;background:rgba(39,189,134,0.06);border-radius:6px;padding:14px;text-align:center"><div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green)">' + masteredN + '</div><div style="font-size:11px;color:var(--fg-secondary);margin-top:2px;display:flex;align-items:center;justify-content:center;gap:3px">' + starInline + ' Mastered</div></div></div></div>';
 
-  html += '</div>';
+  h += '<div class="section-head"><div class="section-title">On the exam</div><div class="section-target">' + starInline + ' <span>80+</span> <span style="font-weight:400;color:var(--fg-muted)">Level 1</span></div></div>';
+  topics.forEach(function(t) { h += topicRow(t, t.score >= mastery); });
+  h += '<button class="mastery-link" onclick="document.getElementById(\'scoreSheet\').classList.add(\'is-open\')">How does mastery work?</button>';
+
+  document.getElementById('content').innerHTML = h;
+  runMasteryAnimation();
+}
+
+function renderAllMastered() {
+  var h = '<div class="exam-info">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div><div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div><div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div></div>';
+  h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>Exam in 5 days</span></div></div>';
+
+  h += '<div class="celebration" id="celebrationArea">';
+  h += '<div class="celebration__icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="var(--green)" style="filter:drop-shadow(0 2px 4px rgba(39,189,134,0.3))"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.9L12 17.3l-6.1 3.4 1.4-6.9L2.2 9.1l6.9-.8Z"/></svg></div>';
+  h += '<div class="celebration__title">All topics mastered!</div>';
+  h += '<div class="celebration__sub">You\'ve reached ' + starInline + ' 80+ on every topic. You\'re ready for the exam — or take a mock to test yourself under real conditions.</div>';
+  h += '</div>';
+
+  h += '<div class="mock-card">';
+  h += '<div class="mock-card__title">Mock Exam</div>';
+  h += '<div class="mock-card__sub">Timed. Same format as the real thing. ' + allMasteredTopics.length + ' questions across all topics.</div>';
+  h += '<button class="btn-mock">Take mock exam</button>';
+  h += '</div>';
+
+  h += '<div style="margin-top:24px"><div class="section-head"><div class="section-title">On the exam</div><div class="section-target" style="color:var(--green)">' + starInline + ' All at 80+</div></div>';
+  allMasteredTopics.forEach(function(t) { h += topicRow(t, true); });
+  h += '</div>';
+
+  document.getElementById('content').innerHTML = h;
+
+  // Confetti on celebration area
+  setTimeout(function() {
+    var container = document.getElementById('celebrationArea');
+    if (!container) return;
+    var colors = ['#64D8AE','#FFCB45','#D4A017','#27BD86','#fff'];
+    for (var i = 0; i < 50; i++) {
+      (function() {
+        var dot = document.createElement('div');
+        var sz = 3 + Math.random() * 5;
+        var left = Math.random() * 100;
+        var delay = Math.random() * 2000;
+        var dur = 1500 + Math.random() * 1500;
+        var drift = (Math.random() - 0.5) * 60;
+        var rot = Math.floor(Math.random() * 720);
+        var col = colors[Math.floor(Math.random() * colors.length)];
+        var isRect = Math.random() > 0.5;
+        dot.style.cssText = 'position:absolute;width:' + sz + 'px;height:' + (isRect ? sz * 0.4 : sz) + 'px;border-radius:' + (isRect ? '1px' : '50%') + ';background:' + col + ';left:' + left + '%;top:-6px;opacity:1;pointer-events:none';
+        container.style.position = 'relative';
+        container.style.overflow = 'hidden';
+        container.appendChild(dot);
+        setTimeout(function() {
+          var fadeDur = Math.round(dur * 0.5);
+          dot.style.transition = 'transform ' + dur + 'ms cubic-bezier(0.15,0.6,0.35,1), opacity ' + fadeDur + 'ms ease-in';
+          dot.style.transform = 'translateY(' + (container.offsetHeight) + 'px) translateX(' + drift + 'px) rotate(' + rot + 'deg)';
+          dot.style.opacity = '0';
+        }, delay);
+        setTimeout(function() { dot.remove(); }, delay + dur + 200);
+      })();
+    }
+  }, 300);
+
+  runMasteryAnimation();
+}
+
+function renderResults() {
+  var h = '<div class="exam-info">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div><div style="font-size:16px;font-weight:700">Qudrat — Quantitative</div><div style="font-size:12px;color:var(--fg-secondary);margin-top:2px">Sunday 29 April 2026 · 9:00 AM</div></div>';
+  h += '<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>Exam in 5 days</span></div></div>';
+
+  h += '<div class="section-head"><div class="section-title">Mock exam results</div></div>';
+
+  // Result 1 — most recent
+  h += '<div class="result-row">';
+  h += '<div class="result-row__score" style="color:var(--green)">88</div>';
+  h += '<div class="result-row__info"><div class="result-row__title">Mock Exam #2</div><div class="result-row__sub">Today · 42 min · 5/5 correct</div></div>';
+  h += '<div class="result-row__badge" style="background:rgba(39,189,134,0.08);color:var(--green)">Best</div>';
+  h += '</div>';
+
+  // Result 2
+  h += '<div class="result-row">';
+  h += '<div class="result-row__score" style="color:' + scoreColor(72) + '">72</div>';
+  h += '<div class="result-row__info"><div class="result-row__title">Mock Exam #1</div><div class="result-row__sub">Yesterday · 38 min · 3/5 correct</div></div>';
+  h += '<div class="result-row__badge" style="background:rgba(20,20,20,0.04);color:var(--fg-secondary)">+16</div>';
+  h += '</div>';
+
+  h += '<div style="margin-top:20px;text-align:center">';
+  h += '<button class="btn-mock">Take another mock</button>';
+  h += '<div style="font-size:12px;color:var(--fg-muted);margin-top:10px">Each attempt generates new questions across all topics</div>';
+  h += '</div>';
+
+  h += '<div style="margin-top:28px"><div class="section-head"><div class="section-title">Score breakdown — Mock #2</div></div>';
+  allMasteredTopics.forEach(function(t) {
+    var col = scoreColor(t.score);
+    h += '<div class="topic">';
+    h += '<div class="topic__tile" style="background:' + col + '"><span class="topic__tile-score">' + t.score + '</span></div>';
+    h += '<div class="topic__info"><div class="topic__name">' + t.name + '</div><div class="topic__sub" style="color:var(--green)">' + starInline + ' Mastered</div></div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  document.getElementById('content').innerHTML = h;
+}
+
+// Mastery tile animation (reusable)
+function runMasteryAnimation() {
+  var colors = ['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];
+  setTimeout(function() {
+    document.querySelectorAll('.topic__tile.is-mastered').forEach(function(tile, i) {
+      setTimeout(function() {
+        tile.style.transition = 'transform 0.2s ease';
+        tile.style.transform = 'scale(1.08)';
+        setTimeout(function() { tile.style.transform = 'scale(1)'; }, 200);
+        for (var c = 0; c < 20; c++) {
+          (function() {
+            var dot = document.createElement('div');
+            var size = 2 + Math.random() * 3;
+            var left = 5 + Math.random() * 90;
+            var delay = Math.random() * 400;
+            var duration = 500 + Math.random() * 400;
+            var rotate = Math.floor(Math.random() * 360);
+            var color = colors[Math.floor(Math.random() * colors.length)];
+            var shape = Math.random() > 0.5 ? '50%' : '1px';
+            dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;border-radius:' + shape + ';background:' + color + ';left:' + left + '%;top:-4px;z-index:5;pointer-events:none;opacity:1';
+            tile.appendChild(dot);
+            setTimeout(function() {
+              dot.style.transition = 'transform ' + duration + 'ms ease-in, opacity ' + (duration * 0.6) + 'ms ease ' + (duration * 0.4) + 'ms';
+              dot.style.transform = 'translateY(' + (tile.offsetHeight + 8) + 'px) rotate(' + rotate + 'deg)';
+              dot.style.opacity = '0';
+            }, delay);
+            setTimeout(function() { dot.remove(); }, delay + duration + 100);
+          })();
+        }
+        var star = tile.querySelector('.topic__tile-star');
+        if (star) setTimeout(function() { star.classList.add('is-stamped'); }, 500);
+        setTimeout(function() { tile.classList.add('is-faded'); }, 1200);
+      }, i * 250);
+    });
+  }, 600);
+}
+
+// State switcher
+document.getElementById('stateSwitcher').addEventListener('click', function(e) {
+  var btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#stateSwitcher button').forEach(function(b) { b.classList.remove('is-on'); });
+  btn.classList.add('is-on');
+  var state = btn.dataset.state;
+  if (state === 'preparing') renderPreparing();
+  else if (state === 'mastered') renderAllMastered();
+  else if (state === 'results') renderResults();
 });
 
-container.innerHTML = html;
-
-// Summary counts
-document.getElementById('masteredCount').textContent = masteredN;
-document.getElementById('remainingCount').textContent = topics.length - masteredN;
-
-// Mastery celebration — matches heatmap shimmerMastered exactly
-var colors = ['#FFCB45','#D4A017','#27BD86','#64D8AE','#fff'];
-setTimeout(function() {
-  document.querySelectorAll('.topic__tile.is-mastered').forEach(function(tile, i) {
-    setTimeout(function() {
-      // Throb
-      tile.style.transition = 'transform 0.2s ease';
-      tile.style.transform = 'scale(1.08)';
-      setTimeout(function() { tile.style.transform = 'scale(1)'; }, 200);
-      // Rain confetti down inside tile
-      for (var c = 0; c < 20; c++) {
-        (function() {
-          var dot = document.createElement('div');
-          var size = 2 + Math.random() * 3;
-          var left = 5 + Math.random() * 90;
-          var delay = Math.random() * 400;
-          var duration = 500 + Math.random() * 400;
-          var rotate = Math.floor(Math.random() * 360);
-          var color = colors[Math.floor(Math.random() * colors.length)];
-          var shape = Math.random() > 0.5 ? '50%' : '1px';
-          dot.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;border-radius:' + shape + ';background:' + color + ';left:' + left + '%;top:-4px;z-index:5;pointer-events:none;opacity:1';
-          tile.appendChild(dot);
-          setTimeout(function() {
-            dot.style.transition = 'transform ' + duration + 'ms ease-in, opacity ' + (duration * 0.6) + 'ms ease ' + (duration * 0.4) + 'ms';
-            dot.style.transform = 'translateY(' + (tile.offsetHeight + 8) + 'px) rotate(' + rotate + 'deg)';
-            dot.style.opacity = '0';
-          }, delay);
-          setTimeout(function() { dot.remove(); }, delay + duration + 100);
-        })();
-      }
-      // Star stamps in after confetti starts falling
-      var star = tile.querySelector('.topic__tile-star');
-      if (star) setTimeout(function() { star.classList.add('is-stamped'); }, 500);
-      // Fade tile background
-      setTimeout(function() { tile.classList.add('is-faded'); }, 1200);
-    }, i * 250);
-  });
-}, 600);
+// Initial render
+renderPreparing();
 </script>
 
 <!-- Mastery info bottom sheet -->
@@ -267,7 +344,7 @@ setTimeout(function() {
     </div>
     <div style="background:rgba(39,189,134,0.06);border-radius:8px;padding:14px 16px;margin-bottom:16px">
       <div style="font-size:13px;font-weight:600;margin-bottom:4px">Reach your target</div>
-      <div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you hit <b>★ 80+</b> on a Quantitative topic or <b>★ 70+</b> on a Verbal topic, you've mastered it. You can stop here — we'll let you know if you need to revisit it before the exam.</div>
+      <div style="font-size:13px;color:var(--fg-secondary);line-height:1.5">Once you hit <b>★ 80+</b> on a Quantitative topic or <b>★ 70+</b> on a Verbal topic, you've mastered it.</div>
     </div>
     <div style="background:rgba(20,20,20,0.03);border-radius:8px;padding:14px 16px">
       <div style="font-size:13px;font-weight:600;margin-bottom:4px">How to improve</div>
