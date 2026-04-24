@@ -900,18 +900,12 @@ P.gridpaper = {
       </div>
 
       <div class="sect"><div class="sect__title">When to Use Grid</div>
-        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Grid adds a sense of measurement and structure. Use it where the student is actively working or navigating a route — in-class, practice, atlas views. Not for passive content like schedules or lists.</p>
+        <p style="font-size:13px;color:var(--fg-subtle);margin:0 0 16px;max-width:55ch">Grid adds a sense of measurement. Use it when showing the student their journey, or on in-class slides presented by the teacher.</p>
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Explorer / design system canvas</div>
-            <div style="height:100px;background:${voidGrid16};display:grid;place-items:center">
-              <div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:12px 20px;font-size:13px;color:var(--fg)">Component preview area</div>
-            </div>
-          </div>
-          <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Atlas / route overview</div>
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Journey / route overview</div>
             <div style="height:100px;background:${voidMajor};display:flex;align-items:center;padding:0 20px">
-              <svg width="200" height="20" viewBox="0 0 200 20">
+              <svg width="100%" height="20" viewBox="0 0 200 20" preserveAspectRatio="xMidYMid meet">
                 <line x1="10" y1="10" x2="190" y2="10" stroke="#c9a227" stroke-width="1.5" opacity="0.6"/>
                 <rect x="6" y="6" width="8" height="8" transform="rotate(45 10 10)" fill="#8e7019"/>
                 <rect x="76" y="6" width="8" height="8" transform="rotate(45 80 10)" fill="#c9a227"/>
@@ -920,13 +914,7 @@ P.gridpaper = {
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ Empty states</div>
-            <div style="height:100px;background:${voidGrid16};display:grid;place-items:center;text-align:center">
-              <div><div style="font-size:13px;color:var(--fg-muted)">No sessions today</div><div style="font-size:11px;color:var(--fg-faint);margin-top:4px">Check back tomorrow</div></div>
-            </div>
-          </div>
-          <div class="cell" style="padding:0;overflow:hidden">
-            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ In-class slides / practice workspace</div>
+            <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--accent)">✓ In-class slides</div>
             <div style="height:100px;background:${voidGrid16};display:grid;place-items:center;padding:0 20px">
               <div style="width:100%;background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:10px 16px;font-size:13px;color:var(--fg);text-align:center">Which word best replaces "meticulous"?</div>
             </div>
@@ -939,33 +927,40 @@ P.gridpaper = {
         <div class="grid grid--2">
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Quiz / practice sessions</div>
-            <div style="height:auto;background:var(--bg);padding:12px 16px">
-              <button class="option" style="pointer-events:none"><span class="option__label">A</span><span class="option__text">The land is completely useless</span></button>
-              <button class="option is-selected" style="pointer-events:none;margin-top:8px"><span class="option__label">B</span><span class="option__text">There is hidden potential</span></button>
+            <div style="background:var(--bg);padding:var(--sp-3) var(--sp-4)">
+              <button class="option" style="pointer-events:none;margin:0"><span class="option__label">A</span><span class="option__text">The land is completely useless</span></button>
+              <button class="option is-selected" style="pointer-events:none;margin:var(--sp-2) 0 0"><span class="option__label">B</span><span class="option__text">There is hidden potential</span></button>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Heatmap / mastery grid</div>
-            <div style="height:100px;background:var(--bg);display:flex;gap:4px;align-items:center;justify-content:center;padding:0 20px">
-              ${[65,42,88,35,76,91].map(function(s){var t=Math.max(0,Math.min(100,s))/100;var r,g,b;if(t<0.5){var p=t/0.5;r=240+(255-240)*p;g=61+(203-61)*p;b=61+(69-61)*p}else{var p=(t-0.5)/0.5;r=255+(39-255)*p;g=203+(189-203)*p;b=69+(134-69)*p}return '<div style="width:32px;height:32px;border-radius:4px;background:rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')"></div>'}).join('')}
+            <div style="background:var(--bg);display:flex;gap:5px;flex-wrap:wrap;padding:var(--sp-4) var(--sp-5)">
+              ${[65,42,88,35,76,91,22,70].map(function(s){var t=Math.max(0,Math.min(100,s))/100;var r,g,b;if(t<0.5){var p=t/0.5;r=240+(255-240)*p;g=61+(203-61)*p;b=61+(69-61)*p}else{var p=(t-0.5)/0.5;r=255+(39-255)*p;g=203+(189-203)*p;b=69+(134-69)*p}return '<div style="width:36px;height:36px;border-radius:4px;background:rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')"></div>'}).join('')}
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Cards and raised surfaces</div>
-            <div style="height:100px;background:var(--bg);display:grid;place-items:center">
-              <div class="card" style="width:200px;padding:16px 20px">
+            <div style="background:var(--bg);padding:var(--sp-4) var(--sp-5)">
+              <div style="background:var(--bg-overlay);border:1px solid var(--border);border-radius:var(--r-2);padding:var(--sp-4) var(--sp-5)">
                 <div class="caps" style="margin-bottom:4px">Topic</div>
-                <div style="font-size:15px;color:var(--fg);font-weight:600">Inference</div>
+                <div style="font-size:15px;color:var(--fg);font-weight:600">Inference & implied meaning</div>
+                <div style="font-size:12px;color:var(--fg-subtle);margin-top:2px">Qudrat Reading - Mr. Hassan</div>
               </div>
             </div>
           </div>
           <div class="cell" style="padding:0;overflow:hidden">
             <div class="cell__label" style="padding:var(--sp-4) var(--sp-5) 0;color:var(--danger-300)">✗ Schedule / session lists</div>
             <div style="background:var(--bg)">
+              <div class="session session--live" style="pointer-events:none">
+                <div class="session__time">8:30</div>
+                <div class="session__indicator"></div>
+                <div class="session__body"><div class="session__title">Storytelling</div><div class="session__meta">Digital Media</div></div>
+                <div class="session__status"><span class="chip chip--signal"><span class="chip__dot"></span> Live</span></div>
+              </div>
               <div class="session session--soon" style="pointer-events:none">
                 <div class="session__time">10:00</div>
                 <div class="session__indicator"></div>
-                <div class="session__body"><div class="session__title">Inference & implied meaning</div><div class="session__meta">Qudrat Reading</div></div>
+                <div class="session__body"><div class="session__title">Inference</div><div class="session__meta">Qudrat Reading</div></div>
                 <div class="session__status"><span class="mono" style="color:var(--signal-bright)">Soon</span></div>
               </div>
             </div>
@@ -1428,7 +1423,7 @@ P.contours = {
     function extendGaps(g, targetH) {
       var result = []; var total = 0;
       while (total < targetH + 80) {
-        for (var i = 0; i < g.length && total < targetH + 40; i++) { result.push(g[i]); total += g[i]; }
+        for (var i = 0; i < g.length; i++) { result.push(g[i]); total += g[i]; }
       }
       return result;
     }
