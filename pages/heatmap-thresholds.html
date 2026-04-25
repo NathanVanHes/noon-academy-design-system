@@ -144,7 +144,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <!-- Math section -->
   <div class="grid-section">
     <div class="grid-section__header">
-      <div class="grid-section__label">Quantitative</div>
+      <div class="grid-section__label">الجزء الكمي</div>
       <div class="grid-section__right"><span class="grid-section__exam" id="quantExam" style="display:none">Exam in 5 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>80+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 1</span></div>
     </div>
     <div class="tile-grid" id="mathGrid"></div>
@@ -153,7 +153,7 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
   <!-- Reading section -->
   <div class="grid-section">
     <div class="grid-section__header">
-      <div class="grid-section__label">Verbal</div>
+      <div class="grid-section__label">الجزء اللفظي</div>
       <div class="grid-section__right"><span class="grid-section__exam" id="verbalExam" style="display:none">Exam in 7 days ·</span> <span style="display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-secondary)"><svg width="14" height="14" viewBox="0 0 12 12" fill="#141414" style="flex:none"><path d="M6 0.5L7.5 4.2L11.5 4.6L8.5 7.2L9.3 11.2L6 9.3L2.7 11.2L3.5 7.2L0.5 4.6L4.5 4.2Z"/></svg>70+</span> <span style="font-size:11px;color:var(--fg-muted);font-weight:400">Level 2</span></div>
     </div>
     <div class="tile-grid" id="readingGrid"></div>
@@ -201,12 +201,10 @@ body{background:var(--bg);margin:0;font-family:var(--font-sans);color:var(--fg);
 </div>
 
 <script>
-// t(score, weekStart, semStart, exam, startWeek)
-// weekStart = score at start of this week (diff = score - weekStart)
-// semStart = score at start of semester (for semester graph baseline)
-function t(score, weekStart, semStart, exam, startWeek) {
+// t(name, score, weekStart, semStart, exam, startWeek)
+function t(name, score, weekStart, semStart, exam, startWeek) {
   return {
-    name: 'Topic name',
+    name: name,
     score: score,
     weekStart: weekStart,
     semStart: semStart != null ? semStart : (weekStart != null ? Math.max(10, weekStart - 20) : null),
@@ -216,47 +214,47 @@ function t(score, weekStart, semStart, exam, startWeek) {
 }
 
 var mathChapters = [
-  { name: 'Chapter name', topics: [
-    t(76, 64, 18, true, 1),   // +12 this week, climbed from 18
-    t(22, 25, 10, false, 1),  // -3 this week, started at 10
-    t(61, 52, 20, false, 1),  // +9 this week
-    t(94, 88, 30, true, 1),   // +6 this week, mastered
-    t(35, 42, 15, false, 2),  // -7 this week
-    t(null, null, null, false, 1),
-    t(70, 65, 25, false, 2),  // +5 this week
-    t(18, 24, 12, true, 1),   // -6 this week, struggling
-    t(85, 80, 45, false, 8),  // +5 this week, mastered
+  { name: 'الحساب', topics: [
+    t('الاعداد و\nخصائصها', 76, 64, 18, true, 1),
+    t('العمليات\nالحسابية', 22, 25, 10, false, 1),
+    t('المضاعفات\nو القواسم', 61, 52, 20, false, 1),
+    t('الكسور\nالاعتيادية', 94, 88, 30, true, 1),
+    t('النسبة\nوالتناسب', 35, 42, 15, false, 2),
+    t('المتتابعات\nوالأنماط', null, null, null, false, 1),
+    t('القياس', 70, 65, 25, false, 2),
+    t('الكسور\nالعشرية', 18, 24, 12, true, 1),
+    t('الحركة', 85, 80, 45, false, 8),
   ]},
-  { name: 'Chapter name', topics: [
-    t(42, 30, 12, false, 3),  // +12 this week
-    t(28, 32, 14, false, 3),  // -4 this week
-    t(15, 15, 8, false, 4),   // no change
-    t(58, 48, 18, false, 3),  // +10 this week
-    t(null, null, null, false, 4),
+  { name: 'الجبر', topics: [
+    t('القوى', 42, 30, 12, false, 3),
+    t('الجذور', 28, 32, 14, false, 3),
+    t('المعادلات', 15, 15, 8, false, 4),
+    t('المتباينات', 58, 48, 18, false, 3),
+    t('المتطابقات', null, null, null, false, 4),
   ]},
-  { name: 'Chapter name', topics: [
-    t(73, 65, 22, false, 5),  // +8 this week
-    t(88, 82, 35, false, 7),  // +6 this week, mastered
-    t(25, 30, 12, false, 6),  // -5 this week
-    t(91, 87, 50, false, 9),  // +4 this week, mastered
-    t(44, 44, 20, false, 6),  // no change
-    t(null, null, null, false, 6),
+  { name: 'الهندسة', topics: [
+    t('المستقيمات', 73, 65, 22, false, 5),
+    t('الزوايا', 88, 82, 35, false, 7),
+    t('المثلثات', 25, 30, 12, false, 6),
+    t('المضلعات', 91, 87, 50, false, 9),
+    t('الدائرة', 44, 44, 20, false, 6),
+    t('المساحة\nوالمحيط', null, null, null, false, 6),
   ]},
-  { name: 'Chapter name', topics: [
-    t(32, 38, 15, false, 8),  // -6 this week
-    t(79, 68, 28, false, 7),  // +11 this week
-    t(55, 48, 22, false, 8),  // +7 this week
+  { name: 'الاحصاء والاحتمالات', topics: [
+    t('الإحصاء', 32, 38, 15, false, 8),
+    t('تحليل\nالبيانات', 79, 68, 28, false, 7),
+    t('الاحتمالات', 55, 48, 22, false, 8),
   ]},
 ];
 var mathTopics = [];
 mathChapters.forEach(function(c){c.topics.forEach(function(t){mathTopics.push(t)})});
 
 var readingTopics = [
-  t(82, 75, 25, false, 1),  // +7 this week, mastered (70+ verbal)
-  t(30, 38, 15, false, 2),  // -8 this week
-  t(91, 85, 32, false, 1),  // +6 this week, mastered
-  t(22, 22, 10, false, 4),  // no change
-  t(67, 55, 20, true, 3),   // +12 this week
+  t('التناظر\nاللفظي', 82, 75, 25, false, 1),
+  t('استيعاب\nالمقروء', 30, 38, 15, false, 2),
+  t('إكمال\nالجمل', 91, 85, 32, false, 1),
+  t('الخطأ\nالسياقي', 22, 22, 10, false, 4),
+  t('الاختلاف\n"المفردة الشاذة"', 67, 55, 20, true, 3),
 ];
 
 function scoreColor(s) {
