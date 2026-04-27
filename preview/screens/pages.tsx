@@ -55,125 +55,113 @@ function Rl({ children }: { children: string }) {
 }
 function Gap({ s }: { s?: number }) { return <View style={{ height: s ?? sp[3] }} />; }
 
+function Import({ children }: { children: string }) {
+  const { theme } = useTheme();
+  return (
+    <View style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[3], marginBottom: sp[5] }}>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent }}>{children}</Text>
+    </View>
+  );
+}
+
+function Prop({ name, type, def, desc }: { name: string; type: string; def?: string; desc?: string }) {
+  const { theme } = useTheme();
+  return (
+    <View style={{ flexDirection: 'row', paddingVertical: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider, gap: sp[2] }}>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.accent, minWidth: 80 }}>{name}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted }}>{type}{def ? `  = ${def}` : ''}</Text>
+        {desc ? <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }}>{desc}</Text> : null}
+      </View>
+    </View>
+  );
+}
+
+function Props({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  return (
+    <View style={{ marginBottom: sp[5] }}>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 2, textTransform: 'uppercase', marginBottom: sp[2] }}>Props</Text>
+      {children}
+    </View>
+  );
+}
+
 // ═══════════════════════════════════════════════
 // PAGES
 // ═══════════════════════════════════════════════
 
 export function ButtonsPage() {
   const { theme } = useTheme();
-  const variants: Array<{ v: 'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'; label: string }> = [
-    { v: 'primary', label: 'Primary' },
-    { v: 'secondary', label: 'Secondary' },
-    { v: 'ghost', label: 'Ghost' },
-    { v: 'danger', label: 'Danger' },
-    { v: 'danger-solid', label: 'Danger Solid' },
-    { v: 'signal', label: 'Signal' },
-  ];
-  const sizes: Array<'sm'|'md'|'lg'> = ['sm', 'md', 'lg'];
-  const sizeLabels = { sm: 'Small (32)', md: 'Medium (40)', lg: 'Large (48)' };
-  const arrow = <Text style={{ color: theme.fgMuted, fontSize: fs[14] }}>←</Text>;
-  const plus = <Text style={{ fontSize: fs[14] }}>+</Text>;
+  const V: Array<'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'> = ['primary','secondary','ghost','danger','danger-solid','signal'];
 
   return <>
-    {/* Every variant at default size */}
-    <S title="Variants" desc="Primary for main action. Secondary for alternatives. Ghost for low-emphasis. Danger for destructive. Signal for journey actions ONLY.">
-      {variants.map(({ v, label }) => (
-        <C key={v} label={label}>
-          <Button variant={v}>{label}</Button>
-        </C>
-      ))}
+    <Import>{"import { Button } from '@noon/design-system';"}</Import>
+
+    <Props>
+      <Prop name="children" type="string" desc="Button label text" />
+      <Prop name="variant" type="'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal'" def="'primary'" />
+      <Prop name="size" type="'sm' | 'md' | 'lg'" def="'md'" desc="32 / 40 / 48 height" />
+      <Prop name="disabled" type="boolean" desc="Grey bg + grey text, not interactive" />
+      <Prop name="loading" type="boolean" desc="Shows spinner, hides text, disables interaction" />
+      <Prop name="block" type="boolean" desc="Full width" />
+      <Prop name="icon" type="ReactNode" desc="Renders before text" />
+      <Prop name="onPress" type="() => void" />
+    </Props>
+
+    <S title="Variants">
+      <R>{V.map(v => <Button key={v} variant={v}>{v}</Button>)}</R>
     </S>
 
-    {/* Every variant × every size */}
-    <S title="All Sizes" desc="Every variant shown at sm (32px), md (40px), lg (48px).">
-      {variants.map(({ v, label }) => (
-        <C key={v} label={label}>
-          <R>
-            {sizes.map(s => <Button key={s} variant={v} size={s}>{sizeLabels[s]}</Button>)}
-          </R>
-        </C>
-      ))}
+    <S title="Sizes">
+      <R><Button size="sm">Small</Button><Button size="md">Medium</Button><Button size="lg">Large</Button></R>
     </S>
 
-    {/* Disabled state for every variant */}
-    <S title="Disabled" desc="Every variant in disabled state.">
+    <S title="Disabled">
+      <R>{V.map(v => <Button key={v} variant={v} disabled>{v}</Button>)}</R>
+    </S>
+
+    <S title="Loading">
+      <R>{V.map(v => <Button key={v} variant={v} loading>{v}</Button>)}</R>
+    </S>
+
+    <S title="Block">
+      {V.map(v => <View key={v} style={{ marginBottom: sp[2] }}><Button variant={v} block>{v}</Button></View>)}
+    </S>
+
+    <S title="With Icon">
       <R>
-        {variants.map(({ v, label }) => <Button key={v} variant={v} disabled>{label}</Button>)}
+        <Button variant="primary" icon={<Text style={{ color: theme.accentFg }}>+</Text>}>Add</Button>
+        <Button variant="secondary" icon={<Text style={{ color: theme.fg }}>\u2190</Text>}>Back</Button>
       </R>
-    </S>
-
-    {/* Loading state for every variant */}
-    <S title="Loading" desc="Spinner replaces text. Button stays interactive-looking but disabled.">
-      <R>
-        {variants.map(({ v, label }) => <Button key={v} variant={v} loading>{label}</Button>)}
-      </R>
-    </S>
-
-    {/* Block — every variant full width */}
-    <S title="Block (Full Width)" desc="Every variant at full width.">
-      {variants.map(({ v, label }) => (
-        <View key={v} style={{ marginBottom: sp[2] }}>
-          <Button variant={v} block>Full width {label.toLowerCase()}</Button>
-        </View>
-      ))}
-    </S>
-
-    {/* With icon */}
-    <S title="With Icon" desc="Icon renders before text.">
-      <R>
-        <Button variant="primary" icon={<Text style={{ color: theme.accentFg }}>+</Text>}>Add topic</Button>
-        <Button variant="secondary" icon={<Text style={{ color: theme.fg }}>←</Text>}>Back</Button>
-        <Button variant="ghost" icon={<Text style={{ color: theme.fgMuted }}>⋮</Text>}>More</Button>
-      </R>
-    </S>
-
-    {/* Specs */}
-    <S title="Specs">
-      <Sp label="Height sm / md / lg" value="32 / 40 / 48" />
-      <Sp label="Padding sm / md / lg" value="12 / 20 / 24" />
-      <Sp label="Ghost padding" value="12 (tighter)" />
-      <Sp label="Border radius" value="r-2 (4px)" />
-      <Sp label="Font" value="sans, fs-14, fw-600" />
-      <Sp label="Letter spacing" value="-0.07 (tr-snug)" />
-      <Sp label="Press feedback" value="opacity 0.9, translateY 0.5" />
-      <Sp label="Outline border" value="1px border-strong (secondary) / danger-border (danger)" />
-    </S>
-
-    {/* Rules */}
-    <S title="Rules">
-      <Rl>Primary for the single most important action on screen. One primary per view.</Rl>
-      <Rl>Secondary for alternatives — "Cancel", "Back", "Skip".</Rl>
-      <Rl>Ghost for low-emphasis actions in toolbars, cards, and inline contexts.</Rl>
-      <Rl>Danger outline for reversible destructive actions. Danger solid for irreversible — always behind a confirmation dialog.</Rl>
-      <Rl>Signal (gold) is ONLY for journey waypoint actions: mark arrival, confirm route, current position. Never for general UI.</Rl>
-      <Rl>Icon-only buttons need an accessibilityLabel since there's no visible text.</Rl>
-      <Rl>Loading state disables interaction and shows spinner. Text becomes transparent but keeps layout.</Rl>
     </S>
   </>;
 }
 
 export function InputsPage() {
   return <>
-    <S title="Text Input">
+    <Import>{"import { Input, Textarea } from '@noon/design-system';"}</Import>
+
+    <Props>
+      <Prop name="label" type="string" desc="Label above input" />
+      <Prop name="placeholder" type="string" />
+      <Prop name="value" type="string" />
+      <Prop name="error" type="string" desc="Error message, red border" />
+      <Prop name="helper" type="string" desc="Help text below input" />
+      <Prop name="disabled" type="boolean" />
+      <Prop name="onChangeText" type="(text: string) => void" />
+    </Props>
+
+    <S title="States">
       <C label="Default"><Input placeholder="Enter text" /></C>
       <C label="With label"><Input label="Name" placeholder="Your name" /></C>
-      <C label="With value"><Input label="Email" value="nathan@noon.com" /></C>
-      <C label="Error"><Input label="Email" placeholder="email@noon.com" error="Invalid email address" /></C>
-      <C label="Helper text"><Input label="Password" placeholder="••••••••" helper="At least 8 characters" /></C>
-      <C label="Disabled"><Input label="Locked" placeholder="Can't edit" disabled /></C>
+      <C label="Error"><Input label="Email" error="Invalid email" /></C>
+      <C label="Disabled"><Input label="Locked" disabled /></C>
     </S>
+
     <S title="Textarea">
-      <C label="Default"><Textarea placeholder="Write something..." rows={3} /></C>
-      <C label="With label + error"><Textarea label="Notes" placeholder="..." error="Required field" /></C>
-    </S>
-    <S title="Specs">
-      <Sp label="Height" value="40px (input-h)" />
-      <Sp label="Padding" value="sp-3 horizontal" />
-      <Sp label="Border" value="1px border-strong, accent on focus" />
-      <Sp label="Radius" value="r-2 (4px)" />
-      <Sp label="Font" value="sans, fs-15" />
-      <Sp label="Label" value="sans, fs-12, fw-500, fg-muted" />
-      <Sp label="Error" value="sans, fs-12, danger" />
+      <C label="Default"><Textarea placeholder="Write..." rows={3} /></C>
+      <C label="With error"><Textarea label="Notes" error="Required" /></C>
     </S>
   </>;
 }
@@ -181,76 +169,108 @@ export function InputsPage() {
 export function ControlsPage() {
   const [sw, setSw] = useState(true);
   const [ch, setCh] = useState(true);
-  const [ch2, setCh2] = useState(false);
   const [rad, setRad] = useState(0);
   const [step, setStep] = useState(3);
   const [seg, setSeg] = useState(0);
   return <>
+    <Import>{"import { Switch, Checkbox, Radio, Stepper, Segmented } from '@noon/design-system';"}</Import>
+
     <S title="Switch">
-      <C label="On"><Switch value={sw} onValueChange={setSw} /></C>
-      <C label="Off"><Switch value={false} onValueChange={() => {}} /></C>
-      <C label="Disabled"><Switch value={true} onValueChange={() => {}} disabled /></C>
+      <Props>
+        <Prop name="value" type="boolean" />
+        <Prop name="onValueChange" type="(val: boolean) => void" />
+        <Prop name="disabled" type="boolean" />
+      </Props>
+      <R><Switch value={sw} onValueChange={setSw} /><Switch value={false} onValueChange={() => {}} /><Switch value={true} onValueChange={() => {}} disabled /></R>
     </S>
+
     <S title="Checkbox">
-      <R>
-        <C label="Checked"><Checkbox checked={ch} onValueChange={setCh} /></C>
-        <C label="Unchecked"><Checkbox checked={ch2} onValueChange={setCh2} /></C>
-        <C label="Disabled"><Checkbox checked={true} onValueChange={() => {}} disabled /></C>
-        <C label="Indeterminate"><Checkbox checked={false} onValueChange={() => {}} indeterminate /></C>
-      </R>
+      <Props>
+        <Prop name="checked" type="boolean" />
+        <Prop name="onValueChange" type="(val: boolean) => void" />
+        <Prop name="disabled" type="boolean" />
+        <Prop name="indeterminate" type="boolean" />
+      </Props>
+      <R><Checkbox checked={ch} onValueChange={setCh} /><Checkbox checked={false} onValueChange={() => {}} /><Checkbox checked={true} onValueChange={() => {}} disabled /><Checkbox checked={false} onValueChange={() => {}} indeterminate /></R>
     </S>
+
     <S title="Radio">
-      <R>
-        <C label="Option 1"><Radio selected={rad===0} onSelect={() => setRad(0)} /></C>
-        <C label="Option 2"><Radio selected={rad===1} onSelect={() => setRad(1)} /></C>
-        <C label="Disabled"><Radio selected={false} onSelect={() => {}} disabled /></C>
-      </R>
+      <Props>
+        <Prop name="selected" type="boolean" />
+        <Prop name="onSelect" type="() => void" />
+        <Prop name="disabled" type="boolean" />
+      </Props>
+      <R><Radio selected={rad===0} onSelect={() => setRad(0)} /><Radio selected={rad===1} onSelect={() => setRad(1)} /><Radio selected={false} onSelect={() => {}} disabled /></R>
     </S>
-    <S title="Stepper"><Stepper value={step} min={0} max={10} onChange={setStep} /></S>
-    <S title="Segmented"><Segmented options={['Day', 'Week', 'Month']} selected={seg} onSelect={setSeg} /></S>
+
+    <S title="Stepper">
+      <Props>
+        <Prop name="value" type="number" />
+        <Prop name="min / max" type="number" def="0 / 100" />
+        <Prop name="onChange" type="(val: number) => void" />
+      </Props>
+      <Stepper value={step} min={0} max={10} onChange={setStep} />
+    </S>
+
+    <S title="Segmented">
+      <Props>
+        <Prop name="options" type="string[]" />
+        <Prop name="selected" type="number" />
+        <Prop name="onSelect" type="(index: number) => void" />
+      </Props>
+      <Segmented options={['Day', 'Week', 'Month']} selected={seg} onSelect={setSeg} />
+    </S>
   </>;
 }
 
 export function ChipsPage() {
   return <>
+    <Import>{"import { Chip } from '@noon/design-system';"}</Import>
+
+    <Props>
+      <Prop name="children" type="string" desc="Chip label" />
+      <Prop name="variant" type="'default' | 'accent' | 'signal' | 'danger' | 'ok'" def="'default'" />
+      <Prop name="interactive" type="boolean" desc="Tappable" />
+      <Prop name="dot" type="boolean" desc="Diamond dot before label" />
+      <Prop name="disabled" type="boolean" />
+      <Prop name="onPress" type="() => void" />
+    </Props>
+
     <S title="Variants">
-      <C label="Default"><Chip>Topic name</Chip></C>
-      <C label="Accent (active)"><Chip variant="accent">Active filter</Chip></C>
-      <C label="Signal (with dot)"><Chip variant="signal" dot>Live</Chip></C>
-      <C label="Danger"><Chip variant="danger">Overdue</Chip></C>
-      <C label="OK"><Chip variant="ok">Completed</Chip></C>
+      <R><Chip>Default</Chip><Chip variant="accent">Accent</Chip><Chip variant="signal" dot>Signal</Chip><Chip variant="danger">Danger</Chip><Chip variant="ok">OK</Chip></R>
     </S>
-    <S title="States">
-      <C label="Interactive"><R><Chip interactive onPress={() => {}}>Tap me</Chip><Chip variant="accent" interactive onPress={() => {}}>Active</Chip></R></C>
-      <C label="Disabled"><Chip disabled>Disabled</Chip></C>
-      <C label="Wrapping"><R>{'ABCDEFGH'.split('').map(c => <Chip key={c} interactive onPress={() => {}}>Topic {c}</Chip>)}</R></C>
-    </S>
-    <S title="Specs">
-      <Sp label="Height" value="28px" />
-      <Sp label="Padding" value="sp-3 (12px)" />
-      <Sp label="Gap" value="sp-2 (8px)" />
-      <Sp label="Radius" value="r-1 (2px)" />
-      <Sp label="Font" value="sans, fs-12, fw-500" />
-      <Sp label="Border" value="1px inset, colored per variant" />
+
+    <S title="Interactive">
+      <R><Chip interactive onPress={() => {}}>Tap me</Chip><Chip disabled>Disabled</Chip></R>
     </S>
   </>;
 }
 
 export function AvatarsPage() {
   return <>
+    <Import>{"import { Avatar, Badge } from '@noon/design-system';"}</Import>
+
+    <Props>
+      <Prop name="initials" type="string" />
+      <Prop name="size" type="'xs' | 'sm' | 'md' | 'lg' | 'xl'" def="'sm'" desc="24 / 32 / 40 / 56 / 72" />
+      <Prop name="color" type="'default' | 'noon' | 'iris'" def="'default'" />
+      <Prop name="star" type="boolean" desc="Gold diamond indicator" />
+      <Prop name="status" type="'online' | 'busy'" desc="Status dot" />
+    </Props>
+
     <S title="Sizes">
       <R><Avatar initials="S" size="xs" /><Avatar initials="S" size="sm" /><Avatar initials="S" size="md" /><Avatar initials="S" size="lg" /><Avatar initials="S" size="xl" /></R>
-      <Sp label="xs / sm / md / lg / xl" value="24 / 32 / 40 / 56 / 72" />
     </S>
-    <S title="Color Variants">
+
+    <S title="Colors">
       <R><Avatar initials="S" size="md" /><Avatar initials="S" size="md" color="noon" /><Avatar initials="F" size="md" color="iris" /></R>
     </S>
+
     <S title="Indicators">
-      <C label="Star (mastery)"><Avatar initials="S" size="md" color="noon" star /></C>
-      <C label="Online"><Avatar initials="O" size="md" status="online" /></C>
-      <C label="Busy"><Avatar initials="A" size="md" status="busy" /></C>
+      <R><Avatar initials="S" size="md" color="noon" star /><Avatar initials="O" size="md" status="online" /><Avatar initials="A" size="md" status="busy" /></R>
     </S>
-    <S title="Badges">
+
+    <S title="Badge">
       <R><Badge>3</Badge><Badge variant="accent">12</Badge><Badge variant="danger">!</Badge><Badge variant="dot" /></R>
     </S>
   </>;
@@ -258,39 +278,51 @@ export function AvatarsPage() {
 
 export function CardsPage() {
   const { theme } = useTheme();
-  const t = (s: string) => <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>{s}</Text>;
   return <>
-    <S title="Variants">
-      <C label="Default"><Card><Text style={{ fontFamily: font.serif, fontSize: fs[18], color: theme.fg }}>Card title</Text><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[1] }}>Body text.</Text></Card></C>
-      <C label="Interactive">{<Card interactive onPress={() => {}}>{t('Press for feedback')}</Card>}</C>
+    <Import>{"import { Card } from '@noon/design-system';"}</Import>
+
+    <Props>
+      <Prop name="children" type="ReactNode" />
+      <Prop name="interactive" type="boolean" desc="Press feedback" />
+      <Prop name="selected" type="boolean" desc="Accent border" />
+      <Prop name="error" type="boolean" desc="Danger border" />
+      <Prop name="live" type="boolean" desc="Accent start border" />
+      <Prop name="loading" type="boolean" desc="0.6 opacity" />
+      <Prop name="onPress" type="() => void" />
+    </Props>
+
+    <S title="Default">
+      <Card><Text style={{ fontFamily: font.serif, fontSize: fs[18], color: theme.fg }}>Card title</Text></Card>
     </S>
+
+    <S title="Interactive">
+      <Card interactive onPress={() => {}}><Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>Press me</Text></Card>
+    </S>
+
     <S title="States">
-      <C label="Selected"><Card selected>{t('Selected')}</Card></C>
-      <C label="Error"><Card error>{t('Error')}</Card></C>
-      <C label="Live"><Card live>{t('Live (accent start border)')}</Card></C>
-      <C label="Loading"><Card loading>{t('Loading (0.6 opacity)')}</Card></C>
-    </S>
-    <S title="Specs">
-      <Sp label="Background" value="bg-raised" />
-      <Sp label="Border" value="1px border" />
-      <Sp label="Radius" value="r-2 (4px)" />
-      <Sp label="Padding" value="sp-5 / sp-6 (20 / 24)" />
+      <C label="Selected"><Card selected><Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>Selected</Text></Card></C>
+      <C label="Error"><Card error><Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>Error</Text></Card></C>
+      <C label="Live"><Card live><Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>Live</Text></Card></C>
+      <C label="Loading"><Card loading><Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>Loading</Text></Card></C>
     </S>
   </>;
 }
 
 export function AlertsPage() {
   return <>
-    <S title="All Variants">
-      <C label="Info"><Alert variant="info" title="Information">General info message.</Alert></C>
-      <C label="OK / Success"><Alert variant="ok" title="Success">Session completed.</Alert></C>
-      <C label="Warning"><Alert variant="warn" title="Warning">Exam in 2 days.</Alert></C>
+    <Import>{"import { Alert } from '@noon/design-system';"}</Import>
+
+    <Props>
+      <Prop name="children" type="string" desc="Alert body text" />
+      <Prop name="variant" type="'info' | 'ok' | 'warn' | 'danger'" def="'info'" />
+      <Prop name="title" type="string" desc="Optional bold title" />
+    </Props>
+
+    <S title="Variants">
+      <C label="Info"><Alert variant="info" title="Info">General information.</Alert></C>
+      <C label="OK"><Alert variant="ok" title="Success">Session completed.</Alert></C>
+      <C label="Warn"><Alert variant="warn">Exam in 2 days.</Alert></C>
       <C label="Danger"><Alert variant="danger" title="Error">Something went wrong.</Alert></C>
-    </S>
-    <S title="Without title"><Alert variant="warn">Your exam is in 2 days.</Alert></S>
-    <S title="Rules">
-      <Rl>Background is always bg-raised. Variant only changes border color.</Rl>
-      <Rl>Title optional. Body required.</Rl>
     </S>
   </>;
 }
