@@ -165,6 +165,9 @@ export const typography = {
     arabic: 'NotoNaskhArabic',
   },
   fontSize: {
+    '9': 9,
+    '10': 10,
+    '11': 11,
     '12': 12,
     '13': 13,
     '14': 14,
@@ -214,6 +217,7 @@ export const spacing = {
   '10': 64,
   '11': 80,
   '12': 96,
+  '0h': 2,
 } as const;
 
 export const radius = {

@@ -245,6 +245,28 @@ P.overview = {
           <div class="cell"><code style="color:var(--accent);font-size:var(--fs-12)">dist/tokens.native.ts</code><div style="font-size:var(--fs-12);color:var(--fg-subtle)">React Native</div></div>
         </div>
       </div>
+      <div class="sect">
+        <div class="sect__title">React Native</div>
+        <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4);max-width:55ch">Every component exists as a typed React Native component in <code style="font-family:var(--font-mono);font-size:var(--fs-12);background:var(--hover-overlay);padding:2px 6px;border-radius:2px">rn/</code>. Wrap your app in ThemeProvider. Each component page below shows the RN import and usage alongside the HTML/CSS reference.</p>
+        <div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>import { ThemeProvider, Button, Card, Chip } from '@noon/design-system';
+import { sp, fs, fw, font, color } from '@noon/design-system/tokens';
+
+export default function App() {
+  return (
+    &lt;ThemeProvider initial="void"&gt;
+      &lt;Button variant="primary" onPress={() =&gt; {}}&gt;
+        Get started
+      &lt;/Button&gt;
+    &lt;/ThemeProvider&gt;
+  );
+}</pre></div>
+        <div style="margin-top:var(--sp-4)">
+          <div class="grid grid--2">
+            <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>30 components</b> — Button, Card, Chip, Avatar, Badge, Alert, Input, Switch, Checkbox, Radio, Stepper, Segmented, Tabs, BottomNav, TitleBar, FilterBar, SessionCard, SessionBar, RouteSteps, QuizOption, Dialog, BottomSheet, Toast, Tooltip, Progress, Skeleton, EmptyState, Table, Divider, Interstitial</div></div>
+            <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Dependencies:</b> react-native-svg (circular progress only). No reanimated, no gesture handler. Pure RN 0.71+. Void and paper themes via ThemeProvider.</div></div>
+          </div>
+        </div>
+      </div>
     </div>`;
   }
 };
@@ -4994,6 +5016,341 @@ function navigate(id) {
   }
 }
 
+// ═══ React Native code examples for every component ═══
+const RN_CODE = {
+  buttons: (k) => `import { Button } from '@noon/design-system';
+
+<Button
+  variant="${k.variant || 'primary'}"
+  size="${k.size || 'md'}"
+  ${k.disabled ? 'disabled' : ''}
+  ${k.loading ? 'loading' : ''}
+  ${k.block ? 'block' : ''}
+  onPress={() => {}}
+>
+  Label
+</Button>`,
+
+  iconbtn: (k) => `import { IconButton } from '@noon/design-system';
+
+<IconButton
+  variant="${k.variant || 'default'}"
+  size="${k.size || 'md'}"
+  onPress={() => {}}
+>
+  <Icon name="arrow-left" />
+</IconButton>`,
+
+  inputs: (k) => `import { Input } from '@noon/design-system';
+
+<Input
+  label="Field label"
+  placeholder="Enter text"
+  ${k.error ? 'error="Error message"' : ''}
+  ${k.disabled ? 'disabled' : ''}
+  onChangeText={(text) => {}}
+/>`,
+
+  textarea: (k) => `import { Textarea } from '@noon/design-system';
+
+<Textarea
+  label="Notes"
+  placeholder="Write something..."
+  rows={4}
+  onChangeText={(text) => {}}
+/>`,
+
+  stepper: (k) => `import { Stepper } from '@noon/design-system';
+
+<Stepper
+  value={value}
+  min={0}
+  max={10}
+  onChange={(v) => setValue(v)}
+/>`,
+
+  segmented: (k) => `import { Segmented } from '@noon/design-system';
+
+<Segmented
+  options={['Day', 'Week', 'Month']}
+  selected={selected}
+  onSelect={(i) => setSelected(i)}
+/>`,
+
+  checkbox: (k) => `import { Checkbox } from '@noon/design-system';
+
+<Checkbox
+  checked={checked}
+  onChange={(v) => setChecked(v)}
+  ${k.disabled ? 'disabled' : ''}
+/>`,
+
+  radio: (k) => `import { Radio } from '@noon/design-system';
+
+<Radio
+  selected={selected === 0}
+  onSelect={() => setSelected(0)}
+/>`,
+
+  switch: (k) => `import { Switch } from '@noon/design-system';
+
+<Switch
+  value={isOn}
+  onValueChange={(v) => setIsOn(v)}
+  ${k.disabled ? 'disabled' : ''}
+/>`,
+
+  chips: (k) => `import { Chip } from '@noon/design-system';
+
+<Chip
+  variant="${k.variant || 'default'}"
+  ${k.interactive ? 'interactive' : ''}
+  ${k.dot ? 'dot' : ''}
+  onPress={() => {}}
+>
+  Label
+</Chip>`,
+
+  cards: (k) => `import { Card } from '@noon/design-system';
+
+<Card
+  ${k.interactive ? 'interactive' : ''}
+  ${k.selected ? 'selected' : ''}
+  ${k.live ? 'live' : ''}
+  onPress={() => {}}
+>
+  <Text>Card content</Text>
+</Card>`,
+
+  avatars: (k) => `import { Avatar } from '@noon/design-system';
+
+<Avatar
+  initials="S"
+  size="${k.size || 'md'}"
+  color="${k.color || 'default'}"
+  ${k.star ? 'star' : ''}
+  ${k.status ? 'status="online"' : ''}
+/>`,
+
+  badges: (k) => `import { Badge } from '@noon/design-system';
+
+<Badge variant="${k.variant || 'default'}">3</Badge>
+<Badge variant="dot" />`,
+
+  tabs: (k) => `import { Tabs } from '@noon/design-system';
+
+<Tabs
+  tabs={['Atlas', 'Schedule', 'Crew']}
+  selected={selected}
+  onSelect={(i) => setSelected(i)}
+/>`,
+
+  bottomnav: (k) => `import { BottomNav } from '@noon/design-system';
+
+<BottomNav
+  items={[
+    { label: 'Home', icon: <HomeIcon /> },
+    { label: 'Schedule', icon: <CalIcon /> },
+    { label: 'Crew', icon: <CrewIcon />, badge: 3 },
+  ]}
+  selected={selected}
+  onSelect={(i) => setSelected(i)}
+/>`,
+
+  alerts: (k) => `import { Alert } from '@noon/design-system';
+
+<Alert
+  variant="${k.variant || 'info'}"
+  title="Title"
+>
+  Alert body text.
+</Alert>`,
+
+  toasts: (k) => `import { Toast } from '@noon/design-system';
+
+<Toast
+  message="Session saved"
+  variant="ok"
+  visible={visible}
+  onDismiss={() => setVisible(false)}
+  duration={4000}
+/>`,
+
+  dialogs: (k) => `import { Dialog } from '@noon/design-system';
+
+<Dialog
+  visible={visible}
+  onClose={() => setVisible(false)}
+  title="Are you sure?"
+  body="This cannot be undone."
+  primaryLabel="Confirm"
+  secondaryLabel="Cancel"
+  onPrimary={() => handleConfirm()}
+  ${k.danger ? 'danger' : ''}
+/>`,
+
+  bottomsheet: (k) => `import { BottomSheet } from '@noon/design-system';
+
+<BottomSheet
+  visible={visible}
+  onClose={() => setVisible(false)}
+  title="Sheet title"
+  ${k.size === 'full' ? 'full' : ''}
+  actions={<Button>Action</Button>}
+>
+  <Text>Sheet content</Text>
+</BottomSheet>`,
+
+  tooltips: (k) => `import { Tooltip } from '@noon/design-system';
+
+<Tooltip text="Score: 76">
+  <Text>Long press me</Text>
+</Tooltip>`,
+
+  sessioncard: (k) => `import { SessionCard } from '@noon/design-system';
+
+<SessionCard
+  time="10:00"
+  title="Inference & implied meaning"
+  meta="Qudrat Reading — Mr. Hassan"
+  state="${k.state || 'upcoming'}"
+  statusText="45 min"
+  onPress={() => {}}
+/>`,
+
+  sessionbar: (k) => `import { SessionBar } from '@noon/design-system';
+
+<SessionBar
+  segments={['correct', 'correct', 'incorrect', 'correct', 'pending', 'pending']}
+  size="${k.size || 'md'}"
+/>`,
+
+  routesteps: (k) => `import { RouteSteps } from '@noon/design-system';
+
+<RouteSteps
+  steps={['done', 'done', 'current', 'incomplete', 'incomplete']}
+/>`,
+
+  progress: (k) => `import { LinearProgress, CircularProgress } from '@noon/design-system';
+
+<LinearProgress value={76} />
+
+<CircularProgress
+  value={76}
+  showValue
+  color={color.noon[400]}
+/>`,
+
+  quizoption: (k) => `import { QuizOption } from '@noon/design-system';
+
+<QuizOption
+  label="A"
+  text="Answer text"
+  state="${k.state || 'default'}"
+  onPress={() => {}}
+/>`,
+
+  titlebar: (k) => `import { TitleBar } from '@noon/design-system';
+
+<TitleBar
+  title="Page Title"
+  variant="${k.variant || 'default'}"
+  onBack={() => navigation.goBack()}
+  rightAction={<IconButton>...</IconButton>}
+/>`,
+
+  empty: (k) => `import { EmptyState } from '@noon/design-system';
+
+<EmptyState
+  title="No sessions today"
+  body="Check back tomorrow."
+  actionLabel="Browse topics"
+  onAction={() => {}}
+/>`,
+
+  skeleton: (k) => `import { Skeleton } from '@noon/design-system';
+
+<Skeleton width="60%" height={12} />
+<Skeleton circle height={40} />`,
+
+  interstitial: (k) => `import { Interstitial } from '@noon/design-system';
+
+<Interstitial
+  title="You mastered it!"
+  body="Topic name is locked in."
+  buttonLabel="See progress"
+  onPress={() => {}}
+/>`,
+
+  filterbar: (k) => `import { FilterBar } from '@noon/design-system';
+
+<FilterBar
+  items={[
+    { label: 'All', active: true },
+    { label: 'Reading', active: false },
+  ]}
+  onToggle={(i) => handleToggle(i)}
+/>`,
+
+  tables: (k) => `import { Table } from '@noon/design-system';
+
+<Table
+  columns={['Name', 'Score', 'Status']}
+  rows={[
+    ['Sarah A.', '92', 'Mastered'],
+    ['Omar K.', '61', 'In progress'],
+  ]}
+/>`,
+
+  video: (k) => `// Video component — use expo-av or react-native-video
+// The design system provides layout tokens only
+import { sp, r, fs, font } from '@noon/design-system';
+
+// Play button: sp[9] × sp[9], r.pill, accent bg
+// Controls bar: sp[4] padding, fs[11] mono timestamps
+// Progress bar: sp[1] height, r.pill radius`,
+
+  calendar: (k) => `// Calendar — complex interactive component
+// Use @react-native-community/datetimepicker or custom
+import { sp, r, fs, fw, font } from '@noon/design-system';
+
+// Day cell: sp[8] × sp[8], r.pill for selected
+// Weekday labels: fs[10], mono, caps
+// Month header: serif fs[18], fw[500]`,
+
+  modal: (k) => `import { Dialog } from '@noon/design-system';
+
+// Modal wraps Dialog with full-screen overlay
+<Dialog
+  visible={visible}
+  onClose={() => setVisible(false)}
+  title="Modal title"
+  body="Content"
+/>`,
+
+  pagination: (k) => `// Pagination — use FlatList with page state
+import { Button, sp } from '@noon/design-system';
+
+// Page buttons: sp[7] × sp[7], r[2], mono fs[13]
+// Active: accent-soft bg, accent text
+// Disabled: fgDisabled color`,
+
+  sidenav: (k) => `// Side nav — tablet/desktop only
+// On mobile, use BottomNav instead
+import { sp, r, fs, fw, font } from '@noon/design-system';
+
+// Item: sp[2] sp[3] padding, r[2], fs[14] fw[500]
+// Active: active-overlay bg, fg color
+// Icon: sp[4] size, stroke currentColor`,
+};
+
+// Auto-attach renderRNCode to any component that has it in the map
+Object.keys(RN_CODE).forEach(id => {
+  if (P[id] && !P[id].renderRNCode) {
+    P[id].renderRNCode = RN_CODE[id];
+  }
+});
+
 function updatePlayground(page, skipKnobs) {
   const canvas = document.getElementById('canvas');
   const knobsEl = document.getElementById('knobsInner');
@@ -5004,7 +5361,8 @@ function updatePlayground(page, skipKnobs) {
   if (codeEl && page.renderCode) {
     const tokenList = page.tokens ? (typeof page.tokens === 'function' ? page.tokens(currentKnobs) : page.tokens) : null;
     const tokensUsed = tokenList ? `<div style="margin-top:var(--sp-4)"><div style="font-family:var(--font-mono);font-size:var(--fs-10);letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:var(--sp-2)">Tokens used</div><div style="display:flex;flex-wrap:wrap;gap:4px">${tokenList.map(t=>`<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-subtle);background:var(--hover-overlay);padding:2px 6px;border-radius:2px">${t}</span>`).join('')}</div></div>` : '';
-    codeEl.innerHTML = `<div style="margin-top:var(--sp-5);padding-top:var(--sp-5);border-top:1px solid var(--divider)"><div class="play__knobs-title">Code</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderCode(currentKnobs))}</pre></div>${tokensUsed}</div>`;
+    const rnCode = page.renderRNCode ? `<div style="margin-top:var(--sp-4)"><div class="play__knobs-title" style="color:var(--accent)">React Native</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderRNCode(currentKnobs))}</pre></div></div>` : '';
+    codeEl.innerHTML = `<div style="margin-top:var(--sp-5);padding-top:var(--sp-5);border-top:1px solid var(--divider)"><div class="play__knobs-title">HTML / CSS</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderCode(currentKnobs))}</pre></div>${rnCode}${tokensUsed}</div>`;
   }
 }
 
