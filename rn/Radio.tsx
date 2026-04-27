@@ -24,7 +24,7 @@ export function Radio({ selected, onSelect, disabled }: RadioProps) {
     borderWidth: selected ? 5 : 1,
     borderColor: selected ? theme.accent : theme.borderStrong,
     backgroundColor: selected ? "transparent" : theme.inputBg,
-    opacity: disabled ? 0.35 : 1,
+    opacity: disabled ? 0.4 : 1,
   };
 
   return (

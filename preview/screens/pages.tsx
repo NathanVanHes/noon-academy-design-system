@@ -216,10 +216,10 @@ export function ControlsPage() {
     </S>
     <S title="Checkbox">
       <R>
-        <C label="Checked"><Checkbox checked={ch} onChange={setCh} /></C>
-        <C label="Unchecked"><Checkbox checked={ch2} onChange={setCh2} /></C>
-        <C label="Disabled"><Checkbox checked={true} onChange={() => {}} disabled /></C>
-        <C label="Indeterminate"><Checkbox checked={false} onChange={() => {}} indeterminate /></C>
+        <C label="Checked"><Checkbox checked={ch} onValueChange={setCh} /></C>
+        <C label="Unchecked"><Checkbox checked={ch2} onValueChange={setCh2} /></C>
+        <C label="Disabled"><Checkbox checked={true} onValueChange={() => {}} disabled /></C>
+        <C label="Indeterminate"><Checkbox checked={false} onValueChange={() => {}} indeterminate /></C>
       </R>
     </S>
     <S title="Radio">

@@ -30,7 +30,7 @@ export function Stepper({ value, min = 0, max = 100, step = 1, onChange, disable
     borderColor: theme.border,
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: enabled && !disabled ? 1 : 0.3,
+    opacity: enabled && !disabled ? 1 : 0.4,
   });
 
   const btnText: TextStyle = {

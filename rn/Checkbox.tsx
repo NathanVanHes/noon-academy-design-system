@@ -8,14 +8,14 @@ import { sp, r, icon } from './tokens';
 
 interface CheckboxProps {
   checked: boolean;
-  onChange: (checked: boolean) => void;
+  onValueChange: (checked: boolean) => void;
   disabled?: boolean;
   indeterminate?: boolean;
 }
 
 const SIZE = 18;
 
-export function Checkbox({ checked, onChange, disabled, indeterminate }: CheckboxProps) {
+export function Checkbox({ checked, onValueChange, disabled, indeterminate }: CheckboxProps) {
   const { theme } = useTheme();
 
   const boxStyle: ViewStyle = {
@@ -27,7 +27,7 @@ export function Checkbox({ checked, onChange, disabled, indeterminate }: Checkbo
     backgroundColor: checked || indeterminate ? theme.accent : theme.inputBg,
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: disabled ? 0.35 : 1,
+    opacity: disabled ? 0.4 : 1,
   };
 
   const checkmarkStyle: ViewStyle = {
@@ -46,7 +46,7 @@ export function Checkbox({ checked, onChange, disabled, indeterminate }: Checkbo
   };
 
   return (
-    <Pressable onPress={() => !disabled && onChange(!checked)} accessibilityRole="checkbox" accessibilityState={{ checked, disabled }} style={boxStyle}>
+    <Pressable onPress={() => !disabled && onValueChange(!checked)} accessibilityRole="checkbox" accessibilityState={{ checked, disabled }} style={boxStyle}>
       {checked && !indeterminate && <View style={checkmarkStyle} />}
       {indeterminate && <View style={dashStyle} />}
     </Pressable>
