@@ -2012,7 +2012,7 @@ P.buttons = {
         <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Ghost:</b> Low-emphasis actions in toolbars, cards, inline contexts.</div></div>
         <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Danger:</b> Outline for reversible. Solid for irreversible — always behind confirmation.</div></div>
         <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Signal:</b> ONLY for journey waypoint actions: mark arrival, confirm route. Never general UI.</div></div>
-        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Icon:</b> Pass icon prop for icon + text. For icon-only square buttons, use IconButton component.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Icon:</b> Pass icon prop to render an icon before the text label.</div></div>
         <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Loading:</b> Disables interaction, shows spinner. Text goes transparent but keeps layout.</div></div>
         <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Disabled:</b> Opacity 0.4 on the whole button — same treatment for every variant. Obviously greyed out.</div></div>
       </div>
@@ -5018,7 +5018,7 @@ ${props.join('\n')}
 // Sizes: sm (32) | md (40) | lg (48)
 // States: disabled, loading, block
 // With icon: icon={<MyIcon />} renders before text
-// For icon-only square buttons use <IconButton /> instead`;
+// With icon: icon={<MyIcon />} renders before text`;
   },
 
   iconbtn: (k) => `import { IconButton } from '@noon/design-system';

@@ -119,33 +119,11 @@ export function ButtonsPage() {
     </S>
 
     {/* With icon */}
-    <S title="With Icon" desc="Icon renders before text. For icon-only square buttons, use IconButton component.">
+    <S title="With Icon" desc="Icon renders before text.">
       <R>
         <Button variant="primary" icon={<Text style={{ color: theme.accentFg }}>+</Text>}>Add topic</Button>
         <Button variant="secondary" icon={<Text style={{ color: theme.fg }}>←</Text>}>Back</Button>
         <Button variant="ghost" icon={<Text style={{ color: theme.fgMuted }}>⋮</Text>}>More</Button>
-      </R>
-    </S>
-
-    {/* Icon Buttons (separate component) */}
-    <S title="Icon Button (separate component)" desc="Standalone icon-only pressable. Default has border, ghost has none.">
-      <L>Variants</L>
-      <R>
-        <IconButton>{arrow}</IconButton>
-        <IconButton variant="primary"><Text style={{ color: theme.accentFg }}>+</Text></IconButton>
-        <IconButton variant="ghost"><Text style={{ color: theme.fgMuted }}>⋮</Text></IconButton>
-        <IconButton variant="danger"><Text style={{ color: theme.danger }}>✕</Text></IconButton>
-      </R>
-      <L>Sizes</L>
-      <R>
-        <IconButton size="sm">{arrow}</IconButton>
-        <IconButton size="md">{arrow}</IconButton>
-        <IconButton size="lg"><Text style={{ color: theme.fgMuted, fontSize: fs[18] }}>←</Text></IconButton>
-      </R>
-      <L>Disabled</L>
-      <R>
-        <IconButton disabled>{arrow}</IconButton>
-        <IconButton variant="primary" disabled><Text style={{ color: theme.accentFg }}>+</Text></IconButton>
       </R>
     </S>
 
@@ -154,7 +132,6 @@ export function ButtonsPage() {
       <Sp label="Height sm / md / lg" value="32 / 40 / 48" />
       <Sp label="Padding sm / md / lg" value="12 / 20 / 24" />
       <Sp label="Ghost padding" value="12 (tighter)" />
-      <Sp label="Icon-only width" value="= height (square)" />
       <Sp label="Border radius" value="r-2 (4px)" />
       <Sp label="Font" value="sans, fs-14, fw-600" />
       <Sp label="Letter spacing" value="-0.07 (tr-snug)" />
