@@ -2,9 +2,10 @@
  * Button — matches CSS spec exactly.
  * Variants: primary, secondary, ghost, danger, danger-solid, signal.
  * Sizes: sm (32px), md (40px default), lg (48px).
+ * States: disabled, loading, block (full width), icon-only (square).
  */
 import React from 'react';
-import { Pressable, Text, ActivityIndicator, StyleSheet, type ViewStyle, type TextStyle } from 'react-native';
+import { Pressable, View, Text, ActivityIndicator, StyleSheet, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, h, color } from './tokens';
 
@@ -12,12 +13,14 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | '
 type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
-  children: string;
+  children?: string;
   variant?: Variant;
   size?: Size;
   disabled?: boolean;
   loading?: boolean;
   block?: boolean;
+  icon?: React.ReactNode;
+  iconOnly?: boolean;
   onPress?: () => void;
 }
 
@@ -28,7 +31,7 @@ const paddings: Record<Size, number> = { sm: sp[3], md: sp[5], lg: sp[6] };
 // font-size per size
 const fontSizes: Record<Size, number> = { sm: fs[13], md: fs[14], lg: fs[15] };
 
-export function Button({ children, variant = 'primary', size = 'md', disabled, loading, block, onPress }: ButtonProps) {
+export function Button({ children, variant = 'primary', size = 'md', disabled, loading, block, icon, iconOnly, onPress }: ButtonProps) {
   const { theme } = useTheme();
 
   const bgMap: Record<Variant, string> = {
@@ -60,12 +63,18 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
 
   const isOutline = variant === 'secondary' || variant === 'danger';
   const borderColor = variant === 'secondary' ? theme.borderStrong
-    : variant === 'danger' ? 'rgba(197,90,78,0.40)'
+    : variant === 'danger' ? theme.dangerBorder
     : 'transparent';
 
+  const dim = heights[size];
+
   const containerStyle: ViewStyle = {
-    height: heights[size],
-    paddingHorizontal: variant === 'ghost' ? sp[3] : paddings[size],
+    height: dim,
+    // icon-only: square button, no horizontal padding
+    ...(iconOnly
+      ? { width: dim, paddingHorizontal: 0 }
+      : { paddingHorizontal: variant === 'ghost' ? sp[3] : paddings[size] }
+    ),
     borderRadius: r[2],
     backgroundColor: disabled ? disabledBg[variant] : bgMap[variant],
     alignItems: 'center',
@@ -73,7 +82,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     flexDirection: 'row',
     gap: sp[2],
     opacity: disabled && variant === 'ghost' ? 0.4 : 1,
-    ...(block ? { width: '100%' } : {}),
+    ...(block && !iconOnly ? { width: '100%' } : {}),
     ...(isOutline ? { borderWidth: 1, borderColor: disabled ? theme.border : borderColor } : {}),
   };
 
@@ -84,6 +93,8 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     letterSpacing: -0.07,
     color: loading ? 'transparent' : (disabled ? theme.fgDisabled : fgMap[variant]),
   };
+
+  const iconColor = disabled ? theme.fgDisabled : fgMap[variant];
 
   return (
     <Pressable
@@ -99,7 +110,8 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
       {loading && (
         <ActivityIndicator size="small" color={fgMap[variant]} style={StyleSheet.absoluteFill} />
       )}
-      <Text style={textStyle}>{children}</Text>
+      {icon && <View style={{ opacity: loading ? 0 : 1 }}>{icon}</View>}
+      {children && !iconOnly ? <Text style={textStyle}>{children}</Text> : null}
     </Pressable>
   );
 }

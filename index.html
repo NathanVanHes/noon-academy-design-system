@@ -2005,33 +2005,42 @@ P.buttons = {
   },
   sections: `
     <div class="sect"><div class="sect__title">All Variants</div>
-      <div class="grid grid--auto">${['primary','secondary','ghost','danger','danger-solid'].map(v=>`<div class="cell"><div class="cell__label">${v}</div><button class="btn btn--${v}">Label</button></div>`).join('')}</div>
+      <div class="grid grid--auto">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<div class="cell"><div class="cell__label">${v}</div><button class="btn btn--${v}">Label</button></div>`).join('')}</div>
     </div>
     <div class="sect"><div class="sect__title">All Sizes</div>
-      <div class="grid grid--3">${['sm','md','lg'].map(s=>`<div class="cell"><div class="cell__label">${s}</div><button class="btn btn--primary btn--${s}">Label</button></div>`).join('')}</div>
+      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Every variant at sm (32px), md (40px), lg (48px).</p>
+      ${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<div class="cell" style="margin-bottom:var(--sp-3)"><div class="cell__label">${v}</div><div class="row gap-2">${['sm','md','lg'].map(s=>`<button class="btn btn--${v} btn--${s}">${s}</button>`).join('')}</div></div>`).join('')}
     </div>
-    <div class="sect"><div class="sect__title">All States</div>
-      <div class="grid grid--auto">
-        <div class="cell"><div class="cell__label">Default</div><button class="btn btn--primary">Label</button></div>
-        <div class="cell"><div class="cell__label">Disabled</div><button class="btn btn--primary" disabled>Label</button></div>
-        <div class="cell"><div class="cell__label">Loading</div><button class="btn btn--primary is-loading">Label</button></div>
-        <div class="cell"><div class="cell__label">Sec. disabled</div><button class="btn btn--secondary" disabled>Label</button></div>
-        <div class="cell"><div class="cell__label">Sec. loading</div><button class="btn btn--secondary is-loading">Label</button></div>
-        <div class="cell"><div class="cell__label">Ghost disabled</div><button class="btn btn--ghost" disabled>Label</button></div>
-        <div class="cell"><div class="cell__label">Danger disabled</div><button class="btn btn--danger" disabled>Label</button></div>
+    <div class="sect"><div class="sect__title">Disabled</div>
+      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Every variant in disabled state.</p>
+      <div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v}" disabled>Label</button>`).join('')}</div>
+    </div>
+    <div class="sect"><div class="sect__title">Loading</div>
+      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Spinner replaces text. Button stays interactive-looking but disabled.</p>
+      <div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} is-loading">Label</button>`).join('')}</div>
+    </div>
+    <div class="sect"><div class="sect__title">Block (Full Width)</div>
+      <div class="col gap-3">
+        <button class="btn btn--primary btn--block">Full width primary</button>
+        <button class="btn btn--secondary btn--block">Full width secondary</button>
+        <button class="btn btn--signal btn--block">Full width signal</button>
       </div>
+    </div>
+    <div class="sect"><div class="sect__title">Icon Only</div>
+      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Square button (width = height). Use for toolbars, close buttons, nav actions.</p>
+      <div class="cell"><div class="cell__label">All variants</div><div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} btn--icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>`).join('')}</div></div>
+      <div class="cell"><div class="cell__label">All sizes</div><div class="row gap-2">
+        <button class="btn btn--primary btn--icon btn--sm"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
+        <button class="btn btn--primary btn--icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
+        <button class="btn btn--primary btn--icon btn--lg"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
+      </div></div>
+      <div class="cell"><div class="cell__label">With icon + text (not icon-only)</div><div class="row gap-2">
+        <button class="btn btn--primary"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3v8M3 7h8"/></svg> Add topic</button>
+        <button class="btn btn--secondary"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3 3 7h8M3 7l5 4"/></svg> Back</button>
+      </div></div>
     </div>
     <div class="sect"><div class="sect__title">Additional Patterns</div>
       <div class="col gap-5">
-        <div class="cell"><div class="cell__label">Very long label (truncates)</div><button class="btn btn--primary" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;text-align:center">This is an extremely long button label that should truncate gracefully</button></div>
-        <div class="cell"><div class="cell__label">Single character</div><div class="row"><button class="btn btn--primary btn--sm">A</button><button class="btn btn--secondary btn--sm">B</button></div></div>
-        <div class="cell"><div class="cell__label">With icon + label</div><button class="btn btn--primary"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h8M8 4l3 3-3 3"/></svg> Begin route</button></div>
-        <div class="cell"><div class="cell__label">Icon only (all sizes)</div><div class="row">
-          <button class="btn btn--secondary btn--icon btn--sm"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3v8M3 7h8"/></svg></button>
-          <button class="btn btn--secondary btn--icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
-          <button class="btn btn--secondary btn--icon btn--lg"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 4v10M4 9h10"/></svg></button>
-        </div></div>
-        <div class="cell"><div class="cell__label">Full width</div><button class="btn btn--primary btn--block">Full width button</button></div>
         <div class="cell"><div class="cell__label">Button group</div><div class="row gap-2"><button class="btn btn--secondary btn--sm">Day</button><button class="btn btn--secondary btn--sm">Week</button><button class="btn btn--primary btn--sm">Month</button></div></div>
         <div class="cell"><div class="cell__label">All variants loading</div><div class="row">${['primary','secondary','ghost','danger','danger-solid'].map(v=>`<button class="btn btn--${v} is-loading">L</button>`).join('')}</div></div>
       </div>
@@ -5018,18 +5027,25 @@ function navigate(id) {
 
 // ═══ React Native code examples for every component ═══
 const RN_CODE = {
-  buttons: (k) => `import { Button } from '@noon/design-system';
+  buttons: (k) => {
+    const props = [`  variant="${k.variant || 'primary'}"`, `  size="${k.size || 'md'}"`];
+    if (k.disabled) props.push('  disabled');
+    if (k.loading) props.push('  loading');
+    if (k.block) props.push('  block');
+    if (k.iconOnly) props.push('  iconOnly\n  icon={<PlusIcon />}');
+    props.push('  onPress={() => {}}');
+    const children = k.iconOnly ? '' : `\n  ${k.label || 'Label'}\n`;
+    return `import { Button } from '@noon/design-system';
 
 <Button
-  variant="${k.variant || 'primary'}"
-  size="${k.size || 'md'}"
-  ${k.disabled ? 'disabled' : ''}
-  ${k.loading ? 'loading' : ''}
-  ${k.block ? 'block' : ''}
-  onPress={() => {}}
->
-  Label
-</Button>`,
+${props.join('\n')}
+>${children}</Button>
+
+// All variants: primary | secondary | ghost | danger | danger-solid | signal
+// All sizes: sm (32) | md (40) | lg (48)
+// States: disabled, loading, block, iconOnly
+// Icon + text: <Button icon={<Icon />}>Label</Button>`;
+  },
 
   iconbtn: (k) => `import { IconButton } from '@noon/design-system';
 
@@ -5361,8 +5377,9 @@ function updatePlayground(page, skipKnobs) {
   if (codeEl && page.renderCode) {
     const tokenList = page.tokens ? (typeof page.tokens === 'function' ? page.tokens(currentKnobs) : page.tokens) : null;
     const tokensUsed = tokenList ? `<div style="margin-top:var(--sp-4)"><div style="font-family:var(--font-mono);font-size:var(--fs-10);letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:var(--sp-2)">Tokens used</div><div style="display:flex;flex-wrap:wrap;gap:4px">${tokenList.map(t=>`<span style="font-family:var(--font-mono);font-size:var(--fs-10);color:var(--fg-subtle);background:var(--hover-overlay);padding:2px 6px;border-radius:2px">${t}</span>`).join('')}</div></div>` : '';
-    const rnCode = page.renderRNCode ? `<div style="margin-top:var(--sp-4)"><div class="play__knobs-title" style="color:var(--accent)">React Native</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderRNCode(currentKnobs))}</pre></div></div>` : '';
-    codeEl.innerHTML = `<div style="margin-top:var(--sp-5);padding-top:var(--sp-5);border-top:1px solid var(--divider)"><div class="play__knobs-title">HTML / CSS</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderCode(currentKnobs))}</pre></div>${rnCode}${tokensUsed}</div>`;
+    const rnCode = page.renderRNCode ? `<div class="play__knobs-title" style="color:var(--accent)">React Native</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderRNCode(currentKnobs))}</pre></div>` : '';
+    const htmlCode = `<div style="margin-top:var(--sp-4)"><div class="play__knobs-title" style="opacity:0.5">HTML / CSS (visual reference)</div><div class="codeblock"><button class="codeblock__copy" onclick="copyCode(this)">Copy</button><pre>${escHTML(page.renderCode(currentKnobs))}</pre></div></div>`;
+    codeEl.innerHTML = `<div style="margin-top:var(--sp-5);padding-top:var(--sp-5);border-top:1px solid var(--divider)">${rnCode}${htmlCode}${tokensUsed}</div>`;
   }
 }
 
