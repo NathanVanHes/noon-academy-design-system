@@ -2005,36 +2005,16 @@ P.buttons = {
     <div class="sect"><div class="sect__title">All Variants</div>
       <div class="grid grid--auto">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<div class="cell"><div class="cell__label">${v}</div><button class="btn btn--${v}">Label</button></div>`).join('')}</div>
     </div>
-    <div class="sect"><div class="sect__title">All Sizes</div>
-      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Every variant at sm (32px), md (40px), lg (48px).</p>
-      ${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<div class="cell" style="margin-bottom:var(--sp-3)"><div class="cell__label">${v}</div><div class="row gap-2">${['sm','md','lg'].map(s=>`<button class="btn btn--${v} btn--${s}">${s}</button>`).join('')}</div></div>`).join('')}
-    </div>
-    <div class="sect"><div class="sect__title">Disabled</div>
-      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Every variant in disabled state.</p>
-      <div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v}" disabled>Label</button>`).join('')}</div>
-    </div>
-    <div class="sect"><div class="sect__title">Loading</div>
-      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Spinner replaces text. Button stays interactive-looking but disabled.</p>
-      <div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} is-loading">Label</button>`).join('')}</div>
-    </div>
-    <div class="sect"><div class="sect__title">Block (Full Width)</div>
-      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Every variant at full width.</p>
-      <div class="col gap-3">
-        ${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} btn--block">Full width ${v}</button>`).join('')}
-      </div>
-    </div>
-    <div class="sect"><div class="sect__title">With Icon</div>
-      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Icon renders before text. For icon-only square buttons, use the IconButton component.</p>
-      <div class="row gap-2">
-        <button class="btn btn--primary"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg> Add topic</button>
-        <button class="btn btn--secondary"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 3 3 8h10"/></svg> Back</button>
-        <button class="btn btn--ghost"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg> More</button>
-      </div>
-    </div>
-    <div class="sect"><div class="sect__title">Additional Patterns</div>
-      <div class="col gap-5">
-        <div class="cell"><div class="cell__label">Button group</div><div class="row gap-2"><button class="btn btn--secondary btn--sm">Day</button><button class="btn btn--secondary btn--sm">Week</button><button class="btn btn--primary btn--sm">Month</button></div></div>
-        <div class="cell"><div class="cell__label">All variants loading</div><div class="row">${['primary','secondary','ghost','danger','danger-solid'].map(v=>`<button class="btn btn--${v} is-loading">L</button>`).join('')}</div></div>
+    <div class="sect"><div class="sect__title">Rules</div>
+      <div class="grid grid--2">
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Primary:</b> Single most important action on screen. One primary per view.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Secondary:</b> Alternatives — "Cancel", "Back", "Skip".</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Ghost:</b> Low-emphasis actions in toolbars, cards, inline contexts.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Danger:</b> Outline for reversible. Solid for irreversible — always behind confirmation.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Signal:</b> ONLY for journey waypoint actions: mark arrival, confirm route. Never general UI.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Icon:</b> Pass icon prop for icon + text. For icon-only square buttons, use IconButton component.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Loading:</b> Disables interaction, shows spinner. Text goes transparent but keeps layout.</div></div>
+        <div class="cell"><div style="font-size:var(--fs-13);color:var(--fg-muted)"><b>Disabled:</b> Opacity 0.4 for ghost, muted bg for others. fgDisabled text color.</div></div>
       </div>
     </div>`
 };
