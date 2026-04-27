@@ -66,40 +66,36 @@
 .btn--primary:hover { background: var(--accent-hover); }
 .btn--primary:active { background: var(--accent-active); transform: translateY(0.5px); }
 .btn--primary:focus-visible { box-shadow: var(--focus-ring); }
-.btn--primary[disabled], .btn--primary.is-disabled { background: var(--accent-disabled); color: var(--accent-disabled-fg); cursor: not-allowed; }
+/* All buttons: disabled = opacity 0.4, no per-variant override */
+.btn[disabled], .btn.is-disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
 /* Secondary (outline) */
 .btn--secondary { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--border-strong); }
 .btn--secondary:hover { box-shadow: inset 0 0 0 1px var(--fg-muted); background: var(--hover-overlay); }
 .btn--secondary:active { background: var(--active-overlay); }
 .btn--secondary:focus-visible { box-shadow: inset 0 0 0 1px var(--blue-400), var(--focus-ring); }
-.btn--secondary[disabled], .btn--secondary.is-disabled { color: var(--fg-disabled); box-shadow: inset 0 0 0 1px var(--border); cursor: not-allowed; }
 
 /* Ghost */
 .btn--ghost { background: transparent; color: var(--fg-muted); padding-inline: var(--sp-3); }
 .btn--ghost:hover { color: var(--fg); background: var(--hover-overlay); }
 .btn--ghost:active { background: var(--active-overlay); }
 .btn--ghost:focus-visible { box-shadow: var(--focus-ring); }
-.btn--ghost[disabled] { color: var(--fg-disabled); cursor: not-allowed; }
 
 /* Danger (outline-ink) */
 .btn--danger { background: transparent; color: var(--danger-300); box-shadow: inset 0 0 0 1px var(--danger-border); }
 .btn--danger:hover { background: var(--danger-soft); color: var(--danger-300); box-shadow: inset 0 0 0 1px var(--danger-400); }
 .btn--danger:active { background: var(--danger-glow); }
-.btn--danger[disabled], .btn--danger.is-disabled { color: var(--fg-disabled); box-shadow: inset 0 0 0 1px var(--border); cursor: not-allowed; background: transparent; }
 
 /* Danger solid */
 .btn--danger-solid { background: var(--danger-400); color: var(--chalk-100); }
 .btn--danger-solid:hover { background: var(--danger-hover); }
 .btn--danger-solid:active { background: var(--danger-active); }
-.btn--danger-solid[disabled], .btn--danger-solid.is-disabled { background: var(--danger-soft); color: var(--fg-disabled); cursor: not-allowed; }
 
 /* Signal (gold — journey actions ONLY: mark arrival, confirm route, current position) */
 .btn--signal { background: var(--signal-btn-bg); color: var(--signal-btn-fg); }
 .btn--signal:hover { background: var(--signal-btn-hover); }
 .btn--signal:active { background: var(--signal-btn-active); }
 .btn--signal:focus-visible { box-shadow: var(--focus-ring); }
-.btn--signal[disabled], .btn--signal.is-disabled { background: var(--signal-soft); color: var(--fg-disabled); cursor: not-allowed; }
 
 /* Loading */
 .btn.is-loading { color: transparent !important; pointer-events: none; }

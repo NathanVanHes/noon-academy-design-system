@@ -2,11 +2,11 @@
  * Button — production component.
  * Variants: primary, secondary, ghost, danger, danger-solid, signal.
  * Sizes: sm (32px), md (40px default), lg (48px).
- * States: disabled, loading, block (full width).
+ * States: disabled (greyed out, opacity 0.4), loading, block (full width).
  * For icon-only buttons, use IconButton component.
  */
 import React from 'react';
-import { Pressable, View, Text, ActivityIndicator, StyleSheet, type ViewStyle, type TextStyle } from 'react-native';
+import { Pressable, View, Text, ActivityIndicator, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, h, color } from './tokens';
 
@@ -49,15 +49,6 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     signal: theme.bg,
   };
 
-  const disabledBg: Record<Variant, string> = {
-    primary: theme.accentSoft,
-    secondary: 'transparent',
-    ghost: 'transparent',
-    danger: 'transparent',
-    'danger-solid': theme.dangerSoft,
-    signal: theme.signalSoft,
-  };
-
   const isOutline = variant === 'secondary' || variant === 'danger';
   const borderColor = variant === 'secondary' ? theme.borderStrong
     : variant === 'danger' ? theme.dangerBorder
@@ -67,14 +58,15 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     height: heights[size],
     paddingHorizontal: variant === 'ghost' ? sp[3] : paddings[size],
     borderRadius: r[2],
-    backgroundColor: disabled ? disabledBg[variant] : bgMap[variant],
+    backgroundColor: bgMap[variant],
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: sp[2],
-    opacity: disabled && variant === 'ghost' ? 0.4 : 1,
+    // Disabled: simple opacity 0.4 for ALL variants — obviously greyed out
+    opacity: disabled ? 0.4 : 1,
     ...(block ? { width: '100%' } : {}),
-    ...(isOutline ? { borderWidth: 1, borderColor: disabled ? theme.border : borderColor } : {}),
+    ...(isOutline ? { borderWidth: 1, borderColor } : {}),
   };
 
   const textStyle: TextStyle = {
@@ -82,7 +74,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     fontSize: fontSizes[size],
     fontWeight: fw[600],
     letterSpacing: -0.07,
-    color: loading ? 'transparent' : (disabled ? theme.fgDisabled : fgMap[variant]),
+    color: loading ? 'transparent' : fgMap[variant],
   };
 
   return (
@@ -98,7 +90,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     >
       {loading && (
         <ActivityIndicator
-          size={size === 'sm' ? 'small' : 'small'}
+          size="small"
           color={fgMap[variant]}
           style={{ position: 'absolute' }}
         />
