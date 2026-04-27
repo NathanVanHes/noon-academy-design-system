@@ -1980,28 +1980,26 @@ P.buttons = {
     disabled: { type:'toggle', default:false, label:'Disabled' },
     loading: { type:'toggle', default:false, label:'Loading' },
     block: { type:'toggle', default:false, label:'Full width' },
-    iconOnly: { type:'toggle', default:false, label:'Icon only' },
+    withIcon: { type:'toggle', default:false, label:'With icon' },
     label: { type:'text', default:"Begin today's route", label:'Label' },
   },
   renderCanvas(k) {
     const cls = ['btn',`btn--${k.variant}`];
     if (k.size!=='md') cls.push(`btn--${k.size}`);
     if (k.block) cls.push('btn--block');
-    if (k.iconOnly) cls.push('btn--icon');
     if (k.loading) cls.push('is-loading');
     if (k.disabled) cls.push('is-disabled');
     const dis = k.disabled ? ' disabled' : '';
-    const icon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>`;
-    const content = k.iconOnly ? icon : esc(k.label);
-    return `<button class="${cls.join(' ')}"${dis}>${content}</button>`;
+    const icon = k.withIcon ? `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg> ` : '';
+    return `<button class="${cls.join(' ')}"${dis}>${icon}${esc(k.label)}</button>`;
   },
   renderCode(k) {
     const cls = ['btn',`btn--${k.variant}`];
     if (k.size!=='md') cls.push(`btn--${k.size}`);
     if (k.block) cls.push('btn--block');
-    if (k.iconOnly) cls.push('btn--icon');
     if (k.loading) cls.push('is-loading');
-    return `<button class="${cls.join(' ')}"${k.disabled?' disabled':''}>${k.iconOnly?'<!-- icon -->':esc(k.label)}</button>`;
+    const iconHtml = k.withIcon ? '<Icon /> ' : '';
+    return `<button class="${cls.join(' ')}"${k.disabled?' disabled':''}>${iconHtml}${esc(k.label)}</button>`;
   },
   sections: `
     <div class="sect"><div class="sect__title">All Variants</div>
@@ -2020,24 +2018,18 @@ P.buttons = {
       <div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} is-loading">Label</button>`).join('')}</div>
     </div>
     <div class="sect"><div class="sect__title">Block (Full Width)</div>
+      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Every variant at full width.</p>
       <div class="col gap-3">
-        <button class="btn btn--primary btn--block">Full width primary</button>
-        <button class="btn btn--secondary btn--block">Full width secondary</button>
-        <button class="btn btn--signal btn--block">Full width signal</button>
+        ${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} btn--block">Full width ${v}</button>`).join('')}
       </div>
     </div>
-    <div class="sect"><div class="sect__title">Icon Only</div>
-      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Square button (width = height). Use for toolbars, close buttons, nav actions.</p>
-      <div class="cell"><div class="cell__label">All variants</div><div class="row gap-2">${['primary','secondary','ghost','danger','danger-solid','signal'].map(v=>`<button class="btn btn--${v} btn--icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>`).join('')}</div></div>
-      <div class="cell"><div class="cell__label">All sizes</div><div class="row gap-2">
-        <button class="btn btn--primary btn--icon btn--sm"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
-        <button class="btn btn--primary btn--icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
-        <button class="btn btn--primary btn--icon btn--lg"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
-      </div></div>
-      <div class="cell"><div class="cell__label">With icon + text (not icon-only)</div><div class="row gap-2">
-        <button class="btn btn--primary"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 3v8M3 7h8"/></svg> Add topic</button>
-        <button class="btn btn--secondary"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3 3 7h8M3 7l5 4"/></svg> Back</button>
-      </div></div>
+    <div class="sect"><div class="sect__title">With Icon</div>
+      <p style="font-size:var(--fs-13);color:var(--fg-subtle);margin:0 0 var(--sp-4)">Icon renders before text. For icon-only square buttons, use the IconButton component.</p>
+      <div class="row gap-2">
+        <button class="btn btn--primary"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg> Add topic</button>
+        <button class="btn btn--secondary"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 3 3 8h10"/></svg> Back</button>
+        <button class="btn btn--ghost"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg> More</button>
+      </div>
     </div>
     <div class="sect"><div class="sect__title">Additional Patterns</div>
       <div class="col gap-5">
@@ -5032,19 +5024,21 @@ const RN_CODE = {
     if (k.disabled) props.push('  disabled');
     if (k.loading) props.push('  loading');
     if (k.block) props.push('  block');
-    if (k.iconOnly) props.push('  iconOnly\n  icon={<PlusIcon />}');
+    if (k.withIcon) props.push('  icon={<PlusIcon />}');
     props.push('  onPress={() => {}}');
-    const children = k.iconOnly ? '' : `\n  ${k.label || 'Label'}\n`;
     return `import { Button } from '@noon/design-system';
 
 <Button
 ${props.join('\n')}
->${children}</Button>
+>
+  ${k.label || 'Label'}
+</Button>
 
-// All variants: primary | secondary | ghost | danger | danger-solid | signal
-// All sizes: sm (32) | md (40) | lg (48)
-// States: disabled, loading, block, iconOnly
-// Icon + text: <Button icon={<Icon />}>Label</Button>`;
+// Variants: primary | secondary | ghost | danger | danger-solid | signal
+// Sizes: sm (32) | md (40) | lg (48)
+// States: disabled, loading, block
+// With icon: icon={<MyIcon />} renders before text
+// For icon-only square buttons use <IconButton /> instead`;
   },
 
   iconbtn: (k) => `import { IconButton } from '@noon/design-system';
