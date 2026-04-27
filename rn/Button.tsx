@@ -58,15 +58,14 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     height: heights[size],
     paddingHorizontal: variant === 'ghost' ? sp[3] : paddings[size],
     borderRadius: r[2],
-    backgroundColor: bgMap[variant],
+    // Disabled: grey bg + grey text for ALL variants
+    backgroundColor: disabled ? theme.border : bgMap[variant],
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     gap: sp[2],
-    // Disabled: simple opacity 0.4 for ALL variants — obviously greyed out
-    opacity: disabled ? 0.4 : 1,
     ...(block ? { width: '100%' } : {}),
-    ...(isOutline ? { borderWidth: 1, borderColor } : {}),
+    ...(isOutline && !disabled ? { borderWidth: 1, borderColor } : {}),
   };
 
   const textStyle: TextStyle = {
@@ -74,7 +73,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     fontSize: fontSizes[size],
     fontWeight: fw[600],
     letterSpacing: -0.07,
-    color: loading ? 'transparent' : fgMap[variant],
+    color: loading ? 'transparent' : disabled ? theme.fgFaint : fgMap[variant],
   };
 
   return (
