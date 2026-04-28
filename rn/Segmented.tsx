@@ -13,31 +13,30 @@ interface SegmentedProps {
   options: string[];
   selected: number;
   onSelect: (index: number) => void;
+  size?: 'sm' | 'md';
 }
 
-export function Segmented({ options, selected, onSelect }: SegmentedProps) {
+export function Segmented({ options, selected, onSelect, size = 'md' }: SegmentedProps) {
   const { theme } = useTheme();
+  const sm = size === 'sm';
 
-  // CSS: .seg { background: var(--input-bg); box-shadow: inset 0 0 0 1px var(--border); border-radius: r-2; padding: 2px; }
   const trackStyle: ViewStyle = {
     flexDirection: 'row',
-    backgroundColor: theme.inputBg, // --input-bg approximation
+    backgroundColor: theme.inputBg,
     borderWidth: 1,
     borderColor: theme.border,
-    borderRadius: r[2],
-    padding: sp[0.5],
+    borderRadius: r[sm ? 1 : 2],
+    padding: 2,
   };
 
   return (
     <View style={trackStyle}>
       {options.map((opt, i) => {
         const isOn = i === selected;
-        // CSS: .seg button { padding: 6px 14px; border-radius: r-1; font-size: fs-13; fw-500; }
-        // CSS: .seg button.is-on { background: bg-overlay; color: fg; box-shadow: inset border-strong; }
         const btnStyle: ViewStyle = {
-          flex: 1,
-          paddingVertical: 6,
-          paddingHorizontal: 14,
+          flex: sm ? undefined : 1,
+          paddingVertical: sm ? 3 : 6,
+          paddingHorizontal: sm ? 8 : 14,
           borderRadius: r[1],
           backgroundColor: isOn ? theme.bgOverlay : 'transparent',
           borderWidth: isOn ? 1 : 0,
@@ -45,9 +44,9 @@ export function Segmented({ options, selected, onSelect }: SegmentedProps) {
           alignItems: 'center',
         };
         const txtStyle: TextStyle = {
-          fontFamily: font.sans,
-          fontSize: fs[13],
-          fontWeight: fw[500],
+          fontFamily: font.mono,
+          fontSize: sm ? fs[10] : fs[13],
+          fontWeight: fw[sm ? 600 : 500],
           color: isOn ? theme.fg : theme.fgSubtle,
         };
         return (

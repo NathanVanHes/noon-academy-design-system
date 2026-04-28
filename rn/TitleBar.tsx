@@ -56,7 +56,7 @@ export function TitleBar({ title, subtitle, variant = 'default', backIcon, onBac
         <>
           {onBack && (
             <Pressable onPress={onBack} hitSlop={8}>
-              {backIcon || <Text style={{ fontSize: 20, color: theme.fgMuted }}>‹</Text>}
+              {backIcon || <Text style={{ fontSize: fs[20], color: theme.fgMuted }}>‹</Text>}
             </Pressable>
           )}
           <Text style={titleStyle} numberOfLines={1}>{title}</Text>
@@ -68,7 +68,7 @@ export function TitleBar({ title, subtitle, variant = 'default', backIcon, onBac
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], width: '100%' }}>
             {onBack && (
               <Pressable onPress={onBack} hitSlop={8}>
-                {backIcon || <Text style={{ fontSize: 20, color: theme.fgMuted }}>‹</Text>}
+                {backIcon || <Text style={{ fontSize: fs[20], color: theme.fgMuted }}>‹</Text>}
               </Pressable>
             )}
             <View style={{ flex: 1 }} />

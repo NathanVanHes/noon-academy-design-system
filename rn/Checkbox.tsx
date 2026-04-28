@@ -2,29 +2,30 @@
  * Checkbox — square check with checkmark.
  */
 import React from 'react';
-import { Pressable, View, type ViewStyle } from 'react-native';
+import { Pressable, View, Text, type ViewStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, icon } from './tokens';
+import { sp, r, fs, font, icon } from './tokens';
 
 interface CheckboxProps {
   checked: boolean;
   onValueChange: (checked: boolean) => void;
   disabled?: boolean;
   indeterminate?: boolean;
+  label?: string;
 }
 
 const SIZE = 18;
 
-export function Checkbox({ checked, onValueChange, disabled, indeterminate }: CheckboxProps) {
+export function Checkbox({ checked, onValueChange, disabled, indeterminate, label }: CheckboxProps) {
   const { theme } = useTheme();
 
   const boxStyle: ViewStyle = {
     width: SIZE,
     height: SIZE,
     borderRadius: r[1],
-    borderWidth: checked || indeterminate ? 0 : 1,
+    borderWidth: checked || indeterminate ? 0 : 1.5,
     borderColor: theme.borderStrong,
-    backgroundColor: checked || indeterminate ? theme.accent : theme.inputBg,
+    backgroundColor: checked || indeterminate ? theme.accent : theme.bg,
     alignItems: 'center',
     justifyContent: 'center',
     opacity: disabled ? 0.4 : 1,
@@ -45,10 +46,17 @@ export function Checkbox({ checked, onValueChange, disabled, indeterminate }: Ch
     backgroundColor: theme.accentFg,
   };
 
-  return (
-    <Pressable onPress={() => !disabled && onValueChange(!checked)} accessibilityRole="checkbox" accessibilityState={{ checked, disabled }} style={boxStyle}>
+  const box = (
+    <View style={boxStyle}>
       {checked && !indeterminate && <View style={checkmarkStyle} />}
       {indeterminate && <View style={dashStyle} />}
+    </View>
+  );
+
+  return (
+    <Pressable onPress={() => !disabled && onValueChange(!checked)} accessibilityRole="checkbox" accessibilityState={{ checked, disabled }} style={label ? { flexDirection: 'row', alignItems: 'center', gap: sp[3] } : undefined}>
+      {box}
+      {label && <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: disabled ? theme.fgFaint : theme.fg }}>{label}</Text>}
     </Pressable>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * Avatar — matches CSS spec: sizes xs-xl, noon/iris variants, star + status indicators.
+ * Avatar — sizes xs-xl, noon/blue variants, star + status indicators.
  */
 import React from 'react';
 import { View, Text, type ViewStyle, type TextStyle } from 'react-native';
@@ -7,7 +7,7 @@ import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, r, icon, color as colorTokens } from './tokens';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-type ColorVariant = 'default' | 'noon' | 'iris';
+type ColorVariant = 'default' | 'noon' | 'blue';
 type StatusType = 'online' | 'busy';
 
 interface AvatarProps {
@@ -29,13 +29,13 @@ export function Avatar({ initials, size = 'sm', color = 'default', star, status 
   const bgMap: Record<ColorVariant, string> = {
     default: theme.bgOverlay,
     noon: theme.accent,
-    iris: colorTokens.iris[400],
+    blue: colorTokens.blue[400],
   };
 
   const fgMap: Record<ColorVariant, string> = {
     default: theme.fgMuted,
     noon: theme.accentFg,
-    iris: colorTokens.void[300],
+    blue: '#ffffff',
   };
 
   const containerStyle: ViewStyle = {

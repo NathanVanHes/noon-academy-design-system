@@ -5017,19 +5017,25 @@ ${props.join('\n')}
 // Variants: primary | secondary | ghost | danger | danger-solid | signal
 // Sizes: sm (32) | md (40) | lg (48)
 // States: disabled, loading, block
-// With icon: icon={<MyIcon />} renders before text
 // With icon: icon={<MyIcon />} renders before text`;
   },
 
-  iconbtn: (k) => `import { IconButton } from '@noon/design-system';
+  iconbtn: (k) => {
+    const props = [`  variant="${k.variant || 'default'}"`, `  size="${k.size || 'md'}"`];
+    if (k.disabled) props.push('  disabled');
+    props.push('  onPress={() => {}}');
+    return `import { IconButton } from '@noon/design-system';
 
 <IconButton
-  variant="${k.variant || 'default'}"
-  size="${k.size || 'md'}"
-  onPress={() => {}}
+${props.join('\n')}
 >
-  <Icon name="arrow-left" />
-</IconButton>`,
+  <MyIcon />
+</IconButton>
+
+// Variants: default (border) | primary (accent fill) | ghost | danger (danger border)
+// Sizes: sm (32) | md (40) | lg (48)
+// Disabled: grey bg + 0.5 opacity`;
+  },
 
   inputs: (k) => `import { Input } from '@noon/design-system';
 
@@ -5176,8 +5182,11 @@ ${props.join('\n')}
   primaryLabel="Confirm"
   secondaryLabel="Cancel"
   onPrimary={() => handleConfirm()}
+  onSecondary={() => setVisible(false)}
   ${k.danger ? 'danger' : ''}
-/>`,
+/>
+
+// primaryLabel defaults to "Confirm", secondaryLabel defaults to "Cancel"`,
 
   bottomsheet: (k) => `import { BottomSheet } from '@noon/design-system';
 
@@ -5186,10 +5195,13 @@ ${props.join('\n')}
   onClose={() => setVisible(false)}
   title="Sheet title"
   ${k.size === 'full' ? 'full' : ''}
-  actions={<Button>Action</Button>}
+  actions={<Button onPress={handleAction}>Done</Button>}
 >
   <Text>Sheet content</Text>
-</BottomSheet>`,
+</BottomSheet>
+
+// full: expands to full screen height
+// actions: rendered at bottom of sheet`,
 
   tooltips: (k) => `import { Tooltip } from '@noon/design-system';
 
@@ -5244,14 +5256,19 @@ ${props.join('\n')}
 
 <TitleBar
   title="Page Title"
+  subtitle="Optional subtitle"
   variant="${k.variant || 'default'}"
+  backIcon={<ArrowLeft />}
   onBack={() => navigation.goBack()}
   rightAction={<IconButton>...</IconButton>}
-/>`,
+/>
+
+// Variants: default | large | transparent | overlay`,
 
   empty: (k) => `import { EmptyState } from '@noon/design-system';
 
 <EmptyState
+  icon={<MyIcon />}
   title="No sessions today"
   body="Check back tomorrow."
   actionLabel="Browse topics"

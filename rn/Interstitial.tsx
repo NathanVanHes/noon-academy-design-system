@@ -91,7 +91,7 @@ export function Interstitial({ title, body, buttonLabel, onPress }: Interstitial
         transform: [{ scale: pulseAnim }],
         zIndex: 2,
       }}>
-        <Text style={{ fontSize: 56 }}>★</Text>
+        <Text style={{ fontSize: fs[48] }}>★</Text>
       </Animated.View>
 
       {/* Copy */}

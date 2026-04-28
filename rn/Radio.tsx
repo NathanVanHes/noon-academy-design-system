@@ -2,19 +2,20 @@
  * Radio — circular selection indicator.
  */
 import React from 'react';
-import { Pressable, View, type ViewStyle } from 'react-native';
+import { Pressable, View, Text, type ViewStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { r } from './tokens';
+import { sp, r, fs, font } from './tokens';
 
 interface RadioProps {
   selected: boolean;
   onSelect: () => void;
   disabled?: boolean;
+  label?: string;
 }
 
 const SIZE = 18;
 
-export function Radio({ selected, onSelect, disabled }: RadioProps) {
+export function Radio({ selected, onSelect, disabled, label }: RadioProps) {
   const { theme } = useTheme();
 
   const outerStyle: ViewStyle = {
@@ -28,6 +29,9 @@ export function Radio({ selected, onSelect, disabled }: RadioProps) {
   };
 
   return (
-    <Pressable onPress={() => !disabled && onSelect()} accessibilityRole="radio" accessibilityState={{ selected, disabled }} style={outerStyle} />
+    <Pressable onPress={() => !disabled && onSelect()} accessibilityRole="radio" accessibilityState={{ selected, disabled }} style={label ? { flexDirection: 'row', alignItems: 'center', gap: sp[3] } : undefined}>
+      <View style={outerStyle} />
+      {label && <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: disabled ? theme.fgFaint : theme.fg }}>{label}</Text>}
+    </Pressable>
   );
 }
