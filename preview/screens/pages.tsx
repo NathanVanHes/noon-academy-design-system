@@ -718,7 +718,8 @@ export function ButtonsPage() {
   const [hasTrailing, setHasTrailing] = useState(false);
   const [label, setLabel] = useState('Label');
 
-  const demoIcon = <Text style={{ fontSize: fs[14], color: variant === 'primary' ? theme.accentFg : theme.fg }}>→</Text>;
+  const iconColor = disabled ? theme.fgFaint : { primary: theme.accentFg, secondary: theme.fg, ghost: theme.fgMuted, danger: color.danger[300], 'danger-solid': color.chalk[100], signal: theme.bg }[variant] || theme.fg;
+  const demoIcon = <Text style={{ fontSize: fs[14], color: iconColor }}>→</Text>;
   const V: Array<'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'> = ['primary','secondary','ghost','danger','danger-solid','signal'];
   return <>
     <Playground
@@ -746,8 +747,8 @@ export function ButtonsPage() {
       <Prop name="disabled" type="boolean" desc="Grey bg + grey text" />
       <Prop name="loading" type="boolean" desc="Spinner, hides text" />
       <Prop name="fullWidth" type="boolean" desc="Stretches to fill container" />
-      <Prop name="leadingIcon" type="ReactNode" desc="Icon before text" />
-      <Prop name="trailingIcon" type="ReactNode" desc="Icon after text" />
+      <Prop name="leadingIcon" type="ReactNode" desc="Icon before text. Constrained to 14/16/18px per sm/md/lg." />
+      <Prop name="trailingIcon" type="ReactNode" desc="Icon after text. Constrained to 14/16/18px per sm/md/lg." />
       <Prop name="onPress" type="() => void" />
     </Props>
     <S title="All Variants"><R>{V.map(v => <Button key={v} variant={v}>{v}</Button>)}</R></S>
@@ -759,6 +760,12 @@ export function ButtonsPage() {
       <Rl>danger: destructive outline. Red border, red text.</Rl>
       <Rl>danger-solid: irreversible destructive. Red fill, white text.</Rl>
       <Rl>signal: journey milestone / gold moment. Gold fill, dark text. Use sparingly.</Rl>
+    </S>
+    <S title="Icon Sizes" desc="Icons are constrained per button size. Pass any ReactNode — the button clips it to fit.">
+      <Rl>sm (32px button) → 14×14px icon</Rl>
+      <Rl>md (40px button) → 16×16px icon</Rl>
+      <Rl>lg (48px button) → 18×18px icon</Rl>
+      <Rl>Icon colour should match the button text colour for the variant.</Rl>
     </S>
     <S title="Rules">
       <Rl>One primary per view. Multiple secondaries are fine.</Rl>
@@ -901,35 +908,36 @@ export function StepperPage() {
 }
 
 export function CheckboxPage() {
-  const [vals, setVals] = useState(['reading']);
+  const [mode, setMode] = useState('single');
+  const [ch, setCh] = useState(true);
   const [disabled, setDisabled] = useState(false);
-  const [hasLabel, setHasLabel] = useState(true);
-  const [count, setCount] = useState('3');
-  const allOpts = [
-    { value: 'reading', label: 'Reading' },
-    { value: 'math', label: 'Math' },
-    { value: 'verbal', label: 'Verbal' },
-    { value: 'writing', label: 'Writing' },
-    { value: 'science', label: 'Science' },
-  ];
-  const opts = allOpts.slice(0, parseInt(count)).map(o => hasLabel ? o : { ...o, label: '' });
+  const [indeterminate, setIndeterminate] = useState(false);
+  const [label, setLabel] = useState('I agree to the terms');
+  const [vals, setVals] = useState(['reading']);
+  const [showGroupTitle, setShowGroupTitle] = useState(true);
   return <>
     <Playground
       knobs={<>
-        <KnobToggle label="Labels" value={hasLabel} onChange={setHasLabel} />
+        <KnobSelect label="Component" value={mode} options={['single', 'group']} onChange={setMode} />
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
-        <KnobSelect label="Count" value={count} options={['1','2','3','4','5']} onChange={setCount} />
+        {mode === 'single' && <KnobToggle label="Indeterminate" value={indeterminate} onChange={setIndeterminate} />}
+        {mode === 'single' && <KnobText label="Label" value={label} onChange={setLabel} />}
+        {mode === 'group' && <KnobToggle label="Title" value={showGroupTitle} onChange={setShowGroupTitle} />}
       </>}
     >
-      {hasLabel ? (
-        <CheckboxGroup values={vals} onChange={setVals} disabled={disabled} options={opts} />
+      {mode === 'single' ? (
+        <Checkbox checked={ch} onValueChange={setCh} disabled={disabled} indeterminate={indeterminate} label={label || undefined} />
       ) : (
-        <R>{opts.map(o => <Checkbox key={o.value} checked={vals.includes(o.value)} onValueChange={(v) => setVals(v ? [...vals, o.value] : vals.filter(x => x !== o.value))} disabled={disabled} />)}</R>
+        <CheckboxGroup title={showGroupTitle ? 'Select subjects' : undefined} values={vals} onChange={setVals} disabled={disabled} options={[
+          { value: 'reading', label: 'Reading' },
+          { value: 'math', label: 'Math' },
+          { value: 'verbal', label: 'Verbal' },
+        ]} />
       )}
     </Playground>
 
     <Import>{"import { Checkbox, CheckboxGroup } from '@noon/design-system';"}</Import>
-    <S title="Checkbox">
+    <S title="Checkbox" desc="Single toggle. Use standalone or inside a form.">
       <Props>
         <Prop name="checked" type="boolean" />
         <Prop name="onValueChange" type="(val: boolean) => void" />
@@ -938,8 +946,9 @@ export function CheckboxPage() {
         <Prop name="indeterminate" type="boolean" />
       </Props>
     </S>
-    <S title="CheckboxGroup">
+    <S title="CheckboxGroup" desc="Multi-select from a list. Manages checked state via values array.">
       <Props>
+        <Prop name="title" type="string" desc="Group heading above the options" />
         <Prop name="values" type="string[]" desc="Currently checked values" />
         <Prop name="onChange" type="(values: string[]) => void" />
         <Prop name="options" type="{ value: string; label: string }[]" />
@@ -952,42 +961,25 @@ export function CheckboxPage() {
 export function RadioPage() {
   const [sel, setSel] = useState('a');
   const [disabled, setDisabled] = useState(false);
-  const [hasLabel, setHasLabel] = useState(true);
-  const [count, setCount] = useState('3');
-  const allOpts = [
-    { value: 'a', label: 'Option A' },
-    { value: 'b', label: 'Option B' },
-    { value: 'c', label: 'Option C' },
-    { value: 'd', label: 'Option D' },
-    { value: 'e', label: 'Option E' },
-  ];
-  const opts = allOpts.slice(0, parseInt(count)).map(o => hasLabel ? o : { ...o, label: '' });
+  const [showTitle, setShowTitle] = useState(true);
   return <>
     <Playground
       knobs={<>
-        <KnobToggle label="Labels" value={hasLabel} onChange={setHasLabel} />
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
-        <KnobSelect label="Count" value={count} options={['2','3','4','5']} onChange={setCount} />
+        <KnobToggle label="Title" value={showTitle} onChange={setShowTitle} />
       </>}
     >
-      {hasLabel ? (
-        <RadioGroup value={sel} onChange={setSel} disabled={disabled} options={opts} />
-      ) : (
-        <R>{opts.map(o => <Radio key={o.value} selected={sel === o.value} onSelect={() => setSel(o.value)} disabled={disabled} />)}</R>
-      )}
+      <RadioGroup title={showTitle ? 'Difficulty level' : undefined} value={sel} onChange={setSel} disabled={disabled} options={[
+        { value: 'a', label: 'Beginner' },
+        { value: 'b', label: 'Intermediate' },
+        { value: 'c', label: 'Advanced' },
+      ]} />
     </Playground>
 
-    <Import>{"import { Radio, RadioGroup } from '@noon/design-system';"}</Import>
-    <S title="Radio">
+    <Import>{"import { RadioGroup } from '@noon/design-system';"}</Import>
+    <S title="RadioGroup" desc="Single-select from a list. Only one option active at a time.">
       <Props>
-        <Prop name="selected" type="boolean" />
-        <Prop name="onSelect" type="() => void" />
-        <Prop name="label" type="string" />
-        <Prop name="disabled" type="boolean" />
-      </Props>
-    </S>
-    <S title="RadioGroup">
-      <Props>
+        <Prop name="title" type="string" desc="Group heading above the options" />
         <Prop name="value" type="string" desc="Currently selected value" />
         <Prop name="onChange" type="(value: string) => void" />
         <Prop name="options" type="{ value: string; label: string }[]" />

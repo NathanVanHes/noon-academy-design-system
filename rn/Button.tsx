@@ -28,6 +28,7 @@ interface ButtonProps {
 const heights: Record<Size, number> = { sm: h.sm, md: h.md, lg: h.lg };
 const paddings: Record<Size, number> = { sm: sp[3], md: sp[5], lg: sp[6] };
 const fontSizes: Record<Size, number> = { sm: fs[13], md: fs[14], lg: fs[15] };
+const iconSizes: Record<Size, number> = { sm: 14, md: 16, lg: 18 };
 
 export function Button({ children, variant = 'primary', size = 'md', disabled, loading, fullWidth, leadingIcon, trailingIcon, onPress }: ButtonProps) {
   const { theme } = useTheme();
@@ -97,9 +98,9 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
           style={{ position: 'absolute' }}
         />
       )}
-      {leadingIcon && !loading && <View>{leadingIcon}</View>}
+      {leadingIcon && !loading && <View style={{ width: iconSizes[size], height: iconSizes[size], alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>{leadingIcon}</View>}
       <Text style={textStyle}>{children}</Text>
-      {trailingIcon && !loading && <View>{trailingIcon}</View>}
+      {trailingIcon && !loading && <View style={{ width: iconSizes[size], height: iconSizes[size], alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>{trailingIcon}</View>}
     </Pressable>
   );
 }
