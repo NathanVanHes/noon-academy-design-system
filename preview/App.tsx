@@ -10,7 +10,7 @@ import {
   // Foundation
   OverviewPage, BrandPage, ColorsPage, TypographyPage, SpacingPage, RadiiPage, ElevationPage, MotionPage, GridSystemPage,
   // Graphical
-  GridPaperPage, WaypointsPage, WaterVesselPage, ContoursPage, DunePatternPage, VoiceTutorPage,
+  IconsPage, GridPaperPage, WaypointsPage, WaterVesselPage, ContoursPage, DunePatternPage, VoiceTutorPage,
   // Actions
   ButtonsPage, IconButtonPage,
   // Inputs
@@ -45,6 +45,7 @@ const NAV = [
     { id: 'elevation', label: 'Elevation' },
     { id: 'motion', label: 'Motion' },
     { id: 'gridsystem', label: 'Grid System' },
+    { id: 'icons', label: 'Icons' },
   ]},
   { group: 'Surfaces', items: [
     { id: 'gridpaper', label: 'Grid Paper' },
@@ -139,6 +140,7 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   elevation:    { component: ElevationPage, desc: 'Visual depth levels via borders and shadows.' },
   motion:       { component: MotionPage, desc: 'Curves, durations, and animation principles.' },
   gridsystem:   { component: GridSystemPage, desc: 'Layout primitives using flexbox and token spacing.' },
+  icons:        { component: IconsPage, desc: 'Custom SVG icon set with size and colour tokens.' },
   gridpaper:    { component: GridPaperPage, desc: 'Dotted grid background surface texture.' },
   waypoints:    { component: WaypointsPage, desc: 'Diamond-shaped markers for routes, progress, and important events.' },
   watervessel:  { component: WaterVesselPage, desc: 'Visual metaphor for proof-of-work.' },

@@ -17,6 +17,8 @@ export { color, voidTheme, paperTheme, voidElevation, paperElevation, sp, icon, 
 export type { Theme } from './tokens';
 
 // Inputs
+export { Icon, iconNames } from './Icon';
+export type { IconName } from './Icon';
 export { Button } from './Button';
 export { IconButton } from './IconButton';
 export { Input } from './Input';

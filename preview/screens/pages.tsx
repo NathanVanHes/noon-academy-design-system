@@ -13,6 +13,7 @@ import {
   Tabs, BottomNav, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table,
   LinearProgress, CircularProgress, Toast, Dialog, BottomSheet, FullSheet, Interstitial,
   RadioGroup, CheckboxGroup,
+  Icon, iconNames,
   GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
@@ -659,6 +660,67 @@ export function MotionPage() {
   </>;
 }
 
+export function IconsPage() {
+  const { theme } = useTheme();
+  const [selectedIcon, setSelectedIcon] = useState('chevron-right');
+  const [iconSize, setIconSize] = useState('md');
+  const sizeMap: Record<string, number> = { xs: 6, sm: 10, md: 14, lg: 18, xl: 20, '2xl': 28 };
+  return <>
+    <Playground
+      knobs={<>
+        <KnobSelect label="Size" value={iconSize} options={['xs', 'sm', 'md', 'lg', 'xl', '2xl']} onChange={setIconSize} />
+      </>}
+    >
+      <Icon name={selectedIcon as any} size={sizeMap[iconSize]} color={theme.fg} />
+    </Playground>
+
+    <Import>{"import { Icon } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="name" type="IconName" desc="Icon identifier" />
+      <Prop name="size" type="number" def="14 (icon.md)" desc="Pixel size. Use icon tokens." />
+      <Prop name="color" type="string" def="theme.fg" desc="Inherits from context. Match parent component colour." />
+    </Props>
+
+    <S title="All Icons" desc="Tap to preview in the playground above.">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[3] }}>
+        {iconNames.map(name => (
+          <Pressable key={name} onPress={() => setSelectedIcon(name)} style={{ alignItems: 'center', gap: sp[1], padding: sp[3], borderRadius: r[2], backgroundColor: selectedIcon === name ? theme.activeOverlay : 'transparent', borderWidth: selectedIcon === name ? 1 : 0, borderColor: theme.border, minWidth: 64 }}>
+            <Icon name={name} size={18} color={selectedIcon === name ? theme.fg : theme.fgMuted} />
+            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint }}>{name}</Text>
+          </Pressable>
+        ))}
+      </View>
+    </S>
+
+    <S title="Sizes" desc="Use icon tokens for consistent sizing across components.">
+      <View style={{ gap: sp[3] }}>
+        {Object.entries(sizeMap).map(([name, size]) => (
+          <View key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[4] }}>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint, minWidth: 40, textAlign: 'right' }}>icon.{name}</Text>
+            <Icon name="chevron-right" size={size} color={theme.fg} />
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{size}px</Text>
+          </View>
+        ))}
+      </View>
+    </S>
+
+    <S title="Usage in Components" desc="Icons inherit colour from their parent. The component constrains the size.">
+      <Rl>Button: leadingIcon / trailingIcon — constrained to 14/16/18px per sm/md/lg.</Rl>
+      <Rl>IconButton: children — fills the button. Use icon.md (14) for sm, icon.lg (18) for md/lg.</Rl>
+      <Rl>Calendar: uses IconButton ghost sm for navigation chevrons.</Rl>
+      <Rl>TitleBar: back icon via backIcon prop.</Rl>
+      <Rl>BottomNav: icon per tab item.</Rl>
+    </S>
+
+    <S title="Rules">
+      <Rl>All icons are custom SVG. No third-party icon libraries.</Rl>
+      <Rl>Stroke-based, 1.5px weight, round caps and joins.</Rl>
+      <Rl>Colour always from theme tokens — never hardcoded.</Rl>
+      <Rl>Size always from icon tokens — never hardcoded pixel values.</Rl>
+    </S>
+  </>;
+}
+
 export function GridSystemPage() {
   const { theme } = useTheme();
   return <>
@@ -719,7 +781,7 @@ export function ButtonsPage() {
   const [label, setLabel] = useState('Label');
 
   const iconColor = disabled ? theme.fgFaint : { primary: theme.accentFg, secondary: theme.fg, ghost: theme.fgMuted, danger: color.danger[300], 'danger-solid': color.chalk[100], signal: theme.bg }[variant] || theme.fg;
-  const demoIcon = <Text style={{ fontSize: fs[14], color: iconColor }}>→</Text>;
+  const demoIcon = <Icon name="arrow-right" size={14} color={iconColor} />;
   const V: Array<'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'> = ['primary','secondary','ghost','danger','danger-solid','signal'];
   return <>
     <Playground
@@ -783,7 +845,7 @@ export function IconButtonPage() {
   const [size, setSize] = useState('md');
   const [disabled, setDisabled] = useState(false);
 
-  const ico = (v: string, dis?: boolean) => <Text style={{ color: dis ? theme.fgFaint : v === 'primary' ? theme.accentFg : theme.fg, fontSize: fs[14] }}>{'✕'}</Text>;
+  const ico = (v: string, dis?: boolean) => <Icon name="close" size={14} color={dis ? theme.fgFaint : v === 'primary' ? theme.accentFg : theme.fg} />;
   return <>
     <Playground
       knobs={<>

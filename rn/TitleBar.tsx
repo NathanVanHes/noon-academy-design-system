@@ -5,7 +5,8 @@
 import React from 'react';
 import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font, h } from './tokens';
+import { sp, r, fs, fw, font, h, icon } from './tokens';
+import { Icon } from './Icon';
 
 type Variant = 'default' | 'large' | 'transparent' | 'overlay';
 
@@ -56,7 +57,7 @@ export function TitleBar({ title, subtitle, variant = 'default', backIcon, onBac
         <>
           {onBack && (
             <Pressable onPress={onBack} hitSlop={8}>
-              {backIcon || <Text style={{ fontSize: fs[20], color: theme.fgMuted }}>‹</Text>}
+              {backIcon || <Icon name="chevron-left" size={icon.lg} color={theme.fgMuted} />}
             </Pressable>
           )}
           <Text style={titleStyle} numberOfLines={1}>{title}</Text>
@@ -68,7 +69,7 @@ export function TitleBar({ title, subtitle, variant = 'default', backIcon, onBac
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], width: '100%' }}>
             {onBack && (
               <Pressable onPress={onBack} hitSlop={8}>
-                {backIcon || <Text style={{ fontSize: fs[20], color: theme.fgMuted }}>‹</Text>}
+                {backIcon || <Icon name="chevron-left" size={icon.lg} color={theme.fgMuted} />}
               </Pressable>
             )}
             <View style={{ flex: 1 }} />

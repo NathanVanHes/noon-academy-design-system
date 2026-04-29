@@ -8,6 +8,7 @@ import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, icon, dur } from './tokens';
 import { Button } from './Button';
 import { IconButton } from './IconButton';
+import { Icon } from './Icon';
 import { WaypointMarker } from './Waypoints';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -211,10 +212,10 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
             <Button variant="ghost" size="sm" onPress={goToday}>Today</Button>
           )}
           <IconButton variant="ghost" size="sm" onPress={prev}>
-            <Text style={{ fontSize: fs[16], color: theme.fgMuted }}>‹</Text>
+            <Icon name="chevron-left" size={icon.md} color={theme.fgMuted} />
           </IconButton>
           <IconButton variant="ghost" size="sm" onPress={next}>
-            <Text style={{ fontSize: fs[16], color: theme.fgMuted }}>›</Text>
+            <Icon name="chevron-right" size={icon.md} color={theme.fgMuted} />
           </IconButton>
           {rightAction}
         </View>
