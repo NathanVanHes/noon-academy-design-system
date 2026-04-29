@@ -319,7 +319,6 @@ export function ColorsPage() {
       {scaleRow('blue', color.blue)}{scaleRow('danger', color.danger)}{scaleRow('warn', color.warn)}{scaleRow('terra', color.terra)}
     </S>
     <S title="Physical to Digital" desc="The digital system mirrors the physical classroom palette.">
-      <Image source={require('../../reference/classroom-palette.png')} style={{ width: 340, height: 340 * (1196 / 1686), borderRadius: r[2], marginBottom: sp[4] }} resizeMode="cover" />
       <View style={{ gap: sp[3] }}>
         {([
           ['Teal Upholstery', theme.accent, 'noon accent'],
