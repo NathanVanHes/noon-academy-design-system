@@ -21,10 +21,10 @@ export function Alert({ title, children, variant = 'info' }: AlertProps) {
 
   // CSS: box-shadow: inset 0 0 0 1px var(--xxx-border) — RN: borderWidth + borderColor
   const borderMap: Record<Variant, string> = {
-    info: 'rgba(107,163,255,0.3)',
+    info: theme.borderStrong,
     success: theme.accentBorder,
-    warn: 'rgba(232,168,48,0.35)',
-    danger: 'rgba(197,90,78,0.40)',
+    warn: theme.signalBorder,
+    danger: theme.dangerBorder,
   };
 
   // CSS: .alert { background: var(--bg-raised); } — same for ALL variants

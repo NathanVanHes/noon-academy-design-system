@@ -5,7 +5,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Pressable, View, Text, Animated, Easing, type ViewStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, font, dur } from './tokens';
+import { sp, r, fs, font, dur, color } from './tokens';
 
 interface SwitchProps {
   value: boolean;
@@ -32,7 +32,7 @@ export function Switch({ value, onValueChange, disabled, label }: SwitchProps) {
   }, [value]);
 
   const bgColor = trackColor.interpolate({ inputRange: [0, 1], outputRange: [theme.borderStrong, theme.accent] });
-  const thumbBg = trackColor.interpolate({ inputRange: [0, 1], outputRange: ['#ffffff', theme.accentFg] });
+  const thumbBg = trackColor.interpolate({ inputRange: [0, 1], outputRange: [color.chalk[100], theme.accentFg] });
 
   const track = (
     <Animated.View style={{

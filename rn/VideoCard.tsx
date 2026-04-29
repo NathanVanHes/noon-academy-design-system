@@ -6,7 +6,8 @@
 import React from 'react';
 import { View, Text, Image, Pressable, Linking, type ImageSourcePropType } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font } from './tokens';
+import { sp, r, fs, fw, font, icon, color } from './tokens';
+import { Icon } from './Icon';
 
 interface VideoCardProps {
   title: string;
@@ -60,7 +61,7 @@ export function VideoCard({ title, attribution, duration, uri, thumbnail, onPres
           backgroundColor: theme.accent,
           alignItems: 'center', justifyContent: 'center',
         }}>
-          <Text style={{ color: theme.accentFg, fontSize: fs[16], marginLeft: 2 }}>{'▶'}</Text>
+          <Icon name="play" size={icon.lg} color={theme.accentFg} />
         </View>
         {duration && (
           <View style={{
@@ -68,7 +69,7 @@ export function VideoCard({ title, attribution, duration, uri, thumbnail, onPres
             backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: r[1],
             paddingHorizontal: sp[1], paddingVertical: 1,
           }}>
-            <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: '#fff' }}>{duration}</Text>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: color.chalk[100] }}>{duration}</Text>
           </View>
         )}
       </View>

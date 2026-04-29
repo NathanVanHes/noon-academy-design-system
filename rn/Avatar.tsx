@@ -35,7 +35,7 @@ export function Avatar({ initials, size = 'sm', color = 'default', star, status 
   const fgMap: Record<ColorVariant, string> = {
     default: theme.fgMuted,
     noon: theme.accentFg,
-    blue: '#ffffff',
+    blue: colorTokens.chalk[100],
   };
 
   const containerStyle: ViewStyle = {

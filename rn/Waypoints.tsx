@@ -5,9 +5,9 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Animated, Easing } from 'react-native';
-import Svg, { Rect, Circle, Line, Polygon, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { useTheme } from './ThemeContext';
-import { sp, fs, fw, font, color } from './tokens';
+import { sp, fs, fw, font } from './tokens';
 
 type WaypointState = 'done' | 'passed' | 'current' | 'arrived' | 'incomplete';
 
@@ -74,38 +74,6 @@ interface WaypointsProps {
   layout?: 'horizontal' | 'vertical' | 'path';
 }
 
-function Marker({ cx, cy, state, fg }: { cx: number; cy: number; state: WaypointState; fg: string }) {
-  const d = 4; // half-width of diamond
-  if (state === 'passed' || state === 'done') {
-    return <>
-      <Rect x={cx - d} y={cy - d} width={d * 2} height={d * 2} rotation={45} origin={`${cx},${cy}`} fill={theme.signal} />
-      <Circle cx={cx} cy={cy} r={1.5} fill={fg} />
-    </>;
-  }
-  if (state === 'current') {
-    return <>
-      <Rect x={cx - d} y={cy - d} width={d * 2} height={d * 2} rotation={45} origin={`${cx},${cy}`} fill={color.gold[400]} />
-      <Line x1={cx} y1={cy - 10} x2={cx} y2={cy - 5} stroke={color.gold[400]} strokeWidth={0.75} />
-      <Line x1={cx} y1={cy + 5} x2={cx} y2={cy + 10} stroke={color.gold[400]} strokeWidth={0.75} />
-      <Line x1={cx - 10} y1={cy} x2={cx - 5} y2={cy} stroke={color.gold[400]} strokeWidth={0.75} />
-      <Line x1={cx + 5} y1={cy} x2={cx + 10} y2={cy} stroke={color.gold[400]} strokeWidth={0.75} />
-    </>;
-  }
-  if (state === 'arrived') {
-    return <>
-      <Rect x={cx - d} y={cy - d} width={d * 2} height={d * 2} rotation={45} origin={`${cx},${cy}`} fill={color.noon[400]} />
-      <Polygon points={`${cx},${cy - 3} ${cx + 2.5},${cy + 1.5} ${cx - 2.5},${cy + 1.5}`} fill={fg} />
-      <Line x1={cx} y1={cy - 10} x2={cx} y2={cy - 5} stroke={color.noon[400]} strokeWidth={0.75} />
-      <Line x1={cx} y1={cy + 5} x2={cx} y2={cy + 10} stroke={color.noon[400]} strokeWidth={0.75} />
-      <Line x1={cx - 10} y1={cy} x2={cx - 5} y2={cy} stroke={color.noon[400]} strokeWidth={0.75} />
-      <Line x1={cx + 5} y1={cy} x2={cx + 10} y2={cy} stroke={color.noon[400]} strokeWidth={0.75} />
-    </>;
-  }
-  // incomplete
-  return (
-    <Rect x={cx - d} y={cy - d} width={d * 2} height={d * 2} rotation={45} origin={`${cx},${cy}`} fill="none" stroke="rgba(232,228,220,0.55)" strokeWidth={1} />
-  );
-}
 
 export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: WaypointsProps) {
   const { theme } = useTheme();
