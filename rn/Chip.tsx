@@ -1,13 +1,13 @@
 /**
  * Chip — matches CSS: height 28, r-1 radius, inset border, fs-12 fw-500.
- * Variants: default, accent (is-on), signal, danger, ok.
+ * Variants: default, accent (is-on), signal, danger, success.
  */
 import React from 'react';
 import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, icon, color } from './tokens';
 
-type Variant = 'default' | 'accent' | 'signal' | 'danger' | 'ok';
+type Variant = 'default' | 'accent' | 'signal' | 'danger' | 'success';
 
 interface ChipProps {
   children: string;
@@ -26,7 +26,7 @@ export function Chip({ children, variant = 'default', interactive, dot, disabled
     accent: theme.accentSoft,
     signal: theme.signalSoft,
     danger: theme.dangerSoft,
-    ok: 'rgba(122,142,100,0.14)',
+    success: theme.accentSoft,
   };
 
   const fgMap: Record<Variant, string> = {
@@ -34,7 +34,7 @@ export function Chip({ children, variant = 'default', interactive, dot, disabled
     accent: theme.accent,
     signal: theme.signalBright,
     danger: theme.danger,
-    ok: color.ok[300],
+    success: theme.accent,
   };
 
   const borderMap: Record<Variant, string> = {
@@ -42,7 +42,7 @@ export function Chip({ children, variant = 'default', interactive, dot, disabled
     accent: theme.accentBorder,
     signal: theme.signalBorder,
     danger: theme.dangerBorder,
-    ok: 'rgba(122,142,100,0.40)', // ok-border not yet in theme
+    success: theme.accentBorder,
   };
 
   const containerStyle: ViewStyle = {

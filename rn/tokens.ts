@@ -12,8 +12,8 @@ export const color = {
   iris: { 300: '#C7A8FF', 400: '#B08AF9', 500: '#8E63E0', 600: '#6B3FA8', 700: '#5C3D8F', 800: '#3D2460' },
   blue: { 300: '#96BCFF', 400: '#6BA3FF', 500: '#4881E0' },
   danger: { 300: '#e58a7f', 400: '#c55a4e', 500: '#9a4339' },
-  warn: { 300: '#e8c06a', 400: '#d9a74a', 500: '#a07830' },
-  ok: { 300: '#a9bc91', 400: '#7a8e64', 500: '#566648' },
+  warn: { 300: '#F5C456', 400: '#E8A830', 500: '#C48A20' },
+  terra: { 200: '#E8B49A', 300: '#D4956E', 400: '#C07A4E', 500: '#A5633A', 600: '#8A4E2A', 700: '#6B3A1E', 800: '#4A2812' },
 } as const;
 
 export const voidTheme = {
@@ -53,6 +53,9 @@ export const voidTheme = {
   irisBorder: 'rgba(176,138,249,0.40)',
   irisLabel: 'rgba(176,138,249,0.60)',
   irisDot: 'rgba(176,138,249,0.50)',
+  terra: color.terra[600],
+  terraSoft: 'rgba(138,78,42,0.10)',
+  terraBorder: 'rgba(138,78,42,0.35)',
 } as const;
 
 export const paperTheme = {
@@ -92,6 +95,9 @@ export const paperTheme = {
   irisBorder: 'rgba(142,99,224,0.35)',
   irisLabel: 'rgba(142,99,224,0.55)',
   irisDot: 'rgba(142,99,224,0.45)',
+  terra: color.terra[400],
+  terraSoft: 'rgba(192,122,78,0.12)',
+  terraBorder: 'rgba(192,122,78,0.35)',
 } as const;
 
 export type Theme = typeof voidTheme;

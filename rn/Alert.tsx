@@ -8,7 +8,7 @@ import { View, Text, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, color } from './tokens';
 
-type Variant = 'info' | 'ok' | 'warn' | 'danger';
+type Variant = 'info' | 'success' | 'warn' | 'danger';
 
 interface AlertProps {
   title?: string;
@@ -22,8 +22,8 @@ export function Alert({ title, children, variant = 'info' }: AlertProps) {
   // CSS: box-shadow: inset 0 0 0 1px var(--xxx-border) — RN: borderWidth + borderColor
   const borderMap: Record<Variant, string> = {
     info: 'rgba(107,163,255,0.3)',
-    ok: 'rgba(122,142,100,0.40)',
-    warn: 'rgba(217,167,74,0.35)',
+    success: theme.accentBorder,
+    warn: 'rgba(232,168,48,0.35)',
     danger: 'rgba(197,90,78,0.40)',
   };
 

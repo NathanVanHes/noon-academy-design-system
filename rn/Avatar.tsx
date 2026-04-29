@@ -78,7 +78,7 @@ export function Avatar({ initials, size = 'sm', color = 'default', star, status 
     width: icon.sm,
     height: icon.sm,
     borderRadius: icon.sm / 2,
-    backgroundColor: status === 'online' ? colorTokens.ok[400] : colorTokens.danger[400],
+    backgroundColor: status === 'online' ? theme.accent : colorTokens.danger[400],
     borderWidth: sp[0.5],
     borderColor: theme.bg,
   };

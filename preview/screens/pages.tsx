@@ -4,7 +4,7 @@
  * Each exports a function component: Import → Props → Live examples.
  */
 import React, { useState } from 'react';
-import { View, Text, Pressable, Animated, Easing, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, Animated, Easing, Image, useWindowDimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
@@ -243,6 +243,12 @@ export function BrandPage() {
       <C label="Routes = Invisible Infrastructure"><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Golden pathways connecting students who should travel together. Show outcomes not mechanics.</Text></C>
       <C label="Difficult But Conquerable"><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Terrain is genuinely challenging. But difficult passages become manageable with the right teammates.</Text></C>
     </S>
+    <S title="Colour Rules" desc="Every colour has one job. Follow semantic token roles — see Colors page for full definitions.">
+      <Rl>Green is action. Purple is tutor. Gold is journey. Terra is place.</Rl>
+      <Rl>Never swap roles. Gold on a button is wrong. Purple on a card is wrong.</Rl>
+      <Rl>Use semantic tokens (theme.accent, theme.iris) not primitives (color.noon[400]).</Rl>
+      <Rl>Colours adapt per theme — don't hardcode values.</Rl>
+    </S>
     <S title="Non-Negotiables">
       <Rl>No emoji. No illustrated characters. No mascots.</Rl>
       <Rl>No pure black or pure white — always ink and paper.</Rl>
@@ -279,19 +285,68 @@ export function ColorsPage() {
   );
   return <>
     <Import>{"import { color, voidTheme, paperTheme } from '@noon/design-system/tokens';"}</Import>
-    <S title="Primitive Scales">
+    <S title="Semantic — Surfaces" desc="Background layers. Sunken for sidebars, raised for cards, overlay for modals.">
+      {swatch(theme.bg, 'bg')}{swatch(theme.bgSunken, 'bgSunken')}{swatch(theme.bgRaised, 'bgRaised')}{swatch(theme.bgOverlay, 'bgOverlay')}{swatch(theme.inputBg, 'inputBg')}
+    </S>
+    <S title="Semantic — Foreground" desc="Text hierarchy. fg for primary, muted for secondary, faint for labels, disabled for inactive.">
+      {swatch(theme.fg, 'fg')}{swatch(theme.fgMuted, 'fgMuted')}{swatch(theme.fgSubtle, 'fgSubtle')}{swatch(theme.fgFaint, 'fgFaint')}{swatch(theme.fgDisabled, 'fgDisabled')}{swatch(theme.fgInverse, 'fgInverse')}
+    </S>
+    <S title="Semantic — Borders" desc="Container edges and dividers. border for cards, borderStrong for inputs, divider for list separators.">
+      {swatch(theme.border, 'border')}{swatch(theme.borderStrong, 'borderStrong')}{swatch(theme.divider, 'divider')}
+    </S>
+    <S title="Semantic — Accent" desc="Action and interaction. Primary CTA, buttons, active states, confirmations. The teal green.">
+      {swatch(theme.accent, 'accent')}{swatch(theme.accentFg, 'accentFg')}{swatch(theme.accentSoft, 'accentSoft')}{swatch(theme.accentBorder, 'accentBorder')}
+    </S>
+    <S title="Semantic — Signal" desc="Journey and progress. Waypoints, achievements, route markers. Gold is journey signal only.">
+      {swatch(theme.signal, 'signal')}{swatch(theme.signalBright, 'signalBright')}{swatch(theme.signalSoft, 'signalSoft')}{swatch(theme.signalBorder, 'signalBorder')}
+    </S>
+    <S title="Semantic — Danger" desc="Destructive actions, errors, validation failures.">
+      {swatch(theme.danger, 'danger')}{swatch(theme.dangerSoft, 'dangerSoft')}{swatch(theme.dangerBorder, 'dangerBorder')}
+    </S>
+    <S title="Semantic — Iris" desc="Voice tutor exclusively. Regal and authoritative — the respected guide. Reserved for the AI presence.">
+      {swatch(theme.iris, 'iris')}{swatch(theme.irisSoft, 'irisSoft')}{swatch(theme.irisBorder, 'irisBorder')}{swatch(theme.irisLabel, 'irisLabel')}{swatch(theme.irisDot, 'irisDot')}
+    </S>
+    <S title="Semantic — Terra" desc="Warmth and place. Saudi dunes after rain. Classroom content, physical space, secondary highlights.">
+      {swatch(theme.terra, 'terra')}{swatch(theme.terraSoft, 'terraSoft')}{swatch(theme.terraBorder, 'terraBorder')}
+    </S>
+    <S title="Semantic — Overlays" desc="Interactive state layers. Hover for mouseover, active for pressed, selected for chosen items.">
+      {swatch(theme.hoverOverlay, 'hoverOverlay')}{swatch(theme.activeOverlay, 'activeOverlay')}{swatch(theme.selectedOverlay, 'selectedOverlay')}{swatch(theme.accentGlow, 'accentGlow')}
+    </S>
+    <S title="Primitive Scales" desc="Raw colour values. Use semantic tokens above — primitives are for reference only.">
       {scaleRow('void', color.void)}{scaleRow('chalk', color.chalk)}{scaleRow('paper', color.paper)}
       {scaleRow('noon', color.noon)}{scaleRow('gold', color.gold)}{scaleRow('iris', color.iris)}
-      {scaleRow('blue', color.blue)}{scaleRow('danger', color.danger)}{scaleRow('warn', color.warn)}{scaleRow('ok', color.ok)}
+      {scaleRow('blue', color.blue)}{scaleRow('danger', color.danger)}{scaleRow('warn', color.warn)}{scaleRow('terra', color.terra)}
     </S>
-    <S title="Semantic — Surfaces">{swatch(theme.bg, 'bg')}{swatch(theme.bgSunken, 'bgSunken')}{swatch(theme.bgRaised, 'bgRaised')}{swatch(theme.bgOverlay, 'bgOverlay')}{swatch(theme.inputBg, 'inputBg')}</S>
-    <S title="Semantic — Foreground">{swatch(theme.fg, 'fg')}{swatch(theme.fgMuted, 'fgMuted')}{swatch(theme.fgSubtle, 'fgSubtle')}{swatch(theme.fgFaint, 'fgFaint')}{swatch(theme.fgDisabled, 'fgDisabled')}{swatch(theme.fgInverse, 'fgInverse')}</S>
-    <S title="Semantic — Borders">{swatch(theme.border, 'border')}{swatch(theme.borderStrong, 'borderStrong')}{swatch(theme.divider, 'divider')}</S>
-    <S title="Semantic — Accent">{swatch(theme.accent, 'accent')}{swatch(theme.accentFg, 'accentFg')}{swatch(theme.accentSoft, 'accentSoft')}{swatch(theme.accentBorder, 'accentBorder')}</S>
-    <S title="Semantic — Signal">{swatch(theme.signal, 'signal')}{swatch(theme.signalBright, 'signalBright')}{swatch(theme.signalSoft, 'signalSoft')}{swatch(theme.signalBorder, 'signalBorder')}</S>
-    <S title="Semantic — Danger">{swatch(theme.danger, 'danger')}{swatch(theme.dangerSoft, 'dangerSoft')}{swatch(theme.dangerBorder, 'dangerBorder')}</S>
-    <S title="Semantic — Iris">{swatch(theme.iris, 'iris')}{swatch(theme.irisSoft, 'irisSoft')}{swatch(theme.irisBorder, 'irisBorder')}{swatch(theme.irisLabel, 'irisLabel')}{swatch(theme.irisDot, 'irisDot')}</S>
-    <S title="Semantic — Overlays">{swatch(theme.hoverOverlay, 'hoverOverlay')}{swatch(theme.activeOverlay, 'activeOverlay')}{swatch(theme.selectedOverlay, 'selectedOverlay')}{swatch(theme.accentGlow, 'accentGlow')}</S>
+    <S title="Physical to Digital" desc="The digital system mirrors the physical classroom palette.">
+      <Image source={require('../../reference/classroom-palette.png')} style={{ width: 340, height: 340 * (1196 / 1686), borderRadius: r[2], marginBottom: sp[4] }} resizeMode="cover" />
+      <View style={{ gap: sp[3] }}>
+        {([
+          ['Teal Upholstery', theme.accent, 'noon accent'],
+          ['Terracotta', theme.terra, 'terra'],
+        ] as const).map(([material, c, token]) => (
+          <View key={material} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+            <View style={{ width: sp[7], height: sp[7], borderRadius: r[2], backgroundColor: c, borderWidth: 1, borderColor: theme.border }} />
+            <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgMuted }}><Text style={{ color: theme.fg }}>{material}</Text> → {token}</Text>
+          </View>
+        ))}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <View style={{ width: sp[7], height: sp[7], borderRadius: r[2], backgroundColor: theme.bg, borderWidth: 1, borderColor: theme.border, overflow: 'hidden' }}>
+            {[1,2,3].map(i => <View key={`h${i}`} style={{ position: 'absolute', top: `${i * 25}%`, left: 2, right: 2, height: 1, backgroundColor: theme.border }} />)}
+            {[1,2,3].map(i => <View key={`v${i}`} style={{ position: 'absolute', left: `${i * 25}%`, top: 2, bottom: 2, width: 1, backgroundColor: theme.border }} />)}
+          </View>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgMuted }}><Text style={{ color: theme.fg }}>Textured Rug</Text> → paper + grid</Text>
+        </View>
+        {([
+          ['Concrete', color.chalk[300], 'chalk'],
+          ['Light Oak', color.paper[200], 'paper surfaces'],
+        ] as const).map(([material, c, token]) => (
+          <View key={material} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+            <View style={{ width: sp[7], height: sp[7], borderRadius: r[2], backgroundColor: c, borderWidth: 1, borderColor: theme.border }} />
+            <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgMuted }}><Text style={{ color: theme.fg }}>{material}</Text> → {token}</Text>
+          </View>
+        ))}
+      </View>
+    </S>
   </>;
 }
 
@@ -1001,7 +1056,7 @@ export function ChipsPage() {
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Variant" value={variant} options={['default','accent','signal','danger','ok']} onChange={setVariant} />
+        <KnobSelect label="Variant" value={variant} options={['default','accent','signal','danger','success']} onChange={setVariant} />
         <KnobToggle label="Dot" value={dot} onChange={setDot} />
         <KnobToggle label="Interactive" value={interactive} onChange={setInteractive} />
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
@@ -1020,7 +1075,7 @@ export function ChipsPage() {
       <Prop name="onPress" type="() => void" />
     </Props>
     <S title="All Variants"><R>
-      <Chip>Default</Chip><Chip variant="accent">Accent</Chip><Chip variant="signal" dot>Signal</Chip><Chip variant="danger">Danger</Chip><Chip variant="ok">OK</Chip>
+      <Chip>Default</Chip><Chip variant="accent">Accent</Chip><Chip variant="signal" dot>Signal</Chip><Chip variant="danger">Danger</Chip><Chip variant="success">Success</Chip>
     </R></S>
   </>;
 }
@@ -1369,7 +1424,7 @@ export function AlertsPage() {
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Variant" value={variant} options={['info','ok','warn','danger']} onChange={setVariant} />
+        <KnobSelect label="Variant" value={variant} options={['info','success','warn','danger']} onChange={setVariant} />
         <KnobToggle label="Title" value={hasTitle} onChange={setHasTitle} />
       </>}
     >
@@ -1381,12 +1436,12 @@ export function AlertsPage() {
     <Import>{"import { Alert } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="children" type="string" desc="Body text" />
-      <Prop name="variant" type="'info' | 'ok' | 'warn' | 'danger'" def="'info'" />
+      <Prop name="variant" type="'info' | 'success' | 'warn' | 'danger'" def="'info'" />
       <Prop name="title" type="string" />
     </Props>
     <S title="All Variants">
       <C label="Info"><Alert variant="info" title="Info">General information.</Alert></C>
-      <C label="OK"><Alert variant="ok" title="Success">Session completed.</Alert></C>
+      <C label="OK"><Alert variant="success" title="Success">Session completed.</Alert></C>
       <C label="Warn"><Alert variant="warn">Exam in 2 days.</Alert></C>
       <C label="Danger"><Alert variant="danger" title="Error">Something went wrong.</Alert></C>
     </S>
@@ -1395,11 +1450,11 @@ export function AlertsPage() {
 
 export function ToastPage() {
   const [vis, setVis] = useState(false);
-  const [variant, setVariant] = useState('ok');
+  const [variant, setVariant] = useState('success');
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Variant" value={variant} options={['info', 'ok', 'warn', 'danger']} onChange={setVariant} />
+        <KnobSelect label="Variant" value={variant} options={['info', 'success', 'warn', 'danger']} onChange={setVariant} />
       </>}
     >
       <Button variant="secondary" onPress={() => setVis(true)}>Show Toast</Button>
@@ -1408,12 +1463,12 @@ export function ToastPage() {
     <Import>{"import { Toast } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="message" type="string" />
-      <Prop name="variant" type="'info' | 'ok' | 'warn' | 'danger'" def="'info'" />
+      <Prop name="variant" type="'info' | 'success' | 'warn' | 'danger'" def="'info'" />
       <Prop name="visible" type="boolean" />
       <Prop name="onDismiss" type="() => void" />
       <Prop name="duration" type="number" def="4000" desc="Auto-dismiss ms" />
     </Props>
-    <Toast message={variant === 'ok' ? 'Practice session saved' : variant === 'danger' ? 'Something went wrong' : variant === 'warn' ? 'Exam in 2 days' : 'Session starts in 10 minutes'} variant={variant as any} visible={vis} onDismiss={() => setVis(false)} />
+    <Toast message={variant === 'success' ? 'Practice session saved' : variant === 'danger' ? 'Something went wrong' : variant === 'warn' ? 'Exam in 2 days' : 'Session starts in 10 minutes'} variant={variant as any} visible={vis} onDismiss={() => setVis(false)} />
   </>;
 }
 

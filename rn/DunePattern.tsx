@@ -81,11 +81,12 @@ export function DunePattern({ width, height, variant = 'constellation', style }:
             return <Circle key={`s${i}`} cx={sx} cy={sy} r={sr} fill={color.gold[300]} opacity={0.1 + (i % 4) * 0.08} />;
           })}
 
-          {/* Purple triangle planes — rich fills */}
+          {/* Triangle planes — iris purple with terracotta warm accents */}
           {triangles.map((t, i) => {
             const a = allNodes[t[0]], b = allNodes[t[1]], c = allNodes[t[2]];
             const op = (triOpacity[i] || 0.2) * (isVoid ? 1 : 0.6);
-            return <Path key={`t${i}`} d={`M${a.x},${a.y} L${b.x},${b.y} L${c.x},${c.y} Z`} fill={theme.iris} fillOpacity={op} />;
+            const isTerra = i === 2 || i === 6 || i === 9; // some triangles get terracotta
+            return <Path key={`t${i}`} d={`M${a.x},${a.y} L${b.x},${b.y} L${c.x},${c.y} Z`} fill={isTerra ? theme.terra : theme.iris} fillOpacity={isTerra ? op * 0.7 : op} />;
           })}
 
           {/* Connection lines — thin gold */}
@@ -121,11 +122,12 @@ export function DunePattern({ width, height, variant = 'constellation', style }:
             <Stop offset="1" stopColor={color.gold[400]} stopOpacity={isVoid ? 0.5 : 0.35} />
           </LinearGradient>
           <LinearGradient id="hGoldWarm" x1="0.3" y1="0.5" x2="0.8" y2="1">
-            <Stop offset="0" stopColor={color.gold[300]} stopOpacity={isVoid ? 0.6 : 0.4} />
-            <Stop offset="1" stopColor={color.gold[500]} stopOpacity={isVoid ? 0.2 : 0.12} />
+            <Stop offset="0" stopColor={color.terra[isVoid ? 500 : 300]} stopOpacity={isVoid ? 0.4 : 0.3} />
+            <Stop offset="0.5" stopColor={color.gold[300]} stopOpacity={isVoid ? 0.5 : 0.35} />
+            <Stop offset="1" stopColor={color.gold[500]} stopOpacity={isVoid ? 0.15 : 0.08} />
           </LinearGradient>
           <LinearGradient id="hShadowL" x1="0" y1="0" x2="0.6" y2="1">
-            <Stop offset="0" stopColor={isVoid ? color.void[100] : color.paper[300]} stopOpacity={isVoid ? 0.5 : 0.25} />
+            <Stop offset="0" stopColor={isVoid ? color.void[100] : color.terra[200]} stopOpacity={isVoid ? 0.5 : 0.2} />
             <Stop offset="1" stopColor={theme.bg} stopOpacity={0} />
           </LinearGradient>
           <LinearGradient id="hShadowDeep" x1="0.2" y1="0" x2="0.5" y2="1">
@@ -148,8 +150,11 @@ export function DunePattern({ width, height, variant = 'constellation', style }:
         {/* Right gold plane — the main lit face */}
         <Path d={`M${w},${h * 0.2} L${cx},${cy} L${w},${h * 0.7} Z`} fill="url(#hGoldBright)" />
 
-        {/* Ground plane — warm gold */}
+        {/* Ground plane — warm gold-to-terracotta */}
         <Path d={`M0,${h} L${cx},${cy} L${w},${h} Z`} fill="url(#hGoldWarm)" />
+
+        {/* Terracotta warm face — lower left */}
+        <Path d={`M0,${h * 0.75} L${cx},${cy} L0,${h} Z`} fill={color.terra[isVoid ? 600 : 400]} fillOpacity={isVoid ? 0.12 : 0.1} />
 
         {/* Left foreground dune curve */}
         <Path d={`M0,${h * 0.8} Q${w * 0.2},${h * 0.65} ${cx},${cy}`} fill="none" stroke={color.gold[400]} strokeWidth={1} strokeOpacity={isVoid ? 0.35 : 0.2} />

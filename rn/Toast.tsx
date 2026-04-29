@@ -7,7 +7,7 @@ import { Text, Pressable, Animated, Easing } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, font, dur } from './tokens';
 
-type Variant = 'info' | 'ok' | 'warn' | 'danger';
+type Variant = 'info' | 'success' | 'warn' | 'danger';
 
 interface ToastProps {
   message: string;
@@ -51,7 +51,7 @@ export function Toast({ message, variant = 'info', visible, onDismiss, duration 
 
   const bgMap: Record<Variant, string> = {
     info: theme.bgOverlay,
-    ok: theme.accentSoft,
+    success: theme.accentSoft,
     warn: theme.signalSoft,
     danger: theme.dangerSoft,
   };
