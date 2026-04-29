@@ -1,90 +1,78 @@
 /**
- * Chip — matches CSS: height 28, r-1 radius, inset border, fs-12 fw-500.
- * Variants: default, accent (is-on), signal, danger, success.
+ * Chip — compact label for filtering, tags, and status.
+ * Variants: default (neutral), accent (selected/active).
+ * Dismissable: adds × button to remove.
  */
 import React from 'react';
 import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font, icon, color } from './tokens';
+import { sp, r, fs, fw, font, icon } from './tokens';
 
-type Variant = 'default' | 'accent' | 'signal' | 'danger' | 'success';
+type Variant = 'default' | 'accent';
 
 interface ChipProps {
   children: string;
   variant?: Variant;
-  interactive?: boolean;
+  dismissable?: boolean;
   dot?: boolean;
   disabled?: boolean;
   onPress?: () => void;
+  onDismiss?: () => void;
 }
 
-export function Chip({ children, variant = 'default', interactive, dot, disabled, onPress }: ChipProps) {
+export function Chip({ children, variant = 'default', dismissable, dot, disabled, onPress, onDismiss }: ChipProps) {
   const { theme } = useTheme();
 
-  const bgMap: Record<Variant, string> = {
-    default: theme.selectedOverlay, // bg
-    accent: theme.accentSoft,
-    signal: theme.signalSoft,
-    danger: theme.dangerSoft,
-    success: theme.accentSoft,
-  };
-
-  const fgMap: Record<Variant, string> = {
-    default: theme.fg,
-    accent: theme.accent,
-    signal: theme.signalBright,
-    danger: theme.danger,
-    success: theme.accent,
-  };
-
-  const borderMap: Record<Variant, string> = {
-    default: theme.border,
-    accent: theme.accentBorder,
-    signal: theme.signalBorder,
-    danger: theme.dangerBorder,
-    success: theme.accentBorder,
-  };
+  const isAccent = variant === 'accent';
 
   const containerStyle: ViewStyle = {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: sp[2], // CSS: gap: sp-2
+    gap: sp[2],
     height: 28,
     paddingHorizontal: sp[3],
     borderRadius: r[1],
-    backgroundColor: bgMap[variant],
+    backgroundColor: isAccent ? theme.accentSoft : theme.selectedOverlay,
     borderWidth: 1,
-    borderColor: borderMap[variant],
+    borderColor: isAccent ? theme.accentBorder : theme.border,
     opacity: disabled ? 0.4 : 1,
   };
+
+  const textColor = isAccent ? theme.accent : theme.fg;
 
   const textStyle: TextStyle = {
     fontFamily: font.sans,
     fontSize: fs[12],
     fontWeight: fw[500],
-    color: fgMap[variant],
+    color: textColor,
   };
 
   const dotStyle: ViewStyle = {
     width: icon.xs,
     height: icon.xs,
-    backgroundColor: fgMap[variant],
+    backgroundColor: textColor,
     transform: [{ rotate: '45deg' }],
   };
 
-  if (interactive && !disabled) {
+  const content = (
+    <>
+      {dot && <View style={dotStyle} />}
+      <Text style={textStyle}>{children}</Text>
+      {dismissable && !disabled && (
+        <Pressable onPress={onDismiss} hitSlop={4} style={{ marginLeft: sp[0.5] }}>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: textColor, opacity: 0.6 }}>×</Text>
+        </Pressable>
+      )}
+    </>
+  );
+
+  if (onPress && !disabled) {
     return (
       <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.border }]}>
-        {dot && <View style={dotStyle} />}
-        <Text style={textStyle}>{children}</Text>
+        {content}
       </Pressable>
     );
   }
 
-  return (
-    <View style={containerStyle}>
-      {dot && <View style={dotStyle} />}
-      <Text style={textStyle}>{children}</Text>
-    </View>
-  );
+  return <View style={containerStyle}>{content}</View>;
 }

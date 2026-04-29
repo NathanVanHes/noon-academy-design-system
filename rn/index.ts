@@ -40,6 +40,7 @@ export { Skeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
 
 // Navigation
+export { Calendar } from './Calendar';
 export { Tabs } from './Tabs';
 export { BottomNav } from './BottomNav';
 export { TitleBar } from './TitleBar';
@@ -55,7 +56,6 @@ export { Tooltip } from './Tooltip';
 
 // Progress
 export { SessionBar } from './SessionBar';
-export { RouteSteps } from './RouteSteps';
 export { LinearProgress, CircularProgress } from './Progress';
 
 // Patterns

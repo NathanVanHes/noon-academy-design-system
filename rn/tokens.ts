@@ -83,7 +83,7 @@ export const paperTheme = {
   accentSoft: 'rgba(25,110,82,0.10)',
   accentBorder: 'rgba(25,110,82,0.30)',
   accentGlow: 'rgba(25,110,82,0.12)',
-  signal: '#7a6014',
+  signal: color.gold[400],
   signalBright: '#9a7b18',
   signalSoft: 'rgba(122,96,20,0.10)',
   signalBorder: 'rgba(122,96,20,0.30)',

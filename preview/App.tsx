@@ -20,7 +20,7 @@ import {
   // Display
   CardsPage, CardGridPage, AvatarsPage, IdentityPage, BadgesPage, TablePage, SessionCardPage, VideoPage,
   // Progress
-  RouteStepsPage, SessionBarPage, ProgressPage,
+  SessionBarPage, ProgressPage,
   // Navigation
   TitleBarPage, TabsPage, BottomNavPage, BreadcrumbsPage, PaginationPage, SideNavPage,
   // Feedback
@@ -83,7 +83,6 @@ const NAV = [
   ]},
   { group: 'Progress', items: [
     { id: 'waypoints', label: 'Waypoints' },
-    { id: 'routesteps', label: 'Route Steps' },
     { id: 'watervessel', label: 'Water Vessel' },
     { id: 'sessionbar', label: 'Session Bar' },
     { id: 'progress', label: 'Linear & Circular' },
@@ -167,7 +166,6 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   tables:       { component: TablePage, desc: 'Columnar data display.' },
   sessioncard:  { component: SessionCardPage, desc: 'Scheduled session with live/soon/done states.' },
   video:        { component: VideoPage, desc: 'Thumbnail card for video content with play button and attribution.' },
-  routesteps:   { component: RouteStepsPage, desc: 'Diamond waypoints showing journey position.' },
   sessionbar:   { component: SessionBarPage, desc: 'Question-by-question results bar.' },
   progress:     { component: ProgressPage, desc: 'Linear and circular progress indicators.' },
   titlebar:     { component: TitleBarPage, desc: 'Screen header with back and actions.' },

@@ -8,12 +8,12 @@ import { View, Text, Pressable, Animated, Easing, Image, useWindowDimensions } f
 import Svg, { Path } from 'react-native-svg';
 import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
-  SessionCard, SessionBar, RouteSteps, QuizOption, Tooltip,
+  SessionCard, SessionBar, QuizOption, Tooltip,
   Input, Textarea, Switch, Checkbox, Radio, Stepper, Segmented,
   Tabs, BottomNav, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table,
   LinearProgress, CircularProgress, Toast, Dialog, BottomSheet, FullSheet, Interstitial,
   RadioGroup, CheckboxGroup,
-  GridPaper, Waypoints, WaterVessel, TerrainPattern, DunePattern, VoiceTutor,
+  GridPaper, Waypoints, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
   sp, fs, fw, font, color, r, h, icon, lh, dur,
@@ -188,7 +188,7 @@ export function OverviewPage() {
     </S>
     <S title="What's Included">
       <C label="30 Components">
-        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Button, Card, Chip, Avatar, Badge, Alert, Input, Switch, Checkbox, Radio, Stepper, Segmented, Tabs, BottomNav, TitleBar, FilterBar, SessionCard, SessionBar, RouteSteps, QuizOption, Dialog, BottomSheet, Toast, Tooltip, Progress, Skeleton, EmptyState, Table, Divider, Interstitial</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Button, Card, Chip, Avatar, Badge, Alert, Input, Switch, Checkbox, Radio, Stepper, Segmented, Tabs, BottomNav, TitleBar, Calendar, FilterBar, SessionCard, SessionBar, Waypoints, QuizOption, Dialog, BottomSheet, Toast, Tooltip, Progress, Skeleton, EmptyState, Table, Divider, Interstitial</Text>
       </C>
       <C label="Dependencies">
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>react-native-svg (circular progress only). No reanimated, no gesture handler. Pure RN 0.71+. Void and paper themes via ThemeProvider.</Text>
@@ -339,6 +339,7 @@ export function ColorsPage() {
         {([
           ['Concrete', color.chalk[300], 'chalk'],
           ['Light Oak', color.paper[200], 'paper surfaces'],
+          ['Glass Glazing', theme.bgOverlay, 'elevation + overlays'],
         ] as const).map(([material, c, token]) => (
           <View key={material} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
             <View style={{ width: sp[7], height: sp[7], borderRadius: r[2], backgroundColor: c, borderWidth: 1, borderColor: theme.border }} />
@@ -1051,76 +1052,105 @@ export function SegmentedPage() {
 export function ChipsPage() {
   const [variant, setVariant] = useState('default');
   const [dot, setDot] = useState(false);
-  const [interactive, setInteractive] = useState(false);
+  const [dismissable, setDismissable] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [label, setLabel] = useState('Label');
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Variant" value={variant} options={['default','accent','signal','danger','success']} onChange={setVariant} />
+        <KnobSelect label="Variant" value={variant} options={['default','accent']} onChange={setVariant} />
         <KnobToggle label="Dot" value={dot} onChange={setDot} />
-        <KnobToggle label="Interactive" value={interactive} onChange={setInteractive} />
+        <KnobToggle label="Dismissable" value={dismissable} onChange={setDismissable} />
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
+        <KnobText label="Label" value={label} onChange={setLabel} />
       </>}
     >
-      <Chip variant={variant as any} dot={dot} interactive={interactive} disabled={disabled} onPress={() => {}}>Label</Chip>
+      <Chip variant={variant as any} dot={dot} dismissable={dismissable} disabled={disabled} onPress={() => {}} onDismiss={() => {}}>{label}</Chip>
     </Playground>
 
     <Import>{"import { Chip } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="children" type="string" />
-      <Prop name="variant" type="'default' | 'accent' | 'signal' | 'danger' | 'ok'" def="'default'" />
-      <Prop name="interactive" type="boolean" />
+      <Prop name="variant" type="'default' | 'accent'" def="'default'" desc="default: neutral. accent: selected/active." />
+      <Prop name="dismissable" type="boolean" desc="Shows × to remove the chip" />
       <Prop name="dot" type="boolean" desc="Diamond dot before label" />
       <Prop name="disabled" type="boolean" />
-      <Prop name="onPress" type="() => void" />
+      <Prop name="onPress" type="() => void" desc="Tap the chip (e.g. toggle filter)" />
+      <Prop name="onDismiss" type="() => void" desc="Tap the × to dismiss" />
     </Props>
-    <S title="All Variants"><R>
-      <Chip>Default</Chip><Chip variant="accent">Accent</Chip><Chip variant="signal" dot>Signal</Chip><Chip variant="danger">Danger</Chip><Chip variant="success">Success</Chip>
+    <S title="Examples"><R>
+      <Chip>Default</Chip>
+      <Chip variant="accent">Active</Chip>
+      <Chip dot>With dot</Chip>
+      <Chip dismissable onDismiss={() => {}}>Dismissable</Chip>
+      <Chip variant="accent" dismissable onDismiss={() => {}}>Active + dismiss</Chip>
     </R></S>
   </>;
 }
 
 export function QuizPage() {
   const [state, setState] = useState('default');
+  const [hasImage, setHasImage] = useState(false);
+  const [optText, setOptText] = useState('There is hidden potential despite appearances');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="State" value={state} options={['default','selected','correct','incorrect','disabled']} onChange={setState} />
+        <KnobToggle label="Image" value={hasImage} onChange={setHasImage} />
+        <KnobText label="Text" value={optText} onChange={setOptText} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <QuizOption label="B" text="There is hidden potential despite appearances" state={state as any} />
+        <QuizOption label="B" text={optText || undefined} image={hasImage ? { uri: 'https://placehold.co/640x360/2a3450/2a3450' } : undefined} state={state as any} />
       </View>
     </Playground>
 
     <Import>{"import { QuizOption } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="label" type="string" desc="A, B, C, D" />
-      <Prop name="text" type="string" />
+      <Prop name="text" type="string" desc="Option text — wraps if long" />
+      <Prop name="image" type="ImageSourcePropType" desc="Option image — renders above text" />
       <Prop name="state" type="'default' | 'selected' | 'correct' | 'incorrect' | 'disabled'" def="'default'" />
       <Prop name="onPress" type="() => void" />
     </Props>
     <S title="All States">
       <C label="Default"><QuizOption label="A" text="The land is completely useless" /></C>
-      <C label="Selected (blue)"><QuizOption label="B" text="There is hidden potential" state="selected" /></C>
+      <C label="Selected"><QuizOption label="B" text="There is hidden potential" state="selected" /></C>
       <C label="Correct"><QuizOption label="B" text="There is hidden potential" state="correct" /></C>
       <C label="Incorrect"><QuizOption label="D" text="The landscape will change soon" state="incorrect" /></C>
+      <C label="Image only"><QuizOption label="C" image={{ uri: 'https://placehold.co/640x360/2a3450/2a3450' }} /></C>
+      <C label="Image + text"><QuizOption label="A" text="The door is described as ajar" image={{ uri: 'https://placehold.co/640x360/2a3450/2a3450' }} /></C>
     </S>
   </>;
 }
 
 export function FilterBarPage() {
-  const [items, setItems] = useState([{ label: 'All', active: true }, { label: 'Reading', active: false }, { label: 'Math', active: false }, { label: 'Verbal', active: false }]);
+  const [count, setCount] = useState('4');
+  const allLabels = ['All', 'Reading', 'Math', 'Verbal', 'Writing', 'Science'];
+  const [items, setItems] = useState(allLabels.slice(0, 4).map((l, i) => ({ label: l, active: i === 0 })));
+  const updateCount = (c: string) => {
+    setCount(c);
+    setItems(allLabels.slice(0, parseInt(c)).map((l, i) => ({ label: l, active: i === 0 })));
+  };
   return <>
+    <Playground
+      knobs={<>
+        <KnobSelect label="Items" value={count} options={['2','3','4','5','6']} onChange={updateCount} />
+      </>}
+    >
+      <View style={{ width: '100%' }}>
+        <FilterBar items={items} onToggle={(i) => setItems(items.map((f, idx) => ({ ...f, active: idx === i })))} />
+      </View>
+    </Playground>
+
     <Import>{"import { FilterBar } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="items" type="{ label: string; active: boolean }[]" />
-      <Prop name="onToggle" type="(index: number) => void" />
+      <Prop name="onToggle" type="(index: number) => void" desc="Tap a pill to activate it. You control the logic — single or multi select." />
     </Props>
-    <S title="Single select"><FilterBar items={items} onToggle={(i) => setItems(items.map((f, idx) => ({ ...f, active: idx === i })))} /></S>
     <S title="Rules">
       <Rl>Horizontal scrolling pill row. First item is usually "All".</Rl>
-      <Rl>Single select: toggling one deactivates others. Multi-select: each pill toggles independently.</Rl>
+      <Rl>Engineer controls selection logic in onToggle — single select (deactivate others) or multi select (toggle independently).</Rl>
       <Rl>Use above content lists to narrow results. Not for navigation — use Tabs for that.</Rl>
     </S>
   </>;
@@ -1238,14 +1268,16 @@ export function TablePage() {
 
 export function SessionCardPage() {
   const [state, setState] = useState('upcoming');
+  const [assessment, setAssessment] = useState(false);
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="State" value={state} options={['live','soon','upcoming','done','cancelled']} onChange={setState} />
+        <KnobToggle label="Assessment" value={assessment} onChange={setAssessment} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <SessionCard time="10:00" title="Inference & implied meaning" meta="Qudrat Reading — Mr. Hassan" state={state as any} statusText={state === 'upcoming' ? '45 min' : undefined} />
+        <SessionCard time="10:00" title="Inference & implied meaning" meta="Qudrat Reading — Mr. Hassan" state={state as any} assessment={assessment} statusText={state === 'upcoming' ? '45 min' : undefined} />
       </View>
     </Playground>
 
@@ -1256,12 +1288,14 @@ export function SessionCardPage() {
       <Prop name="meta" type="string" />
       <Prop name="state" type="'live' | 'soon' | 'upcoming' | 'done' | 'cancelled'" />
       <Prop name="statusText" type="string" />
+      <Prop name="assessment" type="boolean" desc="Gold left border — signals assessment/exam" />
     </Props>
     <S title="All States">
       <C label="Live"><SessionCard time="8:30" title="Storytelling" meta="Digital Media — Ms. Al-Harbi" state="live" /></C>
       <C label="Soon"><SessionCard time="10:00" title="Inference & implied meaning" meta="Qudrat Reading — Mr. Hassan" state="soon" /></C>
       <C label="Upcoming"><SessionCard time="11:30" title="Quantitative reasoning" meta="Qudrat Math — Ms. Noor" state="upcoming" statusText="3:00" /></C>
       <C label="Ended"><SessionCard time="7:00" title="Reading comprehension" meta="Qudrat Reading — Mr. Hassan" state="done" /></C>
+      <C label="Assessment"><SessionCard time="9:00" title="Qudrat Mock Exam" meta="Full practice — 120 min" state="upcoming" assessment statusText="2:00" /></C>
     </S>
   </>;
 }
@@ -1270,19 +1304,6 @@ export function SessionCardPage() {
 // PROGRESS
 // ═══════════════════════════════════════════════
 
-export function RouteStepsPage() {
-  return <>
-    <Import>{"import { RouteSteps } from '@noon/design-system';"}</Import>
-    <Props>
-      <Prop name="steps" type="('done' | 'current' | 'incomplete')[]" />
-    </Props>
-    <S title="States">
-      <C label="In progress (3/5)"><RouteSteps steps={['done','done','current','incomplete','incomplete']} /></C>
-      <C label="Complete"><RouteSteps steps={['done','done','done','done','done']} /></C>
-      <C label="Just started (1/7)"><RouteSteps steps={['current','incomplete','incomplete','incomplete','incomplete','incomplete','incomplete']} /></C>
-    </S>
-  </>;
-}
 
 export function SessionBarPage() {
   return <>
@@ -1685,63 +1706,85 @@ export function GridPaperPage() {
 }
 
 export function WaypointsPage() {
+  const { theme } = useTheme();
   const [layout, setLayout] = useState('horizontal');
-  const [progress, setProgress] = useState('3');
-  const total = 5;
-  const pos = Math.max(0, Math.min(total - 1, parseInt(progress) || 0));
+  const [position, setPosition] = useState(3);
+  const [showLabels, setShowLabels] = useState(false);
+  const [total, setTotal] = useState(5);
+  const pos = Math.max(0, Math.min(total - 1, position - 1));
   const steps = Array.from({ length: total }, (_, i) => {
-    if (i < pos) return 'passed';
+    if (i < pos) return 'done';
     if (i === pos && pos === total - 1) return 'arrived';
     if (i === pos) return 'current';
     return 'incomplete';
   }) as any;
+  const allLabels = ['Start', 'Vocab', 'Inference', 'Analogy', 'Reading', 'Quant', 'Grammar', 'Comprehension', 'Review', 'Arrival'];
+  const labelList = allLabels.slice(0, total);
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="Layout" value={layout} options={['horizontal', 'vertical', 'path']} onChange={setLayout} />
-        <KnobSelect label="Position" value={progress} options={['0','1','2','3','4']} onChange={setProgress} />
+        <View style={{ marginBottom: sp[4] }}>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>Steps</Text>
+          <Stepper value={total} min={2} max={10} onChange={(v) => { setTotal(v); setPosition(Math.min(position, v)); }} />
+        </View>
+        <View style={{ marginBottom: sp[4] }}>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>Position</Text>
+          <Stepper value={position} min={1} max={total} onChange={setPosition} />
+        </View>
+        <KnobToggle label="Labels" value={showLabels} onChange={setShowLabels} />
       </>}
     >
-      <Waypoints layout={layout as any} steps={steps} labels={['Start', 'Vocab', 'Inference', 'Analogy', 'Arrival']} />
+      <View style={{ width: '100%', alignItems: layout === 'vertical' ? 'center' : undefined }}>
+        <Waypoints layout={layout as any} steps={steps} labels={showLabels ? labelList : undefined} />
+      </View>
     </Playground>
 
     <Import>{"import { Waypoints } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="steps" type="('passed' | 'current' | 'arrived' | 'incomplete')[]" />
-      <Prop name="labels" type="string[]" />
+      <Prop name="steps" type="('done' | 'current' | 'arrived' | 'incomplete')[]" />
+      <Prop name="labels" type="string[]" desc="Up to 5 shown under each step. 6+ shows current step name." />
       <Prop name="layout" type="'horizontal' | 'vertical' | 'path'" def="'horizontal'" />
     </Props>
-    <S title="Horizontal — in progress">
-      <Waypoints steps={['passed', 'passed', 'current', 'incomplete', 'incomplete']} />
+
+    <S title="Marker Types" desc="Each state has a distinct visual treatment.">
+      <View style={{ gap: sp[4] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <Waypoints steps={['done']} />
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Done — muted gold fill, center dot showing background</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <Waypoints steps={['current']} />
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Current — bright gold, crosshair spikes extending from each point</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <Waypoints steps={['arrived']} />
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Arrived — green fill, crosshairs, triangle inside. Final waypoint only.</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <Waypoints steps={['incomplete']} />
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Incomplete — outline only, faint. Not yet reached.</Text>
+        </View>
+      </View>
     </S>
-    <S title="Horizontal — arrived">
-      <Waypoints steps={['passed', 'passed', 'passed', 'passed', 'arrived']} />
+
+    <S title="Lines">
+      <Rl>Completed segments: solid gold line (gold-500), 1px.</Rl>
+      <Rl>Incomplete segments: faint gold line (signalBorder), 0.5px.</Rl>
+      <Rl>Small gap between line and diamond on each side.</Rl>
     </S>
-    <S title="With labels">
-      <Waypoints steps={['passed', 'passed', 'current', 'incomplete', 'incomplete']} labels={['Start', 'Vocab', 'Inference', 'Analogy', 'Arrival']} />
+
+    <S title="Labels">
+      <Rl>5 or fewer steps: label shown directly below each waypoint.</Rl>
+      <Rl>6+ steps: "Step X of N · Label" shown below the row.</Rl>
+      <Rl>Vertical and path: labels beside each waypoint.</Rl>
     </S>
-    <S title="Vertical layout" desc="Used when showing the route as a journey through terrain. Hero sections, atlas screens, progress headers.">
-      <Waypoints layout="vertical" steps={['passed', 'passed', 'current', 'incomplete', 'incomplete', 'incomplete', 'incomplete']} labels={['Start', 'Vocab', 'Inference', 'Analogy', 'Reading', 'Quant', 'Arrival']} />
-    </S>
-    <S title="Marker Types">
-      <Rl>Start / passed: dim gold (gold-500) diamond with void center dot</Rl>
-      <Rl>Current position: bright gold (gold-400) diamond with crosshair radials extending 3-4px beyond each edge</Rl>
-      <Rl>Arrived: brand green (noon-400) diamond with triangle inside + crosshairs. Only when student reaches final waypoint</Rl>
-      <Rl>Incomplete: faint outline diamond at 55% opacity. Not yet reached</Rl>
-    </S>
-    <S title="Route Lines">
-      <Rl>Completed: stroke-width 2px, gold-400, opacity 0.85</Rl>
-      <Rl>Remaining: stroke-width 1px, gold-400, opacity 0.4, dashed (4 3)</Rl>
-      <Rl>Lines stop before waypoints, resume after. Never drawn through markers.</Rl>
-    </S>
-    <S title="Crosshairs">
-      <Rl>0.75px radials in N/S/E/W, same color as the diamond</Rl>
-      <Rl>Only on current position and arrived. Never on start, passed, or incomplete markers.</Rl>
-    </S>
+
     <S title="Rules">
       <Rl>Waypoints are always diamonds, never circles.</Rl>
-      <Rl>Gold is the route color. Green only appears on arrival.</Rl>
-      <Rl>This is the canonical reference. Terrain patterns and data vis must match these exact specs.</Rl>
+      <Rl>Gold is the route colour. Green only appears on arrival.</Rl>
+      <Rl>Same diamond shape and size used on Calendar event indicators.</Rl>
+      <Rl>Maximum 10 steps recommended.</Rl>
     </S>
   </>;
 }
@@ -1934,37 +1977,80 @@ export function VoiceTutorPage() {
 
 export function MenuPage() {
   const [vis, setVis] = useState(false);
+  const [count, setCount] = useState('3');
+  const [hasDanger, setHasDanger] = useState(true);
+  const baseItems = ['Edit', 'Duplicate', 'Share', 'Archive'];
+  const items = baseItems.slice(0, parseInt(count) - (hasDanger ? 1 : 0));
+  const menuItems = [
+    ...items.map(l => ({ label: l, onPress: () => setVis(false) })),
+    ...(hasDanger ? [{ label: 'Delete', danger: true, onPress: () => setVis(false) }] : []),
+  ];
   return <>
+    <Playground
+      knobs={<>
+        <KnobSelect label="Items" value={count} options={['2','3','4','5']} onChange={setCount} />
+        <KnobToggle label="Danger item" value={hasDanger} onChange={setHasDanger} />
+      </>}
+    >
+      <Button variant="secondary" onPress={() => setVis(true)}>Open menu</Button>
+    </Playground>
+
     <Import>{"import { Menu } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="visible" type="boolean" />
       <Prop name="onClose" type="() => void" />
-      <Prop name="items" type="{ label: string; icon?: ReactNode; danger?: boolean; onPress: () => void }[]" />
+      <Prop name="items" type="{ label: string; danger?: boolean; onPress: () => void }[]" />
     </Props>
-    <S title="Trigger">
-      <Button variant="secondary" onPress={() => setVis(true)}>Open menu</Button>
-    </S>
-    <Menu visible={vis} onClose={() => setVis(false)} items={[
-      { label: 'Edit', onPress: () => {} },
-      { label: 'Duplicate', onPress: () => {} },
-      { label: 'Delete', danger: true, onPress: () => {} },
-    ]} />
+    <Menu visible={vis} onClose={() => setVis(false)} items={menuItems} />
     <S title="Rules">
       <Rl>Triggered by IconButton or long-press. Positioned near trigger.</Rl>
-      <Rl>Destructive items use danger color.</Rl>
+      <Rl>Destructive items use danger colour.</Rl>
       <Rl>Dismisses on backdrop tap or item selection.</Rl>
     </S>
   </>;
 }
 
 export function CalendarPage() {
+  const [expanded, setExpanded] = useState(false);
+  const [showEvents, setShowEvents] = useState(true);
+  const today = new Date();
+  const sampleEvents = showEvents ? {
+    [`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`]: { count: 3 },
+    [`${today.getFullYear()}-${today.getMonth()}-${today.getDate() + 2}`]: { count: 1, assessment: true },
+    [`${today.getFullYear()}-${today.getMonth()}-5`]: { count: 1 },
+    [`${today.getFullYear()}-${today.getMonth()}-10`]: { count: 1 },
+    [`${today.getFullYear()}-${today.getMonth()}-15`]: { count: 2 },
+  } : {};
   return <>
-    <S title="Calendar" desc="No component provided — build custom or use @react-native-community/datetimepicker. Follow these specs for consistency.">
-      <Rl>Day cell: sp[8] × sp[8], pill radius for selected state.</Rl>
-      <Rl>Weekday labels: fs[10], mono, uppercase with caps tracking.</Rl>
-      <Rl>Month header: serif fs[18], fw[500].</Rl>
-      <Rl>Selected day: accent bg, accentFg text. Today: accentSoft bg.</Rl>
-      <Rl>Disabled days: fgFaint color, no onPress.</Rl>
+    <Playground
+      knobs={<>
+        <KnobToggle label="Expanded" value={expanded} onChange={setExpanded} />
+        <KnobToggle label="Event dots" value={showEvents} onChange={setShowEvents} />
+      </>}
+    >
+      <View style={{ width: '100%' }}>
+        <Calendar expanded={expanded} onToggle={() => setExpanded(!expanded)} events={sampleEvents} />
+      </View>
+    </Playground>
+
+    <Import>{"import { Calendar } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="selected" type="Date" desc="Currently selected date" />
+      <Prop name="onSelect" type="(date: Date) => void" />
+      <Prop name="events" type="Record<string, { count?; assessment? }>" desc="Keyed by 'year-month-day'. assessment: true gives gold treatment." />
+      <Prop name="expanded" type="boolean" desc="Full month view. Default: week strip." />
+      <Prop name="onToggle" type="() => void" desc="Tap or drag handle to expand/collapse" />
+      <Prop name="backIcon" type="ReactNode" desc="Back arrow — same as TitleBar" />
+      <Prop name="onBack" type="() => void" desc="Back navigation — same as TitleBar" />
+      <Prop name="rightAction" type="ReactNode" desc="Right-side content — same as TitleBar" />
+    </Props>
+    <S title="Rules">
+      <Rl>Week strip by default. Drag handle expands to full month.</Rl>
+      <Rl>Selected day: accent bg, pill radius, accentFg text.</Rl>
+      <Rl>Today: accentSoft bg when not selected.</Rl>
+      <Rl>Event dots: up to 3 dots below the day number. Accent colour.</Rl>
+      <Rl>Outside days (prev/next month) shown faint.</Rl>
+      <Rl>Arrows navigate weeks (collapsed) or months (expanded).</Rl>
     </S>
   </>;
 }

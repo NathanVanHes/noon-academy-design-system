@@ -2,7 +2,7 @@
  * Stepper — numeric increment/decrement control.
  */
 import React from 'react';
-import { View, Pressable, Text, type ViewStyle, type TextStyle } from 'react-native';
+import { View, Pressable, Text, Platform, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, h } from './tokens';
 
@@ -46,7 +46,8 @@ export function Stepper({ value, min = 0, max = 100, step = 1, onChange, disable
     color: theme.fg,
     minWidth: h.md,
     textAlign: 'center',
-  };
+    ...(Platform.OS === 'web' ? { userSelect: 'none' } : {}),
+  } as TextStyle;
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
