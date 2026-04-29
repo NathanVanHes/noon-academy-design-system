@@ -72,7 +72,7 @@ export function SessionCard({ time, title, meta, state = 'upcoming', statusText,
   function renderStatus() {
     if (state === 'live') return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], height: 28, paddingHorizontal: sp[3], borderRadius: r[1], backgroundColor: theme.signalSoft, borderWidth: 1, borderColor: theme.signalBorder }}>
-        <View style={{ width: icon.xs, height: icon.xs, backgroundColor: theme.signalBright, transform: [{ rotate: '45deg' }] }} />
+        <View style={{ width: icon.xs, height: icon.xs, borderRadius: icon.xs / 2, backgroundColor: theme.signalBright }} />
         <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.signalBright }}>Live</Text>
       </View>
     );

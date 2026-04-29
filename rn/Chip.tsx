@@ -50,8 +50,8 @@ export function Chip({ children, variant = 'default', dismissable, dot, disabled
   const dotStyle: ViewStyle = {
     width: icon.xs,
     height: icon.xs,
+    borderRadius: icon.xs / 2,
     backgroundColor: textColor,
-    transform: [{ rotate: '45deg' }],
   };
 
   const content = (

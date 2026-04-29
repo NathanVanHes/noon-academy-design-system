@@ -1718,8 +1718,8 @@ export function WaypointsPage() {
     if (i === pos) return 'current';
     return 'incomplete';
   }) as any;
-  const allLabels = ['Start', 'Vocab', 'Inference', 'Analogy', 'Reading', 'Quant', 'Grammar', 'Comprehension', 'Review', 'Arrival'];
-  const labelList = allLabels.slice(0, total);
+  const midLabels = ['Vocab', 'Inference', 'Analogy', 'Reading', 'Quant', 'Grammar', 'Comprehension', 'Review'];
+  const labelList = ['Start', ...midLabels.slice(0, total - 2), 'Arrival'];
   return <>
     <Playground
       knobs={<>
@@ -1748,24 +1748,10 @@ export function WaypointsPage() {
     </Props>
 
     <S title="Marker Types" desc="Each state has a distinct visual treatment.">
-      <View style={{ gap: sp[4] }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
-          <Waypoints steps={['done']} />
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Done — muted gold fill, center dot showing background</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
-          <Waypoints steps={['current']} />
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Current — bright gold, crosshair spikes extending from each point</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
-          <Waypoints steps={['arrived']} />
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Arrived — green fill, crosshairs, triangle inside. Final waypoint only.</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
-          <Waypoints steps={['incomplete']} />
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Incomplete — outline only, faint. Not yet reached.</Text>
-        </View>
-      </View>
+      <Rl>Done — muted gold (gold-500) diamond with center dot. Past steps.</Rl>
+      <Rl>Current — bright gold diamond with crosshair spikes and center dot. Your position.</Rl>
+      <Rl>Arrived — green diamond with crosshairs and triangle. Auto-applied to the final step when complete.</Rl>
+      <Rl>Incomplete — faint outline diamond. Steps ahead.</Rl>
     </S>
 
     <S title="Lines">

@@ -168,7 +168,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
             fontWeight: selected || today || isAssessment ? fw[600] : fw[400],
             color: dayFg,
           }}>{day.d}</Text>
-          {/* Event diamond — inside circle, top right. icon.sm matching RouteSteps. */}
+          {/* Event diamond — inside circle, top right. Same shape/size as Waypoints. */}
           {evtCount > 0 && (
             <View style={{
               position: 'absolute', top: 1, right: 1,
