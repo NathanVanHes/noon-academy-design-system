@@ -8,12 +8,12 @@ import { View, Text, Pressable, Animated, Easing, Image, useWindowDimensions } f
 import Svg, { Path } from 'react-native-svg';
 import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
-  SessionCard, SessionBar, QuizOption, Tooltip,
+  SessionCard, HomeworkCard, SessionBar, QuizOption, Tooltip,
   Input, Textarea, Switch, Checkbox, Radio, Stepper, Segmented,
   Tabs, BottomNav, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table,
   LinearProgress, CircularProgress, Toast, Dialog, BottomSheet, FullSheet, Interstitial,
   RadioGroup, CheckboxGroup,
-  GridPaper, Waypoints, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
+  GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
   sp, fs, fw, font, color, r, h, icon, lh, dur,
@@ -607,9 +607,9 @@ export function MotionPage() {
 
     <S title="Durations">
       <View style={{ flexDirection: 'row', gap: sp[3], marginBottom: sp[4] }}>
-        {[{ ms: 120, label: 'FAST', desc: 'Toggles, focus, color' }, { ms: 200, label: 'NORMAL', desc: 'Tabs, chips, expand' }, { ms: 320, label: 'SLOW', desc: 'Sheets, modals, pages' }, { ms: 600, label: 'DRAMATIC', desc: 'Confetti, counters' }].map(d => (
+        {[{ ms: 120, label: 'FAST', desc: 'Toggles, focus, color' }, { ms: 200, label: 'NORMAL', desc: 'Tabs, chips, expand' }, { ms: 320, label: 'SLOW', desc: 'Sheets, modals, pages' }, { ms: 600, label: 'DRAMATIC', desc: 'Confetti, counters' }, { ms: 1500, label: 'AMBIENT', desc: 'Ping, pulse, presence' }].map(d => (
           <View key={d.ms} style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontFamily: font.mono, fontSize: fs[22], fontWeight: fw[600], color: theme.fg }}>{d.ms === 600 ? '600+' : d.ms}</Text>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[22], fontWeight: fw[600], color: theme.fg }}>{d.ms >= 600 ? d.ms + '+' : d.ms}</Text>
             <Text style={{ fontFamily: font.mono, fontSize: fs[9], fontWeight: fw[600], letterSpacing: 2, color: theme.fgFaint, marginTop: sp[1] }}>{d.label}</Text>
             <Text style={{ fontFamily: font.sans, fontSize: fs[10], color: theme.fgFaint, marginTop: sp[1], textAlign: 'center' }}>{d.desc}</Text>
           </View>
@@ -644,6 +644,9 @@ export function MotionPage() {
       </MotionDemo>
       <MotionDemo label="Mastery star" spec="Spring · 600ms" desc="Overshoot bounce, then settle">
         {(anim) => <Animated.View style={{ transform: [{ scale: anim.interpolate({ inputRange: [0, 0.6, 1], outputRange: [0, 1.3, 1] }) }, { rotate: anim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '72deg'] }) }], opacity: anim }}><Text style={{ fontSize: 32, color: color.gold[300] }}>{'★'}</Text></Animated.View>}
+      </MotionDemo>
+      <MotionDemo label="Waypoint ping" spec="Ease-Out · 1500ms + 1s pause" desc="Diamond expands and fades — signals current position">
+        {() => <WaypointMarker state="current" />}
       </MotionDemo>
     </S>
 
@@ -711,8 +714,11 @@ export function ButtonsPage() {
   const [disabled, setDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fullWidth, setFullWidth] = useState(false);
+  const [hasLeading, setHasLeading] = useState(false);
+  const [hasTrailing, setHasTrailing] = useState(false);
   const [label, setLabel] = useState('Label');
 
+  const demoIcon = <Text style={{ fontSize: fs[14], color: variant === 'primary' ? theme.accentFg : theme.fg }}>→</Text>;
   const V: Array<'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'> = ['primary','secondary','ghost','danger','danger-solid','signal'];
   return <>
     <Playground
@@ -722,11 +728,13 @@ export function ButtonsPage() {
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
         <KnobToggle label="Loading" value={loading} onChange={setLoading} />
         <KnobToggle label="Full Width" value={fullWidth} onChange={setFullWidth} />
+        <KnobToggle label="Leading Icon" value={hasLeading} onChange={setHasLeading} />
+        <KnobToggle label="Trailing Icon" value={hasTrailing} onChange={setHasTrailing} />
         <KnobText label="Label" value={label} onChange={setLabel} />
       </>}
     >
       <View style={fullWidth ? { width: '100%' } : {}}>
-        <Button variant={variant as any} size={size as any} disabled={disabled} loading={loading} fullWidth={fullWidth}>{label}</Button>
+        <Button variant={variant as any} size={size as any} disabled={disabled} loading={loading} fullWidth={fullWidth} leadingIcon={hasLeading ? demoIcon : undefined} trailingIcon={hasTrailing ? demoIcon : undefined}>{label}</Button>
       </View>
     </Playground>
 
@@ -738,7 +746,8 @@ export function ButtonsPage() {
       <Prop name="disabled" type="boolean" desc="Grey bg + grey text" />
       <Prop name="loading" type="boolean" desc="Spinner, hides text" />
       <Prop name="fullWidth" type="boolean" desc="Stretches to fill container" />
-      <Prop name="icon" type="ReactNode" desc="Renders before text" />
+      <Prop name="leadingIcon" type="ReactNode" desc="Icon before text" />
+      <Prop name="trailingIcon" type="ReactNode" desc="Icon after text" />
       <Prop name="onPress" type="() => void" />
     </Props>
     <S title="All Variants"><R>{V.map(v => <Button key={v} variant={v}>{v}</Button>)}</R></S>
@@ -1301,6 +1310,40 @@ export function SessionCardPage() {
 }
 
 // ═══════════════════════════════════════════════
+export function HomeworkCardPage() {
+  const [status, setStatus] = useState('pending');
+  return <>
+    <Playground
+      knobs={<>
+        <KnobSelect label="Status" value={status} options={['pending', 'in-progress', 'submitted', 'overdue', 'graded']} onChange={setStatus} />
+      </>}
+    >
+      <View style={{ width: '100%' }}>
+        <HomeworkCard title="Chapter 5 exercises" subject="Qudrat Math" dueDate="May 1" questions={8} status={status as any} score={status === 'graded' ? '7/8' : undefined} />
+      </View>
+    </Playground>
+
+    <Import>{"import { HomeworkCard } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="title" type="string" />
+      <Prop name="subject" type="string" />
+      <Prop name="dueDate" type="string" />
+      <Prop name="questions" type="number" />
+      <Prop name="status" type="'pending' | 'in-progress' | 'submitted' | 'overdue' | 'graded'" def="'pending'" />
+      <Prop name="score" type="string" desc="Shown when graded, e.g. '7/8'" />
+      <Prop name="onPress" type="() => void" />
+    </Props>
+    <S title="All States">
+      <HomeworkCard title="Vocab practice" subject="Qudrat Reading" dueDate="Apr 28" questions={12} status="pending" />
+      <HomeworkCard title="Inference worksheet" subject="Qudrat Reading" dueDate="Apr 27" questions={6} status="in-progress" />
+      <HomeworkCard title="Trig exercises" subject="Qudrat Math" dueDate="Apr 25" questions={10} status="submitted" />
+      <HomeworkCard title="Grammar review" subject="Qudrat Verbal" dueDate="Apr 24" questions={15} status="overdue" />
+      <HomeworkCard title="Reading comprehension" subject="Qudrat Reading" dueDate="Apr 20" questions={8} status="graded" score="6/8" />
+    </S>
+  </>;
+}
+
+// ═══════════════════════════════════════════════
 // PROGRESS
 // ═══════════════════════════════════════════════
 
@@ -1707,6 +1750,8 @@ export function GridPaperPage() {
 
 export function WaypointsPage() {
   const { theme } = useTheme();
+  const [useCase, setUseCase] = useState('journey');
+  const [eventComponent, setEventComponent] = useState('calendar');
   const [layout, setLayout] = useState('horizontal');
   const [position, setPosition] = useState(3);
   const [showLabels, setShowLabels] = useState(false);
@@ -1720,24 +1765,47 @@ export function WaypointsPage() {
   }) as any;
   const midLabels = ['Vocab', 'Inference', 'Analogy', 'Reading', 'Quant', 'Grammar', 'Comprehension', 'Review'];
   const labelList = ['Start', ...midLabels.slice(0, total - 2), 'Arrival'];
+
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Layout" value={layout} options={['horizontal', 'vertical', 'path']} onChange={setLayout} />
-        <View style={{ marginBottom: sp[4] }}>
-          <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>Steps</Text>
-          <Stepper value={total} min={2} max={10} onChange={(v) => { setTotal(v); setPosition(Math.min(position, v)); }} />
-        </View>
-        <View style={{ marginBottom: sp[4] }}>
-          <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>Position</Text>
-          <Stepper value={position} min={1} max={total} onChange={setPosition} />
-        </View>
-        <KnobToggle label="Labels" value={showLabels} onChange={setShowLabels} />
+        <KnobSelect label="Use" value={useCase} options={['journey', 'events']} onChange={setUseCase} />
+        {useCase === 'journey' && <>
+          <KnobSelect label="Layout" value={layout} options={['horizontal', 'vertical', 'path']} onChange={setLayout} />
+          <View style={{ marginBottom: sp[4] }}>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>Steps</Text>
+            <Stepper value={total} min={2} max={10} onChange={(v) => { setTotal(v); setPosition(Math.min(position, v)); }} />
+          </View>
+          <View style={{ marginBottom: sp[4] }}>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>Position</Text>
+            <Stepper value={position} min={1} max={total} onChange={setPosition} />
+          </View>
+          <KnobToggle label="Labels" value={showLabels} onChange={setShowLabels} />
+        </>}
+        {useCase === 'events' && <KnobSelect label="Component" value={eventComponent} options={['calendar', 'session card']} onChange={setEventComponent} />}
       </>}
     >
-      <View style={{ width: '100%', alignItems: layout === 'vertical' ? 'center' : undefined }}>
-        <Waypoints layout={layout as any} steps={steps} labels={showLabels ? labelList : undefined} />
-      </View>
+      {useCase === 'journey' ? (
+        <View style={{ width: '100%', alignItems: layout === 'vertical' ? 'center' : undefined }}>
+          <Waypoints layout={layout as any} steps={steps} labels={showLabels ? labelList : undefined} />
+        </View>
+      ) : eventComponent === 'calendar' ? (() => {
+        const t = new Date();
+        const dow = t.getDay();
+        const mon = new Date(t.getFullYear(), t.getMonth(), t.getDate() - (dow === 0 ? 6 : dow - 1));
+        return (
+          <View style={{ width: '100%' }}>
+            <Calendar events={{
+              [`${mon.getFullYear()}-${mon.getMonth()}-${mon.getDate()}`]: { count: 1, assessment: true },
+              [`${t.getFullYear()}-${t.getMonth()}-${t.getDate()}`]: { count: 2 },
+            }} />
+          </View>
+        );
+      })() : (
+        <View style={{ width: '100%' }}>
+          <SessionCard time="9:00" title="Qudrat Mock Exam" meta="Full practice — 120 min" state="upcoming" assessment statusText="2:00" />
+        </View>
+      )}
     </Playground>
 
     <Import>{"import { Waypoints } from '@noon/design-system';"}</Import>
@@ -1747,29 +1815,42 @@ export function WaypointsPage() {
       <Prop name="layout" type="'horizontal' | 'vertical' | 'path'" def="'horizontal'" />
     </Props>
 
-    <S title="Marker Types" desc="Each state has a distinct visual treatment.">
-      <Rl>Done — muted gold (gold-500) diamond with center dot. Past steps.</Rl>
-      <Rl>Current — bright gold diamond with crosshair spikes and center dot. Your position.</Rl>
-      <Rl>Arrived — green diamond with crosshairs and triangle. Auto-applied to the final step when complete.</Rl>
-      <Rl>Incomplete — faint outline diamond. Steps ahead.</Rl>
+    <S title="Marker Types" desc="Each state has a distinct visual treatment. Uses the actual WaypointMarker component.">
+      <View style={{ gap: sp[4] }}>
+        {([
+          ['done', 'Done', 'Muted gold, center dot. Past steps.'],
+          ['current', 'Current', 'Bright gold, solid fill. Your position.'],
+          ['arrived', 'Arrived', 'Green, triangle inside. Auto-applied to final step.'],
+          ['incomplete', 'Incomplete', 'Faint outline. Steps ahead.'],
+        ] as const).map(([state, name, desc]) => (
+          <View key={state} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+            <WaypointMarker state={state} />
+            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}><Text style={{ color: theme.fg }}>{name}</Text> — {desc}</Text>
+          </View>
+        ))}
+      </View>
     </S>
 
-    <S title="Lines">
-      <Rl>Completed segments: solid gold line (gold-500), 1px.</Rl>
-      <Rl>Incomplete segments: faint gold line (signalBorder), 0.5px.</Rl>
-      <Rl>Small gap between line and diamond on each side.</Rl>
-    </S>
-
-    <S title="Labels">
-      <Rl>5 or fewer steps: label shown directly below each waypoint.</Rl>
-      <Rl>6+ steps: "Step X of N · Label" shown below the row.</Rl>
-      <Rl>Vertical and path: labels beside each waypoint.</Rl>
+    <S title="Event Indicators" desc="The diamond shape signals important events across the system.">
+      <View style={{ gap: sp[4] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <View style={{ width: icon.sm, height: icon.sm, backgroundColor: theme.signal, transform: [{ rotate: '45deg' }] }} />
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, flex: 1 }}><Text style={{ color: theme.fg }}>Calendar</Text> — gold diamond inside the date circle for assessment days</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <View style={{ width: icon.sm, height: icon.sm, backgroundColor: theme.signal, transform: [{ rotate: '45deg' }] }} />
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, flex: 1 }}><Text style={{ color: theme.fg }}>Session Card</Text> — replaces the status dot + gold left border for assessments</Text>
+        </View>
+      </View>
+      <View style={{ marginTop: sp[4] }}>
+        <Rl>Switch to "events" in the playground above to see both in action.</Rl>
+      </View>
     </S>
 
     <S title="Rules">
-      <Rl>Waypoints are always diamonds, never circles.</Rl>
+      <Rl>Diamonds are reserved for journey and important events. Never decoration.</Rl>
+      <Rl>Circles are used for status indicators (chips, live dots).</Rl>
       <Rl>Gold is the route colour. Green only appears on arrival.</Rl>
-      <Rl>Same diamond shape and size used on Calendar event indicators.</Rl>
       <Rl>Maximum 10 steps recommended.</Rl>
     </S>
   </>;
@@ -2000,10 +2081,11 @@ export function CalendarPage() {
   const [expanded, setExpanded] = useState(false);
   const [showEvents, setShowEvents] = useState(true);
   const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   const sampleEvents = showEvents ? {
+    [`${monday.getFullYear()}-${monday.getMonth()}-${monday.getDate()}`]: { count: 1, assessment: true },
     [`${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`]: { count: 3 },
-    [`${today.getFullYear()}-${today.getMonth()}-${today.getDate() + 2}`]: { count: 1, assessment: true },
-    [`${today.getFullYear()}-${today.getMonth()}-5`]: { count: 1 },
     [`${today.getFullYear()}-${today.getMonth()}-10`]: { count: 1 },
     [`${today.getFullYear()}-${today.getMonth()}-15`]: { count: 2 },
   } : {};

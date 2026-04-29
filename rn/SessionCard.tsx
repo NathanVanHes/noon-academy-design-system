@@ -6,6 +6,7 @@ import React from 'react';
 import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, r, icon } from './tokens';
+import { WaypointMarker } from './Waypoints';
 
 type State = 'upcoming' | 'soon' | 'live' | 'done' | 'cancelled';
 
@@ -38,7 +39,6 @@ export function SessionCard({ time, title, meta, state = 'upcoming', statusText,
     paddingHorizontal: sp[5],
     borderBottomWidth: 1,
     borderBottomColor: theme.divider,
-    ...(assessment ? { borderLeftWidth: 3, borderLeftColor: theme.signal, paddingLeft: sp[5] - 3 } : {}),
   };
 
   const timeStyle: TextStyle = {
@@ -48,12 +48,20 @@ export function SessionCard({ time, title, meta, state = 'upcoming', statusText,
     minWidth: 40,
   };
 
-  const indicatorStyle: ViewStyle = {
-    width: sp[1],
-    height: sp[1],
-    borderRadius: r.pill,
-    backgroundColor: indicatorColor[state],
-  };
+  const isDoneAssessment = assessment && (state === 'done' || state === 'cancelled');
+
+  function renderIndicator() {
+    if (assessment) {
+      return <WaypointMarker state={isDoneAssessment ? 'done' : 'current'} />;
+    }
+    return (
+      <View style={{
+        width: sp[1], height: sp[1],
+        borderRadius: r.pill,
+        backgroundColor: indicatorColor[state],
+      }} />
+    );
+  }
 
   const titleStyle: TextStyle = {
     fontFamily: font.sans,
@@ -85,7 +93,7 @@ export function SessionCard({ time, title, meta, state = 'upcoming', statusText,
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}>
       <Text style={timeStyle}>{time}</Text>
-      <View style={indicatorStyle} />
+      {assessment && renderIndicator()}
       <View style={{ flex: 1 }}>
         <Text style={titleStyle}>{title}</Text>
         <Text style={metaStyle}>{meta}</Text>

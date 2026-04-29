@@ -18,7 +18,7 @@ import {
   // Selection
   ChipsPage, QuizPage, FilterBarPage, MenuPage, CalendarPage,
   // Display
-  CardsPage, CardGridPage, AvatarsPage, IdentityPage, BadgesPage, TablePage, SessionCardPage, VideoPage,
+  CardsPage, CardGridPage, AvatarsPage, IdentityPage, BadgesPage, TablePage, SessionCardPage, HomeworkCardPage, VideoPage,
   // Progress
   SessionBarPage, ProgressPage,
   // Navigation
@@ -79,6 +79,7 @@ const NAV = [
     { id: 'badges', label: 'Badges' },
     { id: 'tables', label: 'Tables' },
     { id: 'sessioncard', label: 'Session Card' },
+    { id: 'homeworkcard', label: 'Homework Card' },
     { id: 'video', label: 'Video Card' },
   ]},
   { group: 'Progress', items: [
@@ -139,7 +140,7 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   motion:       { component: MotionPage, desc: 'Curves, durations, and animation principles.' },
   gridsystem:   { component: GridSystemPage, desc: 'Layout primitives using flexbox and token spacing.' },
   gridpaper:    { component: GridPaperPage, desc: 'Dotted grid background surface texture.' },
-  waypoints:    { component: WaypointsPage, desc: 'Diamond-shaped markers for routes and progress.' },
+  waypoints:    { component: WaypointsPage, desc: 'Diamond-shaped markers for routes, progress, and important events.' },
   watervessel:  { component: WaterVesselPage, desc: 'Visual metaphor for proof-of-work.' },
   contours:     { component: ContoursPage, desc: 'Topographic contour lines for difficulty and mastery.' },
   dunepattern:  { component: DunePatternPage, desc: 'Geometric desert ridgelines with gold gradients.' },
@@ -165,6 +166,7 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   badges:       { component: BadgesPage, desc: 'Numeric or dot indicator.' },
   tables:       { component: TablePage, desc: 'Columnar data display.' },
   sessioncard:  { component: SessionCardPage, desc: 'Scheduled session with live/soon/done states.' },
+  homeworkcard: { component: HomeworkCardPage, desc: 'Homework assignment with due date, status, and question count.' },
   video:        { component: VideoPage, desc: 'Thumbnail card for video content with play button and attribution.' },
   sessionbar:   { component: SessionBarPage, desc: 'Question-by-question results bar.' },
   progress:     { component: ProgressPage, desc: 'Linear and circular progress indicators.' },

@@ -3,13 +3,70 @@
  * Enhanced version of RouteSteps with crosshairs, arrived state, and labels.
  * Markers: passed (dim gold), current (bright gold + crosshairs), arrived (green + crosshairs), incomplete (outline).
  */
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated, Easing } from 'react-native';
 import Svg, { Rect, Circle, Line, Polygon, Path } from 'react-native-svg';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, color } from './tokens';
 
 type WaypointState = 'done' | 'passed' | 'current' | 'arrived' | 'incomplete';
+
+const DIAMOND_SIZE = 10;
+
+/** Standalone diamond marker — use this anywhere the diamond shape is needed. */
+export function WaypointMarker({ state }: { state: WaypointState }) {
+  const { theme } = useTheme();
+  const isDone = state === 'done' || state === 'passed';
+  const isCurrent = state === 'current';
+  const isArrived = state === 'arrived';
+  const isComplete = isDone || isArrived;
+  const S = DIAMOND_SIZE;
+
+  // Ping flash on current — diamond shape expands and fades like a lighthouse
+  const ping = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!isCurrent) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(ping, { toValue: 1, duration: 1500, easing: Easing.out(Easing.ease), useNativeDriver: false }),
+        Animated.timing(ping, { toValue: 0, duration: 0, useNativeDriver: false }),
+        Animated.delay(1000),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [isCurrent]);
+
+  const pingScale = ping.interpolate({ inputRange: [0, 1], outputRange: [1, 2.8] });
+  const pingOpacity = ping.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0.6, 0.25, 0] });
+
+  return (
+    <View style={{ width: S, height: S, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Ping flash — diamond shape radiates outward */}
+      {isCurrent && (
+        <Animated.View style={{
+          position: 'absolute',
+          width: S, height: S,
+          backgroundColor: theme.signalBright,
+          transform: [{ rotate: '45deg' }, { scale: pingScale }],
+          opacity: pingOpacity,
+        }} />
+      )}
+      <View style={{
+        width: S, height: S,
+        transform: [{ rotate: '45deg' }],
+        backgroundColor: isArrived ? theme.accent : isDone ? theme.signalDim : isCurrent ? theme.signalBright : 'transparent',
+        borderWidth: !isComplete && !isCurrent ? 1 : 0,
+        borderColor: theme.fgMuted,
+        opacity: !isComplete && !isCurrent ? 0.55 : 1,
+        alignItems: 'center', justifyContent: 'center',
+      }}>
+        {isDone && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: theme.bg }} />}
+        {isArrived && <View style={{ width: 0, height: 0, borderLeftWidth: 3, borderRightWidth: 3, borderBottomWidth: 5, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: theme.bg, transform: [{ rotate: '-45deg' }], marginBottom: 1 }} />}
+      </View>
+    </View>
+  );
+}
 
 interface WaypointsProps {
   steps: WaypointState[];
@@ -56,10 +113,9 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
   const steps = stepsProp.map((s, i) => i === stepsProp.length - 1 && (s === 'done' || s === 'passed') ? 'arrived' : s);
   const n = steps.length;
 
-  // Main rendering — dashed future lines, crosshair spikes on current/arrived, center dot on done
+  // Main rendering — dashed future lines, center dot on done, triangle on arrived
   {
     const S = 10;
-    const spike = 7;
 
     function stepState(step: WaypointState) {
       const isDone = step === 'done' || step === 'passed';
@@ -69,31 +125,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
     }
 
     function renderDiamond(step: WaypointState) {
-      const { isDone, isCurrent, isArrived, isComplete } = stepState(step);
-      return (
-        <View style={{ width: S, height: S, alignItems: 'center', justifyContent: 'center' }}>
-          {(isCurrent || isArrived) && (
-            <>
-              <View style={{ position: 'absolute', top: -spike, width: 1, height: spike, backgroundColor: isCurrent ? theme.signalBright : theme.accent }} />
-              <View style={{ position: 'absolute', bottom: -spike, width: 1, height: spike, backgroundColor: isCurrent ? theme.signalBright : theme.accent }} />
-              <View style={{ position: 'absolute', left: -spike, height: 1, width: spike, backgroundColor: isCurrent ? theme.signalBright : theme.accent }} />
-              <View style={{ position: 'absolute', right: -spike, height: 1, width: spike, backgroundColor: isCurrent ? theme.signalBright : theme.accent }} />
-            </>
-          )}
-          <View style={{
-            width: S, height: S,
-            transform: [{ rotate: '45deg' }],
-            backgroundColor: isArrived ? theme.accent : isDone ? theme.signalDim : isCurrent ? theme.signalBright : 'transparent',
-            borderWidth: !isComplete && !isCurrent ? 1 : 0,
-            borderColor: theme.fgMuted,
-            opacity: !isComplete && !isCurrent ? 0.55 : 1,
-            alignItems: 'center', justifyContent: 'center',
-          }}>
-            {isDone && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: theme.bg }} />}
-            {isArrived && <View style={{ width: 0, height: 0, borderLeftWidth: 3, borderRightWidth: 3, borderBottomWidth: 5, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: theme.bg, transform: [{ rotate: '-45deg' }], marginBottom: 1 }} />}
-          </View>
-        </View>
-      );
+      return <WaypointMarker state={step} />;
     }
 
     function renderLine(prevDone: boolean, isVertical?: boolean) {
@@ -124,11 +156,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
               return (
                 <React.Fragment key={i}>
                   {i > 0 && (() => {
-                    const prevHasSpikes = steps[i - 1] === 'current' || steps[i - 1] === 'arrived';
-                    const thisHasSpikes = isCurrent || isArrived;
-                    const padLeft = prevHasSpikes ? spike + 1 : 2;
-                    const padRight = thisHasSpikes ? spike + 1 : 2;
-                    return <View style={{ flex: 1, justifyContent: 'center', height: S, paddingLeft: padLeft, paddingRight: padRight }}>{renderLine(prevDone)}</View>;
+                    return <View style={{ flex: 1, justifyContent: 'center', height: S, paddingHorizontal: 2 }}>{renderLine(prevDone)}</View>;
                   })()}
                   <View style={{ alignItems: 'center', width: S, overflow: 'visible' }}>
                     {renderDiamond(step)}
@@ -164,11 +192,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
             return (
               <React.Fragment key={i}>
                 {i > 0 && (() => {
-                  const prevHasSpikes = steps[i - 1] === 'current' || steps[i - 1] === 'arrived';
-                  const thisHasSpikes = isCurrent || isArrived;
-                  const padTop = prevHasSpikes ? spike + 3 : 3;
-                  const padBottom = thisHasSpikes ? spike + 3 : 3;
-                  return <View style={{ height: lineGap, alignItems: 'center', marginLeft: S / 2 - 0.5, width: 1, paddingTop: padTop, paddingBottom: padBottom }}>{renderLine(prevDone, true)}</View>;
+                  return <View style={{ height: lineGap, alignItems: 'center', marginLeft: S / 2 - 0.5, width: 1, paddingVertical: 3 }}>{renderLine(prevDone, true)}</View>;
                 })()}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[4] }}>
                   {renderDiamond(step)}

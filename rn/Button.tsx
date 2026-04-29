@@ -20,7 +20,8 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
-  icon?: React.ReactNode;
+  leadingIcon?: React.ReactNode;
+  trailingIcon?: React.ReactNode;
   onPress?: () => void;
 }
 
@@ -28,7 +29,7 @@ const heights: Record<Size, number> = { sm: h.sm, md: h.md, lg: h.lg };
 const paddings: Record<Size, number> = { sm: sp[3], md: sp[5], lg: sp[6] };
 const fontSizes: Record<Size, number> = { sm: fs[13], md: fs[14], lg: fs[15] };
 
-export function Button({ children, variant = 'primary', size = 'md', disabled, loading, fullWidth, icon, onPress }: ButtonProps) {
+export function Button({ children, variant = 'primary', size = 'md', disabled, loading, fullWidth, leadingIcon, trailingIcon, onPress }: ButtonProps) {
   const { theme } = useTheme();
 
   const bgMap: Record<Variant, string> = {
@@ -96,8 +97,9 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
           style={{ position: 'absolute' }}
         />
       )}
-      {icon && !loading && <View>{icon}</View>}
+      {leadingIcon && !loading && <View>{leadingIcon}</View>}
       <Text style={textStyle}>{children}</Text>
+      {trailingIcon && !loading && <View>{trailingIcon}</View>}
     </Pressable>
   );
 }

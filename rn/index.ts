@@ -60,12 +60,13 @@ export { LinearProgress, CircularProgress } from './Progress';
 
 // Patterns
 export { SessionCard } from './SessionCard';
+export { HomeworkCard } from './HomeworkCard';
 export { QuizOption } from './QuizOption';
 export { Interstitial } from './Interstitial';
 
 // Graphical
 export { GridPaper } from './GridPaper';
-export { Waypoints } from './Waypoints';
+export { Waypoints, WaypointMarker } from './Waypoints';
 export { WaterVessel } from './WaterVessel';
 export { TerrainPattern } from './TerrainPattern';
 export { DunePattern } from './DunePattern';

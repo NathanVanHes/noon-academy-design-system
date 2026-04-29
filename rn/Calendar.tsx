@@ -6,6 +6,9 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Animated, PanResponder, Easing, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, icon, dur } from './tokens';
+import { Button } from './Button';
+import { IconButton } from './IconButton';
+import { WaypointMarker } from './Waypoints';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -76,13 +79,39 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
   }
 
   function prev() {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
-    else setViewMonth(viewMonth - 1);
+    if (isExpanded) {
+      const newMonth = viewMonth === 0 ? 11 : viewMonth - 1;
+      const newYear = viewMonth === 0 ? viewYear - 1 : viewYear;
+      setViewMonth(newMonth);
+      setViewYear(newYear);
+      const d = new Date(newYear, newMonth, 1);
+      if (onSelect) onSelect(d);
+      else setInternalSelected(d);
+    } else {
+      const d = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate() - 1);
+      if (onSelect) onSelect(d);
+      else setInternalSelected(d);
+      setViewMonth(d.getMonth());
+      setViewYear(d.getFullYear());
+    }
   }
 
   function next() {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
-    else setViewMonth(viewMonth + 1);
+    if (isExpanded) {
+      const newMonth = viewMonth === 11 ? 0 : viewMonth + 1;
+      const newYear = viewMonth === 11 ? viewYear + 1 : viewYear;
+      setViewMonth(newMonth);
+      setViewYear(newYear);
+      const d = new Date(newYear, newMonth, 1);
+      if (onSelect) onSelect(d);
+      else setInternalSelected(d);
+    } else {
+      const d = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate() + 1);
+      if (onSelect) onSelect(d);
+      else setInternalSelected(d);
+      setViewMonth(d.getMonth());
+      setViewYear(d.getFullYear());
+    }
   }
 
   function goToday() {
@@ -129,24 +158,9 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
     const evtCount = evt?.count || 0;
     const isAssessment = evt?.assessment || false;
 
-    // Assessment days get gold treatment, regular selected gets accent
-    const dayBg = selected
-      ? (isAssessment ? theme.signal : theme.accent)
-      : today
-        ? (isAssessment ? theme.signalBorder : theme.accentSoft)
-        : isAssessment
-          ? theme.signalBorder
-          : 'transparent';
-
-    const dayFg = selected
-      ? (isAssessment ? theme.fg : theme.accentFg)
-      : day.outside
-        ? theme.fgFaint
-        : today
-          ? (isAssessment ? theme.signal : theme.accent)
-          : isAssessment
-            ? theme.signal
-            : theme.fg;
+    // Day cell colours — assessment signalled by diamond only, not bg/fg tint
+    const dayBg = selected ? theme.accent : today ? theme.accentSoft : 'transparent';
+    const dayFg = selected ? theme.accentFg : day.outside ? theme.fgFaint : today ? theme.accent : theme.fg;
 
     return (
       <Pressable
@@ -160,23 +174,23 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
         <View style={{
           width: DAY_SIZE, height: DAY_SIZE, borderRadius: DAY_SIZE / 2,
           alignItems: 'center', justifyContent: 'center',
-          backgroundColor: dayBg,
-          ...(isAssessment && !selected ? { borderWidth: 1, borderColor: theme.signalBorder } : {}),
+          backgroundColor: dayBg, overflow: 'visible',
         }}>
           <Text style={{
             fontFamily: font.sans, fontSize: fs[14],
-            fontWeight: selected || today || isAssessment ? fw[600] : fw[400],
+            fontWeight: selected || today ? fw[600] : fw[400],
             color: dayFg,
           }}>{day.d}</Text>
-          {/* Event diamond — inside circle, top right. Same shape/size as Waypoints. */}
-          {evtCount > 0 && (
-            <View style={{
-              position: 'absolute', top: 1, right: 1,
-              width: icon.sm, height: icon.sm,
-              backgroundColor: theme.signal,
-              transform: [{ rotate: '45deg' }],
-            }} />
-          )}
+          {/* Event diamond — uses WaypointMarker directly */}
+          {evtCount > 0 && (() => {
+            const dayDate = new Date(day.y, day.m, day.d);
+            const isPast = dayDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            return (
+              <View style={{ position: 'absolute', top: 0, right: 0, overflow: 'visible', zIndex: 10 }}>
+                <WaypointMarker state={isPast ? 'done' : 'current'} />
+              </View>
+            );
+          })()}
         </View>
       </Pressable>
     );
@@ -194,16 +208,14 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
         <Text style={{ fontFamily: font.sans, fontSize: fs[16], fontWeight: fw[600], color: theme.fg, flex: 1 }} numberOfLines={1}>{title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
           {!isTodaySelected && (
-            <Pressable onPress={goToday} style={{ paddingHorizontal: sp[3], paddingVertical: sp[1], borderRadius: r[1], borderWidth: 1, borderColor: theme.border }}>
-              <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgMuted }}>Today</Text>
-            </Pressable>
+            <Button variant="ghost" size="sm" onPress={goToday}>Today</Button>
           )}
-          <Pressable onPress={prev} hitSlop={4} style={{ padding: sp[1] }}>
-            <Text style={{ fontSize: fs[18], color: theme.fgMuted }}>‹</Text>
-          </Pressable>
-          <Pressable onPress={next} hitSlop={4} style={{ padding: sp[1] }}>
-            <Text style={{ fontSize: fs[18], color: theme.fgMuted }}>›</Text>
-          </Pressable>
+          <IconButton variant="ghost" size="sm" onPress={prev}>
+            <Text style={{ fontSize: fs[16], color: theme.fgMuted }}>‹</Text>
+          </IconButton>
+          <IconButton variant="ghost" size="sm" onPress={next}>
+            <Text style={{ fontSize: fs[16], color: theme.fgMuted }}>›</Text>
+          </IconButton>
           {rightAction}
         </View>
       </View>
@@ -218,7 +230,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
       </View>
 
       {/* Day grid */}
-      <View style={{ paddingHorizontal: sp[4], overflow: 'hidden' }}>
+      <View style={{ paddingHorizontal: sp[4], overflow: 'visible', zIndex: 5 }}>
         {weeks.map((week, wi) => {
           if (!isExpanded && wi !== shownWeekIdx) return null;
           return (
