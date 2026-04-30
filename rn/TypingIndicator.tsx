@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, cancelAnimation, Easing } from 'react-native-reanimated';
 import { useTheme } from './ThemeContext';
-import { sp, r, dur } from './tokens';
+import { sp } from './tokens';
 
 const DOT_SIZE = sp[1];
 const DOT_BOUNCE = -sp[1];

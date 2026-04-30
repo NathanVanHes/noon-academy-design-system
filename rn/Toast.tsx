@@ -5,7 +5,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Text, Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, font, dur } from './tokens';
 
@@ -21,7 +21,7 @@ interface ToastProps {
 
 export function Toast({ message, variant = 'info', visible, onDismiss, duration = 4000 }: ToastProps) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
+  const insets = React.useContext(SafeAreaInsetsContext) || { top: 0 };
   const translateY = useSharedValue(-40);
   const opacity = useSharedValue(0);
   const shown = useRef(false);

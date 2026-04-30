@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { View, Pressable, Text, Modal, KeyboardAvoidingView, Platform, type ViewStyle } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, font } from './tokens';
 
@@ -19,7 +19,7 @@ interface BottomSheetProps {
 
 export function BottomSheet({ visible, onClose, title, children, actions, full }: BottomSheetProps) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
+  const insets = React.useContext(SafeAreaInsetsContext) || { bottom: 0 };
 
   const scrimStyle: ViewStyle = {
     flex: 1,

@@ -56,7 +56,7 @@ export function Tooltip({ text, children }: TooltipProps) {
 
   return (
     <View style={{ position: 'relative' }} onLayout={onLayout}>
-      <Pressable onLongPress={() => setVisible(true)} onPressOut={() => setVisible(false)}>
+      <Pressable onLongPress={() => setVisible(true)} onPressOut={() => setVisible(false)} accessibilityRole="button">
         {children}
       </Pressable>
       {visible && (

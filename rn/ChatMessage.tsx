@@ -26,7 +26,7 @@ export function ChatMessage({ children, from, confirmed = true, thinking, reveal
 
   if (from === 'tutor' && thinking) {
     return (
-      <View style={{ alignSelf: 'flex-start', paddingStart: sp[4] } as any}>
+      <View style={{ alignSelf: 'flex-start', paddingStart: sp[4] }}>
         <TypingIndicator />
       </View>
     );
@@ -45,7 +45,7 @@ export function ChatMessage({ children, from, confirmed = true, thinking, reveal
     const unrevealed = children.slice(splitAt);
 
     return (
-      <View style={{ borderStartWidth: 2, borderStartColor: theme.irisBorder, paddingStart: sp[4], alignSelf: 'flex-start', maxWidth: '80%' } as any}>
+      <View style={{ borderStartWidth: 2, borderStartColor: theme.irisBorder, paddingStart: sp[4], alignSelf: 'flex-start', maxWidth: '80%' }}>
         <Text style={{ fontFamily: font.sans, fontSize: fs[14], lineHeight: fs[14] * 1.5 }}>
           <Text style={{ color: theme.fg }}>{revealed}</Text>
           {unrevealed ? <Text style={{ color: theme.fgFaint }}>{unrevealed}</Text> : null}
@@ -65,7 +65,7 @@ export function ChatMessage({ children, from, confirmed = true, thinking, reveal
       backgroundColor: confirmed ? theme.hoverOverlay : `${chalkRGB}0.02)`,
       borderTopStartRadius: r[2], borderBottomStartRadius: r[2],
       alignSelf: 'flex-end', maxWidth: '80%',
-    } as any}>
+    }}>
       <Text style={{
         fontFamily: font.sans, fontSize: fs[14],
         color: confirmed ? theme.fg : theme.fgFaint,

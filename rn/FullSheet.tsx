@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { View, Text, Pressable, Modal, ScrollView } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font } from './tokens';
 
@@ -17,7 +17,7 @@ interface FullSheetProps {
 
 function FullSheetContent({ onClose, title, children }: Omit<FullSheetProps, 'visible'>) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
+  const insets = React.useContext(SafeAreaInsetsContext) || { top: 0, bottom: 0 };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }}>

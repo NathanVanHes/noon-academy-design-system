@@ -10,7 +10,7 @@ import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
   SessionCard, HomeworkCard, SessionBar, QuizOption, Tooltip,
   Input, Textarea, Switch, Checkbox, Radio, Stepper, Segmented,
-  Tabs, BottomNav, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table,
+  Tabs, BottomNav, BottomAction, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table,
   LinearProgress, CircularProgress, Toast, Dialog, BottomSheet, FullSheet, Interstitial,
   RadioGroup, CheckboxGroup,
   Icon, iconNames,
@@ -2672,6 +2672,61 @@ export function VideoPage() {
       <Rl>Progress bar: sp[1] height, pill radius, accent fill.</Rl>
       <Rl>Overlay controls fade in on tap, auto-hide after 3s.</Rl>
       <Rl>In voice chat: can also play inline within the conversation flow.</Rl>
+    </S>
+  </>;
+}
+
+export function BottomActionPage() {
+  const [hasMessage, setHasMessage] = useState(true);
+  const [hasSubmessage, setHasSubmessage] = useState(true);
+  const [hasIcon, setHasIcon] = useState(true);
+  const [msgVariant, setMsgVariant] = useState('accent');
+  const [hasSecondary, setHasSecondary] = useState(false);
+  const [primaryDisabled, setPrimaryDisabled] = useState(false);
+  const msgText = msgVariant === 'accent' ? 'Correct!' : msgVariant === 'danger' ? 'Incorrect' : 'Answer submitted';
+  const subText = msgVariant === 'accent' ? 'The answer is B — plentiful' : msgVariant === 'danger' ? 'The correct answer was B' : 'Your response has been recorded';
+  const iconName = msgVariant === 'accent' ? 'check' : msgVariant === 'danger' ? 'close' : 'info';
+  return <>
+    <Playground
+      knobs={<>
+        <KnobToggle label="message" value={hasMessage} onChange={setHasMessage} />
+        {hasMessage && <KnobToggle label="submessage" value={hasSubmessage} onChange={setHasSubmessage} />}
+        {hasMessage && <KnobToggle label="icon" value={hasIcon} onChange={setHasIcon} />}
+        {hasMessage && <KnobSelect label="messageVariant" value={msgVariant} options={['default', 'accent', 'danger']} onChange={setMsgVariant} />}
+        <KnobToggle label="secondary" value={hasSecondary} onChange={setHasSecondary} />
+        <KnobToggle label="primary disabled" value={primaryDisabled} onChange={setPrimaryDisabled} />
+      </>}
+    >
+      <View style={{ width: '100%' }}>
+        <BottomAction
+          icon={hasMessage && hasIcon ? iconName as any : undefined}
+          message={hasMessage ? msgText : undefined}
+          submessage={hasMessage && hasSubmessage ? subText : undefined}
+          messageVariant={msgVariant as any}
+          primary={{ label: 'Next', onPress: () => {}, disabled: primaryDisabled }}
+          secondary={hasSecondary ? { label: 'Skip', onPress: () => {} } : undefined}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { BottomAction } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="icon" type="IconName" desc="Icon next to message" />
+      <Prop name="message" type="string" desc="Feedback heading" />
+      <Prop name="submessage" type="string" desc="Detail text below message" />
+      <Prop name="messageVariant" type="'default' | 'accent' | 'danger'" def="'default'" desc="Message + icon colour" />
+      <Prop name="primary" type="{ label, onPress, disabled?, variant? }" desc="Primary action button" />
+      <Prop name="secondary" type="{ label, onPress, disabled?, variant? }" desc="Secondary action button" />
+    </Props>
+    <S title="When to use">
+      <Rl>Task screens: quiz answers, form submission, checkout, confirmations.</Rl>
+      <Rl>Never on screens with BottomNav — BottomAction replaces it for the duration of the task.</Rl>
+      <Rl>Place at the bottom of the screen layout, below a ScrollView.</Rl>
+      <Rl>Safe area handled automatically — clears the home indicator.</Rl>
+    </S>
+    <S title="Quiz flow">
+      <Rl>Before answer: primary disabled ("Check"), no message.</Rl>
+      <Rl>After correct: message "Correct!" (accent), primary "Next".</Rl>
+      <Rl>After incorrect: message "Incorrect" (danger), primary "Next", secondary "Try again".</Rl>
     </S>
   </>;
 }

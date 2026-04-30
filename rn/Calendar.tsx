@@ -270,7 +270,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
 
       {/* Drag handle */}
       <View {...panResponder.panHandlers}>
-        <Pressable onPress={toggle} style={{ alignItems: 'center', paddingVertical: sp[3] }}>
+        <Pressable onPress={toggle} style={{ alignItems: 'center', paddingVertical: sp[3] }} accessibilityRole="button" accessibilityLabel="Toggle calendar view">
           <View style={{ width: sp[7], height: 3, borderRadius: 1.5, backgroundColor: theme.fgFaint, opacity: 0.4 }} />
         </Pressable>
       </View>

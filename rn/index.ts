@@ -45,6 +45,7 @@ export { EmptyState } from './EmptyState';
 export { Calendar } from './Calendar';
 export type { CalendarLocale } from './Calendar';
 export { Tabs } from './Tabs';
+export { BottomAction } from './BottomAction';
 export { BottomNav } from './BottomNav';
 export { TitleBar } from './TitleBar';
 export { FilterBar } from './FilterBar';

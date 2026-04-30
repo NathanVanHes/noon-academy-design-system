@@ -25,7 +25,7 @@ import {
   // Progress
   SessionBarPage, ProgressPage,
   // Navigation
-  TitleBarPage, TabsPage, BottomNavPage, BreadcrumbsPage, PaginationPage, SideNavPage,
+  TitleBarPage, TabsPage, BottomNavPage, BottomActionPage, BreadcrumbsPage, PaginationPage, SideNavPage,
   // Feedback
   AlertsPage, ToastPage, DialogPage, ModalPage, BottomSheetPage, FullSheetPage, TooltipPage, PopoversPage,
   // Layout
@@ -102,6 +102,7 @@ const NAV = [
     { id: 'titlebar', label: 'Title Bar' },
     { id: 'tabs', label: 'Tabs' },
     { id: 'bottomnav', label: 'Bottom Nav' },
+    { id: 'bottomaction', label: 'Bottom Action' },
     { id: 'breadcrumbs', label: 'Breadcrumbs' },
     { id: 'pagination', label: 'Pagination' },
     { id: 'sidenav', label: 'Side Nav' },
@@ -188,6 +189,7 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   titlebar:     { component: TitleBarPage, desc: 'Screen header with back and actions.' },
   tabs:         { component: TabsPage, desc: 'Horizontal tab navigation.' },
   bottomnav:    { component: BottomNavPage, desc: 'App-level bottom navigation.' },
+  bottomaction: { component: BottomActionPage, desc: 'Fixed bottom tray for primary actions.' },
   breadcrumbs:  { component: BreadcrumbsPage, desc: 'Horizontal path trail — web/tablet only.' },
   pagination:   { component: PaginationPage, desc: 'Page number navigation — web/tablet only.' },
   sidenav:      { component: SideNavPage, desc: 'Persistent sidebar — desktop/tablet only.' },

@@ -43,11 +43,13 @@ export function SlidesCard({ title, attribution, slides, onPress }: SlidesCardPr
       >
         <View style={{ flexDirection: 'row', padding: sp[3], gap: sp[3], alignItems: 'center' }}>
           {/* Thumbnail of first slide */}
-          <Image
-            source={slides[0]}
-            style={{ width: 56, height: 36, borderRadius: r[1], backgroundColor: theme.hoverOverlay }}
-            resizeMode="cover"
-          />
+          {slides.length > 0 && (
+            <Image
+              source={slides[0]}
+              style={{ width: 56, height: 36, borderRadius: r[1], backgroundColor: theme.hoverOverlay }}
+              resizeMode="cover"
+            />
+          )}
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }}>{title}</Text>
             <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }}>

@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { View, Pressable, Text, type ViewStyle, type TextStyle } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, icon as iconTokens, color } from './tokens';
 import { Icon, type IconName } from './Icon';
@@ -25,7 +25,7 @@ interface BottomNavProps {
 
 export function BottomNav({ items, selected, onSelect }: BottomNavProps) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
+  const insets = React.useContext(SafeAreaInsetsContext) || { bottom: 0 };
 
   const barStyle: ViewStyle = {
     flexDirection: 'row',
