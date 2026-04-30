@@ -21,7 +21,7 @@ interface ActivityCardProps {
 export function ActivityCard({ title, description, buttonLabel = 'Start', complete, score, onPress }: ActivityCardProps) {
   const { theme } = useTheme();
   return (
-    <View style={{ backgroundColor: theme.inputBg, borderRadius: r[2], borderWidth: 1, borderColor: complete ? theme.accentBorder : theme.border, padding: sp[4] }}>
+    <View accessibilityRole="none" style={{ backgroundColor: theme.inputBg, borderRadius: r[2], borderWidth: 1, borderColor: complete ? theme.accentBorder : theme.border, padding: sp[4] }}>
       <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: 'uppercase', fontWeight: fw[600], color: theme.irisLabel, marginBottom: sp[2] }}>Activity</Text>
       <Text style={{ fontFamily: font.serif, fontSize: fs[15], color: theme.fg, marginBottom: description ? sp[1] : sp[3] }}>{title}</Text>
       {description && <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[3] }}>{description}</Text>}

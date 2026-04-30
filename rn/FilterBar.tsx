@@ -2,7 +2,7 @@
  * FilterBar — horizontal scrollable row of filter chips.
  */
 import React from 'react';
-import { ScrollView, View, type ViewStyle } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Chip } from './Chip';
 import { sp } from './tokens';
 
@@ -23,7 +23,6 @@ export function FilterBar({ items, onToggle }: FilterBarProps) {
         <Chip
           key={i}
           variant={item.active ? 'accent' : 'default'}
-          interactive
           onPress={() => onToggle(i)}
         >
           {item.label}

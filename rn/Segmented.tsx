@@ -5,7 +5,7 @@
  * Inactive: transparent, fg-subtle.
  */
 import React from 'react';
-import { View, Pressable, Text, type ViewStyle, type TextStyle } from 'react-native';
+import { View, Pressable, Text, Platform, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font } from './tokens';
 
@@ -27,10 +27,11 @@ export function Segmented({ options, selected, onSelect, size = 'md' }: Segmente
     borderColor: theme.border,
     borderRadius: r[sm ? 1 : 2],
     padding: 2,
-  };
+    ...(Platform.OS === 'web' ? { direction: 'ltr' } : {}),
+  } as ViewStyle;
 
   return (
-    <View style={trackStyle}>
+    <View accessibilityRole="radiogroup" style={trackStyle}>
       {options.map((opt, i) => {
         const isOn = i === selected;
         const btnStyle: ViewStyle = {
@@ -50,7 +51,7 @@ export function Segmented({ options, selected, onSelect, size = 'md' }: Segmente
           color: isOn ? theme.fg : theme.fgSubtle,
         };
         return (
-          <Pressable key={i} onPress={() => onSelect(i)} style={btnStyle} accessibilityRole="button">
+          <Pressable key={i} onPress={() => onSelect(i)} style={btnStyle} accessibilityRole="radio" accessibilityState={{ selected: isOn }}>
             <Text style={txtStyle}>{opt}</Text>
           </Pressable>
         );

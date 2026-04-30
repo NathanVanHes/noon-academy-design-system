@@ -18,7 +18,7 @@ export function LinearProgress({ value, height = sp[1], color }: LinearProps) {
   const { theme } = useTheme();
   const pct = Math.max(0, Math.min(100, value));
   return (
-    <View style={{ height, borderRadius: r.pill, backgroundColor: theme.border, overflow: 'hidden' }}>
+    <View accessibilityRole="progressbar" accessibilityValue={{ now: pct, min: 0, max: 100 }} style={{ height, borderRadius: r.pill, backgroundColor: theme.border, overflow: 'hidden' }}>
       <View style={{ height: '100%', width: `${pct}%`, borderRadius: r.pill, backgroundColor: color || theme.accent }} />
     </View>
   );

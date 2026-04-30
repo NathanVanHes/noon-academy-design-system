@@ -1,14 +1,19 @@
 /**
  * BottomNav — mobile tab bar with icons and labels.
+ * Icons inherit colour from active/inactive state automatically.
+ * Pass `icon` as an IconName string for automatic sizing + colour,
+ * or a render function `(color, size) => ReactNode` for custom icons.
  */
 import React from 'react';
 import { View, Pressable, Text, type ViewStyle, type TextStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font, icon, color } from './tokens';
+import { sp, r, fs, fw, font, icon as iconTokens, color } from './tokens';
+import { Icon, type IconName } from './Icon';
 
 interface NavItem {
   label: string;
-  icon: React.ReactNode;
+  icon: IconName | ((color: string, size: number) => React.ReactNode);
   badge?: number;
 }
 
@@ -20,22 +25,24 @@ interface BottomNavProps {
 
 export function BottomNav({ items, selected, onSelect }: BottomNavProps) {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const barStyle: ViewStyle = {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-start',
     paddingTop: sp[3],
-    paddingBottom: sp[4],
+    paddingBottom: Math.max(sp[4], insets.bottom),
     backgroundColor: theme.bgOverlay,
     borderTopWidth: 1,
     borderTopColor: theme.border,
   };
 
   return (
-    <View style={barStyle}>
+    <View accessibilityRole="tablist" style={barStyle}>
       {items.map((item, i) => {
         const isOn = i === selected;
+        const iconColor = isOn ? theme.accent : theme.fgSubtle;
         const itemStyle: ViewStyle = {
           alignItems: 'center',
           gap: sp[1],
@@ -61,9 +68,11 @@ export function BottomNav({ items, selected, onSelect }: BottomNavProps) {
           color: isOn ? theme.accent : theme.fgSubtle,
         };
         return (
-          <Pressable key={i} onPress={() => onSelect(i)} style={itemStyle}>
+          <Pressable key={i} onPress={() => onSelect(i)} style={itemStyle} accessibilityRole="tab" accessibilityState={{ selected: isOn }}>
             {isOn && <View style={indicatorStyle} />}
-            <View style={{ opacity: isOn ? 1 : 0.55 }}>{item.icon}</View>
+            {typeof item.icon === 'string'
+              ? <Icon name={item.icon} size={iconTokens.tab} color={iconColor} />
+              : item.icon(iconColor, iconTokens.tab)}
             <Text style={labelStyle}>{item.label}</Text>
             {item.badge != null && item.badge > 0 && (
               <View style={{

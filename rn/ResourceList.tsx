@@ -28,7 +28,7 @@ export function ResourceList({ title = 'Resources', links }: ResourceListProps) 
       <View style={{ backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }}>
         <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: 'uppercase', fontWeight: fw[600], color: theme.fgFaint, marginBottom: sp[3] }}>{title}</Text>
         {links.map((link, i) => (
-          <Pressable key={i} onPress={() => {
+          <Pressable key={i} accessibilityRole="link" onPress={() => {
             if (link.onPress) return link.onPress();
             if (link.content) setOpenIdx(i);
           }}>

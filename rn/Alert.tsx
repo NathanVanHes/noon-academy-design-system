@@ -57,7 +57,7 @@ export function Alert({ title, children, variant = 'info' }: AlertProps) {
   };
 
   return (
-    <View style={containerStyle}>
+    <View accessibilityRole="alert" style={containerStyle}>
       <View style={{ flex: 1 }}>
         {title && <Text style={titleStyle}>{title}</Text>}
         <Text style={bodyStyle}>{children}</Text>

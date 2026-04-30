@@ -23,7 +23,7 @@ export function Tabs({ tabs, selected, onSelect }: TabsProps) {
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      <View style={containerStyle}>
+      <View accessibilityRole="tablist" style={containerStyle}>
         {tabs.map((tab, i) => {
           const isOn = i === selected;
           const tabStyle: ViewStyle = {
@@ -42,7 +42,7 @@ export function Tabs({ tabs, selected, onSelect }: TabsProps) {
             color: isOn ? theme.fg : theme.fgSubtle,
           };
           return (
-            <Pressable key={i} onPress={() => onSelect(i)} style={tabStyle}>
+            <Pressable key={i} onPress={() => onSelect(i)} style={tabStyle} accessibilityRole="tab" accessibilityState={{ selected: isOn }}>
               <Text style={txtStyle}>{tab}</Text>
             </Pressable>
           );

@@ -3,7 +3,7 @@
  * Thumb slides with 120ms ease animation (dur-1).
  */
 import React, { useEffect, useRef } from 'react';
-import { Pressable, View, Text, Animated, Easing, type ViewStyle } from 'react-native';
+import { Pressable, Text, Animated, Easing, Platform } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, font, dur, color } from './tokens';
 
@@ -43,7 +43,8 @@ export function Switch({ value, onValueChange, disabled, label }: SwitchProps) {
         justifyContent: 'center',
         paddingHorizontal: 2,
         opacity: disabled ? 0.4 : 1,
-      }}>
+        ...(Platform.OS === 'web' ? { direction: 'ltr' } : {}),
+      } as any}>
         <Animated.View style={{
           width: THUMB_SIZE,
           height: THUMB_SIZE,
@@ -55,8 +56,8 @@ export function Switch({ value, onValueChange, disabled, label }: SwitchProps) {
   );
 
   return (
-    <Pressable onPress={() => !disabled && onValueChange(!value)} accessibilityRole="switch" accessibilityState={{ checked: value, disabled }} style={label ? { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' } : undefined}>
-      {label && <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: disabled ? theme.fgFaint : theme.fg, flex: 1, marginRight: sp[3] }}>{label}</Text>}
+    <Pressable onPress={() => !disabled && onValueChange(!value)} accessibilityRole="switch" accessibilityState={{ checked: value, disabled }} style={label ? { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: sp[3], width: '100%' } : undefined}>
+      {label && <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: disabled ? theme.fgFaint : theme.fg, flex: 1 }}>{label}</Text>}
       {track}
     </Pressable>
   );

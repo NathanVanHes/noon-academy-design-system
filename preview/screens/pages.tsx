@@ -4,7 +4,7 @@
  * Each exports a function component: Import → Props → Live examples.
  */
 import React, { useState } from 'react';
-import { View, Text, Pressable, Animated, Easing, Image, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, Animated, Easing, Image, useWindowDimensions, I18nManager } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
@@ -47,7 +47,7 @@ function Playground({ children, knobs }: { children: React.ReactNode; knobs: Rea
         backgroundColor: theme.bgSunken,
         padding: sp[5],
         ...(wide
-          ? { width: 300, borderLeftWidth: 1, borderLeftColor: theme.border, height: '100%' }
+          ? { width: 300, borderStartWidth: 1, borderStartColor: theme.border, height: '100%' } as any
           : { borderTopWidth: 1, borderTopColor: theme.border }),
       }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], marginBottom: sp[4] }}>
@@ -103,12 +103,15 @@ function KnobText({ label, value, onChange }: { label: string; value: string; on
 }
 
 // ─── Shell components ───
+const dir = () => I18nManager.isRTL ? 'rtl' as const : 'ltr' as const;
+const align = () => I18nManager.isRTL ? 'right' as const : 'left' as const;
+
 function S({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
   const { theme } = useTheme();
   return (
     <View style={{ marginBottom: sp[7] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 2, textTransform: 'uppercase', marginBottom: sp[3], paddingBottom: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider }}>{title}</Text>
-      {desc ? <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[4] }}>{desc}</Text> : null}
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 2, textTransform: 'uppercase', marginBottom: sp[3], paddingBottom: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider, textAlign: align(), writingDirection: dir() }}>{title}</Text>
+      {desc ? <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[4], textAlign: align(), writingDirection: dir() }}>{desc}</Text> : null}
       {children}
     </View>
   );
@@ -120,19 +123,19 @@ function C({ label, children }: { label: string; children: React.ReactNode }) {
   const { theme } = useTheme();
   return (
     <View style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[4], marginBottom: sp[3] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, marginBottom: sp[2] }}>{label}</Text>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, marginBottom: sp[2], textAlign: align(), writingDirection: dir() }}>{label}</Text>
       {children}
     </View>
   );
 }
 function Rl({ children }: { children: string }) {
   const { theme } = useTheme();
-  return <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5, paddingVertical: sp[2] }}>{children}</Text>;
+  return <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5, paddingVertical: sp[2], textAlign: align(), writingDirection: dir() }}>{children}</Text>;
 }
 function Import({ children }: { children: string }) {
   const { theme } = useTheme();
   return (
-    <View style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[3], marginBottom: sp[5] }}>
+    <View {...{ dataSet: { ltr: '' } }} style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[3], marginBottom: sp[5] }}>
       <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent }}>{children}</Text>
     </View>
   );
@@ -140,7 +143,7 @@ function Import({ children }: { children: string }) {
 function Prop({ name, type, def, desc }: { name: string; type: string; def?: string; desc?: string }) {
   const { theme } = useTheme();
   return (
-    <View style={{ flexDirection: 'row', paddingVertical: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider, gap: sp[2] }}>
+    <View {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', paddingVertical: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider, gap: sp[2] }}>
       <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.accent, minWidth: 80 }}>{name}</Text>
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted }}>{type}{def ? `  = ${def}` : ''}</Text>
@@ -153,7 +156,7 @@ function Props({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
   return (
     <View style={{ marginBottom: sp[5] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 2, textTransform: 'uppercase', marginBottom: sp[2] }}>Props</Text>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 2, textTransform: 'uppercase', marginBottom: sp[2], textAlign: align(), writingDirection: dir() }}>Props</Text>
       {children}
     </View>
   );
@@ -215,13 +218,13 @@ export function BrandPage() {
       {rule('Forbidden', 'No exclamation points. No emoji. No "keep exploring." No "you\'ve got this." No "great job."')}
     </S>
     <S title="Examples">
-      <View style={{ borderLeftWidth: 3, borderLeftColor: theme.accent, borderRadius: r[1], paddingLeft: sp[4], marginBottom: sp[4] }}>
+      <View style={{ borderStartWidth: 3, borderStartColor: theme.accent, borderRadius: r[1], paddingStart: sp[4], marginBottom: sp[4] } as any}>
         <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.accent, marginBottom: sp[2] }}>Do</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[1] }}>"You're on pace for 92."</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[1] }}>"Sarah cleared this last Thursday — she can walk you through it."</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>"18 jugs filled. Minimum 12 — you've done your part, and more."</Text>
       </View>
-      <View style={{ borderLeftWidth: 3, borderLeftColor: theme.danger, borderRadius: r[1], paddingLeft: sp[4] }}>
+      <View style={{ borderStartWidth: 3, borderStartColor: theme.danger, borderRadius: r[1], paddingStart: sp[4] } as any}>
         <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.danger, marginBottom: sp[2] }}>Don't</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[1] }}>"Keep crushing it!"</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[1] }}>"Great job"</Text>
@@ -263,7 +266,7 @@ export function BrandPage() {
 export function ColorsPage() {
   const { theme } = useTheme();
   const swatch = (c: string, name: string) => (
-    <View key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[2] }}>
+    <View key={name} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[2] }}>
       <View style={{ width: sp[7], height: sp[7], borderRadius: r[2], backgroundColor: c, borderWidth: 1, borderColor: theme.border }} />
       <View>
         <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fg }}>{name}</Text>
@@ -272,7 +275,7 @@ export function ColorsPage() {
     </View>
   );
   const scaleRow = (name: string, scale: Record<string, string>) => (
-    <View key={name} style={{ marginBottom: sp[5] }}>
+    <View key={name} {...{ dataSet: { ltr: '' } }} style={{ marginBottom: sp[5] }}>
       <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted, marginBottom: sp[2] }}>{name}</Text>
       <View style={{ flexDirection: 'row', gap: sp[1], flexWrap: 'wrap' }}>
         {Object.entries(scale).map(([step, hex]) => (
@@ -370,17 +373,23 @@ export function TypographyPage() {
     </S>
     <S title="Font Size Scale" desc="Every size rendered at actual pixels.">
       {Object.entries(fs).map(([k, v]) => (
-        <View key={k} style={{ flexDirection: 'row', alignItems: 'baseline', gap: sp[3], marginBottom: sp[2] }}>
+        <View key={k} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'baseline', gap: sp[3], marginBottom: sp[2] }}>
           <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, minWidth: 48, textAlign: 'right' }}>fs-{k}</Text>
           <Text style={{ fontFamily: font.sans, fontSize: v as number, color: theme.fg }}>{v}px</Text>
         </View>
       ))}
     </S>
     <S title="Font Weights">
-      {Object.entries(fw).map(([k, v]) => (
-        <View key={k} style={{ flexDirection: 'row', alignItems: 'baseline', gap: sp[3], marginBottom: sp[2] }}>
+      {([
+        ['300', 'Vazirmatn-Light'],
+        ['400', 'Vazirmatn'],
+        ['500', 'Vazirmatn-Medium'],
+        ['600', 'Vazirmatn-SemiBold'],
+        ['700', 'Vazirmatn-Bold'],
+      ] as const).map(([k, family]) => (
+        <View key={k} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'baseline', gap: sp[3], marginBottom: sp[2] }}>
           <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, minWidth: 48, textAlign: 'right' }}>fw-{k}</Text>
-          <Text style={{ fontFamily: font.sans, fontSize: fs[16], fontWeight: v, color: theme.fg }}>The quick brown fox</Text>
+          <Text style={{ fontFamily: family, fontSize: fs[16], color: theme.fg }}>The quick brown fox</Text>
         </View>
       ))}
     </S>
@@ -403,7 +412,7 @@ export function SpacingPage() {
     <Import>{"import { sp, icon, h } from '@noon/design-system/tokens';"}</Import>
     <S title="Spacing Scale" desc="Used for padding, margins, and gaps.">
       {Object.entries(sp).map(([k, v]) => (
-        <View key={k} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[2] }}>
+        <View key={k} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[2] }}>
           <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint, minWidth: 48, textAlign: 'right' }}>sp-{k}</Text>
           <View style={{ height: 20, width: v as number, backgroundColor: theme.accentSoft, borderRadius: r[1], borderWidth: 1, borderColor: theme.accentBorder, minWidth: v === 0 ? 2 : undefined }} />
           <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{v}px</Text>
@@ -412,7 +421,7 @@ export function SpacingPage() {
     </S>
     <S title="Icon Sizes">
       {Object.entries(icon).map(([k, v]) => (
-        <View key={k} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[3] }}>
+        <View key={k} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[3] }}>
           <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint, minWidth: 52, textAlign: 'right' }}>icon-{k}</Text>
           <View style={{ width: v as number, height: v as number, borderRadius: r[1], backgroundColor: theme.accent }} />
           <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{v}px</Text>
@@ -421,7 +430,7 @@ export function SpacingPage() {
     </S>
     <S title="Component Heights">
       {Object.entries(h).map(([k, v]) => (
-        <View key={k} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[2] }}>
+        <View key={k} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], marginBottom: sp[2] }}>
           <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint, minWidth: 40, textAlign: 'right' }}>h-{k}</Text>
           <View style={{ width: 120, height: v as number, backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{v}px</Text>
@@ -695,7 +704,7 @@ export function IconsPage() {
     <S title="Sizes" desc="Use icon tokens for consistent sizing across components.">
       <View style={{ gap: sp[3] }}>
         {Object.entries(sizeMap).map(([name, size]) => (
-          <View key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[4] }}>
+          <View key={name} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[4] }}>
             <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint, minWidth: 40, textAlign: 'right' }}>icon.{name}</Text>
             <Icon name="chevron-right" size={size} color={theme.fg} />
             <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{size}px</Text>
@@ -748,7 +757,7 @@ export function GridSystemPage() {
     <S title="Spacing Scale">
       <View style={{ gap: sp[2] }}>
         {([['0', 0], ['0.5', 2], ['1', 4], ['2', 8], ['3', 12], ['4', 16], ['5', 20], ['6', 24], ['7', 32], ['8', 40], ['9', 48], ['10', 64], ['11', 80], ['12', 96]] as const).map(([key, val]) => (
-          <View key={key} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[4] }}>
+          <View key={key} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[4] }}>
             <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint, width: 48, textAlign: 'right' }}>sp[{key}]</Text>
             <View style={{ height: 20, width: val, backgroundColor: theme.accentSoft, borderRadius: r[1], borderWidth: 1, borderColor: theme.accentBorder }} />
             <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{val}px</Text>
@@ -905,6 +914,10 @@ export function InputPage() {
       <Prop name="disabled" type="boolean" />
       <Prop name="onChangeText" type="(text: string) => void" />
     </Props>
+    <S title="Keyboard">
+      <Rl>Input does not include KeyboardAvoidingView. Wrap your screen in KeyboardAvoidingView or use a ScrollView with keyboardShouldPersistTaps="handled".</Rl>
+      <Rl>Supports forwardRef — pass a ref to programmatically focus or blur.</Rl>
+    </S>
   </>;
 }
 
@@ -934,6 +947,9 @@ export function TextareaPage() {
       <Prop name="disabled" type="boolean" />
       <Prop name="onChangeText" type="(text: string) => void" />
     </Props>
+    <S title="Keyboard">
+      <Rl>Same as Input — wrap your screen in KeyboardAvoidingView. Supports forwardRef.</Rl>
+    </S>
   </>;
 }
 
@@ -1477,8 +1493,11 @@ export function TitleBarPage() {
       <Prop name="rightAction" type="ReactNode" desc="Right-side content" />
     </Props>
     <S title="Default"><TitleBar title="Atlas" /></S>
-    <S title="With back"><TitleBar title="Session details" backIcon={<Text style={{ color: theme.fgMuted }}>{'‹'}</Text>} onBack={() => {}} /></S>
+    <S title="With back"><TitleBar title="Session details" onBack={() => {}} /></S>
     <S title="With right action"><TitleBar title="Schedule" rightAction={<Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent }}>Today</Text>} /></S>
+    <S title="Safe area">
+      <Rl>TitleBar does not handle safe area insets — the parent screen should wrap it in a SafeAreaView or apply paddingTop from useSafeAreaInsets.</Rl>
+    </S>
   </>;
 }
 
@@ -1507,27 +1526,44 @@ export function BottomNavPage() {
   return <>
     <Import>{"import { BottomNav } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="items" type="{ label: string; icon: ReactNode; badge?: number }[]" />
+      <Prop name="items" type="{ label: string; icon: IconName | (color, size) => ReactNode; badge?: number }[]" />
       <Prop name="selected" type="number" />
       <Prop name="onSelect" type="(index: number) => void" />
     </Props>
     <S title="Default">
       <BottomNav
         items={[
-          { label: 'Atlas', icon: <Text>{'◇'}</Text> },
-          { label: 'Schedule', icon: <Text>{'◷'}</Text> },
-          { label: 'Crew', icon: <Text>{'⌂'}</Text> },
-          { label: 'Water', icon: <Text>{'⬦'}</Text> },
+          { label: 'Atlas', icon: 'search' },
+          { label: 'Schedule', icon: 'document' },
+          { label: 'Crew', icon: 'menu' },
+          { label: 'Water', icon: 'expand' },
         ]}
         selected={sel}
         onSelect={setSel}
       />
     </S>
+    <S title="With badge">
+      <BottomNav
+        items={[
+          { label: 'Atlas', icon: 'search' },
+          { label: 'Schedule', icon: 'document', badge: 3 },
+          { label: 'Crew', icon: 'menu' },
+          { label: 'Water', icon: 'expand' },
+        ]}
+        selected={1}
+        onSelect={() => {}}
+      />
+    </S>
     <S title="Rules">
       <Rl>3-5 items max. App-level destinations only.</Rl>
-      <Rl>Active: accent icon + fg label. Inactive: fgMuted.</Rl>
+      <Rl>Pass icon as an IconName string — colour and size (icon.tab = 22px) are set automatically.</Rl>
+      <Rl>Active: accent icon + accent label. Inactive: fgSubtle icon + fgSubtle label.</Rl>
+      <Rl>For custom icons, pass a render function: (color, size) => ReactNode — use the provided colour.</Rl>
       <Rl>Badge count renders as a small number above the icon.</Rl>
       <Rl>On tablet/desktop, replace with SideNav.</Rl>
+    </S>
+    <S title="Safe area">
+      <Rl>Bottom inset handled automatically via useSafeAreaInsets. No wrapper needed.</Rl>
     </S>
   </>;
 }
@@ -1587,6 +1623,9 @@ export function ToastPage() {
       <Prop name="duration" type="number" def="4000" desc="Auto-dismiss ms" />
     </Props>
     <Toast message={variant === 'success' ? 'Practice session saved' : variant === 'danger' ? 'Something went wrong' : variant === 'warn' ? 'Exam in 2 days' : 'Session starts in 10 minutes'} variant={variant as any} visible={vis} onDismiss={() => setVis(false)} />
+    <S title="Safe area">
+      <Rl>Top inset handled automatically via useSafeAreaInsets. Toast clears the notch/Dynamic Island.</Rl>
+    </S>
   </>;
 }
 
@@ -1619,6 +1658,9 @@ export function DialogPage() {
       <Rl>Danger: red primary button. Destructive actions (delete, leave, remove).</Rl>
       <Rl>Always provide a cancel/secondary option. Never auto-dismiss.</Rl>
     </S>
+    <S title="Keyboard">
+      <Rl>KeyboardAvoidingView built in. Dialog shifts up when the software keyboard opens on iOS.</Rl>
+    </S>
     <Dialog visible={vis} onClose={() => setVis(false)} title={danger ? 'Delete topic?' : 'Are you sure?'} body={danger ? 'All practice history will be removed.' : 'This action cannot be undone.'} danger={danger} primaryLabel={danger ? 'Delete' : 'Confirm'} onPrimary={() => setVis(false)} />
   </>;
 }
@@ -1640,6 +1682,12 @@ export function BottomSheetPage() {
     <BottomSheet visible={vis} onClose={() => setVis(false)} title="Session details">
       <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted }}>Inference & implied meaning{'\n'}Qudrat Reading — Mr. Hassan{'\n'}10:00 — 10:45</Text>
     </BottomSheet>
+    <S title="Safe area">
+      <Rl>Bottom inset handled automatically. Content and actions clear the home indicator.</Rl>
+    </S>
+    <S title="Keyboard">
+      <Rl>KeyboardAvoidingView built in. Sheet shifts up when the software keyboard opens on iOS.</Rl>
+    </S>
   </>;
 }
 
@@ -1664,6 +1712,9 @@ export function FullSheetPage() {
       <Rl>Deep-dive content — worked examples, slide decks, resources.</Rl>
       <Rl>Content that needs full screen focus, not a partial overlay.</Rl>
       <Rl>BottomSheet for quick actions and short content. FullSheet for reading and browsing.</Rl>
+    </S>
+    <S title="Safe area">
+      <Rl>Top and bottom insets handled automatically. Header clears the notch, scroll content clears the home indicator.</Rl>
     </S>
   </>;
 }
@@ -2165,6 +2216,7 @@ export function CalendarPage() {
       <Prop name="backIcon" type="ReactNode" desc="Back arrow — same as TitleBar" />
       <Prop name="onBack" type="() => void" desc="Back navigation — same as TitleBar" />
       <Prop name="rightAction" type="ReactNode" desc="Right-side content — same as TitleBar" />
+      <Prop name="locale" type="CalendarLocale | 'ar'" desc="Locale config: day names, months, week start day. Pass 'ar' for built-in Arabic." />
     </Props>
     <S title="Rules">
       <Rl>Week strip by default. Drag handle expands to full month.</Rl>
@@ -2173,6 +2225,11 @@ export function CalendarPage() {
       <Rl>Event dots: up to 3 dots below the day number. Accent colour.</Rl>
       <Rl>Outside days (prev/next month) shown faint.</Rl>
       <Rl>Arrows navigate weeks (collapsed) or months (expanded).</Rl>
+    </S>
+    <S title="Locale">
+      <Rl>Pass locale="ar" for Arabic (Saturday-first week, Arabic day/month names).</Rl>
+      <Rl>Or pass a custom CalendarLocale object: dayNames (7), months (12), fullDays (7), weekStart (0=Sun, 6=Sat), today (label).</Rl>
+      <Rl>Chevrons flip automatically when I18nManager.isRTL is true.</Rl>
     </S>
   </>;
 }

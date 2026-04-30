@@ -18,7 +18,7 @@ interface CheckboxGroupProps {
 export function CheckboxGroup({ values, onChange, options, title, disabled }: CheckboxGroupProps) {
   const { theme } = useTheme();
   return (
-    <View style={{ gap: sp[3] }}>
+    <View accessibilityRole="none" style={{ gap: sp[3] }}>
       {title && <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>{title}</Text>}
       {options.map(opt => (
         <Checkbox

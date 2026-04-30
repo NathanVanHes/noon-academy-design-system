@@ -51,11 +51,11 @@ export function Stepper({ value, min = 0, max = 100, step = 1, onChange, disable
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
-      <Pressable onPress={() => canDec && !disabled && onChange(value - step)} style={btnStyle(canDec)}>
+      <Pressable onPress={() => canDec && !disabled && onChange(value - step)} style={btnStyle(canDec)} accessibilityRole="button" accessibilityLabel="Decrease" accessibilityState={{ disabled: !canDec || !!disabled }}>
         <Text style={btnText}>−</Text>
       </Pressable>
-      <Text style={valueStyle}>{value}</Text>
-      <Pressable onPress={() => canInc && !disabled && onChange(value + step)} style={btnStyle(canInc)}>
+      <Text style={valueStyle} accessibilityRole="text">{value}</Text>
+      <Pressable onPress={() => canInc && !disabled && onChange(value + step)} style={btnStyle(canInc)} accessibilityRole="button" accessibilityLabel="Increase" accessibilityState={{ disabled: !canInc || !!disabled }}>
         <Text style={btnText}>+</Text>
       </Pressable>
     </View>

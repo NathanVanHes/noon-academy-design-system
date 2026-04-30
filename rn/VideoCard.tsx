@@ -37,6 +37,8 @@ export function VideoCard({ title, attribution, duration, uri, thumbnail, onPres
   return (
     <Pressable
       onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
       style={({ pressed }) => ({
         backgroundColor: theme.bgRaised,
         borderRadius: r[2],

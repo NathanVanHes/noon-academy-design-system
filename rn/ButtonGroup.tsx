@@ -5,7 +5,6 @@
  */
 import React from 'react';
 import { View, type ViewStyle } from 'react-native';
-import { useTheme } from './ThemeContext';
 import { r } from './tokens';
 
 interface ButtonGroupProps {
@@ -13,7 +12,6 @@ interface ButtonGroupProps {
 }
 
 export function ButtonGroup({ children }: ButtonGroupProps) {
-  const { theme } = useTheme();
   const items = React.Children.toArray(children);
 
   return (

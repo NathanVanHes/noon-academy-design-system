@@ -18,11 +18,12 @@ interface IconButtonProps {
   size?: Size;
   disabled?: boolean;
   onPress?: () => void;
+  accessibilityLabel?: string;
 }
 
 const sizes: Record<Size, number> = { sm: h.sm, md: h.md, lg: h.lg };
 
-export function IconButton({ children, variant = 'default', size = 'md', disabled, onPress }: IconButtonProps) {
+export function IconButton({ children, variant = 'default', size = 'md', disabled, onPress, accessibilityLabel }: IconButtonProps) {
   const { theme } = useTheme();
 
   const dim = sizes[size];
@@ -47,6 +48,8 @@ export function IconButton({ children, variant = 'default', size = 'md', disable
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={disabled ? { disabled: true } : undefined}
       disabled={disabled}
       style={({ pressed }: any) => [
         style,

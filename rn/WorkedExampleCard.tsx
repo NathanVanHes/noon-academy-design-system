@@ -1,8 +1,8 @@
 /**
- * WorkedExampleCard — opens a step-by-step worked example in a BottomSheet.
+ * WorkedExampleCard — opens a step-by-step worked example in a FullSheet.
  */
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { FullSheet } from './FullSheet';
 import { sp, r, fs, fw, font } from './tokens';
@@ -31,6 +31,8 @@ export function WorkedExampleCard({ title, steps, onPress }: WorkedExampleCardPr
     <>
       <Pressable
         onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={`${title} — ${steps?.length || 0} step worked example`}
         style={({ pressed }) => ({
           backgroundColor: theme.bgRaised,
           borderRadius: r[2],

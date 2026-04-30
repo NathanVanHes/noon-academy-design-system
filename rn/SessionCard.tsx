@@ -91,7 +91,7 @@ export function SessionCard({ time, title, meta, state = 'upcoming', statusText,
   }
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}>
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}>
       <Text style={timeStyle}>{time}</Text>
       {assessment && renderIndicator()}
       <View style={{ flex: 1 }}>

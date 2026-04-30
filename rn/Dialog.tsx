@@ -3,7 +3,7 @@
  * Overlay fades in, content scales up with 200ms ease.
  */
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native';
+import { View, Text, Modal, Pressable, Animated, Easing, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { Button } from './Button';
 import { sp, r, fs, fw, font, dur } from './tokens';
@@ -38,9 +38,11 @@ export function Dialog({ visible, onClose, title, body, primaryLabel = 'Confirm'
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(6,9,19,0.5)', justifyContent: 'center', alignItems: 'center', padding: sp[7] }} onPress={onClose}>
         <Animated.View style={{ transform: [{ scale }], opacity: contentOpacity, width: '100%', maxWidth: 320 }}>
           <Pressable
+            accessibilityRole="none"
             style={{
               backgroundColor: theme.bgRaised,
               borderRadius: r[3],
@@ -62,6 +64,7 @@ export function Dialog({ visible, onClose, title, body, primaryLabel = 'Confirm'
           </Pressable>
         </Animated.View>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

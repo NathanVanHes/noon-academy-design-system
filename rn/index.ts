@@ -43,6 +43,7 @@ export { EmptyState } from './EmptyState';
 
 // Navigation
 export { Calendar } from './Calendar';
+export type { CalendarLocale } from './Calendar';
 export { Tabs } from './Tabs';
 export { BottomNav } from './BottomNav';
 export { TitleBar } from './TitleBar';
@@ -51,6 +52,7 @@ export { FilterBar } from './FilterBar';
 // Feedback
 export { Alert } from './Alert';
 export { Toast } from './Toast';
+export { ToastProvider, useToast } from './ToastProvider';
 export { Dialog } from './Dialog';
 export { BottomSheet } from './BottomSheet';
 export { FullSheet } from './FullSheet';

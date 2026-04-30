@@ -38,10 +38,10 @@ export function Skeleton({ width = '100%', height = sp[4], circle, style }: Skel
           height: circle ? dim : height,
           borderRadius: circle ? (dim! / 2) : r[2],
           backgroundColor: theme.border,
-          opacity,
         },
+        { opacity },
         style,
-      ]}
+      ] as any}
     />
   );
 }

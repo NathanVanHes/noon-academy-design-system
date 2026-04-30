@@ -18,7 +18,7 @@ interface RadioGroupProps {
 export function RadioGroup({ value, onChange, options, title, disabled }: RadioGroupProps) {
   const { theme } = useTheme();
   return (
-    <View style={{ gap: sp[3] }}>
+    <View accessibilityRole="radiogroup" style={{ gap: sp[3] }}>
       {title && <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>{title}</Text>}
       {options.map(opt => (
         <Radio

@@ -1,9 +1,15 @@
 /**
  * Calendar — week strip by default, drag handle to expand to full month.
  * Fully self-contained, no third-party dependencies.
+ * RTL-aware: respects I18nManager.isRTL for layout direction.
+ * Locale: pass `locale` prop to override day/month names and week start.
  */
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Animated, PanResponder, Easing, LayoutAnimation, Platform, UIManager } from 'react-native';
+import React, { useState, useMemo, useRef } from 'react';
+import { View, Text, Pressable, PanResponder, LayoutAnimation, Platform, UIManager, I18nManager } from 'react-native';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, icon, dur } from './tokens';
 import { Button } from './Button';
@@ -11,13 +17,24 @@ import { IconButton } from './IconButton';
 import { Icon } from './Icon';
 import { WaypointMarker } from './Waypoints';
 
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
+const EN_DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const EN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const EN_FULL_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+const AR_DAY_NAMES = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+const AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const AR_FULL_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+export interface CalendarLocale {
+  dayNames: string[];
+  months: string[];
+  fullDays: string[];
+  weekStart: number;
+  today: string;
 }
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const FULL_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const EN_LOCALE: CalendarLocale = { dayNames: EN_DAY_NAMES, months: EN_MONTHS, fullDays: EN_FULL_DAYS, weekStart: 0, today: 'Today' };
+const AR_LOCALE: CalendarLocale = { dayNames: AR_DAY_NAMES, months: AR_MONTHS, fullDays: AR_FULL_DAYS, weekStart: 0, today: 'اليوم' };
 
 const DAY_SIZE = 40;
 
@@ -30,16 +47,18 @@ interface CalendarProps {
   backIcon?: React.ReactNode;
   onBack?: () => void;
   rightAction?: React.ReactNode;
+  locale?: CalendarLocale | 'ar';
 }
 
-function buildGrid(year: number, month: number) {
-  const first = new Date(year, month, 1).getDay();
+function buildGrid(year: number, month: number, weekStart: number = 0) {
+  const firstDow = new Date(year, month, 1).getDay();
+  const offset = (firstDow - weekStart + 7) % 7;
   const dim = new Date(year, month + 1, 0).getDate();
   const prevDim = new Date(year, month, 0).getDate();
   const days: { d: number; m: number; y: number; outside: boolean }[] = [];
-  for (let i = first - 1; i >= 0; i--) days.push({ d: prevDim - i, m: month - 1, y: year, outside: true });
+  for (let i = offset - 1; i >= 0; i--) days.push({ d: prevDim - i, m: month - 1, y: year, outside: true });
   for (let d = 1; d <= dim; d++) days.push({ d, m: month, y: year, outside: false });
-  while (days.length % 7 !== 0) days.push({ d: days.length - first - dim + 1, m: month + 1, y: year, outside: true });
+  while (days.length % 7 !== 0) days.push({ d: days.length - offset - dim + 1, m: month + 1, y: year, outside: true });
   const weeks: typeof days[] = [];
   for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
   return weeks;
@@ -47,8 +66,15 @@ function buildGrid(year: number, month: number) {
 
 function dateKey(d: number, m: number, y: number) { return `${y}-${m}-${d}`; }
 
-export function Calendar({ selected: selectedProp, onSelect, events, expanded: expandedProp, onToggle, backIcon, onBack, rightAction }: CalendarProps) {
+export function Calendar({ selected: selectedProp, onSelect, events, expanded: expandedProp, onToggle, backIcon, onBack, rightAction, locale: localeProp }: CalendarProps) {
   const { theme } = useTheme();
+  const isRTL = I18nManager.isRTL;
+  const loc: CalendarLocale = localeProp === 'ar' ? AR_LOCALE : localeProp || (isRTL ? AR_LOCALE : EN_LOCALE);
+  const reorderedDayNames = useMemo(() => {
+    const arr = [...loc.dayNames];
+    const start = loc.weekStart;
+    return [...arr.slice(start), ...arr.slice(0, start)];
+  }, [loc.dayNames, loc.weekStart]);
   const now = new Date();
   const [internalSelected, setInternalSelected] = useState(selectedProp || now);
   const [internalExpanded, setInternalExpanded] = useState(false);
@@ -58,7 +84,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
   const sel = selectedProp || internalSelected;
   const isExpanded = expandedProp !== undefined ? expandedProp : internalExpanded;
 
-  const weeks = useMemo(() => buildGrid(viewYear, viewMonth), [viewYear, viewMonth]);
+  const weeks = useMemo(() => buildGrid(viewYear, viewMonth, loc.weekStart), [viewYear, viewMonth, loc.weekStart]);
 
   const activeWeekIdx = weeks.findIndex(w =>
     w.some(d => !d.outside && d.d === sel.getDate() && d.m === sel.getMonth() && d.y === sel.getFullYear())
@@ -133,12 +159,10 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
     onMoveShouldSetPanResponder: (_, gs) => Math.abs(gs.dy) > 5,
     onPanResponderRelease: (_, gs) => {
       if (gs.dy > 20) {
-        // Drag down = expand
         LayoutAnimation.configureNext(LayoutAnimation.create(200, 'easeInEaseOut', 'opacity'));
         if (onToggle) onToggle();
         else setInternalExpanded(true);
       } else if (gs.dy < -20) {
-        // Drag up = collapse
         LayoutAnimation.configureNext(LayoutAnimation.create(200, 'easeInEaseOut', 'opacity'));
         if (onToggle) onToggle();
         else setInternalExpanded(false);
@@ -147,8 +171,8 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
   })).current;
 
   const title = isExpanded
-    ? `${MONTHS[viewMonth]} ${viewYear}`
-    : `${FULL_DAYS[sel.getDay()]}, ${MONTHS[sel.getMonth()]} ${sel.getDate()}`;
+    ? `${loc.months[viewMonth]} ${viewYear}`
+    : `${loc.fullDays[sel.getDay()]}, ${loc.months[sel.getMonth()]} ${sel.getDate()}`;
 
   const isTodaySelected = sel.getDate() === now.getDate() && sel.getMonth() === now.getMonth() && sel.getFullYear() === now.getFullYear();
 
@@ -167,6 +191,8 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
       <Pressable
         key={di}
         onPress={() => handleSelect(day.d, day.m)}
+        accessibilityRole="button"
+        accessibilityState={{ selected }}
         style={{
           flex: 1, alignItems: 'center', justifyContent: 'center',
           height: DAY_SIZE + sp[2],
@@ -202,20 +228,20 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
       {/* Header — matches TitleBar: sp[5] horizontal, sp[3] vertical, minHeight 56, font.sans fs[16] fw[600] */}
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: sp[5], paddingVertical: sp[3], minHeight: 56, gap: sp[3] }}>
         {onBack && (
-          <Pressable onPress={onBack} hitSlop={8}>
-            {backIcon || <Text style={{ fontSize: fs[20], color: theme.fgMuted }}>‹</Text>}
+          <Pressable onPress={onBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Back">
+            {backIcon || <Icon name={isRTL ? 'chevron-right' : 'chevron-left'} size={icon.lg} color={theme.fgMuted} />}
           </Pressable>
         )}
         <Text style={{ fontFamily: font.sans, fontSize: fs[16], fontWeight: fw[600], color: theme.fg, flex: 1 }} numberOfLines={1}>{title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
           {!isTodaySelected && (
-            <Button variant="ghost" size="sm" onPress={goToday}>Today</Button>
+            <Button variant="ghost" size="sm" onPress={goToday}>{loc.today}</Button>
           )}
-          <IconButton variant="ghost" size="sm" onPress={prev}>
-            <Icon name="chevron-left" size={icon.md} color={theme.fgMuted} />
+          <IconButton variant="ghost" size="sm" onPress={prev} accessibilityLabel={isExpanded ? 'Previous month' : 'Previous day'}>
+            <Icon name={isRTL ? 'chevron-right' : 'chevron-left'} size={icon.md} color={theme.fgMuted} />
           </IconButton>
-          <IconButton variant="ghost" size="sm" onPress={next}>
-            <Icon name="chevron-right" size={icon.md} color={theme.fgMuted} />
+          <IconButton variant="ghost" size="sm" onPress={next} accessibilityLabel={isExpanded ? 'Next month' : 'Next day'}>
+            <Icon name={isRTL ? 'chevron-left' : 'chevron-right'} size={icon.md} color={theme.fgMuted} />
           </IconButton>
           {rightAction}
         </View>
@@ -223,7 +249,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
 
       {/* Weekday headers */}
       <View style={{ flexDirection: 'row', paddingHorizontal: sp[4] }}>
-        {DAY_NAMES.map(d => (
+        {reorderedDayNames.map(d => (
           <View key={d} style={{ flex: 1, alignItems: 'center', paddingVertical: sp[1] }}>
             <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, textTransform: 'uppercase' }}>{d}</Text>
           </View>

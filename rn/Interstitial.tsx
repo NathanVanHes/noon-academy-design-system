@@ -1,9 +1,9 @@
 /**
  * Interstitial — full-screen mastery celebration.
- * Image, title, description, button. Confetti rains over everything.
+ * Title, description, button. Confetti rains over everything.
  */
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, type ViewStyle, type TextStyle } from 'react-native';
+import { View, Text, Animated } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { Button } from './Button';
 import { sp, fs, fw, font, r, color } from './tokens';
@@ -15,7 +15,7 @@ interface InterstitialProps {
   onPress: () => void;
 }
 
-const CONFETTI_COLORS = [color.noon[400], color.gold[200], color.gold[400], color.noon[200], '#fff'];
+const CONFETTI_COLORS = [color.noon[400], color.gold[200], color.gold[400], color.noon[200], color.chalk[100]];
 const PARTICLE_COUNT = 80;
 
 function ConfettiParticle({ delay, color: c }: { delay: number; color: string }) {
@@ -102,7 +102,7 @@ export function Interstitial({ title, body, buttonLabel, onPress }: Interstitial
 
       {/* CTA */}
       <View style={{ width: '100%', maxWidth: 280, zIndex: 2, paddingBottom: sp[6] }}>
-        <Button variant="primary" block onPress={onPress}>{buttonLabel}</Button>
+        <Button variant="primary" fullWidth onPress={onPress}>{buttonLabel}</Button>
       </View>
     </View>
   );

@@ -7,7 +7,7 @@ import React from 'react';
 import { View, Text, Pressable, Modal, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font } from './tokens';
+import { sp, fs, fw, font } from './tokens';
 
 interface FullSheetProps {
   visible: boolean;
@@ -25,7 +25,7 @@ export function FullSheet({ visible, onClose, title, children }: FullSheetProps)
       <View style={{ flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: sp[5], paddingVertical: sp[3], borderBottomWidth: 1, borderBottomColor: theme.divider }}>
           <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg, flex: 1 }} numberOfLines={1}>{title}</Text>
-          <Pressable onPress={onClose} hitSlop={8}>
+          <Pressable onPress={onClose} hitSlop={8} accessibilityRole="button" accessibilityLabel="Close">
             <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle }}>Close</Text>
           </Pressable>
         </View>

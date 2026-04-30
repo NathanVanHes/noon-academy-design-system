@@ -76,6 +76,8 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
     <Pressable
       onPress={onPress}
       disabled={state === 'disabled' || state === 'correct' || state === 'incorrect'}
+      accessibilityRole="button"
+      accessibilityState={{ selected: state === 'selected', disabled: state === 'disabled' }}
       style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}
     >
       <View style={labelStyle}>

@@ -1,9 +1,10 @@
 /**
- * BottomSheet — slides up from bottom. Drag to dismiss.
- * Requires react-native-reanimated + react-native-gesture-handler.
+ * BottomSheet — slides up from bottom. Tap scrim to dismiss.
+ * Uses Modal with slide animation. No gesture library required.
  */
 import React from 'react';
-import { View, Pressable, Text, Modal, type ViewStyle } from 'react-native';
+import { View, Pressable, Text, Modal, KeyboardAvoidingView, Platform, type ViewStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, font } from './tokens';
 
@@ -18,6 +19,7 @@ interface BottomSheetProps {
 
 export function BottomSheet({ visible, onClose, title, children, actions, full }: BottomSheetProps) {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const scrimStyle: ViewStyle = {
     flex: 1,
@@ -50,7 +52,8 @@ export function BottomSheet({ visible, onClose, title, children, actions, full }
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={scrimStyle} onPress={onClose}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <Pressable style={scrimStyle} onPress={onClose} accessibilityRole="none">
         <Pressable style={sheetStyle} onPress={(e) => e.stopPropagation()}>
           <View style={handleStyle} />
           {title && (
@@ -58,16 +61,17 @@ export function BottomSheet({ visible, onClose, title, children, actions, full }
               <Text style={{ fontFamily: font.serif, fontSize: fs[18], color: theme.fg }}>{title}</Text>
             </View>
           )}
-          <View style={{ paddingHorizontal: sp[6], paddingBottom: sp[5], ...(full ? { flex: 1 } : {}) }}>
+          <View style={{ paddingHorizontal: sp[6], paddingBottom: actions ? sp[5] : Math.max(sp[5], insets.bottom), ...(full ? { flex: 1 } : {}) }}>
             {children}
           </View>
           {actions && (
-            <View style={{ borderTopWidth: 1, borderTopColor: theme.border, padding: sp[4], paddingHorizontal: sp[6] }}>
+            <View style={{ borderTopWidth: 1, borderTopColor: theme.border, padding: sp[4], paddingBottom: Math.max(sp[4], insets.bottom), paddingHorizontal: sp[6] }}>
               {actions}
             </View>
           )}
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

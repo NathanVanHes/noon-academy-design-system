@@ -30,6 +30,8 @@ export function SlidesCard({ title, attribution, slides, onPress }: SlidesCardPr
     <>
       <Pressable
         onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={`${title} — ${slides.length} slide${slides.length !== 1 ? 's' : ''}`}
         style={({ pressed }) => ({
           backgroundColor: theme.bgRaised,
           borderRadius: r[2],

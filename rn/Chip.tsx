@@ -6,7 +6,8 @@
 import React from 'react';
 import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font, icon } from './tokens';
+import { sp, r, fs, fw, font, icon as iconTokens } from './tokens';
+import { Icon } from './Icon';
 
 type Variant = 'default' | 'accent';
 
@@ -48,9 +49,9 @@ export function Chip({ children, variant = 'default', dismissable, dot, disabled
   };
 
   const dotStyle: ViewStyle = {
-    width: icon.xs,
-    height: icon.xs,
-    borderRadius: icon.xs / 2,
+    width: iconTokens.xs,
+    height: iconTokens.xs,
+    borderRadius: iconTokens.xs / 2,
     backgroundColor: textColor,
   };
 
@@ -59,8 +60,8 @@ export function Chip({ children, variant = 'default', dismissable, dot, disabled
       {dot && <View style={dotStyle} />}
       <Text style={textStyle}>{children}</Text>
       {dismissable && !disabled && (
-        <Pressable onPress={onDismiss} hitSlop={4} style={{ marginLeft: sp[0.5] }}>
-          <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: textColor, opacity: 0.6 }}>×</Text>
+        <Pressable onPress={onDismiss} hitSlop={4} style={{ marginLeft: sp[0.5], opacity: 0.6 }} accessibilityRole="button" accessibilityLabel={`Remove ${children}`}>
+          <Icon name="close" size={iconTokens.sm} color={textColor} />
         </Pressable>
       )}
     </>

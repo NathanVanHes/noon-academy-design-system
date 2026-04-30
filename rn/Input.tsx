@@ -1,7 +1,7 @@
 /**
  * Input — text input with label, error state, helper text.
  */
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { View, TextInput, Text, type ViewStyle, type TextStyle, type TextInputProps } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font } from './tokens';
@@ -13,7 +13,7 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
   disabled?: boolean;
 }
 
-export function Input({ label, error, helper, disabled, ...rest }: InputProps) {
+export const Input = forwardRef<TextInput, InputProps>(({ label, error, helper, disabled, ...rest }, ref) => {
   const { theme } = useTheme();
   const [focused, setFocused] = useState(false);
 
@@ -53,8 +53,10 @@ export function Input({ label, error, helper, disabled, ...rest }: InputProps) {
     <View style={containerStyle}>
       {label && <Text style={labelStyle}>{label}</Text>}
       <TextInput
+        ref={ref}
         {...rest}
         editable={!disabled}
+        accessibilityLabel={label}
         placeholderTextColor={theme.fgFaint}
         onFocus={(e) => { setFocused(true); rest.onFocus?.(e); }}
         onBlur={(e) => { setFocused(false); rest.onBlur?.(e); }}
@@ -63,4 +65,4 @@ export function Input({ label, error, helper, disabled, ...rest }: InputProps) {
       {(error || helper) && <Text style={helperStyle}>{error || helper}</Text>}
     </View>
   );
-}
+});

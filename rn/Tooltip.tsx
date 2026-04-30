@@ -60,7 +60,7 @@ export function Tooltip({ text, children }: TooltipProps) {
         {children}
       </Pressable>
       {visible && (
-        <View style={tipStyle}>
+        <View style={tipStyle} accessibilityRole={"tooltip" as any}>
           <Text style={textStyle}>{text}</Text>
           <View style={arrowStyle} />
         </View>

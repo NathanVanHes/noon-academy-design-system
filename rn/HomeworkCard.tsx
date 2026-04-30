@@ -52,7 +52,7 @@ export function HomeworkCard({ title, subject, dueDate, questions, status = 'pen
   };
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}>
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}>
       {/* Due date */}
       <View style={{ minWidth: 40 }}>
         <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: isOverdue ? theme.danger : theme.fgFaint }}>{dueDate}</Text>

@@ -3,7 +3,7 @@
  * Variants: default, large, transparent, overlay.
  */
 import React from 'react';
-import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
+import { View, Text, Pressable, I18nManager, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, h, icon } from './tokens';
 import { Icon } from './Icon';
@@ -56,8 +56,8 @@ export function TitleBar({ title, subtitle, variant = 'default', backIcon, onBac
       {!isLarge && (
         <>
           {onBack && (
-            <Pressable onPress={onBack} hitSlop={8}>
-              {backIcon || <Icon name="chevron-left" size={icon.lg} color={theme.fgMuted} />}
+            <Pressable onPress={onBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Back">
+              {backIcon || <Icon name={I18nManager.isRTL ? 'chevron-right' : 'chevron-left'} size={icon.lg} color={theme.fgMuted} />}
             </Pressable>
           )}
           <Text style={titleStyle} numberOfLines={1}>{title}</Text>
@@ -68,8 +68,8 @@ export function TitleBar({ title, subtitle, variant = 'default', backIcon, onBac
         <>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], width: '100%' }}>
             {onBack && (
-              <Pressable onPress={onBack} hitSlop={8}>
-                {backIcon || <Icon name="chevron-left" size={icon.lg} color={theme.fgMuted} />}
+              <Pressable onPress={onBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Back">
+                {backIcon || <Icon name={I18nManager.isRTL ? 'chevron-right' : 'chevron-left'} size={icon.lg} color={theme.fgMuted} />}
               </Pressable>
             )}
             <View style={{ flex: 1 }} />

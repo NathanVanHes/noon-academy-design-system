@@ -4,7 +4,7 @@
  * Items with optional icons and destructive variant.
  */
 import React from 'react';
-import { View, Text, Pressable, Modal } from 'react-native';
+import { View, Text, Pressable, Modal, I18nManager } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, r, color } from './tokens';
 
@@ -23,13 +23,15 @@ interface MenuProps {
 
 export function Menu({ visible, onClose, items }: MenuProps) {
   const { theme } = useTheme();
+  const isRTL = I18nManager.isRTL;
 
   return (
     <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
       <Pressable style={{ flex: 1 }} onPress={onClose}>
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.3)' }} />
-        <View style={{
-          position: 'absolute', top: 100, right: sp[5],
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(6,9,19,0.5)' }} />
+        <View accessibilityRole="menu" style={{
+          position: 'absolute', top: 100,
+          ...(isRTL ? { left: sp[5] } : { right: sp[5] }),
           backgroundColor: theme.bgOverlay,
           borderRadius: r[3],
           borderWidth: 1,
@@ -45,6 +47,7 @@ export function Menu({ visible, onClose, items }: MenuProps) {
           {items.map((item, i) => (
             <Pressable
               key={i}
+              accessibilityRole="menuitem"
               onPress={() => { item.onPress(); onClose(); }}
               style={({ pressed }) => ({
                 flexDirection: 'row',
