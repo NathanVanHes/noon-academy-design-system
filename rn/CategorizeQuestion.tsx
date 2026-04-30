@@ -17,18 +17,26 @@ interface Category {
 }
 
 interface CategorizeQuestionProps {
-  question: string;
-  instruction?: string;
   items: DragItemData[];
   categories: Category[];
   correctMapping: Record<string, string>;
-  mode?: 'practice' | 'exam' | 'review';
+  instruction?: string;
+  optionsPosition?: 'top' | 'bottom';
+  showButtons?: boolean;
   onAnswer?: (placements: Record<string, string>) => void;
+  onReady?: (controls: { submit: () => void; reset: () => void; allPlaced: boolean; submitted: boolean }) => void;
 }
 
-export function CategorizeQuestion({ question, instruction, items, categories, correctMapping, mode, onAnswer }: CategorizeQuestionProps) {
+export function CategorizeQuestion({ items, categories, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }: CategorizeQuestionProps) {
   const { theme } = useTheme();
   const dd = useDragDrop({ items, zones: categories.map(c => c.id), correctMapping, allowMultiplePerZone: true, onAnswer });
+
+  const onReadyRef = React.useRef(onReady);
+  onReadyRef.current = onReady;
+
+  React.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
 
   const itemsInZone = (zoneId: string): DragItemData[] => {
     return Object.entries(dd.placements)
@@ -37,9 +45,16 @@ export function CategorizeQuestion({ question, instruction, items, categories, c
       .filter(Boolean);
   };
 
+  const sourceItems = !dd.submitted ? (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[2], alignItems: 'flex-start', minHeight: sp[2], overflow: 'visible' }}>
+      {items.filter(item => !dd.placements[item.id]).map(item => (
+        <DragItem key={item.id} item={item} state={dd.itemStates[item.id]} onDragStart={dd.onDragStart} onDragMove={dd.onDragMove} onDragEnd={dd.onDragEnd} />
+      ))}
+    </View>
+  ) : null;
+
   return (
-    <QuestionFrame question={question} instruction={instruction || 'Drag each item into the correct category'} mode={mode} submitted={dd.submitted} allPlaced={dd.allPlaced} onSubmit={dd.submit} onReset={dd.reset}>
-      {/* Category buckets */}
+    <QuestionFrame instruction={instruction || 'Drag each item into the correct category'} optionsPosition={optionsPosition} options={sourceItems} showButtons={showButtons} submitted={dd.submitted} allPlaced={dd.allPlaced} onSubmit={dd.submit} onReset={dd.reset}>
       <View style={{ flexDirection: 'row', gap: sp[3], overflow: 'visible' }}>
         {categories.map(cat => {
           const placed = itemsInZone(cat.id);
@@ -50,14 +65,7 @@ export function CategorizeQuestion({ question, instruction, items, categories, c
                 {placed.length > 0 && (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[2], alignItems: 'flex-start', padding: sp[1] }}>
                     {placed.map(p => (
-                      <DragItem
-                        key={p.id}
-                        item={p}
-                        state={dd.itemStates[p.id]}
-                        onDragStart={dd.onDragStart}
-                        onDragMove={dd.onDragMove}
-                        onDragEnd={dd.onDragEnd}
-                      />
+                      <DragItem key={p.id} item={p} state={dd.itemStates[p.id]} onDragStart={dd.onDragStart} onDragMove={dd.onDragMove} onDragEnd={dd.onDragEnd} />
                     ))}
                   </View>
                 )}
@@ -66,22 +74,6 @@ export function CategorizeQuestion({ question, instruction, items, categories, c
           );
         })}
       </View>
-
-      {/* Source items — only show unplaced */}
-      {!dd.submitted && (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[2], alignItems: 'flex-start', minHeight: sp[2], overflow: 'visible' }}>
-          {items.filter(item => !dd.placements[item.id]).map(item => (
-            <DragItem
-              key={item.id}
-              item={item}
-              state={dd.itemStates[item.id]}
-              onDragStart={dd.onDragStart}
-              onDragMove={dd.onDragMove}
-              onDragEnd={dd.onDragEnd}
-            />
-          ))}
-        </View>
-      )}
     </QuestionFrame>
   );
 }

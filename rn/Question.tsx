@@ -71,8 +71,10 @@ interface QuestionProps {
   image?: ImageSourcePropType;
   imageAspectRatio?: number;
   instruction?: string;
-  mode?: 'practice' | 'exam' | 'review';
+  optionsPosition?: 'top' | 'bottom';
+  showButtons?: boolean;
   onAnswer?: (placements: Record<string, string>) => void;
+  onReady?: (controls: { submit: () => void; reset: () => void; allPlaced: boolean; submitted: boolean }) => void;
   type: QuestionType;
   choiceProps?: ChoiceProps;
   matchProps?: MatchProps;
@@ -118,7 +120,7 @@ function ChoiceAnswer({ options, selected, correctIndex, submitted, onSelect }: 
   );
 }
 
-export function Question({ text, image, imageAspectRatio = 16 / 9, instruction, mode, onAnswer, type, choiceProps, matchProps, categorizeProps, orderProps, fillBlanksProps, hotspotProps }: QuestionProps) {
+export function Question({ text, image, imageAspectRatio = 16 / 9, instruction, optionsPosition, showButtons, onAnswer, onReady, type, choiceProps, matchProps, categorizeProps, orderProps, fillBlanksProps, hotspotProps }: QuestionProps) {
   const { theme } = useTheme();
   const inst = instruction || TYPE_INSTRUCTIONS[type];
 
@@ -146,19 +148,19 @@ export function Question({ text, image, imageAspectRatio = 16 / 9, instruction, 
         <ChoiceAnswer {...choiceProps} />
       )}
       {type === 'match' && matchProps && (
-        <MatchQuestion question="" mode={mode} onAnswer={onAnswer} {...matchProps} />
+        <MatchQuestion optionsPosition={optionsPosition} showButtons={showButtons} onAnswer={onAnswer} onReady={onReady} {...matchProps} />
       )}
       {type === 'categorize' && categorizeProps && (
-        <CategorizeQuestion question="" mode={mode} onAnswer={onAnswer} {...categorizeProps} />
+        <CategorizeQuestion optionsPosition={optionsPosition} showButtons={showButtons} onAnswer={onAnswer} onReady={onReady} {...categorizeProps} />
       )}
       {type === 'order' && orderProps && (
-        <OrderQuestion question="" mode={mode} onAnswer={onAnswer} {...orderProps} />
+        <OrderQuestion optionsPosition={optionsPosition} showButtons={showButtons} onAnswer={onAnswer} onReady={onReady} {...orderProps} />
       )}
       {type === 'fillblanks' && fillBlanksProps && (
-        <FillBlanksQuestion question="" mode={mode} onAnswer={onAnswer} {...fillBlanksProps} />
+        <FillBlanksQuestion optionsPosition={optionsPosition} showButtons={showButtons} onAnswer={onAnswer} onReady={onReady} {...fillBlanksProps} />
       )}
       {type === 'hotspot' && hotspotProps && (
-        <HotspotQuestion question="" mode={mode} onAnswer={onAnswer} {...hotspotProps} />
+        <HotspotQuestion optionsPosition={optionsPosition} showButtons={showButtons} onAnswer={onAnswer} onReady={onReady} {...hotspotProps} />
       )}
     </View>
   );

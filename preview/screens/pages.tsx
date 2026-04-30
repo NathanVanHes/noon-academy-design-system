@@ -16,7 +16,7 @@ import {
   Icon, iconNames,
   GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
-  ChatMessage, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
+  ChatMessage, TypingIndicator, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
   MatchQuestion, CategorizeQuestion, OrderQuestion, FillBlanksQuestion, HotspotQuestion,
   sp, fs, fw, font, color, r, h, icon, lh, dur,
 } from '../../rn';
@@ -892,16 +892,20 @@ export function InputPage() {
   const [hasLabel, setHasLabel] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [placeholder, setPlaceholder] = useState('Enter text');
+  const [helper, setHelper] = useState(false);
   return <>
     <Playground
       knobs={<>
         <KnobToggle label="Label" value={hasLabel} onChange={setHasLabel} />
         <KnobToggle label="Error" value={hasError} onChange={setHasError} />
         <KnobToggle label="Disabled" value={isDisabled} onChange={setIsDisabled} />
+        <KnobText label="placeholder" value={placeholder} onChange={setPlaceholder} />
+        <KnobToggle label="helper" value={helper} onChange={setHelper} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <Input label={hasLabel ? 'Email' : undefined} placeholder="Enter text" error={hasError ? 'Invalid email' : undefined} disabled={isDisabled} />
+        <Input label={hasLabel ? 'Email' : undefined} placeholder={placeholder} error={hasError ? 'Invalid email' : undefined} disabled={isDisabled} helper={helper ? 'We will never share your email' : undefined} />
       </View>
     </Playground>
 
@@ -926,16 +930,20 @@ export function TextareaPage() {
   const [hasLabel, setHasLabel] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [placeholder, setPlaceholder] = useState('Write...');
+  const [rowsSel, setRowsSel] = useState('3');
   return <>
     <Playground
       knobs={<>
         <KnobToggle label="Label" value={hasLabel} onChange={setHasLabel} />
         <KnobToggle label="Error" value={hasError} onChange={setHasError} />
         <KnobToggle label="Disabled" value={isDisabled} onChange={setIsDisabled} />
+        <KnobText label="placeholder" value={placeholder} onChange={setPlaceholder} />
+        <KnobSelect label="rows" value={rowsSel} options={['2','3','4','6']} onChange={setRowsSel} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <Textarea label={hasLabel ? 'Notes' : undefined} placeholder="Write..." rows={3} error={hasError ? 'Required' : undefined} disabled={isDisabled} />
+        <Textarea label={hasLabel ? 'Notes' : undefined} placeholder={placeholder} rows={parseInt(rowsSel)} error={hasError ? 'Required' : undefined} disabled={isDisabled} />
       </View>
     </Playground>
 
@@ -959,15 +967,17 @@ export function StepperPage() {
   const [disabled, setDisabled] = useState(false);
   const [min, setMin] = useState('0');
   const [max, setMax] = useState('10');
+  const [stepSel, setStepSel] = useState('1');
   return <>
     <Playground
       knobs={<>
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
         <KnobSelect label="Min" value={min} options={['0', '1', '5']} onChange={setMin} />
         <KnobSelect label="Max" value={max} options={['5', '10', '20', '100']} onChange={setMax} />
+        <KnobSelect label="step" value={stepSel} options={['1','2','5','10']} onChange={setStepSel} />
       </>}
     >
-      <Stepper value={val} min={parseInt(min)} max={parseInt(max)} onChange={setVal} disabled={disabled} />
+      <Stepper value={val} min={parseInt(min)} max={parseInt(max)} step={parseInt(stepSel)} onChange={setVal} disabled={disabled} />
     </Playground>
 
     <Import>{"import { Stepper } from '@noon/design-system';"}</Import>
@@ -1172,16 +1182,18 @@ export function QuizPage() {
   const [state, setState] = useState('default');
   const [hasImage, setHasImage] = useState(false);
   const [optText, setOptText] = useState('There is hidden potential despite appearances');
+  const [label, setLabel] = useState('B');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="State" value={state} options={['default','selected','correct','incorrect','disabled']} onChange={setState} />
         <KnobToggle label="Image" value={hasImage} onChange={setHasImage} />
         <KnobText label="Text" value={optText} onChange={setOptText} />
+        <KnobText label="label" value={label} onChange={setLabel} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <QuizOption label="B" text={optText || undefined} image={hasImage ? { uri: 'https://placehold.co/640x360/2a3450/2a3450' } : undefined} state={state as any} />
+        <QuizOption label={label} text={optText || undefined} image={hasImage ? require('../../reference/Tester.png') : undefined} state={state as any} />
       </View>
     </Playground>
 
@@ -1198,27 +1210,46 @@ export function QuizPage() {
       <C label="Selected"><QuizOption label="B" text="There is hidden potential" state="selected" /></C>
       <C label="Correct"><QuizOption label="B" text="There is hidden potential" state="correct" /></C>
       <C label="Incorrect"><QuizOption label="D" text="The landscape will change soon" state="incorrect" /></C>
-      <C label="Image only"><QuizOption label="C" image={{ uri: 'https://placehold.co/640x360/2a3450/2a3450' }} /></C>
-      <C label="Image + text"><QuizOption label="A" text="The door is described as ajar" image={{ uri: 'https://placehold.co/640x360/2a3450/2a3450' }} /></C>
+      <C label="Image only"><QuizOption label="C" image={require('../../reference/Tester.png')} /></C>
+      <C label="Image + text"><QuizOption label="A" text="The door is described as ajar" image={require('../../reference/Tester.png')} /></C>
     </S>
   </>;
 }
 
 export function MatchPage() {
+  const { theme } = useTheme();
+  const [hasImage, setHasImage] = useState(false);
+  const [optPos, setOptPos] = useState('bottom');
+  const [showBtns, setShowBtns] = useState(true);
+  const [key, setKey] = useState(0);
+  const [controls, setControls] = useState<any>(null);
   return <>
-    <Playground knobs={<></>}>
+    <Playground
+      knobs={<>
+        <KnobToggle label="items (images)" value={hasImage} onChange={(v) => { setHasImage(v); setKey(k => k + 1); }} />
+        <KnobSelect label="optionsPosition" value={optPos} options={['top', 'bottom']} onChange={(v) => { setOptPos(v); setKey(k => k + 1); }} />
+        <KnobToggle label="showButtons" value={showBtns} onChange={(v) => { setShowBtns(v); setKey(k => k + 1); }} />
+      </>}
+    >
       <View style={{ width: '100%' }}>
         <MatchQuestion
-          question="Match each term to its definition"
-          items={[
-            { id: 'a', label: 'Velocity' },
-            { id: 'b', label: 'Acceleration' },
-            { id: 'c', image: { uri: 'https://placehold.co/96x96/232c43/3a4560' }, imageSize: 48 },
+          key={key}
+          optionsPosition={optPos as any}
+          showButtons={showBtns}
+          onReady={setControls}
+          items={hasImage ? [
+            { id: 'a', image: require('../../reference/Tester.png') },
+            { id: 'b', image: require('../../reference/Tester.png') },
+            { id: 'c', image: require('../../reference/Tester.png') },
+          ] : [
+            { id: 'a', label: 'Summarise' },
+            { id: 'b', label: 'Infer' },
+            { id: 'c', label: 'Compare' },
           ]}
           targets={[
-            { id: 't1', label: 'Rate of change of position' },
-            { id: 't2', label: 'Rate of change of velocity' },
-            { id: 't3', label: 'Mass times acceleration' },
+            { id: 't1', label: 'Give a brief overview of the main points' },
+            { id: 't2', label: 'Draw a conclusion from the evidence' },
+            { id: 't3', label: 'Identify similarities and differences' },
           ]}
           correctMapping={{ a: 't1', b: 't2', c: 't3' }}
         />
@@ -1226,63 +1257,104 @@ export function MatchPage() {
     </Playground>
     <Import>{"import { MatchQuestion } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="question" type="string" />
       <Prop name="items" type="DragItemData[]" desc="{ id, label?, image?, imageSize? }" />
       <Prop name="targets" type="{ id, label }[]" desc="Drop targets — one per item" />
       <Prop name="correctMapping" type="Record<string, string>" desc="itemId → targetId" />
+      <Prop name="optionsPosition" type="'top' | 'bottom'" def="'bottom'" desc="Where source items render relative to drop zones" />
+      <Prop name="onReady" type="(controls) => void" desc="Receives { submit, reset, allPlaced, submitted }" />
+      <Prop name="onAnswer" type="(placements) => void" desc="Called on every placement change" />
     </Props>
-    <S title="Rules">
-      <Rl>1:1 mapping — each item matches exactly one target.</Rl>
-      <Rl>Items can be text or images (32–80px). Targets are always text labels.</Rl>
-      <Rl>Drag from the source area to the drop zone next to each target.</Rl>
+    <S title="Custom layout">
+      <Rl>For custom layouts, compose with the primitives: useDragDrop + DragItem + DropZone + PlacedItem + QuestionFrame.</Rl>
     </S>
   </>;
 }
 
 export function CategorizePage() {
+  const [hasImage, setHasImage] = useState(false);
+  const [optPos, setOptPos] = useState('bottom');
+  const [showBtns, setShowBtns] = useState(true);
+  const [key, setKey] = useState(0);
+  const [controls, setControls] = useState<any>(null);
   return <>
-    <Playground knobs={<></>}>
+    <Playground
+      knobs={<>
+
+        <KnobToggle label="items (images)" value={hasImage} onChange={(v) => { setHasImage(v); setKey(k => k + 1); }} />
+        <KnobSelect label="optionsPosition" value={optPos} options={['top', 'bottom']} onChange={(v) => { setOptPos(v); setKey(k => k + 1); }} />
+        <KnobToggle label="showButtons" value={showBtns} onChange={(v) => { setShowBtns(v); setKey(k => k + 1); }} />
+      </>}
+    >
       <View style={{ width: '100%' }}>
         <CategorizeQuestion
-          question="Sort these into the correct category"
-          items={[
-            { id: 'a', label: 'Proton' },
-            { id: 'b', label: 'Electron' },
-            { id: 'c', image: { uri: 'https://placehold.co/96x96/232c43/3a4560' }, imageSize: 40 },
-            { id: 'd', label: 'Photon' },
+          key={key}
+          optionsPosition={optPos as any}
+          showButtons={showBtns}
+          onReady={setControls}
+          items={hasImage ? [
+            { id: 'a', image: require('../../reference/Tester.png') },
+            { id: 'b', image: require('../../reference/Tester.png') },
+            { id: 'c', image: require('../../reference/Tester.png') },
+            { id: 'd', image: require('../../reference/Tester.png') },
+          ] : [
+            { id: 'a', label: 'Triangle' },
+            { id: 'b', label: 'Square' },
+            { id: 'c', label: 'Circle' },
+            { id: 'd', label: 'Rectangle' },
           ]}
           categories={[
-            { id: 'charged', label: 'Charged' },
-            { id: 'neutral', label: 'Neutral' },
+            { id: 'curved', label: 'Curved' },
+            { id: 'straight', label: 'Straight edges' },
           ]}
-          correctMapping={{ a: 'charged', b: 'charged', c: 'neutral', d: 'neutral' }}
+          correctMapping={{ a: 'straight', b: 'straight', c: 'curved', d: 'straight' }}
         />
       </View>
     </Playground>
     <Import>{"import { CategorizeQuestion } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="question" type="string" />
+
       <Prop name="items" type="DragItemData[]" desc="Items to categorize" />
       <Prop name="categories" type="{ id, label }[]" desc="Category buckets" />
       <Prop name="correctMapping" type="Record<string, string>" desc="itemId → categoryId" />
+      <Prop name="mode" type="'practice' | 'exam' | 'review'" def="'practice'" />
+      <Prop name="optionsPosition" type="'top' | 'bottom'" def="'bottom'" desc="Where source items render relative to drop zones" />
+      <Prop name="onAnswer" type="(placements) => void" desc="Called on every placement change" />
     </Props>
-    <S title="Rules">
-      <Rl>Many:1 — multiple items can go in each category.</Rl>
-      <Rl>Categories are text labels. Items can be text or images.</Rl>
+    <S title="Custom layout">
+      <Rl>For custom layouts, compose with the primitives: useDragDrop + DragItem + DropZone (neutral) + PlacedItem.</Rl>
     </S>
   </>;
 }
 
 export function OrderPage() {
+  const [hasImage, setHasImage] = useState(false);
+  const [optPos, setOptPos] = useState('bottom');
+  const [showBtns, setShowBtns] = useState(true);
+  const [key, setKey] = useState(0);
+  const [controls, setControls] = useState<any>(null);
   return <>
-    <Playground knobs={<></>}>
+    <Playground
+      knobs={<>
+
+        <KnobToggle label="items (images)" value={hasImage} onChange={(v) => { setHasImage(v); setKey(k => k + 1); }} />
+        <KnobSelect label="optionsPosition" value={optPos} options={['top', 'bottom']} onChange={(v) => { setOptPos(v); setKey(k => k + 1); }} />
+        <KnobToggle label="showButtons" value={showBtns} onChange={(v) => { setShowBtns(v); setKey(k => k + 1); }} />
+      </>}
+    >
       <View style={{ width: '100%' }}>
         <OrderQuestion
-          question="Put these events in chronological order"
-          items={[
-            { id: 'c', label: 'Treaty signed' },
-            { id: 'a', image: { uri: 'https://placehold.co/96x96/232c43/3a4560' }, imageSize: 40 },
-            { id: 'b', label: 'Battle fought' },
+          key={key}
+          optionsPosition={optPos as any}
+          showButtons={showBtns}
+          onReady={setControls}
+          items={hasImage ? [
+            { id: 'c', image: require('../../reference/Tester.png') },
+            { id: 'a', image: require('../../reference/Tester.png') },
+            { id: 'b', image: require('../../reference/Tester.png') },
+          ] : [
+            { id: 'c', label: 'Review your answers' },
+            { id: 'a', label: 'Read the passage' },
+            { id: 'b', label: 'Answer the questions' },
           ]}
           correctOrder={['a', 'b', 'c']}
         />
@@ -1290,63 +1362,92 @@ export function OrderPage() {
     </Playground>
     <Import>{"import { OrderQuestion } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="question" type="string" />
+
       <Prop name="items" type="DragItemData[]" desc="Items to order (shown shuffled)" />
       <Prop name="correctOrder" type="string[]" desc="Item IDs in correct sequence" />
+      <Prop name="mode" type="'practice' | 'exam' | 'review'" def="'practice'" />
+      <Prop name="optionsPosition" type="'top' | 'bottom'" def="'bottom'" desc="Where source items render relative to drop zones" />
+      <Prop name="onAnswer" type="(placements) => void" desc="Called on every placement change" />
     </Props>
-    <S title="Rules">
-      <Rl>Items must be placed into numbered slots in sequence.</Rl>
-      <Rl>Each slot accepts exactly one item.</Rl>
+    <S title="Custom layout">
+      <Rl>For custom layouts, compose with the primitives: useDragDrop + DragItem + DropZone (inline) + PlacedItem.</Rl>
     </S>
   </>;
 }
 
 export function FillBlanksPage() {
+  const [optPos, setOptPos] = useState('bottom');
+  const [showBtns, setShowBtns] = useState(true);
+  const [key, setKey] = useState(0);
+  const [controls, setControls] = useState<any>(null);
   return <>
-    <Playground knobs={<></>}>
+    <Playground
+      knobs={<>
+
+        <KnobSelect label="optionsPosition" value={optPos} options={['top', 'bottom']} onChange={(v) => { setOptPos(v); setKey(k => k + 1); }} />
+        <KnobToggle label="showButtons" value={showBtns} onChange={(v) => { setShowBtns(v); setKey(k => k + 1); }} />
+      </>}
+    >
       <View style={{ width: '100%' }}>
         <FillBlanksQuestion
-          question="Complete the sentence"
-          sentence="The {{b1}} of an object is equal to its {{b2}} multiplied by its {{b3}}."
+          key={key}
+          optionsPosition={optPos as any}
+          showButtons={showBtns}
+          onReady={setControls}
+          sentence="A {{b1}} is a word that describes a {{b2}}, while an {{b3}} describes a verb."
           items={[
-            { id: 'w1', label: 'weight' },
-            { id: 'w2', label: 'mass' },
-            { id: 'w3', label: 'acceleration' },
+            { id: 'w1', label: 'noun' },
+            { id: 'w2', label: 'adjective' },
+            { id: 'w3', label: 'adverb' },
           ]}
-          correctMapping={{ w1: 'b1', w2: 'b2', w3: 'b3' }}
+          correctMapping={{ w2: 'b1', w1: 'b2', w3: 'b3' }}
         />
       </View>
     </Playground>
     <Import>{"import { FillBlanksQuestion } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="question" type="string" />
+
       <Prop name="sentence" type="string" desc="Use {{blankId}} for drop zones" />
       <Prop name="items" type="DragItemData[]" desc="Words to drag into blanks" />
       <Prop name="correctMapping" type="Record<string, string>" desc="itemId → blankId" />
+      <Prop name="mode" type="'practice' | 'exam' | 'review'" def="'practice'" />
+      <Prop name="optionsPosition" type="'top' | 'bottom'" def="'bottom'" desc="Where source items render relative to drop zones" />
+      <Prop name="onAnswer" type="(placements) => void" desc="Called on every placement change" />
     </Props>
-    <S title="Rules">
-      <Rl>Blanks are inline drop zones within the sentence text.</Rl>
-      <Rl>Use {"{{blankId}}"} placeholders in the sentence string.</Rl>
-      <Rl>Items are always text pills — no images for fill-in-the-blank.</Rl>
+    <S title="Custom layout">
+      <Rl>For custom sentence rendering, parse the sentence yourself and compose DropZone + PlacedItem inline.</Rl>
     </S>
   </>;
 }
 
 export function HotspotPage() {
+  const [optPos, setOptPos] = useState('bottom');
+  const [showBtns, setShowBtns] = useState(true);
+  const [key, setKey] = useState(0);
+  const [controls, setControls] = useState<any>(null);
   return <>
-    <Playground knobs={<></>}>
+    <Playground
+      knobs={<>
+
+        <KnobSelect label="optionsPosition" value={optPos} options={['top', 'bottom']} onChange={(v) => { setOptPos(v); setKey(k => k + 1); }} />
+        <KnobToggle label="showButtons" value={showBtns} onChange={(v) => { setShowBtns(v); setKey(k => k + 1); }} />
+      </>}
+    >
       <View style={{ width: '100%' }}>
         <HotspotQuestion
-          question="Label the diagram"
-          image={{ uri: 'https://placehold.co/500x500/1a2236/232c43' }}
+          key={key}
+          optionsPosition={optPos as any}
+          showButtons={showBtns}
+          onReady={setControls}
+          image={require('../../reference/Tester.png')}
           imageAspectRatio={1}
           zones={[
             { id: 'z1', x: 15, y: 25, width: 25, height: 25 },
             { id: 'z2', x: 55, y: 45, width: 25, height: 25 },
           ]}
           items={[
-            { id: 'i1', label: 'Part A' },
-            { id: 'i2', label: 'Part B' },
+            { id: 'i1', label: 'Riyadh' },
+            { id: 'i2', label: 'Jeddah' },
           ]}
           correctMapping={{ i1: 'z1', i2: 'z2' }}
         />
@@ -1354,15 +1455,18 @@ export function HotspotPage() {
     </Playground>
     <Import>{"import { HotspotQuestion } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="question" type="string" />
+
       <Prop name="image" type="ImageSource" desc="Background image" />
-      <Prop name="zones" type="{ id, label?, x, y, width, height }[]" desc="Drop regions as % of image" />
+      <Prop name="imageAspectRatio" type="number" def="16/9" />
+      <Prop name="zones" type="{ id, x, y, width, height }[]" desc="Drop regions as % of image size" />
       <Prop name="items" type="DragItemData[]" desc="Labels to drag onto zones" />
       <Prop name="correctMapping" type="Record<string, string>" desc="itemId → zoneId" />
+      <Prop name="mode" type="'practice' | 'exam' | 'review'" def="'practice'" />
+      <Prop name="optionsPosition" type="'top' | 'bottom'" def="'bottom'" desc="Where source items render relative to drop zones" />
+      <Prop name="onAnswer" type="(placements) => void" desc="Called on every placement change" />
     </Props>
-    <S title="Rules">
-      <Rl>Zones are percentage-based regions overlaid on the image.</Rl>
-      <Rl>Each zone accepts one item. Items can be text or small images.</Rl>
+    <S title="Custom layout">
+      <Rl>For custom layouts, compose with useDragDrop + DropZone + PlacedItem and position zones over the image.</Rl>
     </S>
   </>;
 }
@@ -1412,6 +1516,7 @@ export function CardsPage() {
   const [selectable, setSelectable] = useState(false);
   const [selected, setSelected] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasThumbnail, setHasThumbnail] = useState(false);
   const demoActions = [{ label: 'Edit', onPress: () => {} }, { label: 'Remove', danger: true, onPress: () => {} }];
   return <>
     <Playground
@@ -1423,6 +1528,7 @@ export function CardsPage() {
         <KnobToggle label="Selectable" value={selectable} onChange={setSelectable} />
         {selectable && <KnobToggle label="Selected" value={selected} onChange={setSelected} />}
         <KnobToggle label="Loading" value={loading} onChange={setLoading} />
+        <KnobToggle label="thumbnail" value={hasThumbnail} onChange={setHasThumbnail} />
       </>}
     >
       <View style={{ width: '100%' }}>
@@ -1431,6 +1537,7 @@ export function CardsPage() {
           subtitle={hasSubtitle ? 'Mr. Hassan · Comprehension' : undefined}
           actions={hasActions ? demoActions : undefined}
           meta={hasMeta ? '4 of 8 sessions' : undefined}
+          thumbnail={hasThumbnail ? require('../../reference/Tester.png') : undefined}
           selectable={selectable}
           selected={selected}
           loading={loading}
@@ -1545,15 +1652,19 @@ export function TablePage() {
 export function SessionCardPage() {
   const [state, setState] = useState('upcoming');
   const [assessment, setAssessment] = useState(false);
+  const [title, setTitle] = useState('Inference & Implied Meaning');
+  const [meta, setMeta] = useState('Qudrat Reading — Mr. Hassan');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="State" value={state} options={['live','soon','upcoming','done','cancelled']} onChange={setState} />
         <KnobToggle label="Assessment" value={assessment} onChange={setAssessment} />
+        <KnobText label="title" value={title} onChange={setTitle} />
+        <KnobText label="meta" value={meta} onChange={setMeta} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <SessionCard time="10:00" title="Inference & implied meaning" meta="Qudrat Reading — Mr. Hassan" state={state as any} assessment={assessment} statusText={state === 'upcoming' ? '45 min' : undefined} />
+        <SessionCard time="10:00" title={title} meta={meta} state={state as any} assessment={assessment} statusText={state === 'upcoming' ? '45 min' : undefined} />
       </View>
     </Playground>
 
@@ -1579,14 +1690,20 @@ export function SessionCardPage() {
 // ═══════════════════════════════════════════════
 export function HomeworkCardPage() {
   const [status, setStatus] = useState('pending');
+  const [hwTitle, setHwTitle] = useState('Practice worksheet');
+  const [questionsSel, setQuestionsSel] = useState('8');
+  const [showScore, setShowScore] = useState(false);
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="Status" value={status} options={['pending', 'in-progress', 'submitted', 'overdue', 'graded']} onChange={setStatus} />
+        <KnobText label="title" value={hwTitle} onChange={setHwTitle} />
+        <KnobSelect label="questions" value={questionsSel} options={['4','6','8','10']} onChange={setQuestionsSel} />
+        <KnobToggle label="score" value={showScore} onChange={setShowScore} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <HomeworkCard title="Chapter 5 exercises" subject="Qudrat Math" dueDate="May 1" questions={8} status={status as any} score={status === 'graded' ? '7/8' : undefined} />
+        <HomeworkCard title={hwTitle} subject="Qudrat Math" dueDate="May 1" questions={parseInt(questionsSel)} status={status as any} score={showScore && status === 'graded' ? '7/8' : undefined} />
       </View>
     </Playground>
 
@@ -1634,6 +1751,7 @@ export function ProgressPage() {
   const [val, setVal] = useState('76');
   const [clr, setClr] = useState('default');
   const [showVal, setShowVal] = useState(true);
+  const [sizeSel, setSizeSel] = useState('120');
   const num = Math.max(0, Math.min(100, parseInt(val) || 0));
   const progressColor = clr === 'accent' ? color.noon[400] : clr === 'danger' ? color.danger[400] : undefined;
   return <>
@@ -1642,11 +1760,12 @@ export function ProgressPage() {
         <KnobSelect label="Value" value={val} options={['0','10','25','50','76','90','100']} onChange={setVal} />
         <KnobSelect label="Color" value={clr} options={['default', 'accent', 'danger']} onChange={setClr} />
         <KnobToggle label="Show Value" value={showVal} onChange={setShowVal} />
+        <KnobSelect label="size" value={sizeSel} options={['80','120','160']} onChange={setSizeSel} />
       </>}
     >
       <View style={{ width: '100%', alignItems: 'center', gap: sp[5] }}>
         <View style={{ width: '100%' }}><LinearProgress value={num} color={progressColor} /></View>
-        <CircularProgress value={num} showValue={showVal} color={progressColor} />
+        <CircularProgress value={num} showValue={showVal} color={progressColor} size={parseInt(sizeSel)} />
       </View>
     </Playground>
 
@@ -1772,15 +1891,17 @@ export function BottomNavPage() {
 export function AlertsPage() {
   const [variant, setVariant] = useState('info');
   const [hasTitle, setHasTitle] = useState(true);
+  const [children, setChildren] = useState('This is the alert body text.');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="Variant" value={variant} options={['info','success','warn','danger']} onChange={setVariant} />
         <KnobToggle label="Title" value={hasTitle} onChange={setHasTitle} />
+        <KnobText label="children" value={children} onChange={setChildren} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <Alert variant={variant as any} title={hasTitle ? 'Alert title' : undefined}>This is the alert body text.</Alert>
+        <Alert variant={variant as any} title={hasTitle ? 'Alert title' : undefined}>{children}</Alert>
       </View>
     </Playground>
 
@@ -1802,10 +1923,12 @@ export function AlertsPage() {
 export function ToastPage() {
   const [vis, setVis] = useState(false);
   const [variant, setVariant] = useState('success');
+  const [durationSel, setDurationSel] = useState('4000');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="Variant" value={variant} options={['info', 'success', 'warn', 'danger']} onChange={setVariant} />
+        <KnobSelect label="duration" value={durationSel} options={['2000','4000','8000']} onChange={setDurationSel} />
       </>}
     >
       <Button variant="secondary" onPress={() => setVis(true)}>Show Toast</Button>
@@ -1819,7 +1942,7 @@ export function ToastPage() {
       <Prop name="onDismiss" type="() => void" />
       <Prop name="duration" type="number" def="4000" desc="Auto-dismiss ms" />
     </Props>
-    <Toast message={variant === 'success' ? 'Practice session saved' : variant === 'danger' ? 'Something went wrong' : variant === 'warn' ? 'Exam in 2 days' : 'Session starts in 10 minutes'} variant={variant as any} visible={vis} onDismiss={() => setVis(false)} />
+    <Toast message={variant === 'success' ? 'Practice session saved' : variant === 'danger' ? 'Something went wrong' : variant === 'warn' ? 'Exam in 2 days' : 'Session starts in 10 minutes'} variant={variant as any} visible={vis} onDismiss={() => setVis(false)} duration={parseInt(durationSel)} />
     <S title="Safe area">
       <Rl>Top inset handled automatically via useSafeAreaInsets. Toast clears the notch/Dynamic Island.</Rl>
     </S>
@@ -1829,10 +1952,14 @@ export function ToastPage() {
 export function DialogPage() {
   const [vis, setVis] = useState(false);
   const [danger, setDanger] = useState(false);
+  const [primaryLabel, setPrimaryLabel] = useState('Confirm');
+  const [secondaryLabel, setSecondaryLabel] = useState('Cancel');
   return <>
     <Playground
       knobs={<>
         <KnobToggle label="Danger" value={danger} onChange={setDanger} />
+        <KnobText label="primaryLabel" value={primaryLabel} onChange={setPrimaryLabel} />
+        <KnobText label="secondaryLabel" value={secondaryLabel} onChange={setSecondaryLabel} />
       </>}
     >
       <Button variant={danger ? 'danger' : 'secondary'} onPress={() => setVis(true)}>{danger ? 'Delete Dialog' : 'Open Dialog'}</Button>
@@ -1858,7 +1985,7 @@ export function DialogPage() {
     <S title="Keyboard">
       <Rl>KeyboardAvoidingView built in. Dialog shifts up when the software keyboard opens on iOS.</Rl>
     </S>
-    <Dialog visible={vis} onClose={() => setVis(false)} title={danger ? 'Delete topic?' : 'Are you sure?'} body={danger ? 'All practice history will be removed.' : 'This action cannot be undone.'} danger={danger} primaryLabel={danger ? 'Delete' : 'Confirm'} onPrimary={() => setVis(false)} />
+    <Dialog visible={vis} onClose={() => setVis(false)} title={danger ? 'Delete topic?' : 'Are you sure?'} body={danger ? 'All practice history will be removed.' : 'This action cannot be undone.'} danger={danger} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onPrimary={() => setVis(false)} />
   </>;
 }
 
@@ -2301,13 +2428,15 @@ export function DunePatternPage() {
 
 export function VoiceTutorPage() {
   const [vtState, setVtState] = useState('idle');
+  const [vtSizeSel, setVtSizeSel] = useState('160');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="State" value={vtState} options={['idle','listening','thinking','speaking','error']} onChange={setVtState} />
+        <KnobSelect label="size" value={vtSizeSel} options={['80','120','160','200']} onChange={setVtSizeSel} />
       </>}
     >
-      <VoiceTutor state={vtState as any} size={160} />
+      <VoiceTutor state={vtState as any} size={parseInt(vtSizeSel)} />
     </Playground>
 
     <Import>{"import { VoiceTutor } from '@noon/design-system';"}</Import>
@@ -2348,20 +2477,30 @@ export function MenuPage() {
   const [vis, setVis] = useState(false);
   const [count, setCount] = useState('3');
   const [hasDanger, setHasDanger] = useState(true);
+  const [anchor, setAnchor] = useState<{ x: number; y: number } | undefined>();
+  const triggerRef = React.useRef<View>(null);
   const baseItems = ['Edit', 'Duplicate', 'Share', 'Archive'];
   const items = baseItems.slice(0, parseInt(count) - (hasDanger ? 1 : 0));
   const menuItems = [
     ...items.map(l => ({ label: l, onPress: () => setVis(false) })),
     ...(hasDanger ? [{ label: 'Delete', danger: true, onPress: () => setVis(false) }] : []),
   ];
+  const openMenu = () => {
+    triggerRef.current?.measureInWindow((x, y, width, height) => {
+      setAnchor({ x: x + width, y: y + height + 4 });
+      setVis(true);
+    });
+  };
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Items" value={count} options={['2','3','4','5']} onChange={setCount} />
-        <KnobToggle label="Danger item" value={hasDanger} onChange={setHasDanger} />
+        <KnobSelect label="items" value={count} options={['2','3','4','5']} onChange={setCount} />
+        <KnobToggle label="danger item" value={hasDanger} onChange={setHasDanger} />
       </>}
     >
-      <Button variant="secondary" onPress={() => setVis(true)}>Open menu</Button>
+      <View ref={triggerRef} collapsable={false}>
+        <Button variant="secondary" onPress={openMenu}>Open menu</Button>
+      </View>
     </Playground>
 
     <Import>{"import { Menu } from '@noon/design-system';"}</Import>
@@ -2369,8 +2508,9 @@ export function MenuPage() {
       <Prop name="visible" type="boolean" />
       <Prop name="onClose" type="() => void" />
       <Prop name="items" type="{ label: string; danger?: boolean; onPress: () => void }[]" />
+      <Prop name="anchor" type="{ x: number; y: number }" desc="Position near trigger — use measureInWindow" />
     </Props>
-    <Menu visible={vis} onClose={() => setVis(false)} items={menuItems} />
+    <Menu visible={vis} onClose={() => setVis(false)} items={menuItems} anchor={anchor} />
     <S title="Rules">
       <Rl>Triggered by IconButton or long-press. Positioned near trigger.</Rl>
       <Rl>Destructive items use danger colour.</Rl>
@@ -2382,6 +2522,7 @@ export function MenuPage() {
 export function CalendarPage() {
   const [expanded, setExpanded] = useState(false);
   const [showEvents, setShowEvents] = useState(true);
+  const [localeSel, setLocaleSel] = useState('default');
   const today = new Date();
   const dayOfWeek = today.getDay();
   const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
@@ -2396,10 +2537,11 @@ export function CalendarPage() {
       knobs={<>
         <KnobToggle label="Expanded" value={expanded} onChange={setExpanded} />
         <KnobToggle label="Event dots" value={showEvents} onChange={setShowEvents} />
+        <KnobSelect label="locale" value={localeSel} options={['default','ar']} onChange={setLocaleSel} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <Calendar expanded={expanded} onToggle={() => setExpanded(!expanded)} events={sampleEvents} />
+        <Calendar expanded={expanded} onToggle={() => setExpanded(!expanded)} events={sampleEvents} locale={localeSel === 'ar' ? 'ar' : undefined} />
       </View>
     </Playground>
 
@@ -2459,6 +2601,7 @@ export function IdentityPage() {
   const [clr, setClr] = useState('default');
   const [star, setStar] = useState(false);
   const [status, setStatus] = useState('none');
+  const [hasBadge, setHasBadge] = useState(false);
   return <>
     <Playground
       knobs={<>
@@ -2466,9 +2609,10 @@ export function IdentityPage() {
         <KnobSelect label="Color" value={clr} options={['default', 'noon', 'blue']} onChange={setClr} />
         <KnobToggle label="Star" value={star} onChange={setStar} />
         <KnobSelect label="Status" value={status} options={['none', 'online', 'busy']} onChange={setStatus} />
+        <KnobToggle label="badge" value={hasBadge} onChange={setHasBadge} />
       </>}
     >
-      <Identity initials="S" name="Sarah Al-Rashid" role="Crew Alpha" avatarColor={clr as any} star={star} status={status === 'none' ? undefined : status as any} size={size as any} />
+      <Identity initials="S" name="Sarah Al-Rashid" role="Crew Alpha" avatarColor={clr as any} star={star} status={status === 'none' ? undefined : status as any} size={size as any} badge={hasBadge ? 3 : undefined} />
     </Playground>
 
     <Import>{"import { Identity } from '@noon/design-system';"}</Import>
@@ -2618,37 +2762,49 @@ export function DropzonePage() {
 }
 
 export function VoiceChatPage() {
+  const sampleText = 'Read the passage again and focus on what the author doesn\'t say directly. The door being described as ajar tells us something important.';
   const [msgFrom, setMsgFrom] = useState('tutor');
+  const [msgThinking, setMsgThinking] = useState(false);
   const [msgConfirmed, setMsgConfirmed] = useState(true);
-  const [msgText, setMsgText] = useState('Read the passage again and focus on what the author doesn\'t say directly.');
+  const [msgText, setMsgText] = useState(sampleText);
+  const [revealPct, setRevealPct] = useState('100');
+  const revealLen = msgFrom === 'tutor' ? Math.round((parseInt(revealPct) / 100) * msgText.length) : undefined;
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="From" value={msgFrom} options={['tutor', 'student']} onChange={setMsgFrom} />
-        {msgFrom === 'student' && <KnobToggle label="Confirmed" value={msgConfirmed} onChange={setMsgConfirmed} />}
-        <KnobText label="Text" value={msgText} onChange={setMsgText} />
+        <KnobSelect label="from" value={msgFrom} options={['tutor', 'student']} onChange={setMsgFrom} />
+        {msgFrom === 'tutor' && <KnobToggle label="thinking" value={msgThinking} onChange={setMsgThinking} />}
+        {msgFrom === 'student' && <KnobToggle label="confirmed" value={msgConfirmed} onChange={setMsgConfirmed} />}
+        {msgFrom === 'tutor' && !msgThinking && <KnobSelect label="revealedLength" value={revealPct} options={['0', '25', '50', '75', '100']} onChange={setRevealPct} />}
+        <KnobText label="children" value={msgText} onChange={setMsgText} />
       </>}
     >
-      <ChatMessage from={msgFrom as any} confirmed={msgFrom === 'student' ? msgConfirmed : true}>{msgText}</ChatMessage>
+      <ChatMessage from={msgFrom as any} confirmed={msgFrom === 'student' ? msgConfirmed : true} thinking={msgFrom === 'tutor' ? msgThinking : undefined} revealedLength={revealLen}>{msgText}</ChatMessage>
     </Playground>
 
     <Import>{"import { ChatMessage } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="children" type="string" desc="Message text" />
       <Prop name="from" type="'tutor' | 'student'" />
-      <Prop name="confirmed" type="boolean" def="true" desc="Student only — false while recognizing" />
+      <Prop name="confirmed" type="boolean" def="true" desc="Student only — false while speech is being recognized" />
+      <Prop name="thinking" type="boolean" desc="Tutor only — shows bouncing dots instead of text" />
+      <Prop name="revealedLength" type="number" desc="Tutor only — characters revealed so far. Unrevealed text shows in fgFaint." />
     </Props>
-    <S title="Examples">
+    <S title="Tutor — thinking">
+      <ChatMessage from="tutor" thinking>Thinking...</ChatMessage>
+    </S>
+    <S title="Tutor — progressive reveal">
       <View style={{ gap: sp[4] }}>
-        <ChatMessage from="tutor">Read the passage again and focus on what the author doesn't say directly.</ChatMessage>
-        <ChatMessage from="student">I think the character feels trapped?</ChatMessage>
-        <ChatMessage from="student" confirmed={false}>So the door being ajar means...</ChatMessage>
+        <ChatMessage from="tutor" revealedLength={0}>The full response is visible but nothing has been spoken yet.</ChatMessage>
+        <ChatMessage from="tutor" revealedLength={24}>The full response is visible but nothing has been spoken yet.</ChatMessage>
+        <ChatMessage from="tutor">The full response is visible but nothing has been spoken yet.</ChatMessage>
       </View>
     </S>
-    <S title="Rules">
-      <Rl>Tutor: iris left border, left-aligned, hugs text width (max 80%).</Rl>
-      <Rl>Student: accent right border, right-aligned, hugs text width (max 80%).</Rl>
-      <Rl>Unconfirmed: faint border, italic, low opacity. Still being recognized.</Rl>
+    <S title="Student states">
+      <View style={{ gap: sp[4] }}>
+        <ChatMessage from="student" confirmed={false}>I think the character feels trapped?</ChatMessage>
+        <ChatMessage from="student">I think the character feels trapped?</ChatMessage>
+      </View>
     </S>
   </>;
 }
@@ -2685,6 +2841,7 @@ export function ActivityCardPage() {
   const [acDesc, setAcDesc] = useState('Select which emotion the author implies.');
   const [acBtn, setAcBtn] = useState('Start');
   const [acComplete, setAcComplete] = useState(false);
+  const [showScore, setShowScore] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const { theme } = useTheme();
   return <>
@@ -2694,10 +2851,11 @@ export function ActivityCardPage() {
         <KnobText label="Description" value={acDesc} onChange={setAcDesc} />
         <KnobText label="Button Label" value={acBtn} onChange={setAcBtn} />
         <KnobToggle label="Complete" value={acComplete} onChange={setAcComplete} />
+        <KnobToggle label="score" value={showScore} onChange={setShowScore} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <ActivityCard title={acTitle} description={acDesc || undefined} buttonLabel={acBtn || undefined} complete={acComplete} onPress={acComplete ? undefined : () => setSheetOpen(true)} />
+        <ActivityCard title={acTitle} description={acDesc || undefined} buttonLabel={acBtn || undefined} complete={acComplete} score={showScore ? '9/10' : undefined} onPress={acComplete ? undefined : () => setSheetOpen(true)} />
       </View>
     </Playground>
     <Import>{"import { ActivityCard } from '@noon/design-system';"}</Import>
@@ -2763,7 +2921,7 @@ export function SlidesCardPage() {
     >
       <View style={{ width: '100%' }}>
         <SlidesCard title={scTitle} attribution={scAttr || undefined} onPress={() => setSheetOpen(true)} slides={[
-          { uri: 'https://placehold.co/800x450/0a0f1a/e8e4dc?text=Slide+1' },
+          require('../../reference/Tester.png'),
         ]} />
       </View>
     </Playground>

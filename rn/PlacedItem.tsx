@@ -7,7 +7,8 @@ import React, { useRef } from 'react';
 import { Platform } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
-import { DragItemContent, type DragItemData } from './DragItem';
+import { DragItemContent, type DragItemData, type DragItemState } from './DragItem';
+import type { DropZoneState } from './DropZone';
 import { sp, r, dur } from './tokens';
 import type { Theme } from './tokens';
 
@@ -15,8 +16,8 @@ const TIMING = { duration: dur[2], easing: Easing.bezier(0.22, 0.61, 0.36, 1) };
 
 interface PlacedItemProps {
   item: DragItemData;
-  itemState: string;
-  zoneState: string;
+  itemState: DragItemState;
+  zoneState: DropZoneState;
   onDragStart: (id: string) => void;
   onDragMove: (id: string, x: number, y: number) => void;
   onDragEnd: (id: string, x: number, y: number) => void;
@@ -68,8 +69,8 @@ export function PlacedItem({ item, itemState, zoneState, onDragStart, onDragMove
 
   const isHovered = zoneState === 'hovering';
   const isDrag = itemState === 'dragging';
-  const bg = itemState === 'correct' ? theme.accentSoft : itemState === 'incorrect' ? theme.dangerSoft : isHovered ? theme.accentSoft : theme.bgRaised;
-  const border = itemState === 'correct' ? theme.accentBorder : itemState === 'incorrect' ? theme.dangerBorder : isDrag ? theme.accent : isHovered ? theme.accent : theme.borderStrong;
+  const bg = isHovered ? theme.accentSoft : theme.bgRaised;
+  const border = itemState === 'correct' ? theme.accent : itemState === 'incorrect' ? theme.danger : isDrag ? theme.accent : isHovered ? theme.accent : theme.borderStrong;
   const borderStyle = isHovered ? 'dashed' : 'solid';
 
   return (
@@ -77,12 +78,13 @@ export function PlacedItem({ item, itemState, zoneState, onDragStart, onDragMove
       <Animated.View style={[{
         backgroundColor: bg,
         borderRadius: r[2],
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderStyle,
         borderColor: border,
-        paddingVertical: compact ? sp[0.5] : sp[2],
-        paddingHorizontal: compact ? sp[2] : sp[3],
+        paddingVertical: item.image ? 0 : (compact ? sp[0.5] : sp[2]),
+        paddingHorizontal: item.image ? 0 : (compact ? sp[2] : sp[3]),
         alignItems: 'center',
+        overflow: 'hidden',
         ...(Platform.OS === 'web' ? { userSelect: 'none', cursor: isLocked ? 'default' : 'grab' } : {}),
       } as any, animStyle]}>
         <DragItemContent item={item} fontSize={fontSize} />

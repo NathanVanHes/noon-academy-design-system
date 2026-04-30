@@ -26,15 +26,16 @@ interface HotspotZone {
 }
 
 interface HotspotQuestionProps {
-  question: string;
-  instruction?: string;
   image: ImageSourcePropType;
   imageAspectRatio?: number;
   zones: HotspotZone[];
   items: DragItemData[];
   correctMapping: Record<string, string>;
-  mode?: 'practice' | 'exam' | 'review';
+  instruction?: string;
+  optionsPosition?: 'top' | 'bottom';
+  showButtons?: boolean;
   onAnswer?: (placements: Record<string, string>) => void;
+  onReady?: (controls: { submit: () => void; reset: () => void; allPlaced: boolean; submitted: boolean }) => void;
 }
 
 const MARKER_SIZE = 12;
@@ -60,26 +61,45 @@ function HotspotMarker({ state, isDragging, theme }: { state: string; isDragging
         width: MARKER_SIZE,
         height: MARKER_SIZE,
         borderRadius: MARKER_SIZE / 2,
-        backgroundColor: isHovering ? theme.accent : theme.accentSoft,
-        borderWidth: 1.5,
+        backgroundColor: isHovering ? theme.accent : theme.bgRaised,
+        borderWidth: 2,
         borderColor: theme.accent,
-        opacity: isHovering ? 0.5 : isDragging ? 0.4 : 0.6,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.4,
+        shadowRadius: 4,
+        elevation: 4,
       }, ringStyle]} />
     </View>
   );
 }
 
-export function HotspotQuestion({ question, instruction, image, imageAspectRatio = 16 / 9, zones, items, correctMapping, mode, onAnswer }: HotspotQuestionProps) {
+export function HotspotQuestion({ image, imageAspectRatio = 16 / 9, zones, items, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }: HotspotQuestionProps) {
   const { theme } = useTheme();
   const dd = useDragDrop({ items, zones: zones.map(z => z.id), correctMapping, onAnswer });
+
+  const onReadyRef = React.useRef(onReady);
+  onReadyRef.current = onReady;
+
+  React.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
 
   const itemInZone = (zoneId: string): DragItemData | undefined => {
     const entry = Object.entries(dd.placements).find(([_, zid]) => zid === zoneId);
     return entry ? items.find(i => i.id === entry[0]) : undefined;
   };
 
+  const sourceItems = !dd.submitted ? (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[2], alignItems: 'flex-start', minHeight: sp[2], overflow: 'visible' }}>
+      {items.filter(item => !dd.placements[item.id]).map(item => (
+        <DragItem key={item.id} item={item} state={dd.itemStates[item.id]} onDragStart={dd.onDragStart} onDragMove={dd.onDragMove} onDragEnd={dd.onDragEnd} />
+      ))}
+    </View>
+  ) : null;
+
   return (
-    <QuestionFrame question={question} instruction={instruction || 'Drag items to the correct regions'} mode={mode} submitted={dd.submitted} allPlaced={dd.allPlaced} onSubmit={dd.submit} onReset={dd.reset}>
+    <QuestionFrame instruction={instruction || 'Drag items to the correct regions'} optionsPosition={optionsPosition} options={sourceItems} showButtons={showButtons} submitted={dd.submitted} allPlaced={dd.allPlaced} onSubmit={dd.submit} onReset={dd.reset}>
       {/* Image with overlay zones */}
       <View style={{ width: '100%', aspectRatio: imageAspectRatio, borderRadius: r[2], overflow: 'visible', borderWidth: 1, borderColor: theme.border }}>
         <Image source={image} style={{ width: '100%', height: '100%', borderRadius: r[2] - 1 }} resizeMode="cover" />
@@ -108,21 +128,6 @@ export function HotspotQuestion({ question, instruction, image, imageAspectRatio
         })}
       </View>
 
-      {/* Source items — only show unplaced */}
-      {!dd.submitted && (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[2], alignItems: 'flex-start', minHeight: sp[2], overflow: 'visible' }}>
-          {items.filter(item => !dd.placements[item.id]).map(item => (
-            <DragItem
-              key={item.id}
-              item={item}
-              state={dd.itemStates[item.id]}
-              onDragStart={dd.onDragStart}
-              onDragMove={dd.onDragMove}
-              onDragEnd={dd.onDragEnd}
-            />
-          ))}
-        </View>
-      )}
     </QuestionFrame>
   );
 }

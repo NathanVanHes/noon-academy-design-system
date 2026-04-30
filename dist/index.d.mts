@@ -346,7 +346,7 @@ interface FullSheetProps {
     title?: string;
     children: React.ReactNode;
 }
-declare function FullSheet({ visible, onClose, title, children }: FullSheetProps): react_jsx_runtime.JSX.Element;
+declare function FullSheet({ visible, onClose, title, children }: FullSheetProps): react_jsx_runtime.JSX.Element | null;
 
 interface TooltipProps {
     text: string;
@@ -488,8 +488,15 @@ interface QuestionProps {
     image?: ImageSourcePropType;
     imageAspectRatio?: number;
     instruction?: string;
-    mode?: 'practice' | 'exam' | 'review';
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     onAnswer?: (placements: Record<string, string>) => void;
+    onReady?: (controls: {
+        submit: () => void;
+        reset: () => void;
+        allPlaced: boolean;
+        submitted: boolean;
+    }) => void;
     type: QuestionType;
     choiceProps?: ChoiceProps;
     matchProps?: MatchProps;
@@ -498,7 +505,7 @@ interface QuestionProps {
     fillBlanksProps?: FillBlanksProps;
     hotspotProps?: HotspotProps;
 }
-declare function Question({ text, image, imageAspectRatio, instruction, mode, onAnswer, type, choiceProps, matchProps, categorizeProps, orderProps, fillBlanksProps, hotspotProps }: QuestionProps): react_jsx_runtime.JSX.Element;
+declare function Question({ text, image, imageAspectRatio, instruction, optionsPosition, showButtons, onAnswer, onReady, type, choiceProps, matchProps, categorizeProps, orderProps, fillBlanksProps, hotspotProps }: QuestionProps): react_jsx_runtime.JSX.Element;
 
 type DropZoneState = 'empty' | 'hovering' | 'filled' | 'correct' | 'incorrect';
 interface DropZoneBounds {
@@ -547,69 +554,93 @@ declare function useDragDrop({ items, zones, correctMapping, allowMultiplePerZon
     submitted: boolean;
 };
 
-type QuestionMode = 'practice' | 'exam' | 'review';
 interface QuestionFrameProps {
-    question: string;
     instruction?: string;
     children: React.ReactNode;
-    mode?: QuestionMode;
+    options?: React.ReactNode;
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     submitted?: boolean;
     allPlaced?: boolean;
     onSubmit?: () => void;
     onReset?: () => void;
 }
-declare function QuestionFrame({ question, instruction, children, mode, submitted, allPlaced, onSubmit, onReset }: QuestionFrameProps): react_jsx_runtime.JSX.Element;
+declare function QuestionFrame({ instruction, children, options, optionsPosition, showButtons, submitted, allPlaced, onSubmit, onReset }: QuestionFrameProps): react_jsx_runtime.JSX.Element;
 
 interface MatchTarget {
     id: string;
     label: string;
 }
 interface MatchQuestionProps {
-    question: string;
-    instruction?: string;
     items: DragItemData[];
     targets: MatchTarget[];
     correctMapping: Record<string, string>;
-    mode?: 'practice' | 'exam' | 'review';
+    instruction?: string;
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     onAnswer?: (placements: Record<string, string>) => void;
+    onReady?: (controls: {
+        submit: () => void;
+        reset: () => void;
+        allPlaced: boolean;
+        submitted: boolean;
+    }) => void;
 }
-declare function MatchQuestion({ question, instruction, items, targets, correctMapping, mode, onAnswer }: MatchQuestionProps): react_jsx_runtime.JSX.Element;
+declare function MatchQuestion({ items, targets, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }: MatchQuestionProps): react_jsx_runtime.JSX.Element;
 
 interface Category {
     id: string;
     label: string;
 }
 interface CategorizeQuestionProps {
-    question: string;
-    instruction?: string;
     items: DragItemData[];
     categories: Category[];
     correctMapping: Record<string, string>;
-    mode?: 'practice' | 'exam' | 'review';
+    instruction?: string;
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     onAnswer?: (placements: Record<string, string>) => void;
+    onReady?: (controls: {
+        submit: () => void;
+        reset: () => void;
+        allPlaced: boolean;
+        submitted: boolean;
+    }) => void;
 }
-declare function CategorizeQuestion({ question, instruction, items, categories, correctMapping, mode, onAnswer }: CategorizeQuestionProps): react_jsx_runtime.JSX.Element;
+declare function CategorizeQuestion({ items, categories, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }: CategorizeQuestionProps): react_jsx_runtime.JSX.Element;
 
 interface OrderQuestionProps {
-    question: string;
-    instruction?: string;
     items: DragItemData[];
     correctOrder: string[];
-    mode?: 'practice' | 'exam' | 'review';
+    instruction?: string;
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     onAnswer?: (placements: Record<string, string>) => void;
+    onReady?: (controls: {
+        submit: () => void;
+        reset: () => void;
+        allPlaced: boolean;
+        submitted: boolean;
+    }) => void;
 }
-declare function OrderQuestion({ question, instruction, items, correctOrder, mode, onAnswer }: OrderQuestionProps): react_jsx_runtime.JSX.Element;
+declare function OrderQuestion({ items, correctOrder, instruction, optionsPosition, showButtons, onAnswer, onReady }: OrderQuestionProps): react_jsx_runtime.JSX.Element;
 
 interface FillBlanksQuestionProps {
-    question: string;
-    instruction?: string;
     sentence: string;
     items: DragItemData[];
     correctMapping: Record<string, string>;
-    mode?: 'practice' | 'exam' | 'review';
+    instruction?: string;
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     onAnswer?: (placements: Record<string, string>) => void;
+    onReady?: (controls: {
+        submit: () => void;
+        reset: () => void;
+        allPlaced: boolean;
+        submitted: boolean;
+    }) => void;
 }
-declare function FillBlanksQuestion({ question, instruction, sentence, items, correctMapping, mode, onAnswer }: FillBlanksQuestionProps): react_jsx_runtime.JSX.Element;
+declare function FillBlanksQuestion({ sentence, items, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }: FillBlanksQuestionProps): react_jsx_runtime.JSX.Element;
 
 interface HotspotZone {
     id: string;
@@ -620,22 +651,28 @@ interface HotspotZone {
     height: number;
 }
 interface HotspotQuestionProps {
-    question: string;
-    instruction?: string;
     image: ImageSourcePropType;
     imageAspectRatio?: number;
     zones: HotspotZone[];
     items: DragItemData[];
     correctMapping: Record<string, string>;
-    mode?: 'practice' | 'exam' | 'review';
+    instruction?: string;
+    optionsPosition?: 'top' | 'bottom';
+    showButtons?: boolean;
     onAnswer?: (placements: Record<string, string>) => void;
+    onReady?: (controls: {
+        submit: () => void;
+        reset: () => void;
+        allPlaced: boolean;
+        submitted: boolean;
+    }) => void;
 }
-declare function HotspotQuestion({ question, instruction, image, imageAspectRatio, zones, items, correctMapping, mode, onAnswer }: HotspotQuestionProps): react_jsx_runtime.JSX.Element;
+declare function HotspotQuestion({ image, imageAspectRatio, zones, items, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }: HotspotQuestionProps): react_jsx_runtime.JSX.Element;
 
 interface PlacedItemProps {
     item: DragItemData;
-    itemState: string;
-    zoneState: string;
+    itemState: DragItemState;
+    zoneState: DropZoneState;
     onDragStart: (id: string) => void;
     onDragMove: (id: string, x: number, y: number) => void;
     onDragEnd: (id: string, x: number, y: number) => void;
@@ -721,8 +758,14 @@ interface ChatMessageProps {
     children: string;
     from: 'tutor' | 'student';
     confirmed?: boolean;
+    /** Tutor only — shows bouncing dots instead of text */
+    thinking?: boolean;
+    /** Tutor only — characters revealed so far. Unrevealed text shows in fgFaint. Omit for fully revealed. */
+    revealedLength?: number;
 }
-declare function ChatMessage({ children, from, confirmed }: ChatMessageProps): react_jsx_runtime.JSX.Element;
+declare function ChatMessage({ children, from, confirmed, thinking, revealedLength }: ChatMessageProps): react_jsx_runtime.JSX.Element;
+
+declare function TypingIndicator(): react_jsx_runtime.JSX.Element;
 
 interface BreakdownCardProps {
     title: string;
@@ -821,4 +864,4 @@ interface LeaderboardProps {
 }
 declare function Leaderboard({ entries, label, unit }: LeaderboardProps): react_jsx_runtime.JSX.Element;
 
-export { ActivityCard, Alert, Avatar, Badge, BottomNav, BottomSheet, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, OrderQuestion, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, Segmented, SessionBar, SessionCard, Skeleton, SlidesCard, Stepper, Switch, Table, Tabs, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };
+export { ActivityCard, Alert, Avatar, Badge, BottomNav, BottomSheet, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, OrderQuestion, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, Segmented, SessionBar, SessionCard, Skeleton, SlidesCard, Stepper, Switch, Table, Tabs, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };

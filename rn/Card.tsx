@@ -55,7 +55,7 @@ export function Card({ title, subtitle, meta, thumbnail, actions, selectable, se
     borderWidth: 1,
     borderColor: selected ? theme.accentBorder : theme.border,
     overflow: 'hidden',
-    opacity: loading ? 0.6 : 1,
+    opacity: loading ? 0.4 : 1,
     ...style,
   };
 

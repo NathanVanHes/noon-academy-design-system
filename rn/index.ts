@@ -94,6 +94,7 @@ export { VideoCard } from './VideoCard';
 
 // Voice Chat
 export { ChatMessage } from './ChatMessage';
+export { TypingIndicator } from './TypingIndicator';
 export { BreakdownCard } from './BreakdownCard';
 export { ActivityCard } from './ActivityCard';
 export { ResourceList } from './ResourceList';

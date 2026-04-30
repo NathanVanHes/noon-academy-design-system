@@ -93,6 +93,7 @@ __export(rn_exports, {
   Toast: () => Toast,
   ToastProvider: () => ToastProvider,
   Tooltip: () => Tooltip,
+  TypingIndicator: () => TypingIndicator,
   VideoCard: () => VideoCard,
   VoiceTutor: () => VoiceTutor,
   WaterVessel: () => WaterVessel,
@@ -738,19 +739,18 @@ function Switch({ value, onValueChange, disabled, label }) {
     backgroundColor: (0, import_react_native_reanimated.interpolateColor)(trackColor.value, [0, 1], [color.chalk[100], theme.accentFg]),
     transform: [{ translateX: thumbX.value }]
   }));
-  const track = /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_react_native_reanimated.default.View, { style: [{
+  const track = /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_react_native5.View, { ...import_react_native5.Platform.OS === "web" ? { dataSet: { ltr: "" } } : {}, style: { width: TRACK_W }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_react_native_reanimated.default.View, { style: [{
     width: TRACK_W,
     height: TRACK_H,
     borderRadius: r.pill,
     justifyContent: "center",
     paddingHorizontal: 2,
-    opacity: disabled ? 0.4 : 1,
-    ...import_react_native5.Platform.OS === "web" ? { direction: "ltr" } : {}
+    opacity: disabled ? 0.4 : 1
   }, trackStyle], children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_react_native_reanimated.default.View, { style: [{
     width: THUMB_SIZE,
     height: THUMB_SIZE,
     borderRadius: THUMB_SIZE / 2
-  }, thumbStyle] }) });
+  }, thumbStyle] }) }) });
   return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_react_native5.Pressable, { onPress: () => !disabled && onValueChange(!value), accessibilityRole: "switch", accessibilityState: { checked: value, disabled }, style: label ? { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: sp[3], width: "100%" } : void 0, children: [
     label && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(import_react_native5.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: disabled ? theme.fgFaint : theme.fg, flex: 1 }, children: label }),
     track
@@ -1017,7 +1017,7 @@ function Card({ title, subtitle, meta, thumbnail, actions, selectable, selected:
     borderWidth: 1,
     borderColor: selected ? theme.accentBorder : theme.border,
     overflow: "hidden",
-    opacity: loading ? 0.6 : 1,
+    opacity: loading ? 0.4 : 1,
     ...style
   };
   const content = /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
@@ -1957,7 +1957,7 @@ function Toast({ message, variant = "info", visible, onDismiss, duration = 4e3 }
     shadowRadius: 12,
     elevation: 6,
     zIndex: 999
-  }, animatedStyle], children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_native27.Pressable, { onPress: dismiss, children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_native27.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg }, children: message }) }) });
+  }, animatedStyle], children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_native27.Pressable, { onPress: dismiss, accessibilityRole: "button", accessibilityLabel: "Dismiss", children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_native27.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg }, children: message }) }) });
 }
 
 // rn/ToastProvider.tsx
@@ -1990,7 +1990,7 @@ function ToastProvider({ children }) {
   const handleDismiss = (0, import_react11.useCallback)(() => {
     setVisible(false);
     setCurrent(null);
-    setTimeout(showNext, 150);
+    setTimeout(showNext, dur[1]);
   }, [showNext]);
   return /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(ToastContext.Provider, { value: { show }, children: [
     children,
@@ -2029,7 +2029,7 @@ function Dialog({ visible, onClose, title, body, primaryLabel = "Confirm", secon
     transform: [{ scale: scale.value }],
     opacity: contentOpacity.value
   }));
-  return /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native28.Modal, { visible, transparent: true, animationType: "fade", onRequestClose: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native28.KeyboardAvoidingView, { style: { flex: 1 }, behavior: import_react_native28.Platform.OS === "ios" ? "padding" : void 0, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native28.Pressable, { style: { flex: 1, backgroundColor: "rgba(6,9,19,0.5)", justifyContent: "center", alignItems: "center", padding: sp[7] }, onPress: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native_reanimated5.default.View, { style: [{ width: "100%", maxWidth: 320 }, animatedStyle], children: /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native28.Modal, { visible, transparent: true, animationType: "fade", onRequestClose: onClose, accessibilityViewIsModal: true, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native28.KeyboardAvoidingView, { style: { flex: 1 }, behavior: import_react_native28.Platform.OS === "ios" ? "padding" : void 0, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native28.Pressable, { style: { flex: 1, backgroundColor: "rgba(6,9,19,0.5)", justifyContent: "center", alignItems: "center", padding: sp[7] }, onPress: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_native_reanimated5.default.View, { style: [{ width: "100%", maxWidth: 320 }, animatedStyle], children: /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(
     import_react_native28.Pressable,
     {
       accessibilityRole: "none",
@@ -2101,16 +2101,20 @@ function BottomSheet({ visible, onClose, title, children, actions, full }) {
 var import_react_native30 = require("react-native");
 var import_react_native_safe_area_context4 = require("react-native-safe-area-context");
 var import_jsx_runtime34 = require("react/jsx-runtime");
-function FullSheet({ visible, onClose, title, children }) {
+function FullSheetContent({ onClose, title, children }) {
   const { theme } = useTheme();
   const insets = (0, import_react_native_safe_area_context4.useSafeAreaInsets)();
-  return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native30.Modal, { visible, animationType: "slide", onRequestClose: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_native30.View, { style: { flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_native30.View, { style: { flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }, children: [
     /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_native30.View, { style: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: sp[5], paddingVertical: sp[3], borderBottomWidth: 1, borderBottomColor: theme.divider }, children: [
       /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native30.Text, { style: { fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg, flex: 1 }, numberOfLines: 1, children: title }),
       /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native30.Pressable, { onPress: onClose, hitSlop: 8, accessibilityRole: "button", accessibilityLabel: "Close", children: /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native30.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle }, children: "Close" }) })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native30.ScrollView, { style: { flex: 1 }, contentContainerStyle: { padding: sp[5], paddingBottom: sp[5] + insets.bottom }, children })
-  ] }) });
+  ] });
+}
+function FullSheet({ visible, onClose, title, children }) {
+  if (!visible) return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native30.Modal, { visible, animationType: "slide", onRequestClose: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_native_safe_area_context4.SafeAreaProvider, { children: /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(FullSheetContent, { onClose, title, children }) }) });
 }
 
 // rn/Tooltip.tsx
@@ -2350,14 +2354,14 @@ function QuizOption({ label, text, image, state = "default", onPress }) {
   const { theme } = useTheme();
   const borderColorMap = {
     default: theme.border,
-    selected: color.blue[400],
+    selected: theme.accent,
     correct: theme.accent,
     incorrect: theme.danger,
     disabled: theme.border
   };
   const bgMap = {
     default: "transparent",
-    selected: "rgba(107,163,255,0.08)",
+    selected: theme.accentSoft,
     correct: theme.accentSoft,
     incorrect: theme.dangerSoft,
     disabled: "transparent"
@@ -2405,7 +2409,7 @@ function QuizOption({ label, text, image, state = "default", onPress }) {
       children: [
         /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.View, { style: labelStyle, children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Text, { style: labelTextStyle, children: label }) }),
         /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(import_react_native36.View, { style: { flex: 1 }, children: [
-          image && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Image, { source: image, style: { width: "100%", aspectRatio: 16 / 9, maxHeight: 120, borderRadius: r[1], marginBottom: text ? sp[2] : 0 }, resizeMode: "cover" }),
+          image && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.View, { style: { width: 120, height: 120, borderRadius: r[1], overflow: "hidden", marginBottom: text ? sp[2] : 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Image, { source: image, style: { width: "100%", height: "100%" }, resizeMode: "cover" }) }),
           text ? /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Text, { style: optionTextStyle, children: text }) : null
         ] })
       ]
@@ -2417,6 +2421,7 @@ function QuizOption({ label, text, image, state = "default", onPress }) {
 var import_react_native46 = require("react-native");
 
 // rn/MatchQuestion.tsx
+var import_react18 = __toESM(require("react"));
 var import_react_native41 = require("react-native");
 
 // rn/DragItem.tsx
@@ -2426,13 +2431,12 @@ var import_react_native_gesture_handler = require("react-native-gesture-handler"
 var import_react_native_reanimated6 = __toESM(require("react-native-reanimated"));
 var import_jsx_runtime41 = require("react/jsx-runtime");
 var TIMING_CONFIG = { duration: dur[2], easing: import_react_native_reanimated6.Easing.bezier(0.22, 0.61, 0.36, 1) };
-var IMG_MIN = 32;
-var IMG_MAX = 80;
+var IMG_DEFAULT = 90;
 function DragItemContent({ item, fontSize = fs[14] }) {
   const { theme } = useTheme();
-  const imgSize = Math.min(IMG_MAX, Math.max(IMG_MIN, item.imageSize || 48));
   if (item.image) {
-    return /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native37.Image, { source: item.image, style: { width: imgSize, height: imgSize, borderRadius: r[1] }, resizeMode: "contain" });
+    const size = item.imageSize || IMG_DEFAULT;
+    return /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native37.View, { style: { width: size, height: size, borderRadius: r[1], overflow: "hidden" }, children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native37.Image, { source: item.image, style: { width: "100%", height: "100%" }, resizeMode: "cover" }) });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native37.Text, { style: { fontFamily: font.sans, fontSize, fontWeight: fw[500], color: theme.fg, ...import_react_native37.Platform.OS === "web" ? { userSelect: "none" } : {} }, children: item.label });
 }
@@ -2482,26 +2486,26 @@ function DragItem({ item, state = "idle", onDragStart, onDragMove, onDragEnd }) 
     idle: theme.bgRaised,
     dragging: theme.bgOverlay,
     placed: theme.bgRaised,
-    correct: theme.accentSoft,
-    incorrect: theme.dangerSoft,
+    correct: theme.bgRaised,
+    incorrect: theme.bgRaised,
     disabled: theme.bgRaised
   };
   const borderMap = {
     idle: theme.borderStrong,
     dragging: theme.accent,
     placed: theme.borderStrong,
-    correct: theme.accentBorder,
-    incorrect: theme.dangerBorder,
+    correct: theme.accent,
+    incorrect: theme.danger,
     disabled: theme.border
   };
-  const imgSize = Math.min(IMG_MAX, Math.max(IMG_MIN, item.imageSize || 48));
   const containerStyle = {
     backgroundColor: bgMap[state],
     borderRadius: r[2],
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: borderMap[state],
-    paddingVertical: sp[2],
-    paddingHorizontal: item.image ? sp[2] : sp[3],
+    paddingVertical: item.image ? 0 : sp[2],
+    paddingHorizontal: item.image ? 0 : sp[3],
+    overflow: "hidden",
     opacity: isDisabled ? 0.4 : 1,
     alignItems: "center",
     justifyContent: "center",
@@ -2511,7 +2515,7 @@ function DragItem({ item, state = "idle", onDragStart, onDragMove, onDragEnd }) 
     elevation: 8,
     ...import_react_native37.Platform.OS === "web" ? { userSelect: "none", cursor: canDrag ? "grab" : "default" } : {}
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native_gesture_handler.GestureDetector, { gesture, children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native_reanimated6.default.View, { style: [containerStyle, animatedStyle], children: item.image ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native37.Image, { source: item.image, style: { width: imgSize, height: imgSize, borderRadius: r[1] }, resizeMode: "contain" }) : /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native37.Text, { style: { fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg, ...import_react_native37.Platform.OS === "web" ? { userSelect: "none" } : {} }, children: item.label }) }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native_gesture_handler.GestureDetector, { gesture, children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_native_reanimated6.default.View, { style: [containerStyle, animatedStyle], children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(DragItemContent, { item }) }) });
 }
 
 // rn/DropZone.tsx
@@ -2609,18 +2613,19 @@ function PlacedItem({ item, itemState, zoneState, onDragStart, onDragMove, onDra
   }));
   const isHovered = zoneState === "hovering";
   const isDrag = itemState === "dragging";
-  const bg = itemState === "correct" ? theme.accentSoft : itemState === "incorrect" ? theme.dangerSoft : isHovered ? theme.accentSoft : theme.bgRaised;
-  const border = itemState === "correct" ? theme.accentBorder : itemState === "incorrect" ? theme.dangerBorder : isDrag ? theme.accent : isHovered ? theme.accent : theme.borderStrong;
+  const bg = isHovered ? theme.accentSoft : theme.bgRaised;
+  const border = itemState === "correct" ? theme.accent : itemState === "incorrect" ? theme.danger : isDrag ? theme.accent : isHovered ? theme.accent : theme.borderStrong;
   const borderStyle = isHovered ? "dashed" : "solid";
   return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(import_react_native_gesture_handler2.GestureDetector, { gesture, children: /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(import_react_native_reanimated7.default.View, { style: [{
     backgroundColor: bg,
     borderRadius: r[2],
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderStyle,
     borderColor: border,
-    paddingVertical: compact ? sp[0.5] : sp[2],
-    paddingHorizontal: compact ? sp[2] : sp[3],
+    paddingVertical: item.image ? 0 : compact ? sp[0.5] : sp[2],
+    paddingHorizontal: item.image ? 0 : compact ? sp[2] : sp[3],
     alignItems: "center",
+    overflow: "hidden",
     ...import_react_native39.Platform.OS === "web" ? { userSelect: "none", cursor: isLocked ? "default" : "grab" } : {}
   }, animStyle], children: /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(DragItemContent, { item, fontSize }) }) });
 }
@@ -2778,203 +2783,131 @@ function useDragDrop({ items, zones, correctMapping, allowMultiplePerZone, showZ
 // rn/QuestionFrame.tsx
 var import_react_native40 = require("react-native");
 var import_jsx_runtime44 = require("react/jsx-runtime");
-function QuestionFrame({ question, instruction, children, mode = "practice", submitted, allPlaced, onSubmit, onReset }) {
-  const { theme } = useTheme();
+function QuestionFrame({ instruction, children, options, optionsPosition = "bottom", showButtons = true, submitted, allPlaced, onSubmit, onReset }) {
   return /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_react_native40.View, { style: { gap: sp[4], overflow: "visible" }, children: [
-    (question || instruction) && /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_react_native40.View, { children: [
-      question ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_native40.Text, { style: { fontFamily: font.sans, fontSize: fs[16], fontWeight: fw[600], color: theme.fg }, children: question }) : null,
-      instruction && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_native40.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: question ? sp[1] : 0 }, children: instruction })
-    ] }),
+    instruction && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_native40.Text, { style: { fontFamily: font.sans, fontSize: fs[13] }, children: instruction }),
+    optionsPosition === "top" && options,
     children,
-    mode === "practice" && /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_react_native40.View, { style: { flexDirection: "row", gap: sp[3] }, children: [
+    optionsPosition === "bottom" && options,
+    showButtons && /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_react_native40.View, { style: { flexDirection: "row", gap: sp[3] }, children: [
       !submitted && onSubmit && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(Button, { variant: "primary", size: "sm", disabled: !allPlaced, onPress: onSubmit, children: "Check" }),
-      onReset && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(Button, { variant: submitted ? "secondary" : "ghost", size: "sm", onPress: onReset, children: submitted ? "Try again" : "Reset" })
+      submitted && onReset && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(Button, { variant: "secondary", size: "sm", onPress: onReset, children: "Try again" })
     ] })
   ] });
 }
 
 // rn/MatchQuestion.tsx
 var import_jsx_runtime45 = require("react/jsx-runtime");
-function MatchQuestion({ question, instruction, items, targets, correctMapping, mode, onAnswer }) {
+function MatchQuestion({ items, targets, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }) {
   const { theme } = useTheme();
   const dd = useDragDrop({ items, zones: targets.map((t) => t.id), correctMapping, onAnswer });
+  const onReadyRef = import_react18.default.useRef(onReady);
+  onReadyRef.current = onReady;
+  import_react18.default.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
   const itemInZone = (zoneId) => {
     const entry = Object.entries(dd.placements).find(([_, zid]) => zid === zoneId);
     return entry ? items.find((i) => i.id === entry[0]) : void 0;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(QuestionFrame, { question, instruction: instruction || "Drag each item to its match", mode, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_native41.View, { style: { gap: sp[3], overflow: "visible" }, children: targets.map((target) => {
-      const placed = itemInZone(target.id);
-      const isActive = placed && dd.itemStates[placed.id] === "dragging";
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_react_native41.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3], overflow: "visible", zIndex: isActive ? 100 : 1 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_native41.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg, flex: 1 }, children: target.label }),
-        /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(DropZone, { id: target.id, state: dd.zoneStates[target.id], onMeasure: dd.registerZone, minWidth: 100, inline: true, children: placed && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
-          PlacedItem,
-          {
-            item: placed,
-            itemState: dd.itemStates[placed.id],
-            zoneState: dd.zoneStates[target.id],
-            onDragStart: dd.onDragStart,
-            onDragMove: dd.onDragMove,
-            onDragEnd: dd.onDragEnd,
-            theme
-          }
-        ) })
-      ] }, target.id);
-    }) }),
-    !dd.submitted && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_native41.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
-      DragItem,
-      {
-        item,
-        state: dd.itemStates[item.id],
-        onDragStart: dd.onDragStart,
-        onDragMove: dd.onDragMove,
-        onDragEnd: dd.onDragEnd
-      },
-      item.id
-    )) })
-  ] });
+  const sourceItems = !dd.submitted ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_native41.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(DragItem, { item, state: dd.itemStates[item.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd }, item.id)) }) : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(QuestionFrame, { instruction: instruction || "Drag each item to its match", optionsPosition, options: sourceItems, showButtons, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_native41.View, { style: { gap: sp[3], overflow: "visible" }, children: targets.map((target) => {
+    const placed = itemInZone(target.id);
+    const isActive = placed && dd.itemStates[placed.id] === "dragging";
+    return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_react_native41.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3], overflow: "visible", zIndex: isActive ? 100 : 1 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_native41.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg, flex: 1 }, children: target.label }),
+      /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(DropZone, { id: target.id, state: dd.zoneStates[target.id], onMeasure: dd.registerZone, minWidth: 100, inline: true, children: placed && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(PlacedItem, { item: placed, itemState: dd.itemStates[placed.id], zoneState: dd.zoneStates[target.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd, theme }) })
+    ] }, target.id);
+  }) }) });
 }
 
 // rn/CategorizeQuestion.tsx
+var import_react19 = __toESM(require("react"));
 var import_react_native42 = require("react-native");
 var import_jsx_runtime46 = require("react/jsx-runtime");
-function CategorizeQuestion({ question, instruction, items, categories, correctMapping, mode, onAnswer }) {
+function CategorizeQuestion({ items, categories, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }) {
   const { theme } = useTheme();
   const dd = useDragDrop({ items, zones: categories.map((c) => c.id), correctMapping, allowMultiplePerZone: true, onAnswer });
+  const onReadyRef = import_react19.default.useRef(onReady);
+  onReadyRef.current = onReady;
+  import_react19.default.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
   const itemsInZone = (zoneId) => {
     return Object.entries(dd.placements).filter(([_, zid]) => zid === zoneId).map(([iid]) => items.find((i) => i.id === iid)).filter(Boolean);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(QuestionFrame, { question, instruction: instruction || "Drag each item into the correct category", mode, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.View, { style: { flexDirection: "row", gap: sp[3], overflow: "visible" }, children: categories.map((cat) => {
-      const placed = itemsInZone(cat.id);
-      return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_native42.View, { style: { flex: 1, overflow: "visible" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.fgMuted, marginBottom: sp[2], textAlign: "center" }, children: cat.label }),
-        /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(DropZone, { id: cat.id, state: dd.zoneStates[cat.id], onMeasure: dd.registerZone, minHeight: 80, neutral: true, children: placed.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", padding: sp[1] }, children: placed.map((p) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
-          DragItem,
-          {
-            item: p,
-            state: dd.itemStates[p.id],
-            onDragStart: dd.onDragStart,
-            onDragMove: dd.onDragMove,
-            onDragEnd: dd.onDragEnd
-          },
-          p.id
-        )) }) })
-      ] }, cat.id);
-    }) }),
-    !dd.submitted && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
-      DragItem,
-      {
-        item,
-        state: dd.itemStates[item.id],
-        onDragStart: dd.onDragStart,
-        onDragMove: dd.onDragMove,
-        onDragEnd: dd.onDragEnd
-      },
-      item.id
-    )) })
-  ] });
+  const sourceItems = !dd.submitted ? /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(DragItem, { item, state: dd.itemStates[item.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd }, item.id)) }) : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(QuestionFrame, { instruction: instruction || "Drag each item into the correct category", optionsPosition, options: sourceItems, showButtons, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.View, { style: { flexDirection: "row", gap: sp[3], overflow: "visible" }, children: categories.map((cat) => {
+    const placed = itemsInZone(cat.id);
+    return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_native42.View, { style: { flex: 1, overflow: "visible" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.fgMuted, marginBottom: sp[2], textAlign: "center" }, children: cat.label }),
+      /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(DropZone, { id: cat.id, state: dd.zoneStates[cat.id], onMeasure: dd.registerZone, minHeight: 80, neutral: true, children: placed.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_native42.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", padding: sp[1] }, children: placed.map((p) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(DragItem, { item: p, state: dd.itemStates[p.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd }, p.id)) }) })
+    ] }, cat.id);
+  }) }) });
 }
 
 // rn/OrderQuestion.tsx
+var import_react20 = __toESM(require("react"));
 var import_react_native43 = require("react-native");
 var import_jsx_runtime47 = require("react/jsx-runtime");
-function OrderQuestion({ question, instruction, items, correctOrder, mode, onAnswer }) {
+function OrderQuestion({ items, correctOrder, instruction, optionsPosition, showButtons, onAnswer, onReady }) {
   const { theme } = useTheme();
   const zones = correctOrder.map((_, i) => `slot-${i}`);
   const correctMapping = Object.fromEntries(correctOrder.map((id, i) => [id, `slot-${i}`]));
   const dd = useDragDrop({ items, zones, correctMapping, showZoneResults: true, onAnswer });
+  const onReadyRef = import_react20.default.useRef(onReady);
+  onReadyRef.current = onReady;
+  import_react20.default.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
   const itemInZone = (zoneId) => {
     const entry = Object.entries(dd.placements).find(([_, zid]) => zid === zoneId);
     return entry ? items.find((i) => i.id === entry[0]) : void 0;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(QuestionFrame, { question, instruction: instruction || "Drag items into the correct order", mode, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.View, { style: { gap: sp[2], overflow: "visible" }, children: zones.map((zoneId, i) => {
-      const placed = itemInZone(zoneId);
-      const isActive = placed && dd.itemStates[placed.id] === "dragging";
-      return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_native43.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3], overflow: "visible", zIndex: isActive ? 100 : 1 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.Text, { style: { fontFamily: font.mono, fontSize: fs[13], fontWeight: fw[600], color: theme.fgFaint, minWidth: 24, textAlign: "center" }, children: i + 1 }),
-        /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.View, { style: { flex: 1, overflow: "visible" }, children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(DropZone, { id: zoneId, state: dd.zoneStates[zoneId], onMeasure: dd.registerZone, minHeight: 40, inline: true, children: placed && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
-          PlacedItem,
-          {
-            item: placed,
-            itemState: dd.itemStates[placed.id],
-            zoneState: dd.zoneStates[zoneId],
-            onDragStart: dd.onDragStart,
-            onDragMove: dd.onDragMove,
-            onDragEnd: dd.onDragEnd,
-            theme,
-            fontSize: fs[13]
-          }
-        ) }) })
-      ] }, zoneId);
-    }) }),
-    !dd.submitted && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
-      DragItem,
-      {
-        item,
-        state: dd.itemStates[item.id],
-        onDragStart: dd.onDragStart,
-        onDragMove: dd.onDragMove,
-        onDragEnd: dd.onDragEnd
-      },
-      item.id
-    )) })
-  ] });
+  const sourceItems = !dd.submitted ? /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(DragItem, { item, state: dd.itemStates[item.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd }, item.id)) }) : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(QuestionFrame, { instruction: instruction || "Drag items into the correct order", optionsPosition, options: sourceItems, showButtons, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.View, { style: { gap: sp[2], overflow: "visible" }, children: zones.map((zoneId, i) => {
+    const placed = itemInZone(zoneId);
+    const isActive = placed && dd.itemStates[placed.id] === "dragging";
+    return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_native43.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3], overflow: "visible", zIndex: isActive ? 100 : 1 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.Text, { style: { fontFamily: font.mono, fontSize: fs[13], fontWeight: fw[600], color: theme.fgFaint, minWidth: 24, textAlign: "center" }, children: i + 1 }),
+      /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_native43.View, { style: { flex: 1, overflow: "visible" }, children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(DropZone, { id: zoneId, state: dd.zoneStates[zoneId], onMeasure: dd.registerZone, minHeight: 40, inline: true, children: placed && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(PlacedItem, { item: placed, itemState: dd.itemStates[placed.id], zoneState: dd.zoneStates[zoneId], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd, theme, fontSize: fs[13] }) }) })
+    ] }, zoneId);
+  }) }) });
 }
 
 // rn/FillBlanksQuestion.tsx
+var import_react21 = __toESM(require("react"));
 var import_react_native44 = require("react-native");
 var import_jsx_runtime48 = require("react/jsx-runtime");
-function FillBlanksQuestion({ question, instruction, sentence, items, correctMapping, mode, onAnswer }) {
+function FillBlanksQuestion({ sentence, items, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }) {
   const { theme } = useTheme();
   const blankIds = sentence.match(/\{\{(\w+)\}\}/g)?.map((m) => m.slice(2, -2)) || [];
   const dd = useDragDrop({ items, zones: blankIds, correctMapping, onAnswer });
+  const onReadyRef = import_react21.default.useRef(onReady);
+  onReadyRef.current = onReady;
+  import_react21.default.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
   const itemInZone = (zoneId) => {
     const entry = Object.entries(dd.placements).find(([_, zid]) => zid === zoneId);
     return entry ? items.find((i) => i.id === entry[0]) : void 0;
   };
   const parts = sentence.split(/(\{\{\w+\}\})/g);
-  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(QuestionFrame, { question, instruction: instruction || "Drag words into the blanks", mode, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_native44.View, { style: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: sp[1], backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[4], overflow: "visible" }, children: parts.map((part, i) => {
-      const blankMatch = part.match(/^\{\{(\w+)\}\}$/);
-      if (blankMatch) {
-        const blankId = blankMatch[1];
-        const placed = itemInZone(blankId);
-        return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(DropZone, { id: blankId, state: dd.zoneStates[blankId], onMeasure: dd.registerZone, minWidth: 60, minHeight: 32, inline: true, children: placed && /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
-          PlacedItem,
-          {
-            item: placed,
-            itemState: dd.itemStates[placed.id],
-            zoneState: dd.zoneStates[blankId],
-            onDragStart: dd.onDragStart,
-            onDragMove: dd.onDragMove,
-            onDragEnd: dd.onDragEnd,
-            theme,
-            compact: true
-          }
-        ) }, i);
-      }
-      if (!part) return null;
-      return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_native44.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg, lineHeight: 32 }, children: part }, i);
-    }) }),
-    !dd.submitted && /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_native44.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
-      DragItem,
-      {
-        item,
-        state: dd.itemStates[item.id],
-        onDragStart: dd.onDragStart,
-        onDragMove: dd.onDragMove,
-        onDragEnd: dd.onDragEnd
-      },
-      item.id
-    )) })
-  ] });
+  const sourceItems = !dd.submitted ? /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_native44.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(DragItem, { item, state: dd.itemStates[item.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd }, item.id)) }) : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(QuestionFrame, { instruction: instruction || "Drag words into the blanks", optionsPosition, options: sourceItems, showButtons, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_native44.View, { style: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: sp[1], overflow: "visible" }, children: parts.map((part, i) => {
+    const blankMatch = part.match(/^\{\{(\w+)\}\}$/);
+    if (blankMatch) {
+      const blankId = blankMatch[1];
+      const placed = itemInZone(blankId);
+      return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(DropZone, { id: blankId, state: dd.zoneStates[blankId], onMeasure: dd.registerZone, minWidth: 60, minHeight: 32, inline: true, children: placed && /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(PlacedItem, { item: placed, itemState: dd.itemStates[placed.id], zoneState: dd.zoneStates[blankId], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd, theme }) }, i);
+    }
+    if (!part) return null;
+    return /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_native44.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg, lineHeight: sp[7] }, children: part }, i);
+  }) }) });
 }
 
 // rn/HotspotQuestion.tsx
-var import_react18 = __toESM(require("react"));
+var import_react22 = __toESM(require("react"));
 var import_react_native45 = require("react-native");
 var import_react_native_reanimated8 = __toESM(require("react-native-reanimated"));
 var import_jsx_runtime49 = require("react/jsx-runtime");
@@ -2985,7 +2918,7 @@ var MARKER_HOVER = 48;
 function HotspotMarker({ state, isDragging, theme }) {
   const isHovering = state === "hovering";
   const scale = (0, import_react_native_reanimated8.useSharedValue)(1);
-  import_react18.default.useEffect(() => {
+  import_react22.default.useEffect(() => {
     const target = isHovering ? MARKER_HOVER / MARKER_SIZE : isDragging ? MARKER_ACTIVE / MARKER_SIZE : 1;
     scale.value = (0, import_react_native_reanimated8.withTiming)(target, TIMING2);
   }, [isHovering, isDragging]);
@@ -2996,51 +2929,48 @@ function HotspotMarker({ state, isDragging, theme }) {
     width: MARKER_SIZE,
     height: MARKER_SIZE,
     borderRadius: MARKER_SIZE / 2,
-    backgroundColor: isHovering ? theme.accent : theme.accentSoft,
-    borderWidth: 1.5,
+    backgroundColor: isHovering ? theme.accent : theme.bgRaised,
+    borderWidth: 2,
     borderColor: theme.accent,
-    opacity: isHovering ? 0.5 : isDragging ? 0.4 : 0.6
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4
   }, ringStyle] }) });
 }
-function HotspotQuestion({ question, instruction, image, imageAspectRatio = 16 / 9, zones, items, correctMapping, mode, onAnswer }) {
+function HotspotQuestion({ image, imageAspectRatio = 16 / 9, zones, items, correctMapping, instruction, optionsPosition, showButtons, onAnswer, onReady }) {
   const { theme } = useTheme();
   const dd = useDragDrop({ items, zones: zones.map((z) => z.id), correctMapping, onAnswer });
+  const onReadyRef = import_react22.default.useRef(onReady);
+  onReadyRef.current = onReady;
+  import_react22.default.useEffect(() => {
+    onReadyRef.current?.({ submit: dd.submit, reset: dd.reset, allPlaced: dd.allPlaced, submitted: dd.submitted });
+  }, [dd.allPlaced, dd.submitted]);
   const itemInZone = (zoneId) => {
     const entry = Object.entries(dd.placements).find(([_, zid]) => zid === zoneId);
     return entry ? items.find((i) => i.id === entry[0]) : void 0;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(QuestionFrame, { question, instruction: instruction || "Drag items to the correct regions", mode, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_native45.View, { style: { width: "100%", aspectRatio: imageAspectRatio, borderRadius: r[2], overflow: "visible", borderWidth: 1, borderColor: theme.border }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_native45.Image, { source: image, style: { width: "100%", height: "100%", borderRadius: r[2] - 1 }, resizeMode: "cover" }),
-      zones.map((zone) => {
-        const placed = itemInZone(zone.id);
-        return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_native45.View, { style: { position: "absolute", left: `${zone.x}%`, top: `${zone.y}%`, width: `${zone.width}%`, height: `${zone.height}%`, overflow: "visible", zIndex: placed && dd.itemStates[placed.id] === "dragging" ? 100 : 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(DropZone, { id: zone.id, state: dd.zoneStates[zone.id], onMeasure: dd.registerZone, minWidth: 0, minHeight: 0, inline: true, children: placed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
-          PlacedItem,
-          {
-            item: placed,
-            itemState: dd.itemStates[placed.id],
-            zoneState: dd.zoneStates[zone.id],
-            onDragStart: dd.onDragStart,
-            onDragMove: dd.onDragMove,
-            onDragEnd: dd.onDragEnd,
-            theme,
-            fontSize: fs[13]
-          }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(HotspotMarker, { state: dd.zoneStates[zone.id], isDragging: !!dd.draggingId, theme }) }) }, zone.id);
-      })
-    ] }),
-    !dd.submitted && /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_native45.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
-      DragItem,
-      {
-        item,
-        state: dd.itemStates[item.id],
-        onDragStart: dd.onDragStart,
-        onDragMove: dd.onDragMove,
-        onDragEnd: dd.onDragEnd
-      },
-      item.id
-    )) })
-  ] });
+  const sourceItems = !dd.submitted ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_native45.View, { style: { flexDirection: "row", flexWrap: "wrap", gap: sp[2], alignItems: "flex-start", minHeight: sp[2], overflow: "visible" }, children: items.filter((item) => !dd.placements[item.id]).map((item) => /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(DragItem, { item, state: dd.itemStates[item.id], onDragStart: dd.onDragStart, onDragMove: dd.onDragMove, onDragEnd: dd.onDragEnd }, item.id)) }) : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(QuestionFrame, { instruction: instruction || "Drag items to the correct regions", optionsPosition, options: sourceItems, showButtons, submitted: dd.submitted, allPlaced: dd.allPlaced, onSubmit: dd.submit, onReset: dd.reset, children: /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_native45.View, { style: { width: "100%", aspectRatio: imageAspectRatio, borderRadius: r[2], overflow: "visible", borderWidth: 1, borderColor: theme.border }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_native45.Image, { source: image, style: { width: "100%", height: "100%", borderRadius: r[2] - 1 }, resizeMode: "cover" }),
+    zones.map((zone) => {
+      const placed = itemInZone(zone.id);
+      return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_native45.View, { style: { position: "absolute", left: `${zone.x}%`, top: `${zone.y}%`, width: `${zone.width}%`, height: `${zone.height}%`, overflow: "visible", zIndex: placed && dd.itemStates[placed.id] === "dragging" ? 100 : 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(DropZone, { id: zone.id, state: dd.zoneStates[zone.id], onMeasure: dd.registerZone, minWidth: 0, minHeight: 0, inline: true, children: placed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+        PlacedItem,
+        {
+          item: placed,
+          itemState: dd.itemStates[placed.id],
+          zoneState: dd.zoneStates[zone.id],
+          onDragStart: dd.onDragStart,
+          onDragMove: dd.onDragMove,
+          onDragEnd: dd.onDragEnd,
+          theme,
+          fontSize: fs[13]
+        }
+      ) : /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(HotspotMarker, { state: dd.zoneStates[zone.id], isDragging: !!dd.draggingId, theme }) }) }, zone.id);
+    })
+  ] }) });
 }
 
 // rn/Question.tsx
@@ -3076,7 +3006,7 @@ function ChoiceAnswer({ options, selected, correctIndex, submitted, onSelect }) 
     );
   }) });
 }
-function Question({ text, image, imageAspectRatio = 16 / 9, instruction, mode, onAnswer, type, choiceProps, matchProps, categorizeProps, orderProps, fillBlanksProps, hotspotProps }) {
+function Question({ text, image, imageAspectRatio = 16 / 9, instruction, optionsPosition, showButtons, onAnswer, onReady, type, choiceProps, matchProps, categorizeProps, orderProps, fillBlanksProps, hotspotProps }) {
   const { theme } = useTheme();
   const inst = instruction || TYPE_INSTRUCTIONS[type];
   return /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(import_react_native46.View, { style: { gap: sp[4] }, children: [
@@ -3093,29 +3023,29 @@ function Question({ text, image, imageAspectRatio = 16 / 9, instruction, mode, o
       /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_native46.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }, children: inst })
     ] }),
     type === "choice" && choiceProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(ChoiceAnswer, { ...choiceProps }),
-    type === "match" && matchProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(MatchQuestion, { question: "", mode, onAnswer, ...matchProps }),
-    type === "categorize" && categorizeProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(CategorizeQuestion, { question: "", mode, onAnswer, ...categorizeProps }),
-    type === "order" && orderProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(OrderQuestion, { question: "", mode, onAnswer, ...orderProps }),
-    type === "fillblanks" && fillBlanksProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(FillBlanksQuestion, { question: "", mode, onAnswer, ...fillBlanksProps }),
-    type === "hotspot" && hotspotProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(HotspotQuestion, { question: "", mode, onAnswer, ...hotspotProps })
+    type === "match" && matchProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(MatchQuestion, { optionsPosition, showButtons, onAnswer, onReady, ...matchProps }),
+    type === "categorize" && categorizeProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(CategorizeQuestion, { optionsPosition, showButtons, onAnswer, onReady, ...categorizeProps }),
+    type === "order" && orderProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(OrderQuestion, { optionsPosition, showButtons, onAnswer, onReady, ...orderProps }),
+    type === "fillblanks" && fillBlanksProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(FillBlanksQuestion, { optionsPosition, showButtons, onAnswer, onReady, ...fillBlanksProps }),
+    type === "hotspot" && hotspotProps && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(HotspotQuestion, { optionsPosition, showButtons, onAnswer, onReady, ...hotspotProps })
   ] });
 }
 
 // rn/Interstitial.tsx
-var import_react19 = require("react");
+var import_react23 = require("react");
 var import_react_native47 = require("react-native");
 var import_react_native_reanimated9 = __toESM(require("react-native-reanimated"));
 var import_jsx_runtime51 = require("react/jsx-runtime");
 var CONFETTI_COLORS = [color.noon[400], color.gold[200], color.gold[400], color.noon[200], color.chalk[100]];
 var PARTICLE_COUNT = 80;
 function ConfettiParticle({ delay, color: c }) {
-  const left = (0, import_react19.useRef)(Math.random() * 100).current;
-  const size = (0, import_react19.useRef)(3 + Math.random() * 5).current;
-  const isRect = (0, import_react19.useRef)(Math.random() > 0.5).current;
-  const duration = (0, import_react19.useRef)(1500 + Math.random() * 1500).current;
+  const left = (0, import_react23.useRef)(Math.random() * 100).current;
+  const size = (0, import_react23.useRef)(3 + Math.random() * 5).current;
+  const isRect = (0, import_react23.useRef)(Math.random() > 0.5).current;
+  const duration = (0, import_react23.useRef)(1500 + Math.random() * 1500).current;
   const translateY = (0, import_react_native_reanimated9.useSharedValue)(-10);
   const opacity = (0, import_react_native_reanimated9.useSharedValue)(1);
-  (0, import_react19.useEffect)(() => {
+  (0, import_react23.useEffect)(() => {
     translateY.value = (0, import_react_native_reanimated9.withDelay)(delay, (0, import_react_native_reanimated9.withTiming)(700, { duration }));
     opacity.value = (0, import_react_native_reanimated9.withDelay)(delay + duration * 0.5, (0, import_react_native_reanimated9.withTiming)(0, { duration: duration * 0.5 }));
     return () => {
@@ -3145,7 +3075,7 @@ function ConfettiParticle({ delay, color: c }) {
 function Interstitial({ title, body, buttonLabel, onPress }) {
   const { theme } = useTheme();
   const pulseScale = (0, import_react_native_reanimated9.useSharedValue)(1);
-  (0, import_react19.useEffect)(() => {
+  (0, import_react23.useEffect)(() => {
     pulseScale.value = (0, import_react_native_reanimated9.withRepeat)(
       (0, import_react_native_reanimated9.withSequence)(
         (0, import_react_native_reanimated9.withTiming)(1.06, { duration: 1e3 }),
@@ -3263,7 +3193,7 @@ function WaterVessel({ fill, capacity = 18, minimum = 12, size = "lg" }) {
 }
 
 // rn/TerrainPattern.tsx
-var import_react20 = require("react");
+var import_react24 = require("react");
 var import_react_native50 = require("react-native");
 var import_react_native_svg6 = __toESM(require("react-native-svg"));
 var import_jsx_runtime54 = require("react/jsx-runtime");
@@ -3335,7 +3265,7 @@ function generateContours(w, h3, variant, isVoid, seed) {
 function TerrainPattern({ width, height, variant = "standard", opacity = 1, style }) {
   const { theme, mode } = useTheme();
   const isVoid = mode === "void";
-  const paths2 = (0, import_react20.useMemo)(
+  const paths2 = (0, import_react24.useMemo)(
     () => generateContours(width, height, variant, isVoid, 42),
     [width, height, variant, isVoid]
   );
@@ -3346,7 +3276,7 @@ function TerrainPattern({ width, height, variant = "standard", opacity = 1, styl
 }
 
 // rn/DunePattern.tsx
-var import_react21 = __toESM(require("react"));
+var import_react25 = __toESM(require("react"));
 var import_react_native51 = require("react-native");
 var import_react_native_svg7 = __toESM(require("react-native-svg"));
 var import_jsx_runtime55 = require("react/jsx-runtime");
@@ -3433,7 +3363,7 @@ function DunePattern({ width, height, variant = "constellation", style }) {
         },
         `c${i}`
       )),
-      allNodes.map((n, i) => /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)(import_react21.default.Fragment, { children: [
+      allNodes.map((n, i) => /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)(import_react25.default.Fragment, { children: [
         n.bright && /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r + 8, fill: color.gold[300], opacity: isVoid ? 0.06 : 0.04 }),
         n.bright && /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r + 4, fill: color.gold[300], opacity: isVoid ? 0.12 : 0.08 }),
         /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r, fill: n.bright ? color.gold[300] : color.gold[400], opacity: n.bright ? isVoid ? 0.85 : 0.6 : isVoid ? 0.45 : 0.3 })
@@ -3484,7 +3414,7 @@ function DunePattern({ width, height, variant = "constellation", style }) {
 }
 
 // rn/VoiceTutor.tsx
-var import_react22 = require("react");
+var import_react26 = require("react");
 var import_react_native52 = require("react-native");
 var import_react_native_reanimated10 = __toESM(require("react-native-reanimated"));
 var import_jsx_runtime56 = require("react/jsx-runtime");
@@ -3493,7 +3423,7 @@ function VoiceTutor({ state = "idle", size = 160 }) {
   const anim = (0, import_react_native_reanimated10.useSharedValue)(0);
   const orbit = (0, import_react_native_reanimated10.useSharedValue)(0);
   const errorAura = (0, import_react_native_reanimated10.useSharedValue)(0);
-  (0, import_react22.useEffect)(() => {
+  (0, import_react26.useEffect)(() => {
     (0, import_react_native_reanimated10.cancelAnimation)(anim);
     (0, import_react_native_reanimated10.cancelAnimation)(orbit);
     (0, import_react_native_reanimated10.cancelAnimation)(errorAura);
@@ -3677,27 +3607,87 @@ function VideoCard({ title, attribution, duration, uri, thumbnail, onPress }) {
 }
 
 // rn/ChatMessage.tsx
+var import_react_native55 = require("react-native");
+
+// rn/TypingIndicator.tsx
+var import_react27 = require("react");
 var import_react_native54 = require("react-native");
+var import_react_native_reanimated11 = __toESM(require("react-native-reanimated"));
 var import_jsx_runtime58 = require("react/jsx-runtime");
-function ChatMessage({ children, from, confirmed = true }) {
+var DOT_SIZE = sp[1];
+var DOT_BOUNCE = -sp[1];
+var DOT_DURATION = 300;
+var DOT_STAGGER = 150;
+function Dot({ index }) {
+  const { theme } = useTheme();
+  const translateY = (0, import_react_native_reanimated11.useSharedValue)(0);
+  (0, import_react27.useEffect)(() => {
+    translateY.value = (0, import_react_native_reanimated11.withDelay)(
+      index * DOT_STAGGER,
+      (0, import_react_native_reanimated11.withRepeat)(
+        (0, import_react_native_reanimated11.withSequence)(
+          (0, import_react_native_reanimated11.withTiming)(DOT_BOUNCE, { duration: DOT_DURATION, easing: import_react_native_reanimated11.Easing.inOut(import_react_native_reanimated11.Easing.sin) }),
+          (0, import_react_native_reanimated11.withTiming)(0, { duration: DOT_DURATION, easing: import_react_native_reanimated11.Easing.inOut(import_react_native_reanimated11.Easing.sin) }),
+          (0, import_react_native_reanimated11.withDelay)((2 - index) * DOT_STAGGER, (0, import_react_native_reanimated11.withTiming)(0, { duration: 0 }))
+        ),
+        -1
+      )
+    );
+    return () => (0, import_react_native_reanimated11.cancelAnimation)(translateY);
+  }, []);
+  const animStyle = (0, import_react_native_reanimated11.useAnimatedStyle)(() => ({
+    transform: [{ translateY: translateY.value }]
+  }));
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_reanimated11.default.View, { style: [{
+    width: DOT_SIZE,
+    height: DOT_SIZE,
+    borderRadius: DOT_SIZE / 2,
+    backgroundColor: theme.irisDot
+  }, animStyle] });
+}
+function TypingIndicator() {
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native54.View, { style: { flexDirection: "row", gap: sp[1], paddingVertical: sp[1], alignSelf: "flex-start" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Dot, { index: 0 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Dot, { index: 1 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Dot, { index: 2 })
+  ] });
+}
+
+// rn/ChatMessage.tsx
+var import_jsx_runtime59 = require("react/jsx-runtime");
+function ChatMessage({ children, from, confirmed = true, thinking, revealedLength }) {
   const { theme, mode } = useTheme();
   const isVoid = mode === "void";
+  if (from === "tutor" && thinking) {
+    return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: { borderStartWidth: 2, borderStartColor: theme.irisBorder, paddingStart: sp[4], alignSelf: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(TypingIndicator, {}) });
+  }
   if (from === "tutor") {
-    return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.View, { style: { borderLeftWidth: 2, borderLeftColor: theme.irisBorder, paddingLeft: sp[4], alignSelf: "flex-start", maxWidth: "80%" }, children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.Text, { style: { fontFamily: font.sans, fontSize: fs[14], color: theme.fg, lineHeight: fs[14] * 1.5 }, children }) });
+    let splitAt = revealedLength !== void 0 ? revealedLength : children.length;
+    if (splitAt < children.length) {
+      const nextSpace = children.indexOf(" ", splitAt);
+      const prevSpace = children.lastIndexOf(" ", splitAt);
+      splitAt = prevSpace > 0 ? prevSpace : 0;
+    }
+    const revealed = children.slice(0, splitAt);
+    const unrevealed = children.slice(splitAt);
+    return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: { borderStartWidth: 2, borderStartColor: theme.irisBorder, paddingStart: sp[4], alignSelf: "flex-start", maxWidth: "80%" }, children: /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native55.Text, { style: { fontFamily: font.sans, fontSize: fs[14], lineHeight: fs[14] * 1.5 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.Text, { style: { color: theme.fg }, children: revealed }),
+      unrevealed ? /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.Text, { style: { color: theme.fgFaint }, children: unrevealed }) : null
+    ] }) });
   }
   const accentRGB = isVoid ? "rgba(100,216,174," : "rgba(42,138,106,";
   const chalkRGB = isVoid ? "rgba(232,228,220," : "rgba(10,15,26,";
-  return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.View, { style: {
-    borderRightWidth: 2,
-    borderRightColor: confirmed ? `${accentRGB}0.4)` : `${accentRGB}0.1)`,
+  return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: {
+    borderEndWidth: 2,
+    borderEndColor: confirmed ? `${accentRGB}0.4)` : `${accentRGB}0.1)`,
     paddingVertical: sp[3],
     paddingHorizontal: sp[4],
     backgroundColor: confirmed ? theme.hoverOverlay : `${chalkRGB}0.02)`,
-    borderTopLeftRadius: r[2],
-    borderBottomLeftRadius: r[2],
+    borderTopStartRadius: r[2],
+    borderBottomStartRadius: r[2],
     alignSelf: "flex-end",
     maxWidth: "80%"
-  }, children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.Text, { style: {
+  }, children: /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.Text, { style: {
     fontFamily: font.sans,
     fontSize: fs[14],
     color: confirmed ? theme.fg : theme.fgFaint,
@@ -3708,69 +3698,69 @@ function ChatMessage({ children, from, confirmed = true }) {
 }
 
 // rn/BreakdownCard.tsx
-var import_react_native55 = require("react-native");
-var import_jsx_runtime59 = require("react/jsx-runtime");
+var import_react_native56 = require("react-native");
+var import_jsx_runtime60 = require("react/jsx-runtime");
 function BreakdownCard({ title, points }) {
   const { theme } = useTheme();
-  return /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native55.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[600], color: theme.fg, marginBottom: sp[3] }, children: title }),
-    points.map((point, i) => /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native55.View, { style: { flexDirection: "row", gap: sp[2], marginBottom: sp[2] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: { width: 4, height: 4, borderRadius: 1, backgroundColor: theme.irisDot, marginTop: 6, flexShrink: 0 } }),
-      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.Text, { style: { flex: 1, fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }, children: point })
+  return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[600], color: theme.fg, marginBottom: sp[3] }, children: title }),
+    points.map((point, i) => /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.View, { style: { flexDirection: "row", gap: sp[2], marginBottom: sp[2] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.View, { style: { width: 4, height: 4, borderRadius: 1, backgroundColor: theme.irisDot, marginTop: 6, flexShrink: 0 } }),
+      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { flex: 1, fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }, children: point })
     ] }, i))
   ] });
 }
 
 // rn/ActivityCard.tsx
-var import_react_native56 = require("react-native");
-var import_jsx_runtime60 = require("react/jsx-runtime");
+var import_react_native57 = require("react-native");
+var import_jsx_runtime61 = require("react/jsx-runtime");
 function ActivityCard({ title, description, buttonLabel = "Start", complete, score, onPress }) {
   const { theme } = useTheme();
-  return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.View, { accessibilityRole: "none", style: { backgroundColor: theme.inputBg, borderRadius: r[2], borderWidth: 1, borderColor: complete ? theme.accentBorder : theme.border, padding: sp[4] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.irisLabel, marginBottom: sp[2] }, children: "Activity" }),
-    /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.serif, fontSize: fs[15], color: theme.fg, marginBottom: description ? sp[1] : sp[3] }, children: title }),
-    description && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[3] }, children: description }),
-    complete ? /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2], marginTop: description ? 0 : sp[2] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.accent }, children: "Complete" }),
-      score && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.accent }, children: score })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Button, { variant: "primary", size: "sm", onPress, children: buttonLabel })
+  return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_react_native57.View, { accessibilityRole: "none", style: { backgroundColor: theme.inputBg, borderRadius: r[2], borderWidth: 1, borderColor: complete ? theme.accentBorder : theme.border, padding: sp[4] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.irisLabel, marginBottom: sp[2] }, children: "Activity" }),
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.serif, fontSize: fs[15], color: theme.fg, marginBottom: description ? sp[1] : sp[3] }, children: title }),
+    description && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[3] }, children: description }),
+    complete ? /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_react_native57.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2], marginTop: description ? 0 : sp[2] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.accent }, children: "Complete" }),
+      score && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.accent }, children: score })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Button, { variant: "primary", size: "sm", onPress, children: buttonLabel })
   ] });
 }
 
 // rn/ResourceList.tsx
-var import_react23 = require("react");
-var import_react_native57 = require("react-native");
-var import_jsx_runtime61 = require("react/jsx-runtime");
+var import_react28 = require("react");
+var import_react_native58 = require("react-native");
+var import_jsx_runtime62 = require("react/jsx-runtime");
 function ResourceList({ title = "Resources", links }) {
   const { theme } = useTheme();
-  const [openIdx, setOpenIdx] = (0, import_react23.useState)(null);
-  return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_jsx_runtime61.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_react_native57.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.fgFaint, marginBottom: sp[3] }, children: title }),
-      links.map((link, i) => /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Pressable, { accessibilityRole: "link", onPress: () => {
+  const [openIdx, setOpenIdx] = (0, import_react28.useState)(null);
+  return /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_jsx_runtime62.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.fgFaint, marginBottom: sp[3] }, children: title }),
+      links.map((link, i) => /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Pressable, { accessibilityRole: "link", onPress: () => {
         if (link.onPress) return link.onPress();
         if (link.content) setOpenIdx(i);
-      }, children: /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.accent, marginBottom: sp[2] }, children: link.label }) }, i))
+      }, children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.accent, marginBottom: sp[2] }, children: link.label }) }, i))
     ] }),
-    openIdx !== null && links[openIdx]?.content && /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(FullSheet, { visible: true, onClose: () => setOpenIdx(null), title: links[openIdx].label, children: links[openIdx].content })
+    openIdx !== null && links[openIdx]?.content && /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(FullSheet, { visible: true, onClose: () => setOpenIdx(null), title: links[openIdx].label, children: links[openIdx].content })
   ] });
 }
 
 // rn/SlidesCard.tsx
-var import_react24 = require("react");
-var import_react_native58 = require("react-native");
-var import_jsx_runtime62 = require("react/jsx-runtime");
+var import_react29 = require("react");
+var import_react_native59 = require("react-native");
+var import_jsx_runtime63 = require("react/jsx-runtime");
 function SlidesCard({ title, attribution, slides, onPress }) {
   const { theme } = useTheme();
-  const [open, setOpen] = (0, import_react24.useState)(false);
-  const [current, setCurrent] = (0, import_react24.useState)(0);
+  const [open, setOpen] = (0, import_react29.useState)(false);
+  const [current, setCurrent] = (0, import_react29.useState)(0);
   const handlePress = () => {
     if (onPress) return onPress();
     if (slides.length) setOpen(true);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_jsx_runtime62.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
-      import_react_native58.Pressable,
+  return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_jsx_runtime63.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(
+      import_react_native59.Pressable,
       {
         onPress: handlePress,
         accessibilityRole: "button",
@@ -3783,18 +3773,18 @@ function SlidesCard({ title, attribution, slides, onPress }) {
           overflow: "hidden",
           opacity: pressed ? 0.9 : 1
         }),
-        children: /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.View, { style: { flexDirection: "row", padding: sp[3], gap: sp[3], alignItems: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
-            import_react_native58.Image,
+        children: /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flexDirection: "row", padding: sp[3], gap: sp[3], alignItems: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(
+            import_react_native59.Image,
             {
               source: slides[0],
               style: { width: 56, height: 36, borderRadius: r[1], backgroundColor: theme.hoverOverlay },
               resizeMode: "cover"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.View, { style: { flex: 1 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flex: 1 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
               attribution ? `${attribution} \xB7 ` : "",
               slides.length,
               " slide",
@@ -3804,37 +3794,37 @@ function SlidesCard({ title, attribution, slides, onPress }) {
         ] })
       }
     ),
-    slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(FullSheet, { visible: open, onClose: () => setOpen(false), title: `${title} \xB7 ${current + 1}/${slides.length}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(
-        import_react_native58.Image,
+    slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(FullSheet, { visible: open, onClose: () => setOpen(false), title: `${title} \xB7 ${current + 1}/${slides.length}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(
+        import_react_native59.Image,
         {
           source: slides[current],
           style: { width: "100%", aspectRatio: 16 / 9, borderRadius: r[2], marginBottom: sp[5] },
           resizeMode: "contain"
         }
       ),
-      slides.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.View, { style: { flexDirection: "row", gap: sp[3] }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === 0, onPress: () => setCurrent(current - 1), children: "Prev" }),
-        /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === slides.length - 1, onPress: () => setCurrent(current + 1), children: "Next" })
+      slides.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flexDirection: "row", gap: sp[3] }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === 0, onPress: () => setCurrent(current - 1), children: "Prev" }),
+        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === slides.length - 1, onPress: () => setCurrent(current + 1), children: "Next" })
       ] })
     ] })
   ] });
 }
 
 // rn/WorkedExampleCard.tsx
-var import_react25 = require("react");
-var import_react_native59 = require("react-native");
-var import_jsx_runtime63 = require("react/jsx-runtime");
+var import_react30 = require("react");
+var import_react_native60 = require("react-native");
+var import_jsx_runtime64 = require("react/jsx-runtime");
 function WorkedExampleCard({ title, steps, onPress }) {
   const { theme } = useTheme();
-  const [open, setOpen] = (0, import_react25.useState)(false);
+  const [open, setOpen] = (0, import_react30.useState)(false);
   const handlePress = () => {
     if (onPress) return onPress();
     if (steps?.length) setOpen(true);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_jsx_runtime63.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(
-      import_react_native59.Pressable,
+  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_jsx_runtime64.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(
+      import_react_native60.Pressable,
       {
         onPress: handlePress,
         accessibilityRole: "button",
@@ -3847,8 +3837,8 @@ function WorkedExampleCard({ title, steps, onPress }) {
           overflow: "hidden",
           opacity: pressed ? 0.9 : 1
         }),
-        children: /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flexDirection: "row", padding: sp[4], gap: sp[3], alignItems: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.View, { style: {
+        children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", padding: sp[4], gap: sp[3], alignItems: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.View, { style: {
             width: 32,
             height: 32,
             borderRadius: r[1],
@@ -3857,10 +3847,10 @@ function WorkedExampleCard({ title, steps, onPress }) {
             borderColor: theme.irisBorder,
             alignItems: "center",
             justifyContent: "center"
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.mono, fontSize: fs[12], fontWeight: fw[600], color: theme.iris }, children: steps?.length || "?" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flex: 1 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.mono, fontSize: fs[12], fontWeight: fw[600], color: theme.iris }, children: steps?.length || "?" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flex: 1 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
               steps?.length || 0,
               " step worked example"
             ] })
@@ -3868,8 +3858,8 @@ function WorkedExampleCard({ title, steps, onPress }) {
         ] })
       }
     ),
-    steps && steps.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(FullSheet, { visible: open, onClose: () => setOpen(false), title: "Worked example", children: steps.map((step, i) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flexDirection: "row", gap: sp[4], marginBottom: sp[6] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.View, { style: {
+    steps && steps.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(FullSheet, { visible: open, onClose: () => setOpen(false), title: "Worked example", children: steps.map((step, i) => /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", gap: sp[4], marginBottom: sp[6] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.View, { style: {
         width: 24,
         height: 24,
         borderRadius: 12,
@@ -3878,18 +3868,18 @@ function WorkedExampleCard({ title, steps, onPress }) {
         justifyContent: "center",
         flexShrink: 0,
         marginTop: 2
-      }, children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.iris }, children: i + 1 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flex: 1 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[600], color: theme.fg, marginBottom: sp[2] }, children: step.title }),
-        /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.6 }, children: step.content })
+      }, children: /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.iris }, children: i + 1 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flex: 1 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[600], color: theme.fg, marginBottom: sp[2] }, children: step.title }),
+        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.6 }, children: step.content })
       ] })
     ] }, i)) })
   ] });
 }
 
 // rn/Identity.tsx
-var import_react_native60 = require("react-native");
-var import_jsx_runtime64 = require("react/jsx-runtime");
+var import_react_native61 = require("react-native");
+var import_jsx_runtime65 = require("react/jsx-runtime");
 function Identity({
   initials,
   name,
@@ -3905,47 +3895,47 @@ function Identity({
   const { theme } = useTheme();
   const avatarSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "md";
   const nameFs = size === "sm" ? fs[13] : size === "lg" ? fs[16] : fs[14];
-  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Avatar, { initials, size: avatarSize, color: avatarColor, star, status }),
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flex: 1 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2] }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: nameFs, fontWeight: fw[600], color: theme.fg }, numberOfLines: 1, children: name }),
-        badge !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Badge, { variant: "accent", children: String(badge) })
+  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Avatar, { initials, size: avatarSize, color: avatarColor, star, status }),
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flex: 1 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2] }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: nameFs, fontWeight: fw[600], color: theme.fg }, numberOfLines: 1, children: name }),
+        badge !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(Badge, { variant: "accent", children: String(badge) })
       ] }),
-      role && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.fgSubtle, marginTop: sp[0.5] }, children: role }),
-      meta && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[12], color: theme.fgFaint, marginTop: sp[0.5] }, children: meta })
+      role && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.fgSubtle, marginTop: sp[0.5] }, children: role }),
+      meta && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: fs[12], color: theme.fgFaint, marginTop: sp[0.5] }, children: meta })
     ] }),
     right
   ] });
 }
 
 // rn/CardGrid.tsx
-var import_react26 = __toESM(require("react"));
-var import_react_native61 = require("react-native");
-var import_jsx_runtime65 = require("react/jsx-runtime");
+var import_react31 = __toESM(require("react"));
+var import_react_native62 = require("react-native");
+var import_jsx_runtime66 = require("react/jsx-runtime");
 function CardGrid({ children, columns = 2 }) {
-  const items = import_react26.default.Children.toArray(children);
+  const items = import_react31.default.Children.toArray(children);
   const rows = [];
   for (let i = 0; i < items.length; i += columns) {
     rows.push(items.slice(i, i + columns));
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.View, { style: { gap: sp[4] }, children: rows.map((row, ri) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flexDirection: "row", gap: sp[4] }, children: [
-    row.map((item, ci) => /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.View, { style: { flex: 1 }, children: item }, ci)),
-    row.length < columns && Array.from({ length: columns - row.length }).map((_, fi) => /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.View, { style: { flex: 1 } }, `fill-${fi}`))
+  return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.View, { style: { gap: sp[4] }, children: rows.map((row, ri) => /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flexDirection: "row", gap: sp[4] }, children: [
+    row.map((item, ci) => /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.View, { style: { flex: 1 }, children: item }, ci)),
+    row.length < columns && Array.from({ length: columns - row.length }).map((_, fi) => /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.View, { style: { flex: 1 } }, `fill-${fi}`))
   ] }, ri)) });
 }
 
 // rn/Leaderboard.tsx
-var import_react27 = require("react");
-var import_react_native62 = require("react-native");
-var import_jsx_runtime66 = require("react/jsx-runtime");
+var import_react32 = require("react");
+var import_react_native63 = require("react-native");
+var import_jsx_runtime67 = require("react/jsx-runtime");
 function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
   const { theme } = useTheme();
-  const renderItem = (0, import_react27.useCallback)(({ item, index }) => {
+  const renderItem = (0, import_react32.useCallback)(({ item, index }) => {
     const rank = index + 1;
     const isTop3 = rank <= 3;
     const rankColors = [color.gold[400], color.chalk[300], color.gold[500]];
-    return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: {
+    return /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.View, { style: {
       flexDirection: "row",
       alignItems: "center",
       gap: sp[3],
@@ -3956,7 +3946,7 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
       backgroundColor: item.isCurrent ? theme.selectedOverlay : "transparent",
       borderRadius: item.isCurrent ? r[2] : 0
     }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: {
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: {
         fontFamily: font.mono,
         fontSize: fs[12],
         fontWeight: fw[700],
@@ -3964,15 +3954,15 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
         minWidth: 20,
         textAlign: "center"
       }, children: rank }),
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Avatar, { initials: item.initials, size: "sm", color: item.avatarColor, star: isTop3 && rank === 1 }),
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: {
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(Avatar, { initials: item.initials, size: "sm", color: item.avatarColor, star: isTop3 && rank === 1 }),
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: {
         fontFamily: font.sans,
         fontSize: fs[14],
         fontWeight: item.isCurrent ? fw[600] : fw[400],
         color: theme.fg,
         flex: 1
       }, numberOfLines: 1, children: item.name }),
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: {
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: {
         fontFamily: font.mono,
         fontSize: fs[13],
         fontWeight: fw[600],
@@ -3980,9 +3970,9 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
       }, children: item.score })
     ] });
   }, [theme]);
-  const keyExtractor = (0, import_react27.useCallback)((_, i) => String(i), []);
-  return /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(
-    import_react_native62.FlatList,
+  const keyExtractor = (0, import_react32.useCallback)((_, i) => String(i), []);
+  return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(
+    import_react_native63.FlatList,
     {
       data: entries,
       renderItem,
@@ -4056,6 +4046,7 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
   Toast,
   ToastProvider,
   Tooltip,
+  TypingIndicator,
   VideoCard,
   VoiceTutor,
   WaterVessel,

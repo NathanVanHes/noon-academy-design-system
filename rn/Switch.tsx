@@ -3,7 +3,7 @@
  * Thumb slides with 120ms ease animation (dur-1).
  */
 import React, { useEffect } from 'react';
-import { Pressable, Text, Platform } from 'react-native';
+import { Pressable, View, Text, Platform } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, interpolateColor, Easing } from 'react-native-reanimated';
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, font, dur, color } from './tokens';
@@ -41,21 +41,22 @@ export function Switch({ value, onValueChange, disabled, label }: SwitchProps) {
   }));
 
   const track = (
-    <Animated.View style={[{
-        width: TRACK_W,
-        height: TRACK_H,
-        borderRadius: r.pill,
-        justifyContent: 'center',
-        paddingHorizontal: 2,
-        opacity: disabled ? 0.4 : 1,
-        ...(Platform.OS === 'web' ? { direction: 'ltr' } : {}),
-      } as any, trackStyle]}>
-        <Animated.View style={[{
-          width: THUMB_SIZE,
-          height: THUMB_SIZE,
-          borderRadius: THUMB_SIZE / 2,
-        }, thumbStyle]} />
-    </Animated.View>
+    <View {...(Platform.OS === 'web' ? { dataSet: { ltr: '' } } : {})} style={{ width: TRACK_W }}>
+      <Animated.View style={[{
+          width: TRACK_W,
+          height: TRACK_H,
+          borderRadius: r.pill,
+          justifyContent: 'center',
+          paddingHorizontal: 2,
+          opacity: disabled ? 0.4 : 1,
+        }, trackStyle]}>
+          <Animated.View style={[{
+            width: THUMB_SIZE,
+            height: THUMB_SIZE,
+            borderRadius: THUMB_SIZE / 2,
+          }, thumbStyle]} />
+      </Animated.View>
+    </View>
   );
 
   return (

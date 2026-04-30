@@ -9,6 +9,7 @@
  */
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { Toast } from './Toast';
+import { dur } from './tokens';
 
 type Variant = 'info' | 'success' | 'warn' | 'danger';
 
@@ -54,7 +55,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setVisible(false);
     setCurrent(null);
     // Show next in queue after a short delay
-    setTimeout(showNext, 150);
+    setTimeout(showNext, dur[1]);
   }, [showNext]);
 
   return (

@@ -4,7 +4,7 @@
  * States: idle, dragging, placed, correct, incorrect, disabled.
  */
 import React, { useRef } from 'react';
-import { Image, Text, Platform, type ViewStyle, type ImageSourcePropType } from 'react-native';
+import { View, Image, Text, Platform, type ViewStyle, type ImageSourcePropType } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import { useTheme } from './ThemeContext';
@@ -29,15 +29,18 @@ interface DragItemProps {
   onDragEnd?: (id: string, x: number, y: number) => void;
 }
 
-const IMG_MIN = 32;
-const IMG_MAX = 80;
+const IMG_DEFAULT = 90;
 
 /** Renders the content of a drag item — text or image. Reused by zone item renderers. */
 export function DragItemContent({ item, fontSize = fs[14] }: { item: DragItemData; fontSize?: number }) {
   const { theme } = useTheme();
-  const imgSize = Math.min(IMG_MAX, Math.max(IMG_MIN, item.imageSize || 48));
   if (item.image) {
-    return <Image source={item.image} style={{ width: imgSize, height: imgSize, borderRadius: r[1] }} resizeMode="contain" />;
+    const size = item.imageSize || IMG_DEFAULT;
+    return (
+      <View style={{ width: size, height: size, borderRadius: r[1], overflow: 'hidden' }}>
+        <Image source={item.image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+      </View>
+    );
   }
   return <Text style={{ fontFamily: font.sans, fontSize, fontWeight: fw[500], color: theme.fg, ...(Platform.OS === 'web' ? { userSelect: 'none' } : {}) } as any}>{item.label}</Text>;
 }
@@ -98,8 +101,8 @@ export function DragItem({ item, state = 'idle', onDragStart, onDragMove, onDrag
     idle: theme.bgRaised,
     dragging: theme.bgOverlay,
     placed: theme.bgRaised,
-    correct: theme.accentSoft,
-    incorrect: theme.dangerSoft,
+    correct: theme.bgRaised,
+    incorrect: theme.bgRaised,
     disabled: theme.bgRaised,
   };
 
@@ -107,20 +110,19 @@ export function DragItem({ item, state = 'idle', onDragStart, onDragMove, onDrag
     idle: theme.borderStrong,
     dragging: theme.accent,
     placed: theme.borderStrong,
-    correct: theme.accentBorder,
-    incorrect: theme.dangerBorder,
+    correct: theme.accent,
+    incorrect: theme.danger,
     disabled: theme.border,
   };
-
-  const imgSize = Math.min(IMG_MAX, Math.max(IMG_MIN, item.imageSize || 48));
 
   const containerStyle: ViewStyle = {
     backgroundColor: bgMap[state],
     borderRadius: r[2],
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: borderMap[state],
-    paddingVertical: sp[2],
-    paddingHorizontal: item.image ? sp[2] : sp[3],
+    paddingVertical: item.image ? 0 : sp[2],
+    paddingHorizontal: item.image ? 0 : sp[3],
+    overflow: 'hidden',
     opacity: isDisabled ? 0.4 : 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -134,11 +136,7 @@ export function DragItem({ item, state = 'idle', onDragStart, onDragMove, onDrag
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View style={[containerStyle, animatedStyle]}>
-        {item.image ? (
-          <Image source={item.image} style={{ width: imgSize, height: imgSize, borderRadius: r[1] }} resizeMode="contain" />
-        ) : (
-          <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg, ...(Platform.OS === 'web' ? { userSelect: 'none' } : {}) } as any}>{item.label}</Text>
-        )}
+        <DragItemContent item={item} />
       </Animated.View>
     </GestureDetector>
   );

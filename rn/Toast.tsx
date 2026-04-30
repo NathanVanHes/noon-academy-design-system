@@ -82,7 +82,7 @@ export function Toast({ message, variant = 'info', visible, onDismiss, duration 
       elevation: 6,
       zIndex: 999,
     }, animatedStyle]}>
-      <Pressable onPress={dismiss}>
+      <Pressable onPress={dismiss} accessibilityRole="button" accessibilityLabel="Dismiss">
         <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>{message}</Text>
       </Pressable>
     </Animated.View>

@@ -5,7 +5,7 @@
 import React from 'react';
 import { Pressable, View, Text, Image, type ViewStyle, type TextStyle, type ImageSourcePropType } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font, icon, color } from './tokens';
+import { sp, r, fs, fw, font, icon } from './tokens';
 
 type State = 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled';
 
@@ -22,7 +22,7 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
 
   const borderColorMap: Record<State, string> = {
     default: theme.border,
-    selected: color.blue[400],
+    selected: theme.accent,
     correct: theme.accent,
     incorrect: theme.danger,
     disabled: theme.border,
@@ -30,7 +30,7 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
 
   const bgMap: Record<State, string> = {
     default: 'transparent',
-    selected: 'rgba(107,163,255,0.08)',
+    selected: theme.accentSoft,
     correct: theme.accentSoft,
     incorrect: theme.dangerSoft,
     disabled: 'transparent',
@@ -84,7 +84,7 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
         <Text style={labelTextStyle}>{label}</Text>
       </View>
       <View style={{ flex: 1 }}>
-        {image && <Image source={image} style={{ width: '100%', aspectRatio: 16 / 9, maxHeight: 120, borderRadius: r[1], marginBottom: text ? sp[2] : 0 }} resizeMode="cover" />}
+        {image && <View style={{ width: 120, height: 120, borderRadius: r[1], overflow: 'hidden', marginBottom: text ? sp[2] : 0 }}><Image source={image} style={{ width: '100%', height: '100%' }} resizeMode="cover" /></View>}
         {text ? <Text style={optionTextStyle}>{text}</Text> : null}
       </View>
     </Pressable>

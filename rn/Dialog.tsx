@@ -42,7 +42,7 @@ export function Dialog({ visible, onClose, title, body, primaryLabel = 'Confirm'
   }));
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} accessibilityViewIsModal={true}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(6,9,19,0.5)', justifyContent: 'center', alignItems: 'center', padding: sp[7] }} onPress={onClose}>
         <Animated.View style={[{ width: '100%', maxWidth: 320 }, animatedStyle]}>

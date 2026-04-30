@@ -3,10 +3,10 @@
  * Built from pages/voice-tutor.html using design system components.
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, Animated, Easing, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  useTheme, VoiceTutor, ChatMessage, BreakdownCard, ActivityCard,
+  useTheme, VoiceTutor, ChatMessage, TypingIndicator, BreakdownCard, ActivityCard,
   ResourceList, VideoCard, WorkedExampleCard, SlidesCard, FullSheet, Button,
   sp, fs, fw, font, r, color,
 } from '../../rn';
@@ -17,26 +17,8 @@ interface ConvoItem {
   type: 'tutor' | 'student' | 'breakdown' | 'activity' | 'video' | 'resources' | 'typing';
   text?: string;
   confirmed?: boolean;
+  revealedLength?: number;
   data?: any;
-}
-
-function TypingIndicator() {
-  const dots = [0, 1, 2].map(i => {
-    const anim = useRef(new Animated.Value(0)).current;
-    useEffect(() => {
-      const loop = Animated.loop(Animated.sequence([
-        Animated.delay(i * 150),
-        Animated.timing(anim, { toValue: 1, duration: 300, easing: Easing.inOut(Easing.sin), useNativeDriver: false }),
-        Animated.timing(anim, { toValue: 0, duration: 300, easing: Easing.inOut(Easing.sin), useNativeDriver: false }),
-        Animated.delay((2 - i) * 150),
-      ]));
-      loop.start();
-      return () => loop.stop();
-    }, []);
-    const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [0, -4] });
-    return <Animated.View key={i} style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'rgba(176,138,249,0.5)', transform: [{ translateY }] }} />;
-  });
-  return <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 4, maxWidth: '80%' }}>{dots}</View>;
 }
 
 // Helper: tutor speaks — thinking dots, then words stream in as tutor speaks
@@ -164,17 +146,25 @@ export function VoiceTutorSession({ onClose }: { onClose?: () => void }) {
         } else if (step.action === 'tutorStream') {
           const text = step.item!.text!;
           const words = text.split(' ');
-          setItems(prev => [...prev, { type: 'tutor', text: '' }]);
+          // Show full text immediately, ghosted
+          setItems(prev => [...prev, { type: 'tutor', text, revealedLength: 0 }]);
+          // Reveal word by word
           for (let w = 0; w < words.length; w++) {
             if (cancelled) return;
-            await new Promise(r => setTimeout(r, 60 + Math.random() * 40));
-            const partial = words.slice(0, w + 1).join(' ');
+            await new Promise(r => setTimeout(r, 80 + Math.random() * 60));
+            const revealedLength = words.slice(0, w + 1).join(' ').length;
             setItems(prev => {
               const next = [...prev];
-              next[next.length - 1] = { type: 'tutor', text: partial };
+              next[next.length - 1] = { type: 'tutor', text, revealedLength };
               return next;
             });
           }
+          // Fully reveal
+          setItems(prev => {
+            const next = [...prev];
+            next[next.length - 1] = { type: 'tutor', text, revealedLength: text.length };
+            return next;
+          });
           await new Promise(r => setTimeout(r, 300));
         } else if (step.action === 'studentStream') {
           // Word-by-word unconfirmed student message
@@ -228,7 +218,7 @@ export function VoiceTutorSession({ onClose }: { onClose?: () => void }) {
   const renderItem = (item: ConvoItem, i: number) => {
     switch (item.type) {
       case 'tutor':
-        return <ChatMessage key={i} from="tutor">{item.text!}</ChatMessage>;
+        return <ChatMessage key={i} from="tutor" revealedLength={item.revealedLength}>{item.text!}</ChatMessage>;
       case 'student':
         return <ChatMessage key={i} from="student" confirmed={item.confirmed !== false}>{item.text!}</ChatMessage>;
       case 'breakdown':
