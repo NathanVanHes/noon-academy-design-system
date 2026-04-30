@@ -66,6 +66,19 @@ export { LinearProgress, CircularProgress } from './Progress';
 export { SessionCard } from './SessionCard';
 export { HomeworkCard } from './HomeworkCard';
 export { QuizOption } from './QuizOption';
+export { Question } from './Question';
+export { DragItem, DragItemContent } from './DragItem';
+export type { DragItemData, DragItemState } from './DragItem';
+export { DropZone } from './DropZone';
+export type { DropZoneState, DropZoneBounds } from './DropZone';
+export { useDragDrop } from './useDragDrop';
+export { QuestionFrame } from './QuestionFrame';
+export { MatchQuestion } from './MatchQuestion';
+export { CategorizeQuestion } from './CategorizeQuestion';
+export { OrderQuestion } from './OrderQuestion';
+export { FillBlanksQuestion } from './FillBlanksQuestion';
+export { HotspotQuestion } from './HotspotQuestion';
+export { PlacedItem } from './PlacedItem';
 export { Interstitial } from './Interstitial';
 
 // Graphical

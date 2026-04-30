@@ -3,8 +3,19 @@
  * Enhanced version of RouteSteps with crosshairs, arrived state, and labels.
  * Markers: passed (dim gold), current (bright gold + crosshairs), arrived (green + crosshairs), incomplete (outline).
  */
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Easing } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+  withDelay,
+  Easing,
+  interpolate,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font } from './tokens';
@@ -23,34 +34,39 @@ export function WaypointMarker({ state }: { state: WaypointState }) {
   const S = DIAMOND_SIZE;
 
   // Ping flash on current — diamond shape expands and fades like a lighthouse
-  const ping = useRef(new Animated.Value(0)).current;
+  const ping = useSharedValue(0);
   useEffect(() => {
     if (!isCurrent) return;
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(ping, { toValue: 1, duration: 1500, easing: Easing.out(Easing.ease), useNativeDriver: false }),
-        Animated.timing(ping, { toValue: 0, duration: 0, useNativeDriver: false }),
-        Animated.delay(1000),
-      ])
+    ping.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1500, easing: Easing.out(Easing.ease) }),
+        withTiming(0, { duration: 0 }),
+        withDelay(1000, withTiming(0, { duration: 0 })),
+      ),
+      -1
     );
-    loop.start();
-    return () => loop.stop();
+    return () => {
+      cancelAnimation(ping);
+    };
   }, [isCurrent]);
 
-  const pingScale = ping.interpolate({ inputRange: [0, 1], outputRange: [1, 2.8] });
-  const pingOpacity = ping.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0.6, 0.25, 0] });
+  const pingAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      { rotate: '45deg' },
+      { scale: interpolate(ping.value, [0, 1], [1, 2.8]) },
+    ],
+    opacity: interpolate(ping.value, [0, 0.2, 1], [0.6, 0.25, 0]),
+  }));
 
   return (
     <View style={{ width: S, height: S, alignItems: 'center', justifyContent: 'center' }}>
       {/* Ping flash — diamond shape radiates outward */}
       {isCurrent && (
-        <Animated.View style={{
+        <Animated.View style={[{
           position: 'absolute',
           width: S, height: S,
           backgroundColor: theme.signalBright,
-          transform: [{ rotate: '45deg' }, { scale: pingScale }],
-          opacity: pingOpacity,
-        }} />
+        }, pingAnimStyle]} />
       )}
       <View style={{
         width: S, height: S,

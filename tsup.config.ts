@@ -15,6 +15,8 @@ export default defineConfig({
     'react-native',
     'react-native-svg',
     'react-native-safe-area-context',
+    'react-native-gesture-handler',
+    'react-native-reanimated',
   ],
   jsx: 'automatic',
 });

@@ -3,7 +3,8 @@
  * Title, description, button. Confetti rains over everything.
  */
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated } from 'react-native';
+import { View, Text } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, withRepeat, withSequence, cancelAnimation } from 'react-native-reanimated';
 import { useTheme } from './ThemeContext';
 import { Button } from './Button';
 import { sp, fs, fw, font, r, color } from './tokens';
@@ -19,29 +20,31 @@ const CONFETTI_COLORS = [color.noon[400], color.gold[200], color.gold[400], colo
 const PARTICLE_COUNT = 80;
 
 function ConfettiParticle({ delay, color: c }: { delay: number; color: string }) {
-  const translateY = useRef(new Animated.Value(-10)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
   const left = useRef(Math.random() * 100).current;
   const size = useRef(3 + Math.random() * 5).current;
   const isRect = useRef(Math.random() > 0.5).current;
+  const duration = useRef(1500 + Math.random() * 1500).current;
+
+  const translateY = useSharedValue(-10);
+  const opacity = useSharedValue(1);
 
   useEffect(() => {
-    const duration = 1500 + Math.random() * 1500;
-    Animated.sequence([
-      Animated.delay(delay),
-      Animated.parallel([
-        Animated.timing(translateY, { toValue: 700, duration, useNativeDriver: true }),
-        Animated.sequence([
-          Animated.delay(duration * 0.5),
-          Animated.timing(opacity, { toValue: 0, duration: duration * 0.5, useNativeDriver: true }),
-        ]),
-      ]),
-    ]).start();
+    translateY.value = withDelay(delay, withTiming(700, { duration }));
+    opacity.value = withDelay(delay + duration * 0.5, withTiming(0, { duration: duration * 0.5 }));
+    return () => {
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
+    };
   }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
     <Animated.View
-      style={{
+      style={[{
         position: 'absolute',
         left: `${left}%`,
         top: -10,
@@ -49,25 +52,29 @@ function ConfettiParticle({ delay, color: c }: { delay: number; color: string })
         height: isRect ? size * 0.4 : size,
         borderRadius: isRect ? 1 : size / 2,
         backgroundColor: c,
-        opacity,
-        transform: [{ translateY }],
-      }}
+      }, animatedStyle]}
     />
   );
 }
 
 export function Interstitial({ title, body, buttonLabel, onPress }: InterstitialProps) {
   const { theme } = useTheme();
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const pulseScale = useSharedValue(1);
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.06, duration: 1000, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-      ])
-    ).start();
+    pulseScale.value = withRepeat(
+      withSequence(
+        withTiming(1.06, { duration: 1000 }),
+        withTiming(1, { duration: 1000 }),
+      ),
+      -1,
+    );
+    return () => cancelAnimation(pulseScale);
   }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseScale.value }],
+  }));
 
   const particles = Array.from({ length: PARTICLE_COUNT }, (_, i) => (
     <ConfettiParticle key={i} delay={Math.random() * 3000} color={CONFETTI_COLORS[i % CONFETTI_COLORS.length]} />
@@ -83,14 +90,13 @@ export function Interstitial({ title, body, buttonLabel, onPress }: Interstitial
       <View style={{ flex: 1 }} />
 
       {/* Star */}
-      <Animated.View style={{
+      <Animated.View style={[{
         width: 120, height: 120, borderRadius: 60,
         backgroundColor: theme.accentSoft,
         alignItems: 'center', justifyContent: 'center',
         marginBottom: sp[6],
-        transform: [{ scale: pulseAnim }],
         zIndex: 2,
-      }}>
+      }, pulseStyle]}>
         <Text style={{ fontSize: fs[48] }}>★</Text>
       </Animated.View>
 

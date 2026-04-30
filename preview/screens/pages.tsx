@@ -17,6 +17,7 @@ import {
   GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
+  MatchQuestion, CategorizeQuestion, OrderQuestion, FillBlanksQuestion, HotspotQuestion,
   sp, fs, fw, font, color, r, h, icon, lh, dur,
 } from '../../rn';
 
@@ -632,7 +633,7 @@ export function MotionPage() {
         {(anim) => <Animated.View style={{ transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.97] }) }], opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.9] }) }}><Button>Label</Button></Animated.View>}
       </MotionDemo>
       <MotionDemo label="Card press" spec="Ease · 120ms" desc="Opacity 0.9, translateY 0.5">
-        {(anim) => <Animated.View style={{ width: '100%', transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.5] }) }], opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.9] }) }}><Card><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Card content</Text></Card></Animated.View>}
+        {(anim) => <Animated.View style={{ width: '100%', transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.5] }) }], opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.9] }) }}><Card title="Card content" subtitle="Press feedback demo" /></Animated.View>}
       </MotionDemo>
       <MotionDemo label="Switch / Checkbox" spec="Ease · 120ms" desc="Thumb slides, check scales in">
         {() => <MotionToggleDemo />}
@@ -1203,6 +1204,169 @@ export function QuizPage() {
   </>;
 }
 
+export function MatchPage() {
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%' }}>
+        <MatchQuestion
+          question="Match each term to its definition"
+          items={[
+            { id: 'a', label: 'Velocity' },
+            { id: 'b', label: 'Acceleration' },
+            { id: 'c', image: { uri: 'https://placehold.co/96x96/232c43/3a4560' }, imageSize: 48 },
+          ]}
+          targets={[
+            { id: 't1', label: 'Rate of change of position' },
+            { id: 't2', label: 'Rate of change of velocity' },
+            { id: 't3', label: 'Mass times acceleration' },
+          ]}
+          correctMapping={{ a: 't1', b: 't2', c: 't3' }}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { MatchQuestion } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="question" type="string" />
+      <Prop name="items" type="DragItemData[]" desc="{ id, label?, image?, imageSize? }" />
+      <Prop name="targets" type="{ id, label }[]" desc="Drop targets — one per item" />
+      <Prop name="correctMapping" type="Record<string, string>" desc="itemId → targetId" />
+    </Props>
+    <S title="Rules">
+      <Rl>1:1 mapping — each item matches exactly one target.</Rl>
+      <Rl>Items can be text or images (32–80px). Targets are always text labels.</Rl>
+      <Rl>Drag from the source area to the drop zone next to each target.</Rl>
+    </S>
+  </>;
+}
+
+export function CategorizePage() {
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%' }}>
+        <CategorizeQuestion
+          question="Sort these into the correct category"
+          items={[
+            { id: 'a', label: 'Proton' },
+            { id: 'b', label: 'Electron' },
+            { id: 'c', image: { uri: 'https://placehold.co/96x96/232c43/3a4560' }, imageSize: 40 },
+            { id: 'd', label: 'Photon' },
+          ]}
+          categories={[
+            { id: 'charged', label: 'Charged' },
+            { id: 'neutral', label: 'Neutral' },
+          ]}
+          correctMapping={{ a: 'charged', b: 'charged', c: 'neutral', d: 'neutral' }}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { CategorizeQuestion } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="question" type="string" />
+      <Prop name="items" type="DragItemData[]" desc="Items to categorize" />
+      <Prop name="categories" type="{ id, label }[]" desc="Category buckets" />
+      <Prop name="correctMapping" type="Record<string, string>" desc="itemId → categoryId" />
+    </Props>
+    <S title="Rules">
+      <Rl>Many:1 — multiple items can go in each category.</Rl>
+      <Rl>Categories are text labels. Items can be text or images.</Rl>
+    </S>
+  </>;
+}
+
+export function OrderPage() {
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%' }}>
+        <OrderQuestion
+          question="Put these events in chronological order"
+          items={[
+            { id: 'c', label: 'Treaty signed' },
+            { id: 'a', image: { uri: 'https://placehold.co/96x96/232c43/3a4560' }, imageSize: 40 },
+            { id: 'b', label: 'Battle fought' },
+          ]}
+          correctOrder={['a', 'b', 'c']}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { OrderQuestion } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="question" type="string" />
+      <Prop name="items" type="DragItemData[]" desc="Items to order (shown shuffled)" />
+      <Prop name="correctOrder" type="string[]" desc="Item IDs in correct sequence" />
+    </Props>
+    <S title="Rules">
+      <Rl>Items must be placed into numbered slots in sequence.</Rl>
+      <Rl>Each slot accepts exactly one item.</Rl>
+    </S>
+  </>;
+}
+
+export function FillBlanksPage() {
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%' }}>
+        <FillBlanksQuestion
+          question="Complete the sentence"
+          sentence="The {{b1}} of an object is equal to its {{b2}} multiplied by its {{b3}}."
+          items={[
+            { id: 'w1', label: 'weight' },
+            { id: 'w2', label: 'mass' },
+            { id: 'w3', label: 'acceleration' },
+          ]}
+          correctMapping={{ w1: 'b1', w2: 'b2', w3: 'b3' }}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { FillBlanksQuestion } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="question" type="string" />
+      <Prop name="sentence" type="string" desc="Use {{blankId}} for drop zones" />
+      <Prop name="items" type="DragItemData[]" desc="Words to drag into blanks" />
+      <Prop name="correctMapping" type="Record<string, string>" desc="itemId → blankId" />
+    </Props>
+    <S title="Rules">
+      <Rl>Blanks are inline drop zones within the sentence text.</Rl>
+      <Rl>Use {"{{blankId}}"} placeholders in the sentence string.</Rl>
+      <Rl>Items are always text pills — no images for fill-in-the-blank.</Rl>
+    </S>
+  </>;
+}
+
+export function HotspotPage() {
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%' }}>
+        <HotspotQuestion
+          question="Label the diagram"
+          image={{ uri: 'https://placehold.co/500x500/1a2236/232c43' }}
+          imageAspectRatio={1}
+          zones={[
+            { id: 'z1', x: 15, y: 25, width: 25, height: 25 },
+            { id: 'z2', x: 55, y: 45, width: 25, height: 25 },
+          ]}
+          items={[
+            { id: 'i1', label: 'Part A' },
+            { id: 'i2', label: 'Part B' },
+          ]}
+          correctMapping={{ i1: 'z1', i2: 'z2' }}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { HotspotQuestion } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="question" type="string" />
+      <Prop name="image" type="ImageSource" desc="Background image" />
+      <Prop name="zones" type="{ id, label?, x, y, width, height }[]" desc="Drop regions as % of image" />
+      <Prop name="items" type="DragItemData[]" desc="Labels to drag onto zones" />
+      <Prop name="correctMapping" type="Record<string, string>" desc="itemId → zoneId" />
+    </Props>
+    <S title="Rules">
+      <Rl>Zones are percentage-based regions overlaid on the image.</Rl>
+      <Rl>Each zone accepts one item. Items can be text or small images.</Rl>
+    </S>
+  </>;
+}
+
 export function FilterBarPage() {
   const [count, setCount] = useState('4');
   const allLabels = ['All', 'Reading', 'Math', 'Verbal', 'Writing', 'Science'];
@@ -1241,50 +1405,83 @@ export function FilterBarPage() {
 
 export function CardsPage() {
   const { theme } = useTheme();
-  const [interactive, setInteractive] = useState(false);
+  const [hasSubtitle, setHasSubtitle] = useState(true);
+  const [hasActions, setHasActions] = useState(true);
+  const [hasMeta, setHasMeta] = useState(true);
+  const [pressable, setPressable] = useState(true);
+  const [selectable, setSelectable] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [error, setError] = useState(false);
-  const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(false);
+  const demoActions = [{ label: 'Edit', onPress: () => {} }, { label: 'Remove', danger: true, onPress: () => {} }];
   return <>
     <Playground
       knobs={<>
-        <KnobToggle label="Interactive" value={interactive} onChange={setInteractive} />
-        <KnobToggle label="Selected" value={selected} onChange={setSelected} />
-        <KnobToggle label="Error" value={error} onChange={setError} />
-        <KnobToggle label="Live" value={live} onChange={setLive} />
+        <KnobToggle label="Subtitle" value={hasSubtitle} onChange={setHasSubtitle} />
+        <KnobToggle label="Actions menu" value={hasActions} onChange={setHasActions} />
+        <KnobToggle label="Meta" value={hasMeta} onChange={setHasMeta} />
+        <KnobToggle label="Pressable" value={pressable} onChange={setPressable} />
+        <KnobToggle label="Selectable" value={selectable} onChange={setSelectable} />
+        {selectable && <KnobToggle label="Selected" value={selected} onChange={setSelected} />}
         <KnobToggle label="Loading" value={loading} onChange={setLoading} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <Card interactive={interactive} selected={selected} error={error} live={live} loading={loading} onPress={interactive ? () => {} : undefined}>
-          <Text style={{ fontFamily: font.serif, fontSize: fs[18], color: theme.fg }}>Card title</Text>
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[1] }}>Card content goes here</Text>
-        </Card>
+        <Card
+          title="Qudrat Reading"
+          subtitle={hasSubtitle ? 'Mr. Hassan · Comprehension' : undefined}
+          actions={hasActions ? demoActions : undefined}
+          meta={hasMeta ? '4 of 8 sessions' : undefined}
+          selectable={selectable}
+          selected={selected}
+          loading={loading}
+          onPress={pressable || selectable ? () => {} : undefined}
+        />
       </View>
     </Playground>
 
-    <Import>{"import { Card } from '@noon/design-system';"}</Import>
+    <Import>{"import { Card, CardGrid } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="children" type="ReactNode" />
-      <Prop name="interactive" type="boolean" />
-      <Prop name="selected" type="boolean" desc="Accent border" />
-      <Prop name="error" type="boolean" desc="Danger border" />
-      <Prop name="live" type="boolean" desc="Accent start border" />
-      <Prop name="loading" type="boolean" desc="0.6 opacity" />
-      <Prop name="onPress" type="() => void" />
+      <Prop name="title" type="string" desc="Primary text (required)" />
+      <Prop name="subtitle" type="string" desc="Secondary line — teacher, subject" />
+      <Prop name="actions" type="{ label: string; danger?: boolean; onPress }[]" desc="Ellipsis menu items" />
+      <Prop name="meta" type="string" desc="Tertiary info — count, progress" />
+      <Prop name="thumbnail" type="ImageSource" desc="Full-width image above content" />
+      <Prop name="selectable" type="boolean" desc="Shows checkbox, accent border when selected" />
+      <Prop name="selected" type="boolean" desc="Checked state (requires selectable)" />
+      <Prop name="loading" type="boolean" desc="0.6 opacity, disabled" />
+      <Prop name="onPress" type="() => void" desc="Makes card pressable" />
     </Props>
-    <S title="State Guide">
-      <Rl>selected: accent border. Use for the currently active item in a list.</Rl>
-      <Rl>error: danger border. Validation failure or blocked state.</Rl>
-      <Rl>live: accent left border. Active session in progress.</Rl>
-      <Rl>loading: 0.6 opacity. Data still loading.</Rl>
+
+    <S title="Minimal">
+      <Card title="Mathematics 101" subtitle="Dr. Al-Rashid" onPress={() => {}} />
     </S>
+
+    <S title="With actions">
+      <Card title="Physics — Mechanics" subtitle="Mr. Omar" meta="Session 4 of 8" actions={[{ label: 'Edit', onPress: () => {} }, { label: 'Remove', danger: true, onPress: () => {} }]} onPress={() => {}} />
+    </S>
+
+    <S title="Selectable">
+      <View style={{ gap: sp[3] }}>
+        <Card title="Qudrat Reading" subtitle="Comprehension" selectable selected onPress={() => {}} />
+        <Card title="Mathematics" subtitle="Algebra" selectable onPress={() => {}} />
+      </View>
+    </S>
+
+    <S title="Card grid">
+      <CardGrid>
+        <Card title="Qudrat Reading" subtitle="Mr. Hassan" onPress={() => {}} />
+        <Card title="Mathematics" subtitle="Dr. Al-Rashid" actions={[{ label: 'Remove', danger: true, onPress: () => {} }]} onPress={() => {}} />
+        <Card title="Physics" subtitle="Mr. Omar" onPress={() => {}} />
+        <Card title="Chemistry" subtitle="Ms. Fatima" meta="3 sessions" onPress={() => {}} />
+      </CardGrid>
+    </S>
+
     <S title="Rules">
-      <Rl>Cards use bgRaised background, r-2 radius, sp-5/sp-6 padding.</Rl>
-      <Rl>Interactive cards get press feedback (opacity 0.9, 0.5px translateY).</Rl>
-      <Rl>States are mutually exclusive — a card can't be selected AND error.</Rl>
-      <Rl>Don't nest cards inside cards.</Rl>
+      <Rl>All content via props — the card controls the layout.</Rl>
+      <Rl>title is required. subtitle, actions, meta, thumbnail are optional.</Rl>
+      <Rl>actions renders an ellipsis icon that opens a Menu with the given items.</Rl>
+      <Rl>selectable adds a checkbox and accent border when selected.</Rl>
+      <Rl>Wrap in CardGrid for responsive 2-column layout.</Rl>
     </S>
   </>;
 }
@@ -2244,10 +2441,10 @@ export function CardGridPage() {
     </Props>
     <S title="2 columns">
       <CardGrid>
-        <Card><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Card 1</Text></Card>
-        <Card><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Card 2</Text></Card>
-        <Card><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Card 3</Text></Card>
-        <Card><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Card 4</Text></Card>
+        <Card title="Qudrat Reading" subtitle="Mr. Hassan" onPress={() => {}} />
+        <Card title="Mathematics" subtitle="Dr. Al-Rashid" tag="New" tagVariant="accent" onPress={() => {}} />
+        <Card title="Physics" subtitle="Mr. Omar" onPress={() => {}} />
+        <Card title="Chemistry" subtitle="Ms. Fatima" meta="3 sessions" onPress={() => {}} />
       </CardGrid>
     </S>
     <S title="Rules">

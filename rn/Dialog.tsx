@@ -2,8 +2,9 @@
  * Dialog — centered modal for confirmations and decisions.
  * Overlay fades in, content scales up with 200ms ease.
  */
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Modal, Pressable, Animated, Easing, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Modal, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import { useTheme } from './ThemeContext';
 import { Button } from './Button';
 import { sp, r, fs, fw, font, dur } from './tokens';
@@ -22,25 +23,29 @@ interface DialogProps {
 
 export function Dialog({ visible, onClose, title, body, primaryLabel = 'Confirm', secondaryLabel = 'Cancel', onPrimary, onSecondary, danger }: DialogProps) {
   const { theme } = useTheme();
-  const scale = useRef(new Animated.Value(0.92)).current;
-  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const scale = useSharedValue(0.92);
+  const contentOpacity = useSharedValue(0);
 
   useEffect(() => {
     if (visible) {
-      scale.setValue(0.92);
-      contentOpacity.setValue(0);
-      Animated.parallel([
-        Animated.timing(scale, { toValue: 1, duration: dur[2], easing: Easing.bezier(0.22, 0.61, 0.36, 1), useNativeDriver: true }),
-        Animated.timing(contentOpacity, { toValue: 1, duration: dur[2], easing: Easing.bezier(0.22, 0.61, 0.36, 1), useNativeDriver: true }),
-      ]).start();
+      scale.value = 0.92;
+      contentOpacity.value = 0;
+      const config = { duration: dur[2], easing: Easing.bezier(0.22, 0.61, 0.36, 1) };
+      scale.value = withTiming(1, config);
+      contentOpacity.value = withTiming(1, config);
     }
   }, [visible]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: contentOpacity.value,
+  }));
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(6,9,19,0.5)', justifyContent: 'center', alignItems: 'center', padding: sp[7] }} onPress={onClose}>
-        <Animated.View style={{ transform: [{ scale }], opacity: contentOpacity, width: '100%', maxWidth: 320 }}>
+        <Animated.View style={[{ width: '100%', maxWidth: 320 }, animatedStyle]}>
           <Pressable
             accessibilityRole="none"
             style={{

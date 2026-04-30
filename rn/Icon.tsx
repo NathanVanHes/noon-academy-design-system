@@ -15,7 +15,7 @@ export type IconName =
   | 'chevron-left' | 'chevron-right' | 'chevron-down' | 'chevron-up'
   | 'arrow-left' | 'arrow-right'
   | 'close' | 'plus' | 'minus' | 'check'
-  | 'search' | 'menu' | 'more'
+  | 'search' | 'menu' | 'more' | 'more-vertical'
   | 'play' | 'pause'
   | 'expand' | 'collapse'
   | 'document' | 'link'
@@ -63,6 +63,11 @@ const paths: Record<IconName, (s: number) => React.ReactElement> = {
     <Circle cx={s*0.25} cy={s*0.5} r={s*0.06} fill="currentColor" />
     <Circle cx={s*0.5} cy={s*0.5} r={s*0.06} fill="currentColor" />
     <Circle cx={s*0.75} cy={s*0.5} r={s*0.06} fill="currentColor" />
+  </>,
+  'more-vertical': (s) => <>
+    <Circle cx={s*0.5} cy={s*0.25} r={s*0.06} fill="currentColor" />
+    <Circle cx={s*0.5} cy={s*0.5} r={s*0.06} fill="currentColor" />
+    <Circle cx={s*0.5} cy={s*0.75} r={s*0.06} fill="currentColor" />
   </>,
   'play': (s) => <Path d={`M${s*0.3} ${s*0.2}L${s*0.8} ${s*0.5}L${s*0.3} ${s*0.8}Z`} fill="currentColor" />,
   'pause': (s) => <>

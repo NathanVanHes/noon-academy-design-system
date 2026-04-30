@@ -11,22 +11,25 @@ npm install @noon/design-system
 Peer dependencies:
 
 ```bash
-npm install react-native-svg react-native-safe-area-context
+npm install react-native-svg react-native-safe-area-context react-native-gesture-handler react-native-reanimated
 ```
 
 ## Setup
 
 ```tsx
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, Button } from '@noon/design-system';
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider initial="void">
-        <Button variant="primary" onPress={() => {}}>Get started</Button>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider initial="void">
+          <Button variant="primary" onPress={() => {}}>Get started</Button>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 ```

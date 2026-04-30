@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ScrollView, View, Text, StatusBar, Pressable, Animated, Modal, Dimensions, useWindowDimensions, I18nManager, Platform } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { CrimsonPro_300Light, CrimsonPro_400Regular, CrimsonPro_500Medium, CrimsonPro_600SemiBold, CrimsonPro_700Bold } from '@expo-google-fonts/crimson-pro';
 import { JetBrainsMono_300Light, JetBrainsMono_400Regular, JetBrainsMono_500Medium, JetBrainsMono_600SemiBold, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono';
@@ -17,8 +18,10 @@ import {
   InputPage, TextareaPage, StepperPage, CheckboxPage, RadioPage, SwitchPage, SegmentedPage,
   // Selection
   ChipsPage, QuizPage, FilterBarPage, MenuPage, CalendarPage,
+  // Questions
+  MatchPage, CategorizePage, OrderPage, FillBlanksPage, HotspotPage,
   // Display
-  CardsPage, CardGridPage, AvatarsPage, IdentityPage, BadgesPage, TablePage, SessionCardPage, HomeworkCardPage, VideoPage,
+  CardsPage, AvatarsPage, IdentityPage, BadgesPage, TablePage, SessionCardPage, HomeworkCardPage, VideoPage,
   // Progress
   SessionBarPage, ProgressPage,
   // Navigation
@@ -67,15 +70,21 @@ const NAV = [
   ]},
   { group: 'Selection', items: [
     { id: 'chips', label: 'Chips' },
-    { id: 'quizoption', label: 'Quiz Option' },
     { id: 'filterbar', label: 'Filter Bar' },
     { id: 'menu', label: 'Menu' },
     { id: 'calendar', label: 'Calendar' },
   ]},
+  { group: 'Questions', items: [
+    { id: 'quizoption', label: 'Multiple Choice' },
+    { id: 'match', label: 'Match' },
+    { id: 'categorize', label: 'Categorize' },
+    { id: 'order', label: 'Order' },
+    { id: 'fillblanks', label: 'Fill Blanks' },
+    { id: 'hotspot', label: 'Image Hotspot' },
+  ]},
   { group: 'Display', items: [
     { id: 'cards', label: 'Cards' },
-    { id: 'cardgrid', label: 'Card Grid' },
-    { id: 'avatars', label: 'Avatars' },
+{ id: 'avatars', label: 'Avatars' },
     { id: 'identity', label: 'Identity' },
     { id: 'badges', label: 'Badges' },
     { id: 'tables', label: 'Tables' },
@@ -157,13 +166,17 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   switch:       { component: SwitchPage, desc: 'On/off toggle.' },
   segmented:    { component: SegmentedPage, desc: 'Mutually exclusive options in a row.' },
   chips:        { component: ChipsPage, desc: 'Compact labels for filtering and status.' },
-  quizoption:   { component: QuizPage, desc: 'Answer option with selected, correct, incorrect states.' },
+  quizoption:   { component: QuizPage, desc: 'Single or multiple answer selection with correct/incorrect feedback.' },
+  match:        { component: MatchPage, desc: 'Drag items to their matching targets (1:1).' },
+  categorize:   { component: CategorizePage, desc: 'Drag items into category buckets (many:1).' },
+  order:        { component: OrderPage, desc: 'Drag items into the correct sequence.' },
+  fillblanks:   { component: FillBlanksPage, desc: 'Drag words into blanks within a sentence.' },
+  hotspot:      { component: HotspotPage, desc: 'Drag labels onto marked regions of an image.' },
   filterbar:    { component: FilterBarPage, desc: 'Horizontal filter pills.' },
   menu:         { component: MenuPage, desc: 'Contextual dropdown menu.' },
   calendar:     { component: CalendarPage, desc: 'Date picker with day grid.' },
   cards:        { component: CardsPage, desc: 'Container for grouped content.' },
-  cardgrid:     { component: CardGridPage, desc: 'Responsive grid layout for cards.' },
-  avatars:      { component: AvatarsPage, desc: 'User identity with initials and indicators.' },
+avatars:      { component: AvatarsPage, desc: 'User identity with initials and indicators.' },
   identity:     { component: IdentityPage, desc: 'User profile display with avatar and metadata.' },
   badges:       { component: BadgesPage, desc: 'Numeric or dot indicator.' },
   tables:       { component: TablePage, desc: 'Columnar data display.' },
@@ -421,10 +434,12 @@ export default function App() {
   });
   if (!fontsLoaded) return null;
   return (
-    <SafeAreaProvider>
-      <ThemeProvider initial="void">
-        <Explorer />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider initial="void">
+          <Explorer />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
