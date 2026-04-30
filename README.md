@@ -1,6 +1,6 @@
 # Proven Routes — Noon Academy Design System
 
-A fully tokenised React Native design system for Noon Academy. Saudi-native visual language rooted in Empty Quarter geometry, surveyor's-notebook craft, and cartographic precision.
+Saudi-native React Native design system. Empty Quarter geometry, surveyor's-notebook craft, cartographic precision. Void-first. Paper sparingly. Gold is journey signal only.
 
 ## Install
 
@@ -8,119 +8,63 @@ A fully tokenised React Native design system for Noon Academy. Saudi-native visu
 npm install @noon/design-system
 ```
 
-Peer dependencies — install these in your app:
+Peer dependencies:
 
 ```bash
 npm install react-native-svg react-native-safe-area-context
 ```
 
-## Quick start
+## Setup
 
 ```tsx
-import { ThemeProvider, Button, Card, Chip } from '@noon/design-system';
-import { sp, fs, fw, font } from '@noon/design-system/tokens';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider, Button } from '@noon/design-system';
 
 export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider initial="void">
-        <Button variant="primary" onPress={() => {}}>
-          Get started
-        </Button>
+        <Button variant="primary" onPress={() => {}}>Get started</Button>
       </ThemeProvider>
     </SafeAreaProvider>
   );
 }
 ```
 
-## Toast system
-
-Wrap your app in `ToastProvider` for imperative toasts from anywhere:
-
-```tsx
-import { ToastProvider, useToast } from '@noon/design-system';
-
-// In your root
-<ToastProvider>
-  <App />
-</ToastProvider>
-
-// In any component
-const toast = useToast();
-toast.show({ message: 'Saved', variant: 'success' });
-```
-
-Variants: `info`, `success`, `warn`, `danger`. Toasts queue automatically.
-
-## RTL and locale
-
-Components respond to `I18nManager.isRTL` automatically:
-- Calendar, TitleBar, and Menu chevrons flip direction
-- Calendar defaults to Arabic locale (Arabic day/month names, Sunday-first week) when RTL is active
-
-Pass a locale explicitly:
-
-```tsx
-<Calendar locale="ar" />
-// or custom
-<Calendar locale={{ dayNames: [...], months: [...], fullDays: [...], weekStart: 0, today: 'Today' }} />
-```
-
-## Safe areas
-
-These components handle safe area insets internally — no wrapper needed:
-- **Toast** — clears the notch/Dynamic Island at the top
-- **BottomSheet** — content and actions clear the home indicator
-- **BottomNav** — bottom padding clears the home indicator
-- **FullSheet** — top and bottom insets handled
-
-**TitleBar** does not handle safe areas — the parent screen should provide `SafeAreaView` or `useSafeAreaInsets`.
-
-## Keyboard
-
-**Dialog** and **BottomSheet** include `KeyboardAvoidingView` — they shift up when the software keyboard opens on iOS.
-
-For screens with **Input** or **Textarea**, wrap your screen in `KeyboardAvoidingView` or use a `ScrollView` with `keyboardShouldPersistTaps="handled"`. Both support `forwardRef` for programmatic `.focus()`.
-
 ## Explorer
 
-Browse all components, tokens, and documentation interactively:
+Browse all components, tokens, and documentation:
 
 ```bash
 cd preview && npx expo start
 ```
 
-Press `w` for web, `i` for iOS simulator, or scan QR for Expo Go. Toggle **Void/Paper** theme and **RTL** from the top bar.
+Toggle Void/Paper theme and RTL from the top bar.
 
-## Structure
+## What's included
 
-```
-rn/                    — React Native components (production)
-  tokens.ts            — Colour, spacing, typography, and theme tokens
-  ThemeContext.tsx      — Void/Paper theme provider
-  ToastProvider.tsx     — Imperative toast system with queue
-  Icon.tsx             — Custom SVG icon set (21 icons)
-  Calendar.tsx         — Week/month calendar with locale support
-  index.ts             — Public API barrel export
-  ...40+ components
+**40+ components** across inputs, display, navigation, feedback, progress, and graphical categories. Two themes (Void and Paper). Full token system for colour, spacing, typography, radii, elevation, and motion.
 
-preview/               — Expo explorer app
-  App.tsx              — Explorer shell with sidebar, RTL toggle
-  screens/pages.tsx    — All component documentation pages
+**RTL-aware.** Calendar, TitleBar, and Menu respond to `I18nManager.isRTL`. Calendar accepts a `locale` prop with built-in Arabic support.
 
-dist/                  — Built output (CJS + ESM + DTS)
-```
+**Safe area handling** built into Toast, BottomSheet, BottomNav, and FullSheet. Keyboard avoidance built into Dialog and BottomSheet.
+
+**Accessibility** across all interactive components — roles, states, and labels for VoiceOver and TalkBack.
 
 ## Build
 
 ```bash
-npm run build          # tsup → dist/
-npm run typecheck      # tsc --noEmit
+npm run build       # tsup → dist/ (CJS + ESM + DTS)
+npm run typecheck   # tsc --noEmit
 ```
 
-## Themes
+## Structure
 
-Two themes: **Void** (dark) and **Paper** (light). All components adapt automatically via semantic tokens.
+```
+rn/           Components + tokens (production source)
+dist/         Built output
+preview/      Expo explorer app
+```
 
 ## Colour roles
 
@@ -129,30 +73,9 @@ Two themes: **Void** (dark) and **Paper** (light). All components adapt automati
 - **Iris (purple)** — voice tutor exclusively
 - **Terra (terracotta)** — warmth, place, classroom
 - **Danger (red)** — errors, destructive actions
-- **Warn (amber)** — caution, rare UI warnings
 
 ## Typography
 
-- **Body:** Vazirmatn (Arabic + Latin)
-- **Serif headings:** Crimson Pro
-- **Monospace:** JetBrains Mono
-
-## Components
-
-**Inputs:** Button, IconButton, Input, Textarea, Switch, Checkbox, CheckboxGroup, Radio, RadioGroup, Stepper, Segmented
-
-**Selection:** Chip, QuizOption, FilterBar, Menu, Calendar
-
-**Display:** Card, CardGrid, Avatar, Identity, Badge, Table, SessionCard, HomeworkCard, VideoCard, Divider, Skeleton, EmptyState
-
-**Progress:** Waypoints, WaypointMarker, WaterVessel, SessionBar, LinearProgress, CircularProgress
-
-**Navigation:** TitleBar, Tabs, BottomNav
-
-**Feedback:** Alert, Toast, ToastProvider, Dialog, BottomSheet, FullSheet, Tooltip, Interstitial
-
-**Graphical:** GridPaper, TerrainPattern, DunePattern, VoiceTutor, Icon
-
-**Voice Tutor:** ChatMessage, BreakdownCard, ActivityCard, WorkedExampleCard, SlidesCard, ResourceList
-
-**Composition:** Leaderboard, ButtonGroup
+- **Vazirmatn** — body (Arabic + Latin)
+- **Crimson Pro** — serif headings
+- **JetBrains Mono** — code and labels
