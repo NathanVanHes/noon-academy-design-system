@@ -4,7 +4,7 @@
  * Each exports a function component: Import → Props → Live examples.
  */
 import React, { useState } from 'react';
-import { View, Text, Pressable, Animated, Easing, Image, useWindowDimensions, I18nManager } from 'react-native';
+import { View, Text, Pressable, ScrollView, Animated, Easing, Image, useWindowDimensions, I18nManager } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
@@ -17,6 +17,7 @@ import {
   GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, TypingIndicator, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
+  Oasis, RouteMap, type RouteChapter, type RouteMarker,
   MatchQuestion, CategorizeQuestion, OrderQuestion, FillBlanksQuestion, HotspotQuestion,
   sp, fs, fw, font, color, r, h, icon, lh, dur,
 } from '../../rn';
@@ -3063,4 +3064,92 @@ export function LeaderboardPage() {
       <Rl>Score displayed in mono, right-aligned.</Rl>
     </S>
   </>;
+}
+
+// ═══════════════════════════════════════════════
+// EXPERIMENTAL
+// ═══════════════════════════════════════════════
+
+export function OasisPage() {
+  const [level, setLevel] = useState('35');
+  const [status, setStatus] = useState('current');
+  const [size, setSize] = useState('md');
+  return <>
+    <Playground
+      knobs={<>
+        <KnobSelect label="level" value={level} options={['0', '25', '35', '50', '75', '90', '100']} onChange={setLevel} />
+        <KnobSelect label="status" value={status} options={['complete', 'strong', 'weak', 'current', 'upcoming', 'locked']} onChange={setStatus} />
+        <KnobSelect label="size" value={size} options={['sm', 'md', 'lg']} onChange={setSize} />
+      </>}
+    >
+      <Oasis level={parseInt(level)} status={status as any} label="5" size={size as any} />
+    </Playground>
+    <Import>{"import { Oasis } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="level" type="number" desc="Water fill 0–100" />
+      <Prop name="status" type="'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked'" def="'upcoming'" />
+      <Prop name="label" type="string" desc="Text inside the pool (chapter number)" />
+      <Prop name="size" type="'sm' | 'md' | 'lg'" def="'md'" />
+    </Props>
+    <S title="All statuses">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[5], alignItems: 'flex-end' }}>
+        <Oasis level={95} status="complete" label="1" size="sm" />
+        <Oasis level={82} status="strong" label="3" />
+        <Oasis level={45} status="weak" label="2" />
+        <Oasis level={35} status="current" label="5" size="lg" />
+        <Oasis level={0} status="upcoming" label="6" />
+        <Oasis level={0} status="locked" label="8" size="sm" />
+      </View>
+    </S>
+  </>;
+}
+
+export function RouteMapPage({ onClose }: { onClose?: () => void }) {
+  const { theme } = useTheme();
+  const sampleChapters: RouteChapter[] = [
+    { id: 'ch8', label: '8', title: 'Advanced Inference', date: 'in 32 days', status: 'locked', level: 0, markers: [
+      { id: 'implied', label: 'Implied meaning', status: 'unmapped' },
+      { id: 'intent', label: 'Author intent', status: 'unmapped' },
+    ]},
+    { id: 'ch7', label: '7', title: 'Comparative Analysis', date: 'in 25 days', status: 'upcoming', level: 0, markers: [
+      { id: 'comparison', label: 'Passage comparison', status: 'unmapped' },
+      { id: 'evidence', label: 'Evidence weighing', status: 'unmapped' },
+    ]},
+    { id: 'ch6', label: '6', title: 'Data Interpretation', date: 'in 18 days', status: 'upcoming', level: 0, markers: [
+      { id: 'charts', label: 'Charts & tables', status: 'unmapped' },
+      { id: 'stats', label: 'Statistical reasoning', status: 'unmapped' },
+      { id: 'datainf', label: 'Data inference', status: 'unmapped' },
+    ]},
+    { id: 'ch5', label: '5', title: 'Critical Reading', date: 'in 4 days', status: 'current', level: 35, markers: [
+      { id: 'tone', label: 'Tone analysis', status: 'exploring' },
+      { id: 'mainidea', label: 'Main idea extraction', status: 'exploring' },
+      { id: 'support', label: 'Supporting detail', status: 'not-started' },
+    ]},
+    { id: 'ch4', label: '4', title: 'Vocabulary in Context', result: '82%', status: 'strong', level: 82, markers: [
+      { id: 'wordmeaning', label: 'Word meaning', status: 'mapped' },
+      { id: 'contextclues', label: 'Contextual clues', status: 'mapped' },
+    ]},
+    { id: 'ch3', label: '3', title: 'Sentence Completion', result: '91%', status: 'strong', level: 91, markers: [
+      { id: 'grammar', label: 'Grammar patterns', status: 'mapped' },
+      { id: 'connectors', label: 'Logical connectors', status: 'mapped' },
+      { id: 'transitions', label: 'Transition words', status: 'mapped' },
+    ]},
+    { id: 'ch2', label: '2', title: 'Reading Comprehension', result: '45%', status: 'weak', level: 45, markers: [
+      { id: 'structure', label: 'Passage structure', status: 'needs-attention' },
+      { id: 'recall', label: 'Detail recall', status: 'needs-attention' },
+      { id: 'infbasics', label: 'Inference basics', status: 'mapped' },
+    ]},
+    { id: 'ch1', label: '1', title: 'Foundations', result: '95%', status: 'complete', level: 95, markers: [
+      { id: 'vocab', label: 'Basic vocabulary', status: 'mapped' },
+      { id: 'sentences', label: 'Sentence types', status: 'mapped' },
+    ]},
+  ];
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], paddingTop: sp[10], paddingBottom: sp[12] }}>
+        <RouteMap chapters={sampleChapters} currentChapter="ch5" />
+      </ScrollView>
+    </View>
+  );
 }

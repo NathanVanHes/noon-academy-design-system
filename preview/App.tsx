@@ -31,7 +31,7 @@ import {
   // Layout
   InterstitialPage, FormStackPage, EmptyStatePage, SkeletonPage, DropzonePage, DividerPage,
   // Patterns
-  VoiceChatPage, LeaderboardPage,
+  VoiceChatPage, LeaderboardPage, OasisPage, RouteMapPage,
   BreakdownPage, ActivityCardPage, WorkedExamplePage, SlidesCardPage, ResourceListPage,
 } from './screens/pages';
 import { VoiceTutorSession } from './screens/VoiceTutorSession';
@@ -139,6 +139,10 @@ const NAV = [
   { group: 'Patterns', items: [
     { id: 'leaderboard', label: 'Leaderboard' },
   ]},
+  { group: 'Experimental', items: [
+    { id: 'oasis', label: 'Oasis' },
+    { id: 'routemap', label: 'Route Map' },
+  ]},
   { group: 'Pages', items: [
     { id: 'journey', label: 'Journey' },
   ]},
@@ -219,6 +223,8 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   resourcelist: { component: ResourceListPage, desc: 'Link list for external materials.' },
   vtsession:    { component: VoiceTutorSession, desc: 'Animated trig session demo.', fullscreen: true },
   leaderboard:  { component: LeaderboardPage, desc: 'Ranked crew member list.' },
+  oasis:        { component: OasisPage, desc: 'Water pool checkpoint — replaces WaterVessel for journey metaphor.' },
+  routemap:     { component: RouteMapPage, desc: 'Vertical journey with central spine, oases, and topic markers.', fullscreen: true },
   journey:      { component: JourneyPage, desc: 'Qudrat exam journey visualisation.', fullscreen: true },
 };
 

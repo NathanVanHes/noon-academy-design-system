@@ -82,6 +82,11 @@ export { HotspotQuestion } from './HotspotQuestion';
 export { PlacedItem } from './PlacedItem';
 export { Interstitial } from './Interstitial';
 
+// Experimental
+export { Oasis } from './Oasis';
+export { RouteMap } from './RouteMap';
+export type { RouteChapter, RouteMarker } from './RouteMap';
+
 // Graphical
 export { GridPaper } from './GridPaper';
 export { Waypoints, WaypointMarker } from './Waypoints';

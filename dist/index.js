@@ -70,6 +70,7 @@ __export(rn_exports, {
   LinearProgress: () => LinearProgress,
   MatchQuestion: () => MatchQuestion,
   Menu: () => Menu,
+  Oasis: () => Oasis,
   OrderQuestion: () => OrderQuestion,
   PlacedItem: () => PlacedItem,
   Question: () => Question,
@@ -78,6 +79,7 @@ __export(rn_exports, {
   Radio: () => Radio,
   RadioGroup: () => RadioGroup,
   ResourceList: () => ResourceList,
+  RouteMap: () => RouteMap,
   Segmented: () => Segmented,
   SessionBar: () => SessionBar,
   SessionCard: () => SessionCard,
@@ -505,7 +507,7 @@ function Button({ children, variant = "primary", size = "md", disabled, loading,
     signal: theme.bg
   };
   const isOutline = variant === "secondary" || variant === "danger";
-  const borderColor = variant === "secondary" ? theme.borderStrong : variant === "danger" ? theme.dangerBorder : "transparent";
+  const borderColor2 = variant === "secondary" ? theme.borderStrong : variant === "danger" ? theme.dangerBorder : "transparent";
   const containerStyle = {
     height: heights[size],
     paddingHorizontal: variant === "ghost" ? sp[3] : paddings[size],
@@ -517,7 +519,7 @@ function Button({ children, variant = "primary", size = "md", disabled, loading,
     flexDirection: "row",
     gap: sp[2],
     ...fullWidth ? { width: "100%" } : {},
-    ...isOutline && !disabled ? { borderWidth: 1, borderColor } : {}
+    ...isOutline && !disabled ? { borderWidth: 1, borderColor: borderColor2 } : {}
   };
   const textStyle = {
     fontFamily: font.sans,
@@ -601,7 +603,7 @@ var import_jsx_runtime5 = require("react/jsx-runtime");
 var Input = (0, import_react2.forwardRef)(({ label, error, helper, disabled, ...rest }, ref) => {
   const { theme } = useTheme();
   const [focused, setFocused] = (0, import_react2.useState)(false);
-  const borderColor = error ? theme.danger : focused ? theme.accent : theme.borderStrong;
+  const borderColor2 = error ? theme.danger : focused ? theme.accent : theme.borderStrong;
   const containerStyle = { opacity: disabled ? 0.4 : 1 };
   const labelStyle = {
     fontFamily: font.sans,
@@ -616,7 +618,7 @@ var Input = (0, import_react2.forwardRef)(({ label, error, helper, disabled, ...
     color: theme.fg,
     backgroundColor: theme.inputBg,
     borderWidth: 1,
-    borderColor,
+    borderColor: borderColor2,
     borderRadius: r[2],
     paddingHorizontal: sp[3],
     paddingVertical: sp[2],
@@ -660,7 +662,7 @@ var import_jsx_runtime6 = require("react/jsx-runtime");
 var Textarea = (0, import_react3.forwardRef)(({ label, error, helper, rows = 4, disabled, ...rest }, ref) => {
   const { theme } = useTheme();
   const [focused, setFocused] = (0, import_react3.useState)(false);
-  const borderColor = error ? theme.danger : focused ? theme.accent : theme.borderStrong;
+  const borderColor2 = error ? theme.danger : focused ? theme.accent : theme.borderStrong;
   const containerStyle = { opacity: disabled ? 0.4 : 1 };
   const labelStyle = {
     fontFamily: font.sans,
@@ -675,7 +677,7 @@ var Textarea = (0, import_react3.forwardRef)(({ label, error, helper, rows = 4, 
     color: theme.fg,
     backgroundColor: theme.inputBg,
     borderWidth: 1,
-    borderColor,
+    borderColor: borderColor2,
     borderRadius: r[2],
     paddingHorizontal: sp[3],
     paddingVertical: sp[2],
@@ -2342,14 +2344,14 @@ var import_react_native36 = require("react-native");
 var import_jsx_runtime40 = require("react/jsx-runtime");
 function HomeworkCard({ title, subject, dueDate, questions, status = "pending", score, onPress }) {
   const { theme } = useTheme();
-  const statusColor = {
+  const statusColor2 = {
     pending: theme.fgFaint,
     "in-progress": theme.signalBright,
     submitted: theme.accent,
     overdue: theme.danger,
     graded: theme.accent
   };
-  const statusLabel = {
+  const statusLabel2 = {
     pending: "Pending",
     "in-progress": "In progress",
     submitted: "Submitted",
@@ -2379,7 +2381,7 @@ function HomeworkCard({ title, subject, dueDate, questions, status = "pending", 
         questions !== 1 ? "s" : ""
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: statusColor[status] }, children: statusLabel[status] })
+    /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: statusColor2[status] }, children: statusLabel2[status] })
   ] });
 }
 
@@ -3145,10 +3147,214 @@ function Interstitial({ title, body, buttonLabel, onPress }) {
   ] });
 }
 
-// rn/GridPaper.tsx
+// rn/Oasis.tsx
 var import_react_native49 = require("react-native");
-var import_react_native_svg4 = __toESM(require("react-native-svg"));
 var import_jsx_runtime53 = require("react/jsx-runtime");
+var SIZES = { sm: 36, md: 48, lg: 64 };
+function borderColor(status, theme) {
+  switch (status) {
+    case "complete":
+      return color.noon[400];
+    case "strong":
+      return color.noon[400];
+    case "weak":
+      return color.terra[400];
+    case "current":
+      return theme.accent;
+    case "upcoming":
+      return theme.fgFaint;
+    case "locked":
+      return theme.border;
+  }
+}
+function Oasis({ level, status = "upcoming", label, size = "md", meta }) {
+  const { theme } = useTheme();
+  const dim = SIZES[size];
+  const isCurrent = status === "current";
+  const isDashed = status === "upcoming" || status === "locked";
+  const isPast = status === "complete" || status === "strong" || status === "weak";
+  const border = borderColor(status, theme);
+  const clampedLevel = Math.max(0, Math.min(100, level));
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_native49.View, { style: { alignItems: "center" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_native49.View, { style: {
+      width: dim,
+      height: dim,
+      borderRadius: dim / 2,
+      borderWidth: isCurrent ? 2 : 1.5,
+      borderColor: border,
+      borderStyle: isDashed ? "dashed" : "solid",
+      overflow: "hidden",
+      backgroundColor: theme.bg,
+      ...isCurrent ? {
+        shadowColor: theme.accent,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 6
+      } : {}
+    }, children: [
+      clampedLevel > 0 && /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_native49.View, { style: { position: "absolute", bottom: 0, left: 0, right: 0, height: `${clampedLevel}%` }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.View, { style: { flex: 1, backgroundColor: color.blue[400], opacity: 0.35 } }),
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.View, { style: { position: "absolute", top: 0, left: 0, right: 0, height: 1, backgroundColor: color.chalk[100], opacity: 0.2 } })
+      ] }),
+      label && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.View, { style: { flex: 1, alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.Text, { style: {
+        fontFamily: font.mono,
+        fontSize: size === "lg" ? fs[16] : size === "md" ? fs[13] : fs[11],
+        fontWeight: fw[700],
+        color: isCurrent ? theme.accent : isPast ? theme.fg : theme.fgFaint
+      }, children: label }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.View, { style: { marginTop: sp[1], paddingHorizontal: sp[2], paddingVertical: 1, borderRadius: r[1], backgroundColor: theme.bgRaised }, children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.Text, { style: {
+      fontFamily: font.mono,
+      fontSize: fs[9],
+      fontWeight: fw[600],
+      color: clampedLevel >= 90 ? theme.accent : clampedLevel > 0 ? theme.fgMuted : theme.fgFaint
+    }, children: clampedLevel >= 90 ? "FULL" : clampedLevel === 0 ? "EMPTY" : `${clampedLevel}%` }) }),
+    meta && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: isCurrent ? theme.accent : isPast ? theme.fgMuted : theme.fgFaint, marginTop: sp[0.5] }, children: meta })
+  ] });
+}
+
+// rn/RouteMap.tsx
+var import_react_native50 = require("react-native");
+var import_jsx_runtime54 = require("react/jsx-runtime");
+function markerToWaypoint(status) {
+  switch (status) {
+    case "mapped":
+      return "done";
+    case "exploring":
+      return "current";
+    case "needs-attention":
+      return "passed";
+    default:
+      return "incomplete";
+  }
+}
+function statusColor(status) {
+  switch (status) {
+    case "mapped":
+      return color.noon[400];
+    case "exploring":
+      return color.gold[400];
+    case "needs-attention":
+      return color.terra[400];
+    default:
+      return "rgba(232,228,220,0.35)";
+  }
+}
+function statusLabel(status) {
+  switch (status) {
+    case "mapped":
+      return "Mapped";
+    case "exploring":
+      return "Exploring";
+    case "not-started":
+      return "Not started";
+    case "needs-attention":
+      return "Needs attention";
+    case "unmapped":
+      return "Unmapped";
+  }
+}
+var SPINE_LINE_H = 6;
+var CONNECTOR_W = 16;
+function SpineLine({ done, height, gap }) {
+  const { theme } = useTheme();
+  const col = done ? theme.signalDim : theme.border;
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { width: 1, height: gap ? sp[7] : height || SPINE_LINE_H, alignSelf: "center", backgroundColor: done ? col : void 0, borderLeftWidth: done ? 0 : 1, borderLeftColor: col, borderStyle: done ? void 0 : "dashed" } });
+}
+function ConnectorLine({ done, side }) {
+  const { theme } = useTheme();
+  const col = done ? theme.signalDim : theme.border;
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { width: CONNECTOR_W, height: 1, backgroundColor: done ? col : void 0, borderTopWidth: done ? 0 : 1, borderTopColor: col, borderStyle: done ? void 0 : "dashed" } });
+}
+function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }) {
+  const { theme } = useTheme();
+  const isPast = (ch) => ch.status === "complete" || ch.status === "strong" || ch.status === "weak";
+  const isCurrent = (ch) => ch.id === currentChapter;
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { alignItems: "center" }, children: [
+    chapters.map((ch, ci) => {
+      const chPast = isPast(ch);
+      const chCurrent = isCurrent(ch);
+      return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { alignItems: "center", width: "100%" }, children: [
+        ci > 0 && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(SpineLine, { done: chPast || chCurrent, height: sp[5] }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.Pressable, { onPress: () => onChapterPress?.(ch), accessibilityRole: "button", accessibilityLabel: ch.title, style: { alignItems: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Oasis, { level: ch.level, status: ch.status, label: ch.label, size: chCurrent ? "lg" : "md", meta: ch.result || ch.date }),
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.serif, fontSize: chCurrent ? fs[16] : fs[14], fontWeight: fw[500], color: chCurrent ? theme.fg : chPast ? theme.fgMuted : theme.fgSubtle, marginTop: sp[2], textAlign: "center" }, children: ch.title })
+        ] }),
+        ch.markers.map((marker, mi) => {
+          const isLeft = mi % 2 === 0;
+          const wpState = markerToWaypoint(marker.status);
+          const col = statusColor(marker.status);
+          const markerDone = marker.status === "mapped";
+          const lineDone = chPast || chCurrent && mi === 0;
+          return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { width: "100%" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(SpineLine, { done: lineDone || markerDone, height: SPINE_LINE_H }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flexDirection: "row", alignItems: "center", width: "100%", paddingHorizontal: sp[4] }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }, children: isLeft && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
+                  import_react_native50.Pressable,
+                  {
+                    onPress: () => onMarkerPress?.(marker, ch),
+                    accessibilityRole: "button",
+                    accessibilityLabel: `${marker.label} \u2014 ${statusLabel(marker.status)}`,
+                    style: {
+                      flex: 1,
+                      maxWidth: 160,
+                      paddingVertical: sp[2],
+                      paddingHorizontal: sp[3],
+                      backgroundColor: marker.status === "exploring" ? "rgba(100,216,174,0.05)" : theme.bgRaised,
+                      borderWidth: 1,
+                      borderColor: marker.status === "exploring" ? "rgba(100,216,174,0.25)" : theme.border,
+                      borderRadius: r[2],
+                      alignItems: "flex-end"
+                    },
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg, textAlign: "right" }, numberOfLines: 1, children: marker.label }),
+                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2, textAlign: "right" }, children: statusLabel(marker.status) })
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(ConnectorLine, { done: markerDone, side: "left" })
+              ] }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(WaypointMarker, { state: wpState }),
+              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }, children: !isLeft && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(ConnectorLine, { done: markerDone, side: "right" }),
+                /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
+                  import_react_native50.Pressable,
+                  {
+                    onPress: () => onMarkerPress?.(marker, ch),
+                    accessibilityRole: "button",
+                    accessibilityLabel: `${marker.label} \u2014 ${statusLabel(marker.status)}`,
+                    style: {
+                      flex: 1,
+                      maxWidth: 160,
+                      paddingVertical: sp[2],
+                      paddingHorizontal: sp[3],
+                      backgroundColor: marker.status === "exploring" ? "rgba(100,216,174,0.05)" : theme.bgRaised,
+                      borderWidth: 1,
+                      borderColor: marker.status === "exploring" ? "rgba(100,216,174,0.25)" : theme.border,
+                      borderRadius: r[2]
+                    },
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg }, numberOfLines: 1, children: marker.label }),
+                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2 }, children: statusLabel(marker.status) })
+                    ]
+                  }
+                )
+              ] }) })
+            ] })
+          ] }, marker.id);
+        })
+      ] }, ch.id);
+    }),
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(SpineLine, { done: false })
+  ] });
+}
+
+// rn/GridPaper.tsx
+var import_react_native51 = require("react-native");
+var import_react_native_svg4 = __toESM(require("react-native-svg"));
+var import_jsx_runtime55 = require("react/jsx-runtime");
 function GridPaper({ variant = "standard", width, height, style }) {
   const { theme, mode } = useTheme();
   const isVoid = mode === "void";
@@ -3159,43 +3365,43 @@ function GridPaper({ variant = "standard", width, height, style }) {
   if (variant === "standard") {
     const step = 16;
     for (let x = 0; x <= width; x += step) {
-      lines.push(/* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.Line, { x1: x, y1: 0, x2: x, y2: height, stroke: lineColor, strokeWidth: 0.5 }, `v${x}`));
+      lines.push(/* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.Line, { x1: x, y1: 0, x2: x, y2: height, stroke: lineColor, strokeWidth: 0.5 }, `v${x}`));
     }
     for (let y = 0; y <= height; y += step) {
-      lines.push(/* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.Line, { x1: 0, y1: y, x2: width, y2: y, stroke: lineColor, strokeWidth: 0.5 }, `h${y}`));
+      lines.push(/* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.Line, { x1: 0, y1: y, x2: width, y2: y, stroke: lineColor, strokeWidth: 0.5 }, `h${y}`));
     }
   } else if (variant === "major") {
     const minor = 8;
     const major = 64;
     for (let x = 0; x <= width; x += minor) {
       const isMajor = x % major === 0;
-      lines.push(/* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.Line, { x1: x, y1: 0, x2: x, y2: height, stroke: isMajor ? goldColor : lineColor, strokeWidth: 0.5 }, `v${x}`));
+      lines.push(/* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.Line, { x1: x, y1: 0, x2: x, y2: height, stroke: isMajor ? goldColor : lineColor, strokeWidth: 0.5 }, `v${x}`));
     }
     for (let y = 0; y <= height; y += minor) {
       const isMajor = y % major === 0;
-      lines.push(/* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.Line, { x1: 0, y1: y, x2: width, y2: y, stroke: isMajor ? goldColor : lineColor, strokeWidth: 0.5 }, `h${y}`));
+      lines.push(/* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.Line, { x1: 0, y1: y, x2: width, y2: y, stroke: isMajor ? goldColor : lineColor, strokeWidth: 0.5 }, `h${y}`));
     }
   } else {
     const step = 24;
     for (let x = 0; x <= width; x += step) {
-      lines.push(/* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.Line, { x1: x, y1: 0, x2: x, y2: height, stroke: canvasColor, strokeWidth: 0.5 }, `v${x}`));
+      lines.push(/* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.Line, { x1: x, y1: 0, x2: x, y2: height, stroke: canvasColor, strokeWidth: 0.5 }, `v${x}`));
     }
     for (let y = 0; y <= height; y += step) {
-      lines.push(/* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.Line, { x1: 0, y1: y, x2: width, y2: y, stroke: canvasColor, strokeWidth: 0.5 }, `h${y}`));
+      lines.push(/* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.Line, { x1: 0, y1: y, x2: width, y2: y, stroke: canvasColor, strokeWidth: 0.5 }, `h${y}`));
     }
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native49.View, { style: [{ width, height, backgroundColor: theme.bg }, style], children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_native_svg4.default, { width, height, style: { position: "absolute" }, children: lines }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native51.View, { style: [{ width, height, backgroundColor: theme.bg }, style], children: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg4.default, { width, height, style: { position: "absolute" }, children: lines }) });
 }
 
 // rn/WaterVessel.tsx
-var import_react_native50 = require("react-native");
+var import_react_native52 = require("react-native");
 var import_react_native_svg5 = __toESM(require("react-native-svg"));
-var import_jsx_runtime54 = require("react/jsx-runtime");
+var import_jsx_runtime56 = require("react/jsx-runtime");
 var VESSEL_PATH = "M15,4 L25,4 C27,4 28,5 28,7 L28,12 C28,13 27,14 26,14 L26,18 C32,20 34,26 34,34 C34,42 34,48 32,51 C30,54 26,55 20,55 C14,55 10,54 8,51 C6,48 6,42 6,34 C6,26 8,20 14,18 L14,14 C13,14 12,13 12,12 L12,7 C12,5 13,4 15,4 Z";
-var SIZES = { sm: 40, md: 72, lg: 110 };
+var SIZES2 = { sm: 40, md: 72, lg: 110 };
 function WaterVessel({ fill, capacity = 18, minimum = 12, size = "lg" }) {
   const { theme } = useTheme();
-  const dim = SIZES[size];
+  const dim = SIZES2[size];
   const h3 = Math.round(dim * 1.4);
   const pct = Math.min(fill / capacity, 1);
   const met = fill >= minimum;
@@ -3204,35 +3410,35 @@ function WaterVessel({ fill, capacity = 18, minimum = 12, size = "lg" }) {
   const fillRange = 32;
   const waterTop = 52 - pct * fillRange;
   const status = fill >= capacity ? "Overflowing" : met ? "Minimum met" : `${minimum - fill} more needed`;
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[5] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native_svg5.default, { width: dim, height: h3, viewBox: "0 0 40 56", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Defs, { children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.ClipPath, { id: "vc", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Path, { d: VESSEL_PATH }) }) }),
-      pct > 0 && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Rect, { x: 4, y: waterTop, width: 32, height: 57 - waterTop, fill: wc, opacity: 0.45, clipPath: "url(#vc)" }),
-      pct > 0 && !overflow && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Line, { x1: 6, y1: waterTop, x2: 34, y2: waterTop, stroke: wc, strokeWidth: 1.5, opacity: 0.7, clipPath: "url(#vc)" }),
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Path, { d: VESSEL_PATH, stroke: theme.fgMuted, strokeWidth: 1.5, strokeLinejoin: "round", fill: "none" }),
-      overflow && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Circle, { cx: 36, cy: 10, r: 1.5, fill: wc, opacity: 0.5 }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native_svg5.Circle, { cx: 38, cy: 16, r: 1, fill: wc, opacity: 0.4 })
+  return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native52.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[5] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg5.default, { width: dim, height: h3, viewBox: "0 0 40 56", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Defs, { children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.ClipPath, { id: "vc", children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Path, { d: VESSEL_PATH }) }) }),
+      pct > 0 && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Rect, { x: 4, y: waterTop, width: 32, height: 57 - waterTop, fill: wc, opacity: 0.45, clipPath: "url(#vc)" }),
+      pct > 0 && !overflow && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Line, { x1: 6, y1: waterTop, x2: 34, y2: waterTop, stroke: wc, strokeWidth: 1.5, opacity: 0.7, clipPath: "url(#vc)" }),
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Path, { d: VESSEL_PATH, stroke: theme.fgMuted, strokeWidth: 1.5, strokeLinejoin: "round", fill: "none" }),
+      overflow && /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_jsx_runtime56.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Circle, { cx: 36, cy: 10, r: 1.5, fill: wc, opacity: 0.5 }),
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg5.Circle, { cx: 38, cy: 16, r: 1, fill: wc, opacity: 0.4 })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flexDirection: "row", alignItems: "baseline", gap: sp[2] }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.serif, fontSize: size === "lg" ? fs[32] : fs[24], fontWeight: fw[500], color: theme.fg }, children: fill }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native52.View, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native52.View, { style: { flexDirection: "row", alignItems: "baseline", gap: sp[2] }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native52.Text, { style: { fontFamily: font.serif, fontSize: size === "lg" ? fs[32] : fs[24], fontWeight: fw[500], color: theme.fg }, children: fill }),
+        /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native52.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint }, children: [
           "/ ",
           capacity
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: wc, marginTop: sp[1] }, children: status })
+      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native52.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: wc, marginTop: sp[1] }, children: status })
     ] })
   ] });
 }
 
 // rn/TerrainPattern.tsx
 var import_react28 = require("react");
-var import_react_native51 = require("react-native");
+var import_react_native53 = require("react-native");
 var import_react_native_svg6 = __toESM(require("react-native-svg"));
-var import_jsx_runtime55 = require("react/jsx-runtime");
+var import_jsx_runtime57 = require("react/jsx-runtime");
 function seeded(s) {
   return () => {
     s = Math.sin(s) * 1e4;
@@ -3305,17 +3511,17 @@ function TerrainPattern({ width, height, variant = "standard", opacity = 1, styl
     () => generateContours(width, height, variant, isVoid, 42),
     [width, height, variant, isVoid]
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native51.View, { style: [{ width, height, backgroundColor: theme.bg, overflow: "hidden" }, style], children: /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg6.default, { width, height, style: { position: "absolute", opacity }, children: paths2.map((entry, i) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native53.View, { style: [{ width, height, backgroundColor: theme.bg, overflow: "hidden" }, style], children: /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native_svg6.default, { width, height, style: { position: "absolute", opacity }, children: paths2.map((entry, i) => {
     const [d, stroke] = entry.split("|");
-    return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_native_svg6.Path, { d, stroke, strokeWidth: 0.8, fill: "none" }, i);
+    return /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native_svg6.Path, { d, stroke, strokeWidth: 0.8, fill: "none" }, i);
   }) }) });
 }
 
 // rn/DunePattern.tsx
 var import_react29 = __toESM(require("react"));
-var import_react_native52 = require("react-native");
+var import_react_native54 = require("react-native");
 var import_react_native_svg7 = __toESM(require("react-native-svg"));
-var import_jsx_runtime56 = require("react/jsx-runtime");
+var import_jsx_runtime58 = require("react/jsx-runtime");
 function DunePattern({ width, height, variant = "constellation", style }) {
   const { theme, mode } = useTheme();
   const isVoid = mode === "void";
@@ -3373,20 +3579,20 @@ function DunePattern({ width, height, variant = "constellation", style }) {
       // extra depth
     ];
     const triOpacity = [0.35, 0.2, 0.28, 0.15, 0.3, 0.18, 0.25, 0.22, 0.2, 0.32, 0.12, 0.18];
-    return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native52.View, { style: [{ width: w2, height: h4, backgroundColor: theme.bg }, style], children: /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.default, { width: w2, height: h4, children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.View, { style: [{ width: w2, height: h4, backgroundColor: theme.bg }, style], children: /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.default, { width: w2, height: h4, children: [
       Array.from({ length: 40 }, (_, i) => {
         const sx = (i * 97.3 + 13) % w2;
         const sy = (i * 53.7 + 7) % (h4 * 0.5);
         const sr = 0.4 + i % 3 * 0.3;
-        return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Circle, { cx: sx, cy: sy, r: sr, fill: color.gold[300], opacity: 0.1 + i % 4 * 0.08 }, `s${i}`);
+        return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Circle, { cx: sx, cy: sy, r: sr, fill: color.gold[300], opacity: 0.1 + i % 4 * 0.08 }, `s${i}`);
       }),
       triangles.map((t, i) => {
         const a = allNodes[t[0]], b = allNodes[t[1]], c = allNodes[t[2]];
         const op = (triOpacity[i] || 0.2) * (isVoid ? 1 : 0.6);
         const isTerra = i === 2 || i === 6 || i === 9;
-        return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M${a.x},${a.y} L${b.x},${b.y} L${c.x},${c.y} Z`, fill: isTerra ? theme.terra : theme.iris, fillOpacity: isTerra ? op * 0.7 : op }, `t${i}`);
+        return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M${a.x},${a.y} L${b.x},${b.y} L${c.x},${c.y} Z`, fill: isTerra ? theme.terra : theme.iris, fillOpacity: isTerra ? op * 0.7 : op }, `t${i}`);
       }),
-      connections.map(([a, b], i) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
+      connections.map(([a, b], i) => /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
         import_react_native_svg7.Line,
         {
           x1: allNodes[a].x,
@@ -3399,61 +3605,61 @@ function DunePattern({ width, height, variant = "constellation", style }) {
         },
         `c${i}`
       )),
-      allNodes.map((n, i) => /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react29.default.Fragment, { children: [
-        n.bright && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r + 8, fill: color.gold[300], opacity: isVoid ? 0.06 : 0.04 }),
-        n.bright && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r + 4, fill: color.gold[300], opacity: isVoid ? 0.12 : 0.08 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r, fill: n.bright ? color.gold[300] : color.gold[400], opacity: n.bright ? isVoid ? 0.85 : 0.6 : isVoid ? 0.45 : 0.3 })
+      allNodes.map((n, i) => /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react29.default.Fragment, { children: [
+        n.bright && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r + 8, fill: color.gold[300], opacity: isVoid ? 0.06 : 0.04 }),
+        n.bright && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r + 4, fill: color.gold[300], opacity: isVoid ? 0.12 : 0.08 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Circle, { cx: n.x, cy: n.y, r: n.r, fill: n.bright ? color.gold[300] : color.gold[400], opacity: n.bright ? isVoid ? 0.85 : 0.6 : isVoid ? 0.45 : 0.3 })
       ] }, `n${i}`))
     ] }) });
   }
   const w = width, h3 = height;
   const cx = w * 0.45;
   const cy = h3 * 0.5;
-  return /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native52.View, { style: [{ width: w, height: h3, backgroundColor: theme.bg }, style], children: /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.default, { width: w, height: h3, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.Defs, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.LinearGradient, { id: "hGoldBright", x1: "0.4", y1: "0.3", x2: "1", y2: "0.7", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: color.gold[200], stopOpacity: isVoid ? 0.95 : 0.7 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0.5", stopColor: color.gold[300], stopOpacity: isVoid ? 0.8 : 0.55 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: color.gold[400], stopOpacity: isVoid ? 0.5 : 0.35 })
+  return /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.View, { style: [{ width: w, height: h3, backgroundColor: theme.bg }, style], children: /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.default, { width: w, height: h3, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.Defs, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.LinearGradient, { id: "hGoldBright", x1: "0.4", y1: "0.3", x2: "1", y2: "0.7", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: color.gold[200], stopOpacity: isVoid ? 0.95 : 0.7 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0.5", stopColor: color.gold[300], stopOpacity: isVoid ? 0.8 : 0.55 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: color.gold[400], stopOpacity: isVoid ? 0.5 : 0.35 })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.LinearGradient, { id: "hGoldWarm", x1: "0.3", y1: "0.5", x2: "0.8", y2: "1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: color.terra[isVoid ? 500 : 300], stopOpacity: isVoid ? 0.4 : 0.3 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0.5", stopColor: color.gold[300], stopOpacity: isVoid ? 0.5 : 0.35 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: color.gold[500], stopOpacity: isVoid ? 0.15 : 0.08 })
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.LinearGradient, { id: "hGoldWarm", x1: "0.3", y1: "0.5", x2: "0.8", y2: "1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: color.terra[isVoid ? 500 : 300], stopOpacity: isVoid ? 0.4 : 0.3 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0.5", stopColor: color.gold[300], stopOpacity: isVoid ? 0.5 : 0.35 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: color.gold[500], stopOpacity: isVoid ? 0.15 : 0.08 })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.LinearGradient, { id: "hShadowL", x1: "0", y1: "0", x2: "0.6", y2: "1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: isVoid ? color.void[100] : color.terra[200], stopOpacity: isVoid ? 0.5 : 0.2 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: theme.bg, stopOpacity: 0 })
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.LinearGradient, { id: "hShadowL", x1: "0", y1: "0", x2: "0.6", y2: "1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: isVoid ? color.void[100] : color.terra[200], stopOpacity: isVoid ? 0.5 : 0.2 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: theme.bg, stopOpacity: 0 })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.LinearGradient, { id: "hShadowDeep", x1: "0.2", y1: "0", x2: "0.5", y2: "1", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: isVoid ? color.void[200] : color.paper[300], stopOpacity: isVoid ? 0.35 : 0.15 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: theme.bg, stopOpacity: 0 })
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.LinearGradient, { id: "hShadowDeep", x1: "0.2", y1: "0", x2: "0.5", y2: "1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: isVoid ? color.void[200] : color.paper[300], stopOpacity: isVoid ? 0.35 : 0.15 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: theme.bg, stopOpacity: 0 })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_native_svg7.LinearGradient, { id: "hGlow", x1: "0.5", y1: "0.5", x2: "0.5", y2: "0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: color.gold[200], stopOpacity: isVoid ? 0.3 : 0.2 }),
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: color.gold[300], stopOpacity: 0 })
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native_svg7.LinearGradient, { id: "hGlow", x1: "0.5", y1: "0.5", x2: "0.5", y2: "0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "0", stopColor: color.gold[200], stopOpacity: isVoid ? 0.3 : 0.2 }),
+        /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Stop, { offset: "1", stopColor: color.gold[300], stopOpacity: 0 })
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Circle, { cx, cy, r: h3 * 0.4, fill: "url(#hGlow)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.35} L${cx},${cy} L0,${h3 * 0.75} Z`, fill: "url(#hShadowL)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.55} L${cx},${cy} L0,${h3 * 0.9} Z`, fill: "url(#hShadowDeep)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M${w},${h3 * 0.2} L${cx},${cy} L${w},${h3 * 0.7} Z`, fill: "url(#hGoldBright)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M0,${h3} L${cx},${cy} L${w},${h3} Z`, fill: "url(#hGoldWarm)" }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.75} L${cx},${cy} L0,${h3} Z`, fill: color.terra[isVoid ? 600 : 400], fillOpacity: isVoid ? 0.12 : 0.1 }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.8} Q${w * 0.2},${h3 * 0.65} ${cx},${cy}`, fill: "none", stroke: color.gold[400], strokeWidth: 1, strokeOpacity: isVoid ? 0.35 : 0.2 }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Line, { x1: 0, y1: h3 * 0.35, x2: cx, y2: cy, stroke: theme.borderStrong, strokeWidth: 0.75 }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Line, { x1: cx, y1: cy, x2: w, y2: h3 * 0.2, stroke: color.gold[300], strokeWidth: 1.5, strokeOpacity: isVoid ? 0.5 : 0.35 }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Line, { x1: cx, y1: cy, x2: w, y2: h3 * 0.7, stroke: color.gold[400], strokeWidth: 0.75, strokeOpacity: isVoid ? 0.3 : 0.2 }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Line, { x1: 0, y1: h3 * 0.75, x2: cx, y2: cy, stroke: theme.border, strokeWidth: 0.5 }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_native_svg7.Circle, { cx, cy, r: 2.5, fill: color.gold[200], opacity: isVoid ? 0.8 : 0.5 })
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Circle, { cx, cy, r: h3 * 0.4, fill: "url(#hGlow)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.35} L${cx},${cy} L0,${h3 * 0.75} Z`, fill: "url(#hShadowL)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.55} L${cx},${cy} L0,${h3 * 0.9} Z`, fill: "url(#hShadowDeep)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M${w},${h3 * 0.2} L${cx},${cy} L${w},${h3 * 0.7} Z`, fill: "url(#hGoldBright)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M0,${h3} L${cx},${cy} L${w},${h3} Z`, fill: "url(#hGoldWarm)" }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.75} L${cx},${cy} L0,${h3} Z`, fill: color.terra[isVoid ? 600 : 400], fillOpacity: isVoid ? 0.12 : 0.1 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Path, { d: `M0,${h3 * 0.8} Q${w * 0.2},${h3 * 0.65} ${cx},${cy}`, fill: "none", stroke: color.gold[400], strokeWidth: 1, strokeOpacity: isVoid ? 0.35 : 0.2 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Line, { x1: 0, y1: h3 * 0.35, x2: cx, y2: cy, stroke: theme.borderStrong, strokeWidth: 0.75 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Line, { x1: cx, y1: cy, x2: w, y2: h3 * 0.2, stroke: color.gold[300], strokeWidth: 1.5, strokeOpacity: isVoid ? 0.5 : 0.35 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Line, { x1: cx, y1: cy, x2: w, y2: h3 * 0.7, stroke: color.gold[400], strokeWidth: 0.75, strokeOpacity: isVoid ? 0.3 : 0.2 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Line, { x1: 0, y1: h3 * 0.75, x2: cx, y2: cy, stroke: theme.border, strokeWidth: 0.5 }),
+    /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native_svg7.Circle, { cx, cy, r: 2.5, fill: color.gold[200], opacity: isVoid ? 0.8 : 0.5 })
   ] }) });
 }
 
 // rn/VoiceTutor.tsx
 var import_react30 = require("react");
-var import_react_native53 = require("react-native");
+var import_react_native55 = require("react-native");
 var import_react_native_reanimated10 = __toESM(require("react-native-reanimated"));
-var import_jsx_runtime57 = require("react/jsx-runtime");
+var import_jsx_runtime59 = require("react/jsx-runtime");
 function VoiceTutor({ state = "idle", size = 160 }) {
   const { theme } = useTheme();
   const anim = (0, import_react_native_reanimated10.useSharedValue)(0);
@@ -3540,21 +3746,21 @@ function VoiceTutor({ state = "idle", size = 160 }) {
   });
   const coreColor = isError ? color.danger[300] : theme.iris;
   const auraColor = isError ? "rgba(249,176,138,0.12)" : theme.irisSoft;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_react_native53.View, { style: { alignItems: "center" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_react_native53.View, { style: { width: size, height: size, alignItems: "center", justifyContent: "center" }, children: [
-      auraBase > 0 && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native_reanimated10.default.View, { style: [{
+  return /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native55.View, { style: { alignItems: "center" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native55.View, { style: { width: size, height: size, alignItems: "center", justifyContent: "center" }, children: [
+      auraBase > 0 && /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native_reanimated10.default.View, { style: [{
         position: "absolute",
         width: auraBase,
         height: auraBase,
         borderRadius: auraBase / 2,
         backgroundColor: auraColor
       }, auraAnimStyle] }),
-      state === "thinking" && /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_react_native_reanimated10.default.View, { style: [{ position: "absolute", width: 70, height: 70 }, orbitAnimStyle], children: [
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native53.View, { style: { position: "absolute", top: 0, left: 32, width: 5, height: 5, borderRadius: 2.5, backgroundColor: theme.irisDot } }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native53.View, { style: { position: "absolute", bottom: 0, left: 32, width: 4, height: 4, borderRadius: 2, backgroundColor: theme.irisBorder } }),
-        /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native53.View, { style: { position: "absolute", top: 32, right: 0, width: 3, height: 3, borderRadius: 1.5, backgroundColor: theme.irisBorder } })
+      state === "thinking" && /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native_reanimated10.default.View, { style: [{ position: "absolute", width: 70, height: 70 }, orbitAnimStyle], children: [
+        /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: { position: "absolute", top: 0, left: 32, width: 5, height: 5, borderRadius: 2.5, backgroundColor: theme.irisDot } }),
+        /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: { position: "absolute", bottom: 0, left: 32, width: 4, height: 4, borderRadius: 2, backgroundColor: theme.irisBorder } }),
+        /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.View, { style: { position: "absolute", top: 32, right: 0, width: 3, height: 3, borderRadius: 1.5, backgroundColor: theme.irisBorder } })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native_reanimated10.default.View, { style: [{
+      /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native_reanimated10.default.View, { style: [{
         width: core,
         height: core,
         borderRadius: core / 2,
@@ -3566,7 +3772,7 @@ function VoiceTutor({ state = "idle", size = 160 }) {
         elevation: 6
       }, coreAnimStyle] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(import_react_native53.Text, { style: {
+    /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native55.Text, { style: {
       marginTop: sp[3],
       fontFamily: font.mono,
       fontSize: fs[10],
@@ -3579,8 +3785,8 @@ function VoiceTutor({ state = "idle", size = 160 }) {
 }
 
 // rn/VideoCard.tsx
-var import_react_native54 = require("react-native");
-var import_jsx_runtime58 = require("react/jsx-runtime");
+var import_react_native56 = require("react-native");
+var import_jsx_runtime60 = require("react/jsx-runtime");
 function getYouTubeThumbnail(url) {
   const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
   return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
@@ -3591,10 +3797,10 @@ function VideoCard({ title, attribution, duration, uri, thumbnail, onPress }) {
   const thumbSource = thumbnail || (autoThumb ? { uri: autoThumb } : null);
   const handlePress = () => {
     if (onPress) return onPress();
-    if (uri) import_react_native54.Linking.openURL(uri);
+    if (uri) import_react_native56.Linking.openURL(uri);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(
-    import_react_native54.Pressable,
+  return /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(
+    import_react_native56.Pressable,
     {
       onPress: handlePress,
       accessibilityRole: "button",
@@ -3608,22 +3814,22 @@ function VideoCard({ title, attribution, duration, uri, thumbnail, onPress }) {
         opacity: pressed ? 0.9 : 1
       }),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native54.View, { style: {
+        /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.View, { style: {
           aspectRatio: 16 / 9,
           backgroundColor: theme.hoverOverlay,
           alignItems: "center",
           justifyContent: "center"
         }, children: [
-          thumbSource && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.Image, { source: thumbSource, style: { position: "absolute", width: "100%", height: "100%" }, resizeMode: "cover" }),
-          /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.View, { style: {
+          thumbSource && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Image, { source: thumbSource, style: { position: "absolute", width: "100%", height: "100%" }, resizeMode: "cover" }),
+          /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.View, { style: {
             width: sp[9],
             height: sp[9],
             borderRadius: sp[9] / 2,
             backgroundColor: theme.accent,
             alignItems: "center",
             justifyContent: "center"
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Icon, { name: "play", size: icon.lg, color: theme.accentFg }) }),
-          duration && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.View, { style: {
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(Icon, { name: "play", size: icon.lg, color: theme.accentFg }) }),
+          duration && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.View, { style: {
             position: "absolute",
             bottom: sp[2],
             right: sp[2],
@@ -3631,11 +3837,11 @@ function VideoCard({ title, attribution, duration, uri, thumbnail, onPress }) {
             borderRadius: r[1],
             paddingHorizontal: sp[1],
             paddingVertical: 1
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.Text, { style: { fontFamily: font.mono, fontSize: fs[10], color: color.chalk[100] }, children: duration }) })
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.mono, fontSize: fs[10], color: color.chalk[100] }, children: duration }) })
         ] }),
-        (title || attribution) && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_react_native54.View, { style: { padding: sp[3], paddingHorizontal: sp[4] }, children: [
-          title ? /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }) : null,
-          attribution && /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(import_react_native54.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: attribution })
+        (title || attribution) && /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.View, { style: { padding: sp[3], paddingHorizontal: sp[4] }, children: [
+          title ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }) : null,
+          attribution && /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: attribution })
         ] })
       ]
     }
@@ -3643,13 +3849,13 @@ function VideoCard({ title, attribution, duration, uri, thumbnail, onPress }) {
 }
 
 // rn/ChatMessage.tsx
-var import_react_native56 = require("react-native");
+var import_react_native58 = require("react-native");
 
 // rn/TypingIndicator.tsx
 var import_react31 = require("react");
-var import_react_native55 = require("react-native");
+var import_react_native57 = require("react-native");
 var import_react_native_reanimated11 = __toESM(require("react-native-reanimated"));
-var import_jsx_runtime59 = require("react/jsx-runtime");
+var import_jsx_runtime61 = require("react/jsx-runtime");
 var DOT_SIZE = sp[1];
 var DOT_BOUNCE = -sp[1];
 var DOT_DURATION = 300;
@@ -3674,7 +3880,7 @@ function Dot({ index }) {
   const animStyle = (0, import_react_native_reanimated11.useAnimatedStyle)(() => ({
     transform: [{ translateY: translateY.value }]
   }));
-  return /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(import_react_native_reanimated11.default.View, { style: [{
+  return /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native_reanimated11.default.View, { style: [{
     width: DOT_SIZE,
     height: DOT_SIZE,
     borderRadius: DOT_SIZE / 2,
@@ -3682,20 +3888,20 @@ function Dot({ index }) {
   }, animStyle] });
 }
 function TypingIndicator() {
-  return /* @__PURE__ */ (0, import_jsx_runtime59.jsxs)(import_react_native55.View, { style: { flexDirection: "row", gap: sp[1], paddingVertical: sp[1], alignSelf: "flex-start" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Dot, { index: 0 }),
-    /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Dot, { index: 1 }),
-    /* @__PURE__ */ (0, import_jsx_runtime59.jsx)(Dot, { index: 2 })
+  return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_react_native57.View, { style: { flexDirection: "row", gap: sp[1], paddingVertical: sp[1], alignSelf: "flex-start" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Dot, { index: 0 }),
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Dot, { index: 1 }),
+    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(Dot, { index: 2 })
   ] });
 }
 
 // rn/ChatMessage.tsx
-var import_jsx_runtime60 = require("react/jsx-runtime");
+var import_jsx_runtime62 = require("react/jsx-runtime");
 function ChatMessage({ children, from, confirmed = true, thinking, revealedLength }) {
   const { theme, mode } = useTheme();
   const isVoid = mode === "void";
   if (from === "tutor" && thinking) {
-    return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.View, { style: { alignSelf: "flex-start", paddingStart: sp[4] }, children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(TypingIndicator, {}) });
+    return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.View, { style: { alignSelf: "flex-start", paddingStart: sp[4] }, children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(TypingIndicator, {}) });
   }
   if (from === "tutor") {
     let splitAt = revealedLength !== void 0 ? revealedLength : children.length;
@@ -3706,14 +3912,14 @@ function ChatMessage({ children, from, confirmed = true, thinking, revealedLengt
     }
     const revealed = children.slice(0, splitAt);
     const unrevealed = children.slice(splitAt);
-    return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.View, { style: { borderStartWidth: 2, borderStartColor: theme.irisBorder, paddingStart: sp[4], alignSelf: "flex-start", maxWidth: "80%" }, children: /* @__PURE__ */ (0, import_jsx_runtime60.jsxs)(import_react_native56.Text, { style: { fontFamily: font.sans, fontSize: fs[14], lineHeight: fs[14] * 1.5 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { color: theme.fg }, children: revealed }),
-      unrevealed ? /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: { color: theme.fgFaint }, children: unrevealed }) : null
+    return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.View, { style: { borderStartWidth: 2, borderStartColor: theme.irisBorder, paddingStart: sp[4], alignSelf: "flex-start", maxWidth: "80%" }, children: /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.Text, { style: { fontFamily: font.sans, fontSize: fs[14], lineHeight: fs[14] * 1.5 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { color: theme.fg }, children: revealed }),
+      unrevealed ? /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { color: theme.fgFaint }, children: unrevealed }) : null
     ] }) });
   }
   const accentRGB = isVoid ? "rgba(100,216,174," : "rgba(42,138,106,";
   const chalkRGB = isVoid ? "rgba(232,228,220," : "rgba(10,15,26,";
-  return /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.View, { style: {
+  return /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.View, { style: {
     borderEndWidth: 2,
     borderEndColor: confirmed ? `${accentRGB}0.4)` : `${accentRGB}0.1)`,
     paddingVertical: sp[3],
@@ -3723,7 +3929,7 @@ function ChatMessage({ children, from, confirmed = true, thinking, revealedLengt
     borderBottomStartRadius: r[2],
     alignSelf: "flex-end",
     maxWidth: "80%"
-  }, children: /* @__PURE__ */ (0, import_jsx_runtime60.jsx)(import_react_native56.Text, { style: {
+  }, children: /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: {
     fontFamily: font.sans,
     fontSize: fs[14],
     color: confirmed ? theme.fg : theme.fgFaint,
@@ -3734,58 +3940,58 @@ function ChatMessage({ children, from, confirmed = true, thinking, revealedLengt
 }
 
 // rn/BreakdownCard.tsx
-var import_react_native57 = require("react-native");
-var import_jsx_runtime61 = require("react/jsx-runtime");
+var import_react_native59 = require("react-native");
+var import_jsx_runtime63 = require("react/jsx-runtime");
 function BreakdownCard({ title, points }) {
   const { theme } = useTheme();
-  return /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_react_native57.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[600], color: theme.fg, marginBottom: sp[3] }, children: title }),
-    points.map((point, i) => /* @__PURE__ */ (0, import_jsx_runtime61.jsxs)(import_react_native57.View, { style: { flexDirection: "row", gap: sp[2], marginBottom: sp[2] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.View, { style: { width: 4, height: 4, borderRadius: 1, backgroundColor: theme.irisDot, marginTop: 6, flexShrink: 0 } }),
-      /* @__PURE__ */ (0, import_jsx_runtime61.jsx)(import_react_native57.Text, { style: { flex: 1, fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }, children: point })
+  return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[600], color: theme.fg, marginBottom: sp[3] }, children: title }),
+    points.map((point, i) => /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { flexDirection: "row", gap: sp[2], marginBottom: sp[2] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.View, { style: { width: 4, height: 4, borderRadius: 1, backgroundColor: theme.irisDot, marginTop: 6, flexShrink: 0 } }),
+      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { flex: 1, fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }, children: point })
     ] }, i))
   ] });
 }
 
 // rn/ActivityCard.tsx
-var import_react_native58 = require("react-native");
-var import_jsx_runtime62 = require("react/jsx-runtime");
+var import_react_native60 = require("react-native");
+var import_jsx_runtime64 = require("react/jsx-runtime");
 function ActivityCard({ title, description, buttonLabel = "Start", complete, score, onPress }) {
   const { theme } = useTheme();
-  return /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.View, { accessibilityRole: "none", style: { backgroundColor: theme.inputBg, borderRadius: r[2], borderWidth: 1, borderColor: complete ? theme.accentBorder : theme.border, padding: sp[4] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.irisLabel, marginBottom: sp[2] }, children: "Activity" }),
-    /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.serif, fontSize: fs[15], color: theme.fg, marginBottom: description ? sp[1] : sp[3] }, children: title }),
-    description && /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[3] }, children: description }),
-    complete ? /* @__PURE__ */ (0, import_jsx_runtime62.jsxs)(import_react_native58.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2], marginTop: description ? 0 : sp[2] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.accent }, children: "Complete" }),
-      score && /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(import_react_native58.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.accent }, children: score })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime62.jsx)(Button, { variant: "primary", size: "sm", onPress, children: buttonLabel })
+  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { accessibilityRole: "none", style: { backgroundColor: theme.inputBg, borderRadius: r[2], borderWidth: 1, borderColor: complete ? theme.accentBorder : theme.border, padding: sp[4] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.irisLabel, marginBottom: sp[2] }, children: "Activity" }),
+    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.serif, fontSize: fs[15], color: theme.fg, marginBottom: description ? sp[1] : sp[3] }, children: title }),
+    description && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[3] }, children: description }),
+    complete ? /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2], marginTop: description ? 0 : sp[2] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.accent }, children: "Complete" }),
+      score && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.accent }, children: score })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Button, { variant: "primary", size: "sm", onPress, children: buttonLabel })
   ] });
 }
 
 // rn/ResourceList.tsx
 var import_react32 = require("react");
-var import_react_native59 = require("react-native");
-var import_jsx_runtime63 = require("react/jsx-runtime");
+var import_react_native61 = require("react-native");
+var import_jsx_runtime65 = require("react/jsx-runtime");
 function ResourceList({ title = "Resources", links }) {
   const { theme } = useTheme();
   const [openIdx, setOpenIdx] = (0, import_react32.useState)(null);
-  return /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_jsx_runtime63.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime63.jsxs)(import_react_native59.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.fgFaint, marginBottom: sp[3] }, children: title }),
-      links.map((link, i) => /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Pressable, { accessibilityRole: "link", onPress: () => {
+  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_jsx_runtime65.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.fgFaint, marginBottom: sp[3] }, children: title }),
+      links.map((link, i) => /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Pressable, { accessibilityRole: "link", onPress: () => {
         if (link.onPress) return link.onPress();
         if (link.content) setOpenIdx(i);
-      }, children: /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(import_react_native59.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.accent, marginBottom: sp[2] }, children: link.label }) }, i))
+      }, children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.accent, marginBottom: sp[2] }, children: link.label }) }, i))
     ] }),
-    openIdx !== null && links[openIdx]?.content && /* @__PURE__ */ (0, import_jsx_runtime63.jsx)(FullSheet, { visible: true, onClose: () => setOpenIdx(null), title: links[openIdx].label, children: links[openIdx].content })
+    openIdx !== null && links[openIdx]?.content && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(FullSheet, { visible: true, onClose: () => setOpenIdx(null), title: links[openIdx].label, children: links[openIdx].content })
   ] });
 }
 
 // rn/SlidesCard.tsx
 var import_react33 = require("react");
-var import_react_native60 = require("react-native");
-var import_jsx_runtime64 = require("react/jsx-runtime");
+var import_react_native62 = require("react-native");
+var import_jsx_runtime66 = require("react/jsx-runtime");
 function SlidesCard({ title, attribution, slides, onPress }) {
   const { theme } = useTheme();
   const [open, setOpen] = (0, import_react33.useState)(false);
@@ -3794,9 +4000,9 @@ function SlidesCard({ title, attribution, slides, onPress }) {
     if (onPress) return onPress();
     if (slides.length) setOpen(true);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_jsx_runtime64.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(
-      import_react_native60.Pressable,
+  return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_jsx_runtime66.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(
+      import_react_native62.Pressable,
       {
         onPress: handlePress,
         accessibilityRole: "button",
@@ -3809,18 +4015,18 @@ function SlidesCard({ title, attribution, slides, onPress }) {
           overflow: "hidden",
           opacity: pressed ? 0.9 : 1
         }),
-        children: /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", padding: sp[3], gap: sp[3], alignItems: "center" }, children: [
-          slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(
-            import_react_native60.Image,
+        children: /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flexDirection: "row", padding: sp[3], gap: sp[3], alignItems: "center" }, children: [
+          slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(
+            import_react_native62.Image,
             {
               source: slides[0],
               style: { width: 56, height: 36, borderRadius: r[1], backgroundColor: theme.hoverOverlay },
               resizeMode: "cover"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flex: 1 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flex: 1 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
               attribution ? `${attribution} \xB7 ` : "",
               slides.length,
               " slide",
@@ -3830,18 +4036,18 @@ function SlidesCard({ title, attribution, slides, onPress }) {
         ] })
       }
     ),
-    slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(FullSheet, { visible: open, onClose: () => setOpen(false), title: `${title} \xB7 ${current + 1}/${slides.length}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(
-        import_react_native60.Image,
+    slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(FullSheet, { visible: open, onClose: () => setOpen(false), title: `${title} \xB7 ${current + 1}/${slides.length}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(
+        import_react_native62.Image,
         {
           source: slides[current],
           style: { width: "100%", aspectRatio: 16 / 9, borderRadius: r[2], marginBottom: sp[5] },
           resizeMode: "contain"
         }
       ),
-      slides.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime64.jsxs)(import_react_native60.View, { style: { flexDirection: "row", gap: sp[3] }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === 0, onPress: () => setCurrent(current - 1), children: "Prev" }),
-        /* @__PURE__ */ (0, import_jsx_runtime64.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === slides.length - 1, onPress: () => setCurrent(current + 1), children: "Next" })
+      slides.length > 1 && /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flexDirection: "row", gap: sp[3] }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === 0, onPress: () => setCurrent(current - 1), children: "Prev" }),
+        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Button, { variant: "secondary", size: "sm", disabled: current === slides.length - 1, onPress: () => setCurrent(current + 1), children: "Next" })
       ] })
     ] })
   ] });
@@ -3849,8 +4055,8 @@ function SlidesCard({ title, attribution, slides, onPress }) {
 
 // rn/WorkedExampleCard.tsx
 var import_react34 = require("react");
-var import_react_native61 = require("react-native");
-var import_jsx_runtime65 = require("react/jsx-runtime");
+var import_react_native63 = require("react-native");
+var import_jsx_runtime67 = require("react/jsx-runtime");
 function WorkedExampleCard({ title, steps, onPress }) {
   const { theme } = useTheme();
   const [open, setOpen] = (0, import_react34.useState)(false);
@@ -3858,9 +4064,9 @@ function WorkedExampleCard({ title, steps, onPress }) {
     if (onPress) return onPress();
     if (steps?.length) setOpen(true);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_jsx_runtime65.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(
-      import_react_native61.Pressable,
+  return /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_jsx_runtime67.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(
+      import_react_native63.Pressable,
       {
         onPress: handlePress,
         accessibilityRole: "button",
@@ -3873,8 +4079,8 @@ function WorkedExampleCard({ title, steps, onPress }) {
           overflow: "hidden",
           opacity: pressed ? 0.9 : 1
         }),
-        children: /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flexDirection: "row", padding: sp[4], gap: sp[3], alignItems: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.View, { style: {
+        children: /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.View, { style: { flexDirection: "row", padding: sp[4], gap: sp[3], alignItems: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.View, { style: {
             width: 32,
             height: 32,
             borderRadius: r[1],
@@ -3883,10 +4089,10 @@ function WorkedExampleCard({ title, steps, onPress }) {
             borderColor: theme.irisBorder,
             alignItems: "center",
             justifyContent: "center"
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.mono, fontSize: fs[12], fontWeight: fw[600], color: theme.iris }, children: steps?.length || "?" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flex: 1 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: { fontFamily: font.mono, fontSize: fs[12], fontWeight: fw[600], color: theme.iris }, children: steps?.length || "?" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.View, { style: { flex: 1 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }, children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.Text, { style: { fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }, children: [
               steps?.length || 0,
               " step worked example"
             ] })
@@ -3894,8 +4100,8 @@ function WorkedExampleCard({ title, steps, onPress }) {
         ] })
       }
     ),
-    steps && steps.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(FullSheet, { visible: open, onClose: () => setOpen(false), title: "Worked example", children: steps.map((step, i) => /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flexDirection: "row", gap: sp[4], marginBottom: sp[6] }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.View, { style: {
+    steps && steps.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(FullSheet, { visible: open, onClose: () => setOpen(false), title: "Worked example", children: steps.map((step, i) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.View, { style: { flexDirection: "row", gap: sp[4], marginBottom: sp[6] }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.View, { style: {
         width: 24,
         height: 24,
         borderRadius: 12,
@@ -3904,18 +4110,18 @@ function WorkedExampleCard({ title, steps, onPress }) {
         justifyContent: "center",
         flexShrink: 0,
         marginTop: 2
-      }, children: /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.iris }, children: i + 1 }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime65.jsxs)(import_react_native61.View, { style: { flex: 1 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[600], color: theme.fg, marginBottom: sp[2] }, children: step.title }),
-        /* @__PURE__ */ (0, import_jsx_runtime65.jsx)(import_react_native61.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.6 }, children: step.content })
+      }, children: /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: { fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.iris }, children: i + 1 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.View, { style: { flex: 1 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: { fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[600], color: theme.fg, marginBottom: sp[2] }, children: step.title }),
+        /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.Text, { style: { fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.6 }, children: step.content })
       ] })
     ] }, i)) })
   ] });
 }
 
 // rn/Identity.tsx
-var import_react_native62 = require("react-native");
-var import_jsx_runtime66 = require("react/jsx-runtime");
+var import_react_native64 = require("react-native");
+var import_jsx_runtime68 = require("react/jsx-runtime");
 function Identity({
   initials,
   name,
@@ -3931,15 +4137,15 @@ function Identity({
   const { theme } = useTheme();
   const avatarSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "md";
   const nameFs = size === "sm" ? fs[13] : size === "lg" ? fs[16] : fs[14];
-  return /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3] }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Avatar, { initials, size: avatarSize, color: avatarColor, star, status }),
-    /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flex: 1 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime66.jsxs)(import_react_native62.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2] }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: { fontFamily: font.sans, fontSize: nameFs, fontWeight: fw[600], color: theme.fg }, numberOfLines: 1, children: name }),
-        badge !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(Badge, { variant: "accent", children: String(badge) })
+  return /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(import_react_native64.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[3] }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Avatar, { initials, size: avatarSize, color: avatarColor, star, status }),
+    /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(import_react_native64.View, { style: { flex: 1 }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(import_react_native64.View, { style: { flexDirection: "row", alignItems: "center", gap: sp[2] }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(import_react_native64.Text, { style: { fontFamily: font.sans, fontSize: nameFs, fontWeight: fw[600], color: theme.fg }, numberOfLines: 1, children: name }),
+        badge !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Badge, { variant: "accent", children: String(badge) })
       ] }),
-      role && /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.fgSubtle, marginTop: sp[0.5] }, children: role }),
-      meta && /* @__PURE__ */ (0, import_jsx_runtime66.jsx)(import_react_native62.Text, { style: { fontFamily: font.sans, fontSize: fs[12], color: theme.fgFaint, marginTop: sp[0.5] }, children: meta })
+      role && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(import_react_native64.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: theme.fgSubtle, marginTop: sp[0.5] }, children: role }),
+      meta && /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(import_react_native64.Text, { style: { fontFamily: font.sans, fontSize: fs[12], color: theme.fgFaint, marginTop: sp[0.5] }, children: meta })
     ] }),
     right
   ] });
@@ -3947,31 +4153,31 @@ function Identity({
 
 // rn/CardGrid.tsx
 var import_react35 = __toESM(require("react"));
-var import_react_native63 = require("react-native");
-var import_jsx_runtime67 = require("react/jsx-runtime");
+var import_react_native65 = require("react-native");
+var import_jsx_runtime69 = require("react/jsx-runtime");
 function CardGrid({ children, columns = 2 }) {
   const items = import_react35.default.Children.toArray(children);
   const rows = [];
   for (let i = 0; i < items.length; i += columns) {
     rows.push(items.slice(i, i + columns));
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.View, { style: { gap: sp[4] }, children: rows.map((row, ri) => /* @__PURE__ */ (0, import_jsx_runtime67.jsxs)(import_react_native63.View, { style: { flexDirection: "row", gap: sp[4] }, children: [
-    row.map((item, ci) => /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.View, { style: { flex: 1 }, children: item }, ci)),
-    row.length < columns && Array.from({ length: columns - row.length }).map((_, fi) => /* @__PURE__ */ (0, import_jsx_runtime67.jsx)(import_react_native63.View, { style: { flex: 1 } }, `fill-${fi}`))
+  return /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(import_react_native65.View, { style: { gap: sp[4] }, children: rows.map((row, ri) => /* @__PURE__ */ (0, import_jsx_runtime69.jsxs)(import_react_native65.View, { style: { flexDirection: "row", gap: sp[4] }, children: [
+    row.map((item, ci) => /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(import_react_native65.View, { style: { flex: 1 }, children: item }, ci)),
+    row.length < columns && Array.from({ length: columns - row.length }).map((_, fi) => /* @__PURE__ */ (0, import_jsx_runtime69.jsx)(import_react_native65.View, { style: { flex: 1 } }, `fill-${fi}`))
   ] }, ri)) });
 }
 
 // rn/Leaderboard.tsx
 var import_react36 = require("react");
-var import_react_native64 = require("react-native");
-var import_jsx_runtime68 = require("react/jsx-runtime");
+var import_react_native66 = require("react-native");
+var import_jsx_runtime70 = require("react/jsx-runtime");
 function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
   const { theme } = useTheme();
   const renderItem = (0, import_react36.useCallback)(({ item, index }) => {
     const rank = index + 1;
     const isTop3 = rank <= 3;
     const rankColors = [color.gold[400], color.chalk[300], color.gold[500]];
-    return /* @__PURE__ */ (0, import_jsx_runtime68.jsxs)(import_react_native64.View, { style: {
+    return /* @__PURE__ */ (0, import_jsx_runtime70.jsxs)(import_react_native66.View, { style: {
       flexDirection: "row",
       alignItems: "center",
       gap: sp[3],
@@ -3982,7 +4188,7 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
       backgroundColor: item.isCurrent ? theme.selectedOverlay : "transparent",
       borderRadius: item.isCurrent ? r[2] : 0
     }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(import_react_native64.Text, { style: {
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(import_react_native66.Text, { style: {
         fontFamily: font.mono,
         fontSize: fs[12],
         fontWeight: fw[700],
@@ -3990,15 +4196,15 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
         minWidth: 20,
         textAlign: "center"
       }, children: rank }),
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(Avatar, { initials: item.initials, size: "sm", color: item.avatarColor, star: isTop3 && rank === 1 }),
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(import_react_native64.Text, { style: {
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(Avatar, { initials: item.initials, size: "sm", color: item.avatarColor, star: isTop3 && rank === 1 }),
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(import_react_native66.Text, { style: {
         fontFamily: font.sans,
         fontSize: fs[14],
         fontWeight: item.isCurrent ? fw[600] : fw[400],
         color: theme.fg,
         flex: 1
       }, numberOfLines: 1, children: item.name }),
-      /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(import_react_native64.Text, { style: {
+      /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(import_react_native66.Text, { style: {
         fontFamily: font.mono,
         fontSize: fs[13],
         fontWeight: fw[600],
@@ -4007,8 +4213,8 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
     ] });
   }, [theme]);
   const keyExtractor = (0, import_react36.useCallback)((_, i) => String(i), []);
-  return /* @__PURE__ */ (0, import_jsx_runtime68.jsx)(
-    import_react_native64.FlatList,
+  return /* @__PURE__ */ (0, import_jsx_runtime70.jsx)(
+    import_react_native66.FlatList,
     {
       data: entries,
       renderItem,
@@ -4059,6 +4265,7 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
   LinearProgress,
   MatchQuestion,
   Menu,
+  Oasis,
   OrderQuestion,
   PlacedItem,
   Question,
@@ -4067,6 +4274,7 @@ function Leaderboard({ entries, label = "Rank", unit = "jugs" }) {
   Radio,
   RadioGroup,
   ResourceList,
+  RouteMap,
   Segmented,
   SessionBar,
   SessionCard,

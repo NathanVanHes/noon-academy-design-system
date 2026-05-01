@@ -706,6 +706,40 @@ interface InterstitialProps {
 }
 declare function Interstitial({ title, body, buttonLabel, onPress }: InterstitialProps): react_jsx_runtime.JSX.Element;
 
+type OasisStatus = 'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked';
+interface OasisProps {
+    level: number;
+    status?: OasisStatus;
+    label?: string;
+    size?: 'sm' | 'md' | 'lg';
+    meta?: string;
+}
+declare function Oasis({ level, status, label, size, meta }: OasisProps): react_jsx_runtime.JSX.Element;
+
+type MarkerStatus = 'mapped' | 'exploring' | 'not-started' | 'needs-attention' | 'unmapped';
+interface RouteMarker {
+    id: string;
+    label: string;
+    status: MarkerStatus;
+}
+interface RouteChapter {
+    id: string;
+    label: string;
+    title: string;
+    date?: string;
+    result?: string;
+    status: 'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked';
+    level: number;
+    markers: RouteMarker[];
+}
+interface RouteMapProps {
+    chapters: RouteChapter[];
+    currentChapter?: string;
+    onChapterPress?: (chapter: RouteChapter) => void;
+    onMarkerPress?: (marker: RouteMarker, chapter: RouteChapter) => void;
+}
+declare function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }: RouteMapProps): react_jsx_runtime.JSX.Element;
+
 type Variant$1 = 'standard' | 'major' | 'canvas';
 interface GridPaperProps {
     variant?: Variant$1;
@@ -880,4 +914,4 @@ interface LeaderboardProps {
 }
 declare function Leaderboard({ entries, label, unit }: LeaderboardProps): react_jsx_runtime.JSX.Element;
 
-export { ActivityCard, Alert, Avatar, Badge, BottomAction, BottomNav, BottomSheet, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, OrderQuestion, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, Segmented, SessionBar, SessionCard, Skeleton, SlidesCard, Stepper, Switch, Table, Tabs, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };
+export { ActivityCard, Alert, Avatar, Badge, BottomAction, BottomNav, BottomSheet, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, Oasis, OrderQuestion, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, type RouteChapter, RouteMap, type RouteMarker, Segmented, SessionBar, SessionCard, Skeleton, SlidesCard, Stepper, Switch, Table, Tabs, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };
