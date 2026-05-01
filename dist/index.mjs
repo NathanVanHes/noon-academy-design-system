@@ -2228,14 +2228,14 @@ import { View as View34, Text as Text32, Pressable as Pressable21 } from "react-
 import { jsx as jsx40, jsxs as jsxs30 } from "react/jsx-runtime";
 function HomeworkCard({ title, subject, dueDate, questions, status = "pending", score, onPress }) {
   const { theme } = useTheme();
-  const statusColor2 = {
+  const statusColor = {
     pending: theme.fgFaint,
     "in-progress": theme.signalBright,
     submitted: theme.accent,
     overdue: theme.danger,
     graded: theme.accent
   };
-  const statusLabel2 = {
+  const statusLabel = {
     pending: "Pending",
     "in-progress": "In progress",
     submitted: "Submitted",
@@ -2265,7 +2265,7 @@ function HomeworkCard({ title, subject, dueDate, questions, status = "pending", 
         questions !== 1 ? "s" : ""
       ] })
     ] }),
-    /* @__PURE__ */ jsx40(Text32, { style: { fontFamily: font.mono, fontSize: fs[11], color: statusColor2[status] }, children: statusLabel2[status] })
+    /* @__PURE__ */ jsx40(Text32, { style: { fontFamily: font.mono, fontSize: fs[11], color: statusColor[status] }, children: statusLabel[status] })
   ] });
 }
 
@@ -3100,20 +3100,8 @@ function Oasis({ level, status = "upcoming", label, size = "md", meta }) {
 
 // rn/RouteMap.tsx
 import { View as View47, Text as Text44, Pressable as Pressable23 } from "react-native";
-import { Fragment as Fragment5, jsx as jsx54, jsxs as jsxs40 } from "react/jsx-runtime";
-function markerToWaypoint(status) {
-  switch (status) {
-    case "mapped":
-      return "done";
-    case "exploring":
-      return "current";
-    case "needs-attention":
-      return "passed";
-    default:
-      return "incomplete";
-  }
-}
-function statusColor(status) {
+import { jsx as jsx54, jsxs as jsxs40 } from "react/jsx-runtime";
+function markerColor(status) {
   switch (status) {
     case "mapped":
       return color.noon[400];
@@ -3125,7 +3113,19 @@ function statusColor(status) {
       return "rgba(232,228,220,0.35)";
   }
 }
-function statusLabel(status) {
+function markerBg(status) {
+  switch (status) {
+    case "mapped":
+      return color.noon[400];
+    case "exploring":
+      return "transparent";
+    case "needs-attention":
+      return "rgba(212,149,110,0.18)";
+    default:
+      return "transparent";
+  }
+}
+function sublabel(status) {
   switch (status) {
     case "mapped":
       return "Mapped";
@@ -3139,99 +3139,113 @@ function statusLabel(status) {
       return "Unmapped";
   }
 }
-var SPINE_LINE_H = 6;
-var CONNECTOR_W = 16;
-function SpineLine({ done, height, gap }) {
-  const { theme } = useTheme();
-  const col = done ? theme.signalDim : theme.border;
-  return /* @__PURE__ */ jsx54(View47, { style: { width: 1, height: gap ? sp[7] : height || SPINE_LINE_H, alignSelf: "center", backgroundColor: done ? col : void 0, borderLeftWidth: done ? 0 : 1, borderLeftColor: col, borderStyle: done ? void 0 : "dashed" } });
-}
-function ConnectorLine({ done, side }) {
-  const { theme } = useTheme();
-  const col = done ? theme.signalDim : theme.border;
-  return /* @__PURE__ */ jsx54(View47, { style: { width: CONNECTOR_W, height: 1, backgroundColor: done ? col : void 0, borderTopWidth: done ? 0 : 1, borderTopColor: col, borderStyle: done ? void 0 : "dashed" } });
-}
 function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }) {
   const { theme } = useTheme();
   const isPast = (ch) => ch.status === "complete" || ch.status === "strong" || ch.status === "weak";
-  const isCurrent = (ch) => ch.id === currentChapter;
-  return /* @__PURE__ */ jsxs40(View47, { style: { alignItems: "center" }, children: [
+  const isCurr = (ch) => ch.id === currentChapter;
+  const currentIdx = chapters.findIndex((ch) => ch.id === currentChapter);
+  return /* @__PURE__ */ jsxs40(View47, { style: { position: "relative" }, children: [
+    /* @__PURE__ */ jsx54(View47, { style: { position: "absolute", top: 0, bottom: 0, left: "50%", width: 1, marginLeft: -0.5, backgroundColor: theme.borderStrong } }),
     chapters.map((ch, ci) => {
-      const chPast = isPast(ch);
-      const chCurrent = isCurrent(ch);
-      return /* @__PURE__ */ jsxs40(View47, { style: { alignItems: "center", width: "100%" }, children: [
-        ci > 0 && /* @__PURE__ */ jsx54(SpineLine, { done: chPast || chCurrent, height: sp[5] }),
-        /* @__PURE__ */ jsxs40(Pressable23, { onPress: () => onChapterPress?.(ch), accessibilityRole: "button", accessibilityLabel: ch.title, style: { alignItems: "center" }, children: [
-          /* @__PURE__ */ jsx54(Oasis, { level: ch.level, status: ch.status, label: ch.label, size: chCurrent ? "lg" : "md", meta: ch.result || ch.date }),
-          /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.serif, fontSize: chCurrent ? fs[16] : fs[14], fontWeight: fw[500], color: chCurrent ? theme.fg : chPast ? theme.fgMuted : theme.fgSubtle, marginTop: sp[2], textAlign: "center" }, children: ch.title })
+      const past = isPast(ch);
+      const current = isCurr(ch);
+      const isHere = current;
+      return /* @__PURE__ */ jsxs40(View47, { style: { paddingVertical: sp[5] }, children: [
+        /* @__PURE__ */ jsx54(Pressable23, { onPress: () => onChapterPress?.(ch), accessibilityRole: "button", accessibilityLabel: ch.title, style: { alignItems: "center", zIndex: 5 }, children: /* @__PURE__ */ jsx54(Oasis, { level: ch.level, status: ch.status, label: ch.label, size: current ? "lg" : "md", meta: ch.result || ch.eyebrow }) }),
+        /* @__PURE__ */ jsxs40(View47, { style: { alignItems: "center", marginTop: sp[2], marginBottom: sp[4], paddingHorizontal: sp[5] }, children: [
+          /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.mono, fontSize: fs[9], color: current ? theme.accent : past ? markerColor("mapped") : theme.fgFaint, letterSpacing: 1.5, textTransform: "uppercase", textAlign: "center" }, children: current ? "You are here" : ch.eyebrow || `Chapter ${ch.label}` }),
+          /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.serif, fontSize: current ? fs[18] : fs[16], fontWeight: fw[500], color: current ? theme.fg : past ? theme.fgMuted : theme.fgSubtle, marginTop: sp[1], textAlign: "center" }, children: ch.title }),
+          ch.result && /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.serif, fontSize: fs[12], fontStyle: "italic", color: ch.status === "weak" ? color.terra[300] : color.noon[300], marginTop: sp[0.5] }, children: ch.result })
         ] }),
         ch.markers.map((marker, mi) => {
           const isLeft = mi % 2 === 0;
-          const wpState = markerToWaypoint(marker.status);
-          const col = statusColor(marker.status);
-          const markerDone = marker.status === "mapped";
-          const lineDone = chPast || chCurrent && mi === 0;
-          return /* @__PURE__ */ jsxs40(View47, { style: { width: "100%" }, children: [
-            /* @__PURE__ */ jsx54(SpineLine, { done: lineDone || markerDone, height: SPINE_LINE_H }),
-            /* @__PURE__ */ jsxs40(View47, { style: { flexDirection: "row", alignItems: "center", width: "100%", paddingHorizontal: sp[4] }, children: [
-              /* @__PURE__ */ jsx54(View47, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }, children: isLeft && /* @__PURE__ */ jsxs40(Fragment5, { children: [
-                /* @__PURE__ */ jsxs40(
-                  Pressable23,
-                  {
-                    onPress: () => onMarkerPress?.(marker, ch),
-                    accessibilityRole: "button",
-                    accessibilityLabel: `${marker.label} \u2014 ${statusLabel(marker.status)}`,
-                    style: {
-                      flex: 1,
-                      maxWidth: 160,
-                      paddingVertical: sp[2],
-                      paddingHorizontal: sp[3],
-                      backgroundColor: marker.status === "exploring" ? "rgba(100,216,174,0.05)" : theme.bgRaised,
-                      borderWidth: 1,
-                      borderColor: marker.status === "exploring" ? "rgba(100,216,174,0.25)" : theme.border,
-                      borderRadius: r[2],
-                      alignItems: "flex-end"
-                    },
-                    children: [
-                      /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg, textAlign: "right" }, numberOfLines: 1, children: marker.label }),
-                      /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2, textAlign: "right" }, children: statusLabel(marker.status) })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsx54(ConnectorLine, { done: markerDone, side: "left" })
-              ] }) }),
-              /* @__PURE__ */ jsx54(WaypointMarker, { state: wpState }),
-              /* @__PURE__ */ jsx54(View47, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }, children: !isLeft && /* @__PURE__ */ jsxs40(Fragment5, { children: [
-                /* @__PURE__ */ jsx54(ConnectorLine, { done: markerDone, side: "right" }),
-                /* @__PURE__ */ jsxs40(
-                  Pressable23,
-                  {
-                    onPress: () => onMarkerPress?.(marker, ch),
-                    accessibilityRole: "button",
-                    accessibilityLabel: `${marker.label} \u2014 ${statusLabel(marker.status)}`,
-                    style: {
-                      flex: 1,
-                      maxWidth: 160,
-                      paddingVertical: sp[2],
-                      paddingHorizontal: sp[3],
-                      backgroundColor: marker.status === "exploring" ? "rgba(100,216,174,0.05)" : theme.bgRaised,
-                      borderWidth: 1,
-                      borderColor: marker.status === "exploring" ? "rgba(100,216,174,0.25)" : theme.border,
-                      borderRadius: r[2]
-                    },
-                    children: [
-                      /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg }, numberOfLines: 1, children: marker.label }),
-                      /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2 }, children: statusLabel(marker.status) })
-                    ]
-                  }
-                )
-              ] }) })
-            ] })
+          const mc = markerColor(marker.status);
+          const mb = markerBg(marker.status);
+          const isDashed = marker.status === "unmapped" || marker.status === "not-started";
+          const isHereMarker = marker.status === "exploring" && current;
+          const sub = marker.sublabel || sublabel(marker.status);
+          return /* @__PURE__ */ jsxs40(View47, { style: { flexDirection: "row", marginVertical: sp[1] }, children: [
+            /* @__PURE__ */ jsx54(View47, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }, children: isLeft && /* @__PURE__ */ jsxs40(
+              Pressable23,
+              {
+                onPress: () => onMarkerPress?.(marker, ch),
+                accessibilityRole: "button",
+                accessibilityLabel: `${marker.label} \u2014 ${sub}`,
+                style: {
+                  flex: 1,
+                  marginLeft: sp[4],
+                  marginRight: 0,
+                  flexDirection: "row-reverse",
+                  alignItems: "center",
+                  gap: sp[3],
+                  paddingVertical: sp[3],
+                  paddingHorizontal: sp[3],
+                  backgroundColor: isHereMarker ? "rgba(100,216,174,0.06)" : "rgba(16,23,42,0.45)",
+                  borderWidth: 1,
+                  borderColor: isHereMarker ? "rgba(100,216,174,0.3)" : theme.border,
+                  borderRadius: r[2]
+                },
+                children: [
+                  /* @__PURE__ */ jsx54(View47, { style: {
+                    width: isHereMarker ? 14 : 12,
+                    height: isHereMarker ? 14 : 12,
+                    transform: [{ rotate: "45deg" }],
+                    borderWidth: 1.5,
+                    borderColor: mc,
+                    borderStyle: isDashed ? "dashed" : "solid",
+                    backgroundColor: mb,
+                    ...isHereMarker ? { shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 8, elevation: 4 } : {}
+                  } }),
+                  /* @__PURE__ */ jsxs40(View47, { style: { flex: 1 }, children: [
+                    /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg, textAlign: "right" }, numberOfLines: 1, children: marker.label }),
+                    /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1, textTransform: "uppercase", marginTop: 2, textAlign: "right" }, children: sub })
+                  ] })
+                ]
+              }
+            ) }),
+            /* @__PURE__ */ jsx54(View47, { style: { width: sp[5] * 2, alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx54(View47, { style: { width: "100%", height: 1, backgroundColor: theme.fgFaint, opacity: 0.4 } }) }),
+            /* @__PURE__ */ jsx54(View47, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }, children: !isLeft && /* @__PURE__ */ jsxs40(
+              Pressable23,
+              {
+                onPress: () => onMarkerPress?.(marker, ch),
+                accessibilityRole: "button",
+                accessibilityLabel: `${marker.label} \u2014 ${sub}`,
+                style: {
+                  flex: 1,
+                  marginRight: sp[4],
+                  marginLeft: 0,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: sp[3],
+                  paddingVertical: sp[3],
+                  paddingHorizontal: sp[3],
+                  backgroundColor: isHereMarker ? "rgba(100,216,174,0.06)" : "rgba(16,23,42,0.45)",
+                  borderWidth: 1,
+                  borderColor: isHereMarker ? "rgba(100,216,174,0.3)" : theme.border,
+                  borderRadius: r[2]
+                },
+                children: [
+                  /* @__PURE__ */ jsx54(View47, { style: {
+                    width: isHereMarker ? 14 : 12,
+                    height: isHereMarker ? 14 : 12,
+                    transform: [{ rotate: "45deg" }],
+                    borderWidth: 1.5,
+                    borderColor: mc,
+                    borderStyle: isDashed ? "dashed" : "solid",
+                    backgroundColor: mb,
+                    ...isHereMarker ? { shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 8, elevation: 4 } : {}
+                  } }),
+                  /* @__PURE__ */ jsxs40(View47, { style: { flex: 1 }, children: [
+                    /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg }, numberOfLines: 1, children: marker.label }),
+                    /* @__PURE__ */ jsx54(Text44, { style: { fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1, textTransform: "uppercase", marginTop: 2 }, children: sub })
+                  ] })
+                ]
+              }
+            ) })
           ] }, marker.id);
         })
       ] }, ch.id);
-    }),
-    /* @__PURE__ */ jsx54(SpineLine, { done: false })
+    })
   ] });
 }
 
@@ -3280,7 +3294,7 @@ function GridPaper({ variant = "standard", width, height, style }) {
 // rn/WaterVessel.tsx
 import { View as View49, Text as Text45 } from "react-native";
 import Svg5, { Path as Path3, Rect as Rect2, Line as Line3, Circle as Circle3, ClipPath, Defs } from "react-native-svg";
-import { Fragment as Fragment6, jsx as jsx56, jsxs as jsxs41 } from "react/jsx-runtime";
+import { Fragment as Fragment5, jsx as jsx56, jsxs as jsxs41 } from "react/jsx-runtime";
 var VESSEL_PATH = "M15,4 L25,4 C27,4 28,5 28,7 L28,12 C28,13 27,14 26,14 L26,18 C32,20 34,26 34,34 C34,42 34,48 32,51 C30,54 26,55 20,55 C14,55 10,54 8,51 C6,48 6,42 6,34 C6,26 8,20 14,18 L14,14 C13,14 12,13 12,12 L12,7 C12,5 13,4 15,4 Z";
 var SIZES2 = { sm: 40, md: 72, lg: 110 };
 function WaterVessel({ fill, capacity = 18, minimum = 12, size = "lg" }) {
@@ -3300,7 +3314,7 @@ function WaterVessel({ fill, capacity = 18, minimum = 12, size = "lg" }) {
       pct > 0 && /* @__PURE__ */ jsx56(Rect2, { x: 4, y: waterTop, width: 32, height: 57 - waterTop, fill: wc, opacity: 0.45, clipPath: "url(#vc)" }),
       pct > 0 && !overflow && /* @__PURE__ */ jsx56(Line3, { x1: 6, y1: waterTop, x2: 34, y2: waterTop, stroke: wc, strokeWidth: 1.5, opacity: 0.7, clipPath: "url(#vc)" }),
       /* @__PURE__ */ jsx56(Path3, { d: VESSEL_PATH, stroke: theme.fgMuted, strokeWidth: 1.5, strokeLinejoin: "round", fill: "none" }),
-      overflow && /* @__PURE__ */ jsxs41(Fragment6, { children: [
+      overflow && /* @__PURE__ */ jsxs41(Fragment5, { children: [
         /* @__PURE__ */ jsx56(Circle3, { cx: 36, cy: 10, r: 1.5, fill: wc, opacity: 0.5 }),
         /* @__PURE__ */ jsx56(Circle3, { cx: 38, cy: 16, r: 1, fill: wc, opacity: 0.4 })
       ] })
@@ -3866,11 +3880,11 @@ function ActivityCard({ title, description, buttonLabel = "Start", complete, sco
 // rn/ResourceList.tsx
 import { useState as useState9 } from "react";
 import { View as View58, Text as Text51, Pressable as Pressable25 } from "react-native";
-import { Fragment as Fragment7, jsx as jsx65, jsxs as jsxs49 } from "react/jsx-runtime";
+import { Fragment as Fragment6, jsx as jsx65, jsxs as jsxs49 } from "react/jsx-runtime";
 function ResourceList({ title = "Resources", links }) {
   const { theme } = useTheme();
   const [openIdx, setOpenIdx] = useState9(null);
-  return /* @__PURE__ */ jsxs49(Fragment7, { children: [
+  return /* @__PURE__ */ jsxs49(Fragment6, { children: [
     /* @__PURE__ */ jsxs49(View58, { style: { backgroundColor: theme.inputBg, borderRadius: r[2], padding: sp[4] }, children: [
       /* @__PURE__ */ jsx65(Text51, { style: { fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1, textTransform: "uppercase", fontWeight: fw[600], color: theme.fgFaint, marginBottom: sp[3] }, children: title }),
       links.map((link, i) => /* @__PURE__ */ jsx65(Pressable25, { accessibilityRole: "link", onPress: () => {
@@ -3885,7 +3899,7 @@ function ResourceList({ title = "Resources", links }) {
 // rn/SlidesCard.tsx
 import { useState as useState10 } from "react";
 import { View as View59, Text as Text52, Pressable as Pressable26, Image as Image7 } from "react-native";
-import { Fragment as Fragment8, jsx as jsx66, jsxs as jsxs50 } from "react/jsx-runtime";
+import { Fragment as Fragment7, jsx as jsx66, jsxs as jsxs50 } from "react/jsx-runtime";
 function SlidesCard({ title, attribution, slides, onPress }) {
   const { theme } = useTheme();
   const [open, setOpen] = useState10(false);
@@ -3894,7 +3908,7 @@ function SlidesCard({ title, attribution, slides, onPress }) {
     if (onPress) return onPress();
     if (slides.length) setOpen(true);
   };
-  return /* @__PURE__ */ jsxs50(Fragment8, { children: [
+  return /* @__PURE__ */ jsxs50(Fragment7, { children: [
     /* @__PURE__ */ jsx66(
       Pressable26,
       {
@@ -3950,7 +3964,7 @@ function SlidesCard({ title, attribution, slides, onPress }) {
 // rn/WorkedExampleCard.tsx
 import { useState as useState11 } from "react";
 import { View as View60, Text as Text53, Pressable as Pressable27 } from "react-native";
-import { Fragment as Fragment9, jsx as jsx67, jsxs as jsxs51 } from "react/jsx-runtime";
+import { Fragment as Fragment8, jsx as jsx67, jsxs as jsxs51 } from "react/jsx-runtime";
 function WorkedExampleCard({ title, steps, onPress }) {
   const { theme } = useTheme();
   const [open, setOpen] = useState11(false);
@@ -3958,7 +3972,7 @@ function WorkedExampleCard({ title, steps, onPress }) {
     if (onPress) return onPress();
     if (steps?.length) setOpen(true);
   };
-  return /* @__PURE__ */ jsxs51(Fragment9, { children: [
+  return /* @__PURE__ */ jsxs51(Fragment8, { children: [
     /* @__PURE__ */ jsx67(
       Pressable27,
       {

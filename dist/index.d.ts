@@ -720,13 +720,14 @@ type MarkerStatus = 'mapped' | 'exploring' | 'not-started' | 'needs-attention' |
 interface RouteMarker {
     id: string;
     label: string;
+    sublabel?: string;
     status: MarkerStatus;
 }
 interface RouteChapter {
     id: string;
     label: string;
     title: string;
-    date?: string;
+    eyebrow?: string;
     result?: string;
     status: 'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked';
     level: number;

@@ -1,12 +1,10 @@
 /**
- * RouteMap — vertical journey with central spine.
- * Oasis checkpoints on the spine, topic markers branching left/right.
- * Spine runs down the centre, markers alternate sides with connector lines.
+ * RouteMap — central spine journey. Direct translation of riyadh-to-moon layout.
+ * Spine at 50%, oasis checkpoints centred, topics branch left/right alternating.
  */
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { WaypointMarker } from './Waypoints';
 import { Oasis } from './Oasis';
 import { sp, r, fs, fw, font, color } from './tokens';
 
@@ -15,6 +13,7 @@ type MarkerStatus = 'mapped' | 'exploring' | 'not-started' | 'needs-attention' |
 export interface RouteMarker {
   id: string;
   label: string;
+  sublabel?: string;
   status: MarkerStatus;
 }
 
@@ -22,7 +21,7 @@ export interface RouteChapter {
   id: string;
   label: string;
   title: string;
-  date?: string;
+  eyebrow?: string;
   result?: string;
   status: 'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked';
   level: number;
@@ -36,128 +35,133 @@ interface RouteMapProps {
   onMarkerPress?: (marker: RouteMarker, chapter: RouteChapter) => void;
 }
 
-function markerToWaypoint(status: MarkerStatus): 'done' | 'passed' | 'current' | 'arrived' | 'incomplete' {
-  switch (status) { case 'mapped': return 'done'; case 'exploring': return 'current'; case 'needs-attention': return 'passed'; default: return 'incomplete'; }
-}
-
-function statusColor(status: MarkerStatus): string {
+function markerColor(status: MarkerStatus): string {
   switch (status) { case 'mapped': return color.noon[400]; case 'exploring': return color.gold[400]; case 'needs-attention': return color.terra[400]; default: return 'rgba(232,228,220,0.35)'; }
 }
 
-function statusLabel(status: MarkerStatus): string {
+function markerBg(status: MarkerStatus): string {
+  switch (status) { case 'mapped': return color.noon[400]; case 'exploring': return 'transparent'; case 'needs-attention': return 'rgba(212,149,110,0.18)'; default: return 'transparent'; }
+}
+
+function sublabel(status: MarkerStatus): string {
   switch (status) { case 'mapped': return 'Mapped'; case 'exploring': return 'Exploring'; case 'not-started': return 'Not started'; case 'needs-attention': return 'Needs attention'; case 'unmapped': return 'Unmapped'; }
-}
-
-const SPINE_LINE_H = 6;
-const CONNECTOR_W = 16;
-
-function SpineLine({ done, height, gap }: { done: boolean; height?: number; gap?: boolean }) {
-  const { theme } = useTheme();
-  const col = done ? theme.signalDim : theme.border;
-  return (
-    <View style={{ width: 1, height: gap ? sp[7] : (height || SPINE_LINE_H), alignSelf: 'center', backgroundColor: done ? col : undefined, borderLeftWidth: done ? 0 : 1, borderLeftColor: col, borderStyle: done ? undefined : 'dashed' }} />
-  );
-}
-
-function ConnectorLine({ done, side }: { done: boolean; side: 'left' | 'right' }) {
-  const { theme } = useTheme();
-  const col = done ? theme.signalDim : theme.border;
-  return (
-    <View style={{ width: CONNECTOR_W, height: 1, backgroundColor: done ? col : undefined, borderTopWidth: done ? 0 : 1, borderTopColor: col, borderStyle: done ? undefined : 'dashed' }} />
-  );
 }
 
 export function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }: RouteMapProps) {
   const { theme } = useTheme();
 
   const isPast = (ch: RouteChapter) => ch.status === 'complete' || ch.status === 'strong' || ch.status === 'weak';
-  const isCurrent = (ch: RouteChapter) => ch.id === currentChapter;
+  const isCurr = (ch: RouteChapter) => ch.id === currentChapter;
+
+  // Find where progress spine reaches (from bottom)
+  const currentIdx = chapters.findIndex(ch => ch.id === currentChapter);
 
   return (
-    <View style={{ alignItems: 'center' }}>
+    <View style={{ position: 'relative' }}>
+      {/* Spine background — full height, dashed */}
+      <View style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1, marginLeft: -0.5, backgroundColor: theme.borderStrong }} />
+
+      {/* Chapters */}
       {chapters.map((ch, ci) => {
-        const chPast = isPast(ch);
-        const chCurrent = isCurrent(ch);
+        const past = isPast(ch);
+        const current = isCurr(ch);
+        const isHere = current;
 
         return (
-          <View key={ch.id} style={{ alignItems: 'center', width: '100%' }}>
-            {/* Spine line into oasis */}
-            {ci > 0 && <SpineLine done={chPast || chCurrent} height={sp[5]} />}
-
-            {/* Oasis centred with title below */}
-            <Pressable onPress={() => onChapterPress?.(ch)} accessibilityRole="button" accessibilityLabel={ch.title} style={{ alignItems: 'center' }}>
-              <Oasis level={ch.level} status={ch.status} label={ch.label} size={chCurrent ? 'lg' : 'md'} meta={ch.result || ch.date} />
-              <Text style={{ fontFamily: font.serif, fontSize: chCurrent ? fs[16] : fs[14], fontWeight: fw[500], color: chCurrent ? theme.fg : chPast ? theme.fgMuted : theme.fgSubtle, marginTop: sp[2], textAlign: 'center' }}>{ch.title}</Text>
+          <View key={ch.id} style={{ paddingVertical: sp[5] }}>
+            {/* Oasis centred on spine */}
+            <Pressable onPress={() => onChapterPress?.(ch)} accessibilityRole="button" accessibilityLabel={ch.title} style={{ alignItems: 'center', zIndex: 5 }}>
+              <Oasis level={ch.level} status={ch.status} label={ch.label} size={current ? 'lg' : 'md'} meta={ch.result || ch.eyebrow} />
             </Pressable>
 
-            {/* Topic markers alternating left/right from spine */}
+            {/* Title below oasis */}
+            <View style={{ alignItems: 'center', marginTop: sp[2], marginBottom: sp[4], paddingHorizontal: sp[5] }}>
+              <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: current ? theme.accent : past ? markerColor('mapped') : theme.fgFaint, letterSpacing: 1.5, textTransform: 'uppercase', textAlign: 'center' }}>
+                {current ? 'You are here' : ch.eyebrow || `Chapter ${ch.label}`}
+              </Text>
+              <Text style={{ fontFamily: font.serif, fontSize: current ? fs[18] : fs[16], fontWeight: fw[500], color: current ? theme.fg : past ? theme.fgMuted : theme.fgSubtle, marginTop: sp[1], textAlign: 'center' }}>{ch.title}</Text>
+              {ch.result && <Text style={{ fontFamily: font.serif, fontSize: fs[12], fontStyle: 'italic', color: ch.status === 'weak' ? color.terra[300] : color.noon[300], marginTop: sp[0.5] }}>{ch.result}</Text>}
+            </View>
+
+            {/* Topics — alternating left/right */}
             {ch.markers.map((marker, mi) => {
               const isLeft = mi % 2 === 0;
-              const wpState = markerToWaypoint(marker.status);
-              const col = statusColor(marker.status);
-              const markerDone = marker.status === 'mapped';
-              const lineDone = chPast || (chCurrent && mi === 0);
+              const mc = markerColor(marker.status);
+              const mb = markerBg(marker.status);
+              const isDashed = marker.status === 'unmapped' || marker.status === 'not-started';
+              const isHereMarker = marker.status === 'exploring' && current;
+              const sub = marker.sublabel || sublabel(marker.status);
 
               return (
-                <View key={marker.id} style={{ width: '100%' }}>
-                  {/* Spine segment */}
-                  <SpineLine done={lineDone || markerDone} height={SPINE_LINE_H} />
+                <View key={marker.id} style={{ flexDirection: 'row', marginVertical: sp[1] }}>
+                  {/* Left side */}
+                  <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    {isLeft && (
+                      <Pressable
+                        onPress={() => onMarkerPress?.(marker, ch)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${marker.label} — ${sub}`}
+                        style={{
+                          flex: 1, marginLeft: sp[4], marginRight: 0,
+                          flexDirection: 'row-reverse', alignItems: 'center', gap: sp[3],
+                          paddingVertical: sp[3], paddingHorizontal: sp[3],
+                          backgroundColor: isHereMarker ? 'rgba(100,216,174,0.06)' : 'rgba(16,23,42,0.45)',
+                          borderWidth: 1,
+                          borderColor: isHereMarker ? 'rgba(100,216,174,0.3)' : theme.border,
+                          borderRadius: r[2],
+                        }}
+                      >
+                        {/* Diamond marker */}
+                        <View style={{
+                          width: isHereMarker ? 14 : 12, height: isHereMarker ? 14 : 12,
+                          transform: [{ rotate: '45deg' }],
+                          borderWidth: 1.5, borderColor: mc, borderStyle: isDashed ? 'dashed' : 'solid',
+                          backgroundColor: mb,
+                          ...(isHereMarker ? { shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 8, elevation: 4 } : {}),
+                        }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: marker.status === 'unmapped' || marker.status === 'not-started' ? theme.fgMuted : theme.fg, textAlign: 'right' }} numberOfLines={1}>{marker.label}</Text>
+                          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1, textTransform: 'uppercase', marginTop: 2, textAlign: 'right' }}>{sub}</Text>
+                        </View>
+                      </Pressable>
+                    )}
+                  </View>
 
-                  {/* Marker row — spine centre, card branches to side */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', paddingHorizontal: sp[4] }}>
-                    {/* Left card */}
-                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-                      {isLeft && (
-                        <>
-                          <Pressable
-                            onPress={() => onMarkerPress?.(marker, ch)}
-                            accessibilityRole="button"
-                            accessibilityLabel={`${marker.label} — ${statusLabel(marker.status)}`}
-                            style={{
-                              flex: 1, maxWidth: 160,
-                              paddingVertical: sp[2], paddingHorizontal: sp[3],
-                              backgroundColor: marker.status === 'exploring' ? 'rgba(100,216,174,0.05)' : theme.bgRaised,
-                              borderWidth: 1,
-                              borderColor: marker.status === 'exploring' ? 'rgba(100,216,174,0.25)' : theme.border,
-                              borderRadius: r[2],
-                              alignItems: 'flex-end',
-                            }}
-                          >
-                            <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === 'unmapped' || marker.status === 'not-started' ? theme.fgMuted : theme.fg, textAlign: 'right' }} numberOfLines={1}>{marker.label}</Text>
-                            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: 'uppercase', marginTop: 2, textAlign: 'right' }}>{statusLabel(marker.status)}</Text>
-                          </Pressable>
-                          <ConnectorLine done={markerDone} side="left" />
-                        </>
-                      )}
-                    </View>
+                  {/* Connector + spine centre point */}
+                  <View style={{ width: sp[5] * 2, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ width: '100%', height: 1, backgroundColor: theme.fgFaint, opacity: 0.4 }} />
+                  </View>
 
-                    {/* Diamond on spine */}
-                    <WaypointMarker state={wpState} />
-
-                    {/* Right card */}
-                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                      {!isLeft && (
-                        <>
-                          <ConnectorLine done={markerDone} side="right" />
-                          <Pressable
-                            onPress={() => onMarkerPress?.(marker, ch)}
-                            accessibilityRole="button"
-                            accessibilityLabel={`${marker.label} — ${statusLabel(marker.status)}`}
-                            style={{
-                              flex: 1, maxWidth: 160,
-                              paddingVertical: sp[2], paddingHorizontal: sp[3],
-                              backgroundColor: marker.status === 'exploring' ? 'rgba(100,216,174,0.05)' : theme.bgRaised,
-                              borderWidth: 1,
-                              borderColor: marker.status === 'exploring' ? 'rgba(100,216,174,0.25)' : theme.border,
-                              borderRadius: r[2],
-                            }}
-                          >
-                            <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === 'unmapped' || marker.status === 'not-started' ? theme.fgMuted : theme.fg }} numberOfLines={1}>{marker.label}</Text>
-                            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: 'uppercase', marginTop: 2 }}>{statusLabel(marker.status)}</Text>
-                          </Pressable>
-                        </>
-                      )}
-                    </View>
+                  {/* Right side */}
+                  <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                    {!isLeft && (
+                      <Pressable
+                        onPress={() => onMarkerPress?.(marker, ch)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${marker.label} — ${sub}`}
+                        style={{
+                          flex: 1, marginRight: sp[4], marginLeft: 0,
+                          flexDirection: 'row', alignItems: 'center', gap: sp[3],
+                          paddingVertical: sp[3], paddingHorizontal: sp[3],
+                          backgroundColor: isHereMarker ? 'rgba(100,216,174,0.06)' : 'rgba(16,23,42,0.45)',
+                          borderWidth: 1,
+                          borderColor: isHereMarker ? 'rgba(100,216,174,0.3)' : theme.border,
+                          borderRadius: r[2],
+                        }}
+                      >
+                        <View style={{
+                          width: isHereMarker ? 14 : 12, height: isHereMarker ? 14 : 12,
+                          transform: [{ rotate: '45deg' }],
+                          borderWidth: 1.5, borderColor: mc, borderStyle: isDashed ? 'dashed' : 'solid',
+                          backgroundColor: mb,
+                          ...(isHereMarker ? { shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 8, elevation: 4 } : {}),
+                        }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: marker.status === 'unmapped' || marker.status === 'not-started' ? theme.fgMuted : theme.fg }} numberOfLines={1}>{marker.label}</Text>
+                          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 }}>{sub}</Text>
+                        </View>
+                      </Pressable>
+                    )}
                   </View>
                 </View>
               );
@@ -165,8 +169,6 @@ export function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPre
           </View>
         );
       })}
-      {/* Final spine tail */}
-      <SpineLine done={false} />
     </View>
   );
 }

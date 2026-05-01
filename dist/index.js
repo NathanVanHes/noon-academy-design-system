@@ -2344,14 +2344,14 @@ var import_react_native36 = require("react-native");
 var import_jsx_runtime40 = require("react/jsx-runtime");
 function HomeworkCard({ title, subject, dueDate, questions, status = "pending", score, onPress }) {
   const { theme } = useTheme();
-  const statusColor2 = {
+  const statusColor = {
     pending: theme.fgFaint,
     "in-progress": theme.signalBright,
     submitted: theme.accent,
     overdue: theme.danger,
     graded: theme.accent
   };
-  const statusLabel2 = {
+  const statusLabel = {
     pending: "Pending",
     "in-progress": "In progress",
     submitted: "Submitted",
@@ -2381,7 +2381,7 @@ function HomeworkCard({ title, subject, dueDate, questions, status = "pending", 
         questions !== 1 ? "s" : ""
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: statusColor2[status] }, children: statusLabel2[status] })
+    /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_native36.Text, { style: { fontFamily: font.mono, fontSize: fs[11], color: statusColor[status] }, children: statusLabel[status] })
   ] });
 }
 
@@ -3217,19 +3217,7 @@ function Oasis({ level, status = "upcoming", label, size = "md", meta }) {
 // rn/RouteMap.tsx
 var import_react_native50 = require("react-native");
 var import_jsx_runtime54 = require("react/jsx-runtime");
-function markerToWaypoint(status) {
-  switch (status) {
-    case "mapped":
-      return "done";
-    case "exploring":
-      return "current";
-    case "needs-attention":
-      return "passed";
-    default:
-      return "incomplete";
-  }
-}
-function statusColor(status) {
+function markerColor(status) {
   switch (status) {
     case "mapped":
       return color.noon[400];
@@ -3241,7 +3229,19 @@ function statusColor(status) {
       return "rgba(232,228,220,0.35)";
   }
 }
-function statusLabel(status) {
+function markerBg(status) {
+  switch (status) {
+    case "mapped":
+      return color.noon[400];
+    case "exploring":
+      return "transparent";
+    case "needs-attention":
+      return "rgba(212,149,110,0.18)";
+    default:
+      return "transparent";
+  }
+}
+function sublabel(status) {
   switch (status) {
     case "mapped":
       return "Mapped";
@@ -3255,99 +3255,113 @@ function statusLabel(status) {
       return "Unmapped";
   }
 }
-var SPINE_LINE_H = 6;
-var CONNECTOR_W = 16;
-function SpineLine({ done, height, gap }) {
-  const { theme } = useTheme();
-  const col = done ? theme.signalDim : theme.border;
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { width: 1, height: gap ? sp[7] : height || SPINE_LINE_H, alignSelf: "center", backgroundColor: done ? col : void 0, borderLeftWidth: done ? 0 : 1, borderLeftColor: col, borderStyle: done ? void 0 : "dashed" } });
-}
-function ConnectorLine({ done, side }) {
-  const { theme } = useTheme();
-  const col = done ? theme.signalDim : theme.border;
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { width: CONNECTOR_W, height: 1, backgroundColor: done ? col : void 0, borderTopWidth: done ? 0 : 1, borderTopColor: col, borderStyle: done ? void 0 : "dashed" } });
-}
 function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }) {
   const { theme } = useTheme();
   const isPast = (ch) => ch.status === "complete" || ch.status === "strong" || ch.status === "weak";
-  const isCurrent = (ch) => ch.id === currentChapter;
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { alignItems: "center" }, children: [
+  const isCurr = (ch) => ch.id === currentChapter;
+  const currentIdx = chapters.findIndex((ch) => ch.id === currentChapter);
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { position: "relative" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { position: "absolute", top: 0, bottom: 0, left: "50%", width: 1, marginLeft: -0.5, backgroundColor: theme.borderStrong } }),
     chapters.map((ch, ci) => {
-      const chPast = isPast(ch);
-      const chCurrent = isCurrent(ch);
-      return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { alignItems: "center", width: "100%" }, children: [
-        ci > 0 && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(SpineLine, { done: chPast || chCurrent, height: sp[5] }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.Pressable, { onPress: () => onChapterPress?.(ch), accessibilityRole: "button", accessibilityLabel: ch.title, style: { alignItems: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Oasis, { level: ch.level, status: ch.status, label: ch.label, size: chCurrent ? "lg" : "md", meta: ch.result || ch.date }),
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.serif, fontSize: chCurrent ? fs[16] : fs[14], fontWeight: fw[500], color: chCurrent ? theme.fg : chPast ? theme.fgMuted : theme.fgSubtle, marginTop: sp[2], textAlign: "center" }, children: ch.title })
+      const past = isPast(ch);
+      const current = isCurr(ch);
+      const isHere = current;
+      return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { paddingVertical: sp[5] }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Pressable, { onPress: () => onChapterPress?.(ch), accessibilityRole: "button", accessibilityLabel: ch.title, style: { alignItems: "center", zIndex: 5 }, children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(Oasis, { level: ch.level, status: ch.status, label: ch.label, size: current ? "lg" : "md", meta: ch.result || ch.eyebrow }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { alignItems: "center", marginTop: sp[2], marginBottom: sp[4], paddingHorizontal: sp[5] }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: current ? theme.accent : past ? markerColor("mapped") : theme.fgFaint, letterSpacing: 1.5, textTransform: "uppercase", textAlign: "center" }, children: current ? "You are here" : ch.eyebrow || `Chapter ${ch.label}` }),
+          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.serif, fontSize: current ? fs[18] : fs[16], fontWeight: fw[500], color: current ? theme.fg : past ? theme.fgMuted : theme.fgSubtle, marginTop: sp[1], textAlign: "center" }, children: ch.title }),
+          ch.result && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.serif, fontSize: fs[12], fontStyle: "italic", color: ch.status === "weak" ? color.terra[300] : color.noon[300], marginTop: sp[0.5] }, children: ch.result })
         ] }),
         ch.markers.map((marker, mi) => {
           const isLeft = mi % 2 === 0;
-          const wpState = markerToWaypoint(marker.status);
-          const col = statusColor(marker.status);
-          const markerDone = marker.status === "mapped";
-          const lineDone = chPast || chCurrent && mi === 0;
-          return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { width: "100%" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(SpineLine, { done: lineDone || markerDone, height: SPINE_LINE_H }),
-            /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flexDirection: "row", alignItems: "center", width: "100%", paddingHorizontal: sp[4] }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }, children: isLeft && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
-                  import_react_native50.Pressable,
-                  {
-                    onPress: () => onMarkerPress?.(marker, ch),
-                    accessibilityRole: "button",
-                    accessibilityLabel: `${marker.label} \u2014 ${statusLabel(marker.status)}`,
-                    style: {
-                      flex: 1,
-                      maxWidth: 160,
-                      paddingVertical: sp[2],
-                      paddingHorizontal: sp[3],
-                      backgroundColor: marker.status === "exploring" ? "rgba(100,216,174,0.05)" : theme.bgRaised,
-                      borderWidth: 1,
-                      borderColor: marker.status === "exploring" ? "rgba(100,216,174,0.25)" : theme.border,
-                      borderRadius: r[2],
-                      alignItems: "flex-end"
-                    },
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg, textAlign: "right" }, numberOfLines: 1, children: marker.label }),
-                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2, textAlign: "right" }, children: statusLabel(marker.status) })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(ConnectorLine, { done: markerDone, side: "left" })
-              ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(WaypointMarker, { state: wpState }),
-              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }, children: !isLeft && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(ConnectorLine, { done: markerDone, side: "right" }),
-                /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
-                  import_react_native50.Pressable,
-                  {
-                    onPress: () => onMarkerPress?.(marker, ch),
-                    accessibilityRole: "button",
-                    accessibilityLabel: `${marker.label} \u2014 ${statusLabel(marker.status)}`,
-                    style: {
-                      flex: 1,
-                      maxWidth: 160,
-                      paddingVertical: sp[2],
-                      paddingHorizontal: sp[3],
-                      backgroundColor: marker.status === "exploring" ? "rgba(100,216,174,0.05)" : theme.bgRaised,
-                      borderWidth: 1,
-                      borderColor: marker.status === "exploring" ? "rgba(100,216,174,0.25)" : theme.border,
-                      borderRadius: r[2]
-                    },
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg }, numberOfLines: 1, children: marker.label }),
-                      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: col, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 2 }, children: statusLabel(marker.status) })
-                    ]
-                  }
-                )
-              ] }) })
-            ] })
+          const mc = markerColor(marker.status);
+          const mb = markerBg(marker.status);
+          const isDashed = marker.status === "unmapped" || marker.status === "not-started";
+          const isHereMarker = marker.status === "exploring" && current;
+          const sub = marker.sublabel || sublabel(marker.status);
+          return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flexDirection: "row", marginVertical: sp[1] }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }, children: isLeft && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
+              import_react_native50.Pressable,
+              {
+                onPress: () => onMarkerPress?.(marker, ch),
+                accessibilityRole: "button",
+                accessibilityLabel: `${marker.label} \u2014 ${sub}`,
+                style: {
+                  flex: 1,
+                  marginLeft: sp[4],
+                  marginRight: 0,
+                  flexDirection: "row-reverse",
+                  alignItems: "center",
+                  gap: sp[3],
+                  paddingVertical: sp[3],
+                  paddingHorizontal: sp[3],
+                  backgroundColor: isHereMarker ? "rgba(100,216,174,0.06)" : "rgba(16,23,42,0.45)",
+                  borderWidth: 1,
+                  borderColor: isHereMarker ? "rgba(100,216,174,0.3)" : theme.border,
+                  borderRadius: r[2]
+                },
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: {
+                    width: isHereMarker ? 14 : 12,
+                    height: isHereMarker ? 14 : 12,
+                    transform: [{ rotate: "45deg" }],
+                    borderWidth: 1.5,
+                    borderColor: mc,
+                    borderStyle: isDashed ? "dashed" : "solid",
+                    backgroundColor: mb,
+                    ...isHereMarker ? { shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 8, elevation: 4 } : {}
+                  } }),
+                  /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flex: 1 }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg, textAlign: "right" }, numberOfLines: 1, children: marker.label }),
+                    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1, textTransform: "uppercase", marginTop: 2, textAlign: "right" }, children: sub })
+                  ] })
+                ]
+              }
+            ) }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { width: sp[5] * 2, alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { width: "100%", height: 1, backgroundColor: theme.fgFaint, opacity: 0.4 } }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: { flex: 1, flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }, children: !isLeft && /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
+              import_react_native50.Pressable,
+              {
+                onPress: () => onMarkerPress?.(marker, ch),
+                accessibilityRole: "button",
+                accessibilityLabel: `${marker.label} \u2014 ${sub}`,
+                style: {
+                  flex: 1,
+                  marginRight: sp[4],
+                  marginLeft: 0,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: sp[3],
+                  paddingVertical: sp[3],
+                  paddingHorizontal: sp[3],
+                  backgroundColor: isHereMarker ? "rgba(100,216,174,0.06)" : "rgba(16,23,42,0.45)",
+                  borderWidth: 1,
+                  borderColor: isHereMarker ? "rgba(100,216,174,0.3)" : theme.border,
+                  borderRadius: r[2]
+                },
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.View, { style: {
+                    width: isHereMarker ? 14 : 12,
+                    height: isHereMarker ? 14 : 12,
+                    transform: [{ rotate: "45deg" }],
+                    borderWidth: 1.5,
+                    borderColor: mc,
+                    borderStyle: isDashed ? "dashed" : "solid",
+                    backgroundColor: mb,
+                    ...isHereMarker ? { shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 8, elevation: 4 } : {}
+                  } }),
+                  /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_native50.View, { style: { flex: 1 }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: marker.status === "unmapped" || marker.status === "not-started" ? theme.fgMuted : theme.fg }, numberOfLines: 1, children: marker.label }),
+                    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_native50.Text, { style: { fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1, textTransform: "uppercase", marginTop: 2 }, children: sub })
+                  ] })
+                ]
+              }
+            ) })
           ] }, marker.id);
         })
       ] }, ch.id);
-    }),
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(SpineLine, { done: false })
+    })
   ] });
 }
 
