@@ -35,6 +35,7 @@ import {
   BreakdownPage, ActivityCardPage, WorkedExamplePage, SlidesCardPage, ResourceListPage,
 } from './screens/pages';
 import { VoiceTutorSession } from './screens/VoiceTutorSession';
+import { JourneyPage } from './screens/JourneyPage';
 
 // ─── Nav structure — mirrors index.html exactly ───
 const NAV = [
@@ -138,6 +139,9 @@ const NAV = [
   { group: 'Patterns', items: [
     { id: 'leaderboard', label: 'Leaderboard' },
   ]},
+  { group: 'Pages', items: [
+    { id: 'journey', label: 'Journey' },
+  ]},
 ];
 
 const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen?: boolean }> = {
@@ -215,6 +219,7 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   resourcelist: { component: ResourceListPage, desc: 'Link list for external materials.' },
   vtsession:    { component: VoiceTutorSession, desc: 'Animated trig session demo.', fullscreen: true },
   leaderboard:  { component: LeaderboardPage, desc: 'Ranked crew member list.' },
+  journey:      { component: JourneyPage, desc: 'Qudrat exam journey visualisation.', fullscreen: true },
 };
 
 const allItems = NAV.flatMap(g => g.items);
