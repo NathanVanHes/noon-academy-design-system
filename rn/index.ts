@@ -36,7 +36,9 @@ export { Card } from './Card';
 export { Chip } from './Chip';
 export { Avatar } from './Avatar';
 export { Badge } from './Badge';
-export { Table } from './Table';
+export { Table, type TableColumn } from './Table';
+export { Pagination } from './Pagination';
+export { Breadcrumbs } from './Breadcrumbs';
 export { Divider } from './Divider';
 export { Skeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
@@ -93,6 +95,11 @@ export { Waypoints, WaypointMarker } from './Waypoints';
 export { WaterVessel } from './WaterVessel';
 export { TerrainPattern } from './TerrainPattern';
 export { DunePattern } from './DunePattern';
+export { ConstellationPattern } from './ConstellationPattern';
+export { Slider } from './Slider';
+export { DuneDynamic } from './DuneDynamic';
+export { StarsDynamic } from './StarsDynamic';
+export { TerrainDynamic } from './TerrainDynamic';
 export { VoiceTutor } from './VoiceTutor';
 
 // Media

@@ -27,11 +27,11 @@ declare function Icon({ name, size, color: colorProp }: IconProps): react_jsx_ru
 /** All available icon names */
 declare const iconNames: IconName[];
 
-type Variant$9 = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal';
+type Variant$8 = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal';
 type Size$2 = 'sm' | 'md' | 'lg';
 interface ButtonProps {
     children: string;
-    variant?: Variant$9;
+    variant?: Variant$8;
     size?: Size$2;
     disabled?: boolean;
     loading?: boolean;
@@ -42,11 +42,11 @@ interface ButtonProps {
 }
 declare function Button({ children, variant, size, disabled, loading, fullWidth, leadingIcon, trailingIcon, onPress }: ButtonProps): react_jsx_runtime.JSX.Element;
 
-type Variant$8 = 'default' | 'primary' | 'ghost' | 'danger';
+type Variant$7 = 'default' | 'primary' | 'ghost' | 'danger';
 type Size$1 = 'sm' | 'md' | 'lg';
 interface IconButtonProps {
     children: React.ReactNode;
-    variant?: Variant$8;
+    variant?: Variant$7;
     size?: Size$1;
     disabled?: boolean;
     onPress?: () => void;
@@ -166,10 +166,10 @@ interface CardProps {
 }
 declare function Card({ title, subtitle, meta, thumbnail, actions, selectable, selected: selectedProp, loading, onPress, style }: CardProps): react_jsx_runtime.JSX.Element;
 
-type Variant$7 = 'default' | 'accent';
+type Variant$6 = 'default' | 'accent';
 interface ChipProps {
     children: string;
-    variant?: Variant$7;
+    variant?: Variant$6;
     dismissable?: boolean;
     dot?: boolean;
     disabled?: boolean;
@@ -183,25 +183,67 @@ type ColorVariant = 'default' | 'noon' | 'blue';
 type StatusType = 'online' | 'busy';
 interface AvatarProps {
     initials: string;
+    imageUri?: string;
     size?: Size;
     color?: ColorVariant;
-    star?: boolean;
     status?: StatusType;
 }
-declare function Avatar({ initials, size, color, star, status }: AvatarProps): react_jsx_runtime.JSX.Element;
+declare function Avatar({ initials, imageUri, size, color, status }: AvatarProps): react_jsx_runtime.JSX.Element;
 
-type Variant$6 = 'default' | 'accent' | 'danger' | 'dot';
+type Variant$5 = 'default' | 'accent' | 'danger' | 'dot';
 interface BadgeProps {
     children?: string | number;
-    variant?: Variant$6;
+    variant?: Variant$5;
 }
 declare function Badge({ children, variant }: BadgeProps): react_jsx_runtime.JSX.Element;
 
-interface TableProps {
-    columns: string[];
-    rows: string[][];
+interface TableColumn {
+    key: string;
+    label: string;
+    width?: number;
+    align?: 'left' | 'center' | 'right';
+    sortable?: boolean;
+    render?: (value: string, row: Record<string, string>, rowIndex: number) => React.ReactNode;
 }
-declare function Table({ columns, rows }: TableProps): react_jsx_runtime.JSX.Element;
+interface TableProps {
+    /** Column definitions. For simple usage, pass string[] and it auto-converts. */
+    columns: TableColumn[] | string[];
+    /** Row data. For simple usage, pass string[][] keyed by column index. */
+    rows: Record<string, string>[] | string[][];
+    /** Enable row checkboxes */
+    selectable?: boolean;
+    /** Controlled selected row indices */
+    selected?: number[];
+    /** Called when selection changes */
+    onSelectionChange?: (indices: number[]) => void;
+    /** Called when a row is pressed (non-checkbox tap) */
+    onRowPress?: (row: Record<string, string>, index: number) => void;
+    /** Sort state — controlled */
+    sortKey?: string;
+    sortDir?: 'asc' | 'desc';
+    onSort?: (key: string, dir: 'asc' | 'desc') => void;
+    /** Minimum table width — enables horizontal scroll when exceeded */
+    minWidth?: number;
+    /** Action bar content shown when rows are selected */
+    actionBar?: (selectedCount: number) => React.ReactNode;
+}
+declare function Table({ columns: columnsProp, rows: rowsProp, selectable, selected: selectedProp, onSelectionChange, onRowPress, sortKey: sortKeyProp, sortDir: sortDirProp, onSort, minWidth, actionBar, }: TableProps): react_jsx_runtime.JSX.Element;
+
+interface PaginationProps {
+    total: number;
+    current: number;
+    onPageChange: (page: number) => void;
+}
+declare function Pagination({ total, current, onPageChange }: PaginationProps): react_jsx_runtime.JSX.Element | null;
+
+interface BreadcrumbItem {
+    label: string;
+    onPress?: () => void;
+}
+interface BreadcrumbsProps {
+    items: BreadcrumbItem[];
+}
+declare function Breadcrumbs({ items }: BreadcrumbsProps): react_jsx_runtime.JSX.Element;
 
 declare function Divider(): react_jsx_runtime.JSX.Element;
 
@@ -277,14 +319,15 @@ interface BottomNavProps {
     items: NavItem[];
     selected: number;
     onSelect: (index: number) => void;
+    maxVisible?: number;
 }
-declare function BottomNav({ items, selected, onSelect }: BottomNavProps): react_jsx_runtime.JSX.Element;
+declare function BottomNav({ items, selected, onSelect, maxVisible }: BottomNavProps): react_jsx_runtime.JSX.Element;
 
-type Variant$5 = 'default' | 'large' | 'transparent' | 'overlay';
+type Variant$4 = 'default' | 'large' | 'transparent' | 'overlay';
 interface TitleBarProps {
     title: string;
     subtitle?: string;
-    variant?: Variant$5;
+    variant?: Variant$4;
     backIcon?: React.ReactNode;
     onBack?: () => void;
     rightAction?: React.ReactNode;
@@ -301,28 +344,29 @@ interface FilterBarProps {
 }
 declare function FilterBar({ items, onToggle }: FilterBarProps): react_jsx_runtime.JSX.Element;
 
-type Variant$4 = 'info' | 'success' | 'warn' | 'danger';
+type Variant$3 = 'info' | 'success' | 'warn' | 'danger';
 interface AlertProps {
     title?: string;
     children: string;
-    variant?: Variant$4;
+    variant?: Variant$3;
+    icon?: IconName;
 }
-declare function Alert({ title, children, variant }: AlertProps): react_jsx_runtime.JSX.Element;
+declare function Alert({ title, children, variant, icon }: AlertProps): react_jsx_runtime.JSX.Element;
 
-type Variant$3 = 'info' | 'success' | 'warn' | 'danger';
+type Variant$2 = 'info' | 'success' | 'warn' | 'danger';
 interface ToastProps {
     message: string;
-    variant?: Variant$3;
+    variant?: Variant$2;
     visible: boolean;
     onDismiss: () => void;
     duration?: number;
 }
 declare function Toast({ message, variant, visible, onDismiss, duration }: ToastProps): react_jsx_runtime.JSX.Element | null;
 
-type Variant$2 = 'info' | 'success' | 'warn' | 'danger';
+type Variant$1 = 'info' | 'success' | 'warn' | 'danger';
 interface ToastOptions {
     message: string;
-    variant?: Variant$2;
+    variant?: Variant$1;
     duration?: number;
 }
 interface ToastApi {
@@ -374,8 +418,10 @@ type SegState = 'correct' | 'incorrect' | 'current' | 'pending';
 interface SessionBarProps {
     segments: SegState[];
     size?: 'sm' | 'md' | 'lg';
+    /** Max segments per page. Default 10. */
+    pageSize?: number;
 }
-declare function SessionBar({ segments, size }: SessionBarProps): react_jsx_runtime.JSX.Element;
+declare function SessionBar({ segments, size, pageSize }: SessionBarProps): react_jsx_runtime.JSX.Element;
 
 interface LinearProps {
     value: number;
@@ -404,17 +450,18 @@ interface SessionCardProps {
 }
 declare function SessionCard({ time, title, meta, state, statusText, assessment, onPress }: SessionCardProps): react_jsx_runtime.JSX.Element;
 
-type Status = 'pending' | 'in-progress' | 'submitted' | 'overdue' | 'graded';
+type Status = 'due-soon' | 'complete' | 'overdue';
 interface HomeworkCardProps {
     title: string;
     subject: string;
-    dueDate: string;
-    questions: number;
+    /** Relative time e.g. "Due in 4h", "Due tomorrow", "2 days overdue" */
+    due: string;
+    /** Number of questions */
+    questions?: number;
     status?: Status;
-    score?: string;
     onPress?: () => void;
 }
-declare function HomeworkCard({ title, subject, dueDate, questions, status, score, onPress }: HomeworkCardProps): react_jsx_runtime.JSX.Element;
+declare function HomeworkCard({ title, subject, due, questions, status, onPress }: HomeworkCardProps): react_jsx_runtime.JSX.Element;
 
 type State = 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled';
 interface QuizOptionProps {
@@ -698,20 +745,34 @@ interface PlacedItemProps {
 }
 declare function PlacedItem({ item, itemState, zoneState, onDragStart, onDragMove, onDragEnd, theme, fontSize, compact }: PlacedItemProps): react_jsx_runtime.JSX.Element;
 
+type InterstitialVariant = 'mastery' | 'exam' | 'progress' | 'complete';
 interface InterstitialProps {
     title: string;
     body: string;
     buttonLabel: string;
     onPress: () => void;
+    /** Built-in hero graphic variant */
+    variant?: InterstitialVariant;
+    /** Exam score for 'exam' variant (0-100) */
+    score?: number;
+    /** Custom hero element — overrides variant when provided (image, animation, etc.) */
+    hero?: React.ReactNode;
+    /** Show confetti */
+    confetti?: boolean;
 }
-declare function Interstitial({ title, body, buttonLabel, onPress }: InterstitialProps): react_jsx_runtime.JSX.Element;
+declare function Interstitial({ title, body, buttonLabel, onPress, variant, score, hero, confetti: confettiProp }: InterstitialProps): react_jsx_runtime.JSX.Element;
 
 type OasisStatus = 'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked';
 interface OasisProps {
+    /** Water level 0–100 */
     level: number;
+    /** Border color intent */
     status?: OasisStatus;
+    /** Text inside the diamond (e.g. "95%", "—") */
     label?: string;
-    size?: 'sm' | 'md' | 'lg';
+    /** sm=28, md=40, lg=56, xl=72 */
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    /** Caption below */
     meta?: string;
 }
 declare function Oasis({ level, status, label, size, meta }: OasisProps): react_jsx_runtime.JSX.Element;
@@ -741,9 +802,9 @@ interface RouteMapProps {
 }
 declare function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }: RouteMapProps): react_jsx_runtime.JSX.Element;
 
-type Variant$1 = 'standard' | 'major' | 'canvas';
+type Variant = 'standard' | 'major' | 'canvas';
 interface GridPaperProps {
-    variant?: Variant$1;
+    variant?: Variant;
     width: number;
     height: number;
     style?: ViewStyle;
@@ -779,14 +840,68 @@ interface TerrainPatternProps {
 }
 declare function TerrainPattern({ width, height, variant, opacity, style }: TerrainPatternProps): react_jsx_runtime.JSX.Element;
 
-type Variant = 'constellation' | 'horizon';
 interface DunePatternProps {
     width: number;
     height: number;
-    variant?: Variant;
+    opacity?: number;
     style?: ViewStyle;
 }
-declare function DunePattern({ width, height, variant, style }: DunePatternProps): react_jsx_runtime.JSX.Element;
+declare function DunePattern({ width: w, height: h, opacity, style }: DunePatternProps): react_jsx_runtime.JSX.Element;
+
+interface ConstellationPatternProps {
+    width: number;
+    height: number;
+    opacity?: number;
+    style?: ViewStyle;
+}
+declare function ConstellationPattern({ width: w, height: h, opacity, style }: ConstellationPatternProps): react_jsx_runtime.JSX.Element;
+
+interface SliderProps {
+    value: number;
+    min: number;
+    max: number;
+    step?: number;
+    label?: string;
+    showValue?: boolean;
+    onValueChange: (value: number) => void;
+}
+declare function Slider({ value, min, max, step, label, showValue, onValueChange }: SliderProps): react_jsx_runtime.JSX.Element;
+
+interface DuneDynamicProps {
+    width: number;
+    height: number;
+    layers?: number;
+    wind?: number;
+    density?: number;
+    shimmer?: number;
+    contrast?: number;
+    style?: ViewStyle;
+}
+declare function DuneDynamic({ width, height, layers, wind, density, shimmer, contrast, style, }: DuneDynamicProps): react_jsx_runtime.JSX.Element;
+
+interface StarsDynamicProps {
+    width: number;
+    height: number;
+    density?: number;
+    twinkle?: number;
+    halo?: number;
+    lines?: number;
+    style?: ViewStyle;
+}
+declare function StarsDynamic({ width, height, density, twinkle, halo, lines, style }: StarsDynamicProps): react_jsx_runtime.JSX.Element;
+
+interface TerrainDynamicProps {
+    width: number;
+    height: number;
+    scale?: number;
+    detail?: number;
+    relief?: number;
+    contrast?: number;
+    tilt?: number;
+    showRoute?: boolean;
+    style?: ViewStyle;
+}
+declare function TerrainDynamic({ width, height, scale, detail, relief, contrast, tilt, showRoute, style }: TerrainDynamicProps): react_jsx_runtime.JSX.Element;
 
 type VoiceTutorState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
 interface VoiceTutorProps {
@@ -866,17 +981,17 @@ declare function WorkedExampleCard({ title, steps, onPress }: WorkedExampleCardP
 
 interface IdentityProps {
     initials: string;
+    imageUri?: string;
     name: string;
     role?: string;
     meta?: string;
     avatarColor?: 'default' | 'noon' | 'blue';
-    star?: boolean;
     status?: 'online' | 'busy';
     badge?: string | number;
     right?: React.ReactNode;
     size?: 'sm' | 'md' | 'lg';
 }
-declare function Identity({ initials, name, role, meta, avatarColor, star, status, badge, right, size, }: IdentityProps): react_jsx_runtime.JSX.Element;
+declare function Identity({ initials, imageUri, name, role, meta, avatarColor, status, badge, right, size, }: IdentityProps): react_jsx_runtime.JSX.Element;
 
 interface MenuItem {
     label: string;
@@ -915,4 +1030,4 @@ interface LeaderboardProps {
 }
 declare function Leaderboard({ entries, label, unit }: LeaderboardProps): react_jsx_runtime.JSX.Element;
 
-export { ActivityCard, Alert, Avatar, Badge, BottomAction, BottomNav, BottomSheet, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, Oasis, OrderQuestion, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, type RouteChapter, RouteMap, type RouteMarker, Segmented, SessionBar, SessionCard, Skeleton, SlidesCard, Stepper, Switch, Table, Tabs, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };
+export { ActivityCard, Alert, Avatar, Badge, BottomAction, BottomNav, BottomSheet, Breadcrumbs, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, ConstellationPattern, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DuneDynamic, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, Oasis, OrderQuestion, Pagination, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, type RouteChapter, RouteMap, type RouteMarker, Segmented, SessionBar, SessionCard, Skeleton, Slider, SlidesCard, StarsDynamic, Stepper, Switch, Table, type TableColumn, Tabs, TerrainDynamic, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };

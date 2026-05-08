@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Topographic Survey — a particle study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Noon — Surfaces */
+    --bg:           #0a0f1a;
+    --bg-sunken:    #060913;
+    --bg-raised:    #10172a;
+    --bg-overlay:   #1a2236;
+
+    /* Foreground */
+    --fg:           rgba(232,228,220,1);
+    --fg-muted:     rgba(232,228,220,0.70);
+    --fg-subtle:    rgba(232,228,220,0.55);
+    --fg-faint:     rgba(232,228,220,0.35);
+
+    /* Borders */
+    --border:        rgba(232,228,220,0.10);
+    --border-strong: rgba(232,228,220,0.22);
+    --divider:       rgba(232,228,220,0.06);
+
+    /* Accent / Signal / Terra */
+    --accent:        #64D8AE;
+    --accent-soft:   rgba(100,216,174,0.14);
+    --accent-border: rgba(100,216,174,0.35);
+    --signal:        #c9a227;
+    --signal-bright: #e0b83a;
+    --terra:         #8A4E2A;
+    --terra-soft:    rgba(138,78,42,0.10);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+  body { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--fg); }
+  canvas { display: block; position: fixed; inset: 0; }
+
+  /* Sky depth fade */
+  .sky-fade {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: linear-gradient(to bottom, var(--bg-sunken) 0%, transparent 35%);
+  }
+
+  /* Editorial masthead */
+  .masthead {
+    position: fixed; top: 28px; left: 32px; z-index: 2;
+    user-select: none; pointer-events: none;
+  }
+  .masthead .eyebrow {
+    font: 500 10px/1 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 12px;
+  }
+  .masthead h1 {
+    font: italic 300 38px/1 'Fraunces', serif;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+  .masthead .deck {
+    font: 400 11px/1.5 'JetBrains Mono', monospace;
+    color: var(--fg-subtle);
+    margin-top: 8px;
+    max-width: 280px;
+  }
+
+  /* Plate / signature mark */
+  .plate {
+    position: fixed; bottom: 28px; right: 32px; z-index: 2;
+    text-align: right;
+    font: 500 9px/1.4 'JetBrains Mono', monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+    user-select: none; pointer-events: none;
+  }
+  .plate em {
+    color: var(--terra);
+    font-style: normal;
+  }
+
+  /* Controls */
+  .controls {
+    position: fixed; bottom: 28px; left: 32px; z-index: 3;
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 18px 22px;
+    border: 1px solid var(--border);
+    background: rgba(26, 34, 54, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 2px;
+    min-width: 230px;
+  }
+  .controls .label-bar {
+    font: 500 9px/1 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .ctrl {
+    display: grid;
+    grid-template-columns: 70px 1fr 36px;
+    align-items: center;
+    gap: 10px;
+    font: 400 10px/1 'JetBrains Mono', monospace;
+    color: var(--fg);
+  }
+  .ctrl label {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+  }
+  .ctrl .val {
+    text-align: right;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+  .ctrl input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 1px;
+    background: var(--border-strong);
+    outline: none;
+    cursor: pointer;
+  }
+  .ctrl input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .ctrl input[type=range]::-moz-range-thumb {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border: none; border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .toggle {
+    margin-top: 4px;
+    font: 500 9px/1 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: color 200ms, border-color 200ms, background 200ms;
+  }
+  .toggle:hover {
+    color: var(--accent);
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+  }
+  .toggle.active {
+    color: var(--signal);
+    border-color: var(--signal);
+    background: rgba(201, 162, 39, 0.10);
+  }
+  .toggle.active:hover {
+    color: var(--signal-bright);
+    border-color: var(--signal-bright);
+    background: rgba(201, 162, 39, 0.16);
+  }
+
+  .controls.minimised .label-bar,
+  .controls.minimised .ctrl { display: none; }
+  .controls.minimised { min-width: 0; padding: 10px 14px; }
+
+  /* Plate navigation */
+  .plate-nav {
+    position: fixed; top: 28px; right: 32px; z-index: 4;
+    display: flex; gap: 14px; align-items: center;
+    font: 500 10px/1 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .plate-nav .label { color: var(--fg-faint); }
+  .plate-nav .sep   { color: var(--fg-faint); }
+  .plate-nav a {
+    color: var(--fg-subtle);
+    text-decoration: none;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: color 200ms, border-color 200ms;
+  }
+  .plate-nav a:hover {
+    color: var(--fg);
+    border-color: var(--border-strong);
+  }
+  .plate-nav a.active {
+    color: var(--signal);
+    border-color: var(--signal);
+    cursor: default;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div class="sky-fade"></div>
+
+<nav class="plate-nav">
+  <span class="label">Atlas</span>
+  <a href="dunes.html">I</a>
+  <span class="sep">·</span>
+  <a href="stars.html">II</a>
+  <span class="sep">·</span>
+  <a href="terrain.html" class="active">III</a>
+</nav>
+
+<header class="masthead">
+  <div class="eyebrow">Plate III</div>
+  <h1>Topographic Survey</h1>
+  <p class="deck">A study in elevation — where lines crowd, the climb steepens. Density traces difficulty.</p>
+</header>
+
+<div class="plate">
+  fig.&nbsp;03 &nbsp;·&nbsp; <em>contour relief</em>
+</div>
+
+<aside class="controls" id="controls">
+  <div class="label-bar">Survey</div>
+  <div class="ctrl">
+    <label>Scale</label>
+    <input type="range" id="scale" min="0.2" max="1.5" step="0.02" value="0.7">
+    <span class="val" id="scale-v">0.70</span>
+  </div>
+  <div class="ctrl">
+    <label>Detail</label>
+    <input type="range" id="detail" min="0.5" max="2" step="0.05" value="1">
+    <span class="val" id="detail-v">1.00</span>
+  </div>
+  <div class="ctrl">
+    <label>Relief</label>
+    <input type="range" id="relief" min="0.4" max="1.8" step="0.05" value="1">
+    <span class="val" id="relief-v">1.00</span>
+  </div>
+  <div class="ctrl">
+    <label>Contrast</label>
+    <input type="range" id="contrast" min="0.4" max="2" step="0.05" value="1">
+    <span class="val" id="contrast-v">1.00</span>
+  </div>
+  <div class="ctrl">
+    <label>Tilt</label>
+    <input type="range" id="tilt" min="0" max="0.7" step="0.02" value="0">
+    <span class="val" id="tilt-v">0.00</span>
+  </div>
+  <button class="toggle" id="route-toggle">Show&nbsp;Route</button>
+  <button class="toggle" id="hide">Hide&nbsp;Panel</button>
+</aside>
+
+<script>
+/* ============================================================
+   TOPOGRAPHIC SURVEY — a particle study
+   ------------------------------------------------------------
+   Same atlas series as Plates I & II. Here the "particle" is
+   the contour line: thousands of short segments traced across
+   a height-field via marching squares.
+
+   Heightmap is a central Gaussian peak overlaid with four
+   octaves of sine-noise — gives a recognisable summit
+   surrounded by organic undulation. Contour spacing is even
+   in elevation, so where the surface is steep the lines
+   crowd up; where it's gentle, they spread out. That density
+   IS the visual representation of difficulty.
+
+   Major contours every fifth interval are stroked at higher
+   alpha and slightly thicker, the way a real topo map calls
+   out index lines. A signal-gold dot marks the highest point.
+
+   A very subtle global "breathing" modulates total alpha on
+   a slow cycle so the map feels alive without losing its
+   surveyor's precision.
+   ============================================================ */
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const TAU = Math.PI * 2;
+
+let W = 0, H = 0, DPR = 1;
+
+const config = {
+  ink: { r: 232, g: 228, b: 220 },        // chalk fg
+
+  // Sliders
+  detail:    1.0,                          // contour density multiplier
+  relief:    1.0,                          // heightmap amplitude — affects contour count and tilt lift
+  scale:     0.7,                          // dune density / spatial frequency
+  contrast:  1.0,                          // major/minor alpha contrast
+  tilt:      0.0,                          // 0 = top-down, 0.7 = max useful oblique
+  showRoute: false,                        // toggle: draw route line through the field
+
+  // Render constants
+  majorEvery: 5,
+  gridSize: 11,                           // pixels per grid cell
+  baseInterval: 0.045,                    // elevation per contour at detail=1
+  maxContours: 80,
+  alphaMinor: 0.16,
+  alphaMajor: 0.50,
+  widthMinor: 0.55,
+  widthMajor: 1.10,
+};
+
+/* ----- Heightmap — desert dune field ----- *
+ * Pure multi-octave sine waves, no Gaussian peaks. Lower base
+ * frequencies than mountain ranges so a small handful of major
+ * dunes dominate, with finer texture layered on top.
+ * config.scale multiplies all spatial frequencies.
+ */
+function height(x, y) {
+  const sx = x / W;
+  const sy = y / H;
+  const s = config.scale;
+
+  let h = 0;
+  // Three octaves of major dune undulations
+  h += Math.sin(sx * 2.5 * s + 0.4) * Math.cos(sy * 2.0 * s + 1.2) * 0.55;
+  h += Math.sin(sx * 5.5 * s + 1.7) * Math.cos(sy * 4.5 * s + 0.4) * 0.35;
+  h += Math.sin(sx * 10.0 * s + 2.3) * Math.cos(sy * 8.5 * s + 3.1) * 0.18;
+
+  // Two finer octaves with reduced amplitude — texture, not noise
+  h += Math.sin(sx * 18.0 * s + 0.9) * Math.cos(sy * 15.0 * s + 1.4) * 0.07;
+  h += Math.sin(sx * 32.0 * s + 1.5) * Math.cos(sy * 28.0 * s + 2.7) * 0.03;
+
+  // Diagonal dune crests — gives a wind direction
+  h += Math.sin((sx + sy * 0.35) * 5.0 * s + 0.5) * 0.13;
+  h += Math.sin((sx - sy * 0.45) * 11.0 * s + 1.9) * 0.06;
+
+  return h * config.relief;
+}
+
+/* ----- Route through the field ----- *
+ * Greedy pathfinder: starts in the upper-left, ends in the lower-
+ * right, at each step picks the unvisited neighbour that's both
+ * forward toward the goal and at lower elevation. Doesn't produce
+ * an optimal path, but produces a believable one that meanders
+ * through valleys between dune crests. Smoothed with a moving
+ * average for clean curves.
+ */
+let route = [];   // [{ x, y, normH }] in canvas coords
+
+function findRoute(heights, gw, gh, hMin, hMax) {
+  const idx = (x, y) => y * gw + x;
+  const gs = config.gridSize;
+
+  let cx = Math.floor(gw * 0.08);
+  let cy = Math.floor(gh * 0.20);
+  const endX = Math.floor(gw * 0.92);
+  const endY = Math.floor(gh * 0.80);
+
+  const visited = new Uint8Array(gw * gh);
+  const grid = [];
+
+  visited[idx(cx, cy)] = 1;
+  grid.push([cx, cy]);
+
+  const maxSteps = (gw + gh) * 2;
+
+  for (let step = 0; step < maxSteps; step++) {
+    const dx = endX - cx;
+    const dy = endY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 1.5) break;
+
+    const tx = dx / dist;
+    const ty = dy / dist;
+
+    let bestX = -1, bestY = -1;
+    let bestScore = Infinity;
+
+    for (let oy = -1; oy <= 1; oy++) {
+      for (let ox = -1; ox <= 1; ox++) {
+        if (ox === 0 && oy === 0) continue;
+        const nx = cx + ox;
+        const ny = cy + oy;
+        if (nx < 0 || nx >= gw || ny < 0 || ny >= gh) continue;
+        if (visited[idx(nx, ny)]) continue;
+
+        // Skip neighbours pointing backwards from our heading
+        const odist = Math.sqrt(ox * ox + oy * oy);
+        const dot = (ox * tx + oy * ty) / odist;
+        if (dot < -0.1) continue;
+
+        // Score: prefer low elevation, prefer forward motion
+        const elev = heights[idx(nx, ny)];
+        const score = elev * 5 - dot * 1.0;
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestX = nx;
+          bestY = ny;
+        }
+      }
+    }
+
+    if (bestX === -1) break;   // boxed in (shouldn't happen with the heightmap)
+
+    cx = bestX;
+    cy = bestY;
+    visited[idx(cx, cy)] = 1;
+    grid.push([cx, cy]);
+  }
+
+  // Convert to canvas coords with normalised elevation
+  const range = Math.max(0.001, hMax - hMin);
+  let path = grid.map(([gx, gy]) => ({
+    x: gx * gs,
+    y: gy * gs,
+    normH: (heights[idx(gx, gy)] - hMin) / range,
+  }));
+
+  // Smooth: moving average, three passes — knocks the grid jaggies
+  // off without losing the overall route shape
+  for (let pass = 0; pass < 3; pass++) {
+    if (path.length < 3) break;
+    const next = [path[0]];
+    for (let i = 1; i < path.length - 1; i++) {
+      next.push({
+        x:     (path[i-1].x     + path[i].x * 2     + path[i+1].x)     / 4,
+        y:     (path[i-1].y     + path[i].y * 2     + path[i+1].y)     / 4,
+        normH: (path[i-1].normH + path[i].normH * 2 + path[i+1].normH) / 4,
+      });
+    }
+    next.push(path[path.length - 1]);
+    path = next;
+  }
+
+  return path;
+}
+
+/* ----- Marching squares ----- *
+ * Per-level storage so each contour can be lifted by its own
+ * elevation when tilt > 0. Two batched stroke passes per frame.
+ */
+let contours = [];     // [{ normH, isMajor, segs: number[] }]
+
+function generateContours() {
+  contours = [];
+
+  const gs = config.gridSize;
+  const gw = Math.ceil(W / gs) + 2;
+  const gh = Math.ceil(H / gs) + 2;
+
+  // Sample heights at all grid corners
+  const heights = new Float32Array(gw * gh);
+  let hMin = Infinity, hMax = -Infinity;
+
+  for (let j = 0; j < gh; j++) {
+    for (let i = 0; i < gw; i++) {
+      const v = height(i * gs, j * gs);
+      heights[j * gw + i] = v;
+      if (v < hMin) hMin = v;
+      if (v > hMax) hMax = v;
+    }
+  }
+
+  const range = hMax - hMin;
+  if (range < 0.001) return;
+
+  // Fixed elevation interval — flatter terrain means fewer contours,
+  // taller terrain means more. Capped so high detail × high relief
+  // doesn't blow up segment count.
+  const baseInterval = config.baseInterval / config.detail;
+  const minInterval  = range / config.maxContours;
+  const interval     = Math.max(baseInterval, minInterval);
+  const startLevel   = Math.ceil(hMin / interval) * interval;
+
+  let levelIdx = 0;
+  for (let level = startLevel; level <= hMax; level += interval) {
+    const normH = (level - hMin) / range;
+    const isMajor = (levelIdx % config.majorEvery === 0);
+    levelIdx++;
+
+    const segs = [];
+
+    for (let j = 0; j < gh - 1; j++) {
+      for (let i = 0; i < gw - 1; i++) {
+        const tl = heights[j * gw + i];
+        const tr = heights[j * gw + i + 1];
+        const br = heights[(j + 1) * gw + i + 1];
+        const bl = heights[(j + 1) * gw + i];
+
+        let idx = 0;
+        if (tl > level) idx |= 1;
+        if (tr > level) idx |= 2;
+        if (br > level) idx |= 4;
+        if (bl > level) idx |= 8;
+
+        if (idx === 0 || idx === 15) continue;
+
+        const x0 = i * gs, y0 = j * gs;
+        const x1 = x0 + gs, y1 = y0 + gs;
+
+        const lerp = (a, b) => {
+          const d = b - a;
+          return Math.abs(d) < 1e-6 ? 0.5 : (level - a) / d;
+        };
+        const xt = x0 + lerp(tl, tr) * gs;
+        const yr = y0 + lerp(tr, br) * gs;
+        const xb = x0 + lerp(bl, br) * gs;
+        const yl = y0 + lerp(tl, bl) * gs;
+
+        switch (idx) {
+          case 1: case 14:  segs.push(x0, yl, xt, y0); break;
+          case 2: case 13:  segs.push(xt, y0, x1, yr); break;
+          case 3: case 12:  segs.push(x0, yl, x1, yr); break;
+          case 4: case 11:  segs.push(x1, yr, xb, y1); break;
+          case 6: case 9:   segs.push(xt, y0, xb, y1); break;
+          case 7: case 8:   segs.push(x0, yl, xb, y1); break;
+          case 5: {
+            const avg = (tl + tr + br + bl) * 0.25;
+            if (avg > level) {
+              segs.push(x0, yl, xt, y0);
+              segs.push(x1, yr, xb, y1);
+            } else {
+              segs.push(x0, yl, xb, y1);
+              segs.push(xt, y0, x1, yr);
+            }
+            break;
+          }
+          case 10: {
+            const avg = (tl + tr + br + bl) * 0.25;
+            if (avg > level) {
+              segs.push(xt, y0, x1, yr);
+              segs.push(x0, yl, xb, y1);
+            } else {
+              segs.push(x0, yl, xt, y0);
+              segs.push(x1, yr, xb, y1);
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    if (segs.length > 0) {
+      contours.push({ normH, isMajor, segs });
+    }
+  }
+
+  // Generate the route through this heightmap (re-runs whenever
+  // scale/relief/detail change, since they regenerate the field)
+  route = findRoute(heights, gw, gh, hMin, hMax);
+}
+
+/* ----- Render with optional oblique projection ----- *
+ * When tilt = 0 the projection collapses to identity (top-down,
+ * full canvas use). As tilt rises, the v-axis foreshortens and
+ * each contour is lifted by its own elevation × relief.
+ *
+ * Alpha biases by normalised elevation: peaks render solid, valleys
+ * fade. This gives a clear focal hierarchy — the dune crests are
+ * the visual subject, low ground recedes. Costs us batched stroke
+ * calls (one per contour now) but with ~50 contours that's still
+ * trivially fast.
+ */
+function strokePass(isMajor, baseAlpha, lineWidth, yCompress, yShift, elevLift) {
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  for (let k = 0, K = contours.length; k < K; k++) {
+    const c = contours[k];
+    if (c.isMajor !== isMajor) continue;
+
+    // Linear elevation alpha: 30% at sea level, 100% at peak.
+    // Adjust the 0.30 floor lower for more dramatic fade, higher for subtler.
+    const elevAlpha = 0.30 + 0.70 * c.normH;
+    const alpha = baseAlpha * elevAlpha;
+
+    ctx.strokeStyle = `rgba(${config.ink.r}, ${config.ink.g}, ${config.ink.b}, ${alpha.toFixed(3)})`;
+    ctx.beginPath();
+
+    const yOffset = yShift - c.normH * elevLift;
+    const segs = c.segs;
+    for (let i = 0, n = segs.length; i < n; i += 4) {
+      ctx.moveTo(segs[i],     segs[i + 1] * yCompress + yOffset);
+      ctx.lineTo(segs[i + 2], segs[i + 3] * yCompress + yOffset);
+    }
+    ctx.stroke();
+  }
+}
+
+/* ----- Route renderer — signal gold journey line on top of contours ----- */
+function drawRoute(yCompress, yShift, elevLift) {
+  if (!config.showRoute || route.length < 2) return;
+
+  // The line itself
+  ctx.strokeStyle = 'rgba(201, 162, 39, 0.85)';   // signal gold
+  ctx.lineWidth = 1.6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+
+  for (let i = 0, n = route.length; i < n; i++) {
+    const p = route[i];
+    const yProj = p.y * yCompress + yShift - p.normH * elevLift;
+    if (i === 0) ctx.moveTo(p.x, yProj);
+    else         ctx.lineTo(p.x, yProj);
+  }
+  ctx.stroke();
+
+  // Endpoint markers — solid dot with halo at start/end
+  ctx.fillStyle = 'rgba(201, 162, 39, 0.95)';
+  for (const i of [0, route.length - 1]) {
+    const p = route[i];
+    const yProj = p.y * yCompress + yShift - p.normH * elevLift;
+    ctx.beginPath();
+    ctx.arc(p.x, yProj, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(201, 162, 39, 0.18)';
+  for (const i of [0, route.length - 1]) {
+    const p = route[i];
+    const yProj = p.y * yCompress + yShift - p.normH * elevLift;
+    ctx.beginPath();
+    ctx.arc(p.x, yProj, 9, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/* ----- Main draw ----- */
+function draw(t) {
+  ctx.fillStyle = '#0a0f1a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle global breathing on alpha — period ~16s, ±10%
+  const breath = 0.93 + Math.sin(t * 0.0001) * 0.07;
+
+  // Contrast slider biases the difference between minor & major
+  const cMin = config.alphaMinor * (1 / Math.sqrt(config.contrast));
+  const cMaj = config.alphaMajor * Math.sqrt(config.contrast);
+
+  // Oblique projection — at tilt=0 this is identity (top-down).
+  // yShift scales with relief so peaks stay on-canvas at high values.
+  const tilt = config.tilt;
+  const yCompress = Math.max(0.20, 1.0 - tilt * 0.55);
+  const elevLift  = tilt * H * 0.26 * config.relief;
+  const yShift    = tilt * H * (0.30 + 0.12 * config.relief);
+
+  strokePass(false, cMin * breath, config.widthMinor, yCompress, yShift, elevLift);
+  strokePass(true,  cMaj * breath, config.widthMajor, yCompress, yShift, elevLift);
+  drawRoute(yCompress, yShift, elevLift);
+}
+
+/* ----- Loop ----- */
+let raf = null;
+function loop(t) {
+  draw(t);
+  raf = requestAnimationFrame(loop);
+}
+
+/* ----- Resize ----- */
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  generateContours();
+}
+
+/* ----- Controls ----- */
+function bind(id, key, regen = false) {
+  const el = document.getElementById(id);
+  const out = document.getElementById(id + '-v');
+  el.addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    config[key] = v;
+    out.textContent = v.toFixed(2);
+    if (regen) generateContours();
+  });
+}
+bind('scale',    'scale',    true);
+bind('detail',   'detail',   true);
+bind('relief',   'relief',   true);
+bind('contrast', 'contrast');             // contrast doesn't need a regen — just changes alpha math
+bind('tilt',     'tilt');                 // tilt is render-only too
+
+document.getElementById('hide').addEventListener('click', e => {
+  const c = document.getElementById('controls');
+  c.classList.toggle('minimised');
+  e.target.textContent = c.classList.contains('minimised') ? 'Show Panel' : 'Hide Panel';
+});
+
+document.getElementById('route-toggle').addEventListener('click', e => {
+  config.showRoute = !config.showRoute;
+  e.target.classList.toggle('active', config.showRoute);
+  e.target.innerHTML = config.showRoute ? 'Hide&nbsp;Route' : 'Show&nbsp;Route';
+});
+
+window.addEventListener('resize', () => {
+  if (raf) cancelAnimationFrame(raf);
+  resize();
+  raf = requestAnimationFrame(loop);
+});
+
+resize();
+loop(0);
+</script>
+</body>
+</html>

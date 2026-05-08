@@ -1,20 +1,9 @@
 /**
  * VoiceTutor — AI conversational guide presence indicator.
- * Simple: one aura circle + one core circle per state. Matches index.html exactly.
+ * Uses React Native's built-in Animated API for cross-platform compatibility.
  */
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withRepeat,
-  withSequence,
-  withDelay,
-  Easing,
-  interpolate,
-  cancelAnimation,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated, Easing } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, color } from './tokens';
 
@@ -25,156 +14,149 @@ interface VoiceTutorProps {
   size?: number;
 }
 
-// IRIS resolved per-theme in the component body
-
 export function VoiceTutor({ state = 'idle', size = 160 }: VoiceTutorProps) {
   const { theme } = useTheme();
-  const anim = useSharedValue(0);
-  const orbit = useSharedValue(0);
-  const errorAura = useSharedValue(0);
+  const anim = useRef(new Animated.Value(0)).current;
+  const orbit = useRef(new Animated.Value(0)).current;
+  const errorAura = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Reset values
-    cancelAnimation(anim);
-    cancelAnimation(orbit);
-    cancelAnimation(errorAura);
-    anim.value = 0;
-    orbit.value = 0;
-    errorAura.value = 0;
+    anim.stopAnimation();
+    orbit.stopAnimation();
+    errorAura.stopAnimation();
+    anim.setValue(0);
+    orbit.setValue(0);
+    errorAura.setValue(0);
+
+    let animation: Animated.CompositeAnimation;
 
     if (state === 'idle') {
-      anim.value = withRepeat(
-        withTiming(1, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
-        -1
+      animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ])
       );
+      animation.start();
     } else if (state === 'listening') {
-      anim.value = withRepeat(
-        withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.sin) }),
-        -1
+      animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration: 1500, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 1500, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ])
       );
+      animation.start();
     } else if (state === 'thinking') {
-      anim.value = withRepeat(
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.sin) }),
-        -1
+      animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration: 1000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 1000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ])
       );
-      orbit.value = withRepeat(
-        withTiming(1, { duration: 2000, easing: Easing.linear }),
-        -1
-      );
+      animation.start();
+      Animated.loop(
+        Animated.timing(orbit, { toValue: 1, duration: 2000, easing: Easing.linear, useNativeDriver: true })
+      ).start();
     } else if (state === 'speaking') {
-      anim.value = withRepeat(
-        withTiming(1, { duration: 400, easing: Easing.inOut(Easing.sin) }),
-        -1
+      animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration: 200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 200, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        ])
       );
+      animation.start();
     } else if (state === 'error') {
-      // Core flickers on loop
-      anim.value = withRepeat(
-        withSequence(
-          withTiming(1, { duration: 100 }),
-          withTiming(0, { duration: 100 }),
-          withTiming(0.7, { duration: 80 }),
-          withTiming(0, { duration: 200 }),
-          withDelay(1500, withTiming(0, { duration: 0 })),
-        ),
-        -1
+      animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration: 100, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 100, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0.7, duration: 80, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 200, useNativeDriver: true }),
+          Animated.delay(1500),
+        ])
       );
-      // Aura: flicker then disappear (plays once)
-      errorAura.value = withSequence(
-        withTiming(1, { duration: 80 }),
-        withTiming(0.5, { duration: 60 }),
-        withTiming(0.8, { duration: 80 }),
-        withTiming(0, { duration: 300, easing: Easing.bezier(0.4, 0, 1, 1) }),
-      );
+      animation.start();
+      Animated.sequence([
+        Animated.timing(errorAura, { toValue: 1, duration: 80, useNativeDriver: true }),
+        Animated.timing(errorAura, { toValue: 0.5, duration: 60, useNativeDriver: true }),
+        Animated.timing(errorAura, { toValue: 0.8, duration: 80, useNativeDriver: true }),
+        Animated.timing(errorAura, { toValue: 0, duration: 300, easing: Easing.bezier(0.4, 0, 1, 1), useNativeDriver: true }),
+      ]).start();
     }
 
     return () => {
-      cancelAnimation(anim);
-      cancelAnimation(orbit);
-      cancelAnimation(errorAura);
+      anim.stopAnimation();
+      orbit.stopAnimation();
+      errorAura.stopAnimation();
     };
   }, [state]);
 
   const isError = state === 'error';
-
-  const core = { idle: 32, listening: 44, thinking: 24, speaking: 44, error: 22 }[state];
-
-  // Aura: none for idle, grows for listening/speaking, small for thinking, collapses for error
-  const auraBase = { idle: 0, listening: 80, thinking: 50, speaking: 90, error: 50 }[state];
-
-  const coreAnimStyle = useAnimatedStyle(() => {
-    const coreScale = state === 'listening'
-      ? interpolate(anim.value, [0, 0.5, 1], [0.9, 1.12, 0.9])
-      : state === 'speaking'
-      ? interpolate(anim.value, [0, 0.5, 1], [0.94, 1.06, 0.94])
-      : state === 'thinking'
-      ? interpolate(anim.value, [0, 0.5, 1], [0.96, 1.04, 0.96])
-      : interpolate(anim.value, [0, 0.5, 1], [0.92, 1.08, 0.92]); // idle: slow visible breathe
-
-    const errorFlash = interpolate(anim.value, [0, 1], [1, 0.4]);
-
-    return {
-      transform: [{ scale: coreScale }],
-      opacity: isError ? errorFlash : 1,
-    };
-  });
-
-  const auraAnimStyle = useAnimatedStyle(() => {
-    const auraScale = state === 'listening'
-      ? interpolate(anim.value, [0, 0.5, 1], [0.85, 1.15, 0.85])
-      : state === 'speaking'
-      ? interpolate(anim.value, [0, 0.5, 1], [0.9, 1.1, 0.9])
-      : interpolate(anim.value, [0, 0.5, 1], [0.95, 1.05, 0.95]);
-
-    return {
-      transform: [{ scale: isError ? 1 : auraScale }],
-      opacity: isError ? errorAura.value : 1,
-    };
-  });
-
-  const orbitAnimStyle = useAnimatedStyle(() => {
-    const rotate = interpolate(orbit.value, [0, 1], [0, 360]);
-    return {
-      transform: [{ rotate: `${rotate}deg` }],
-    };
-  });
-
+  const core = { idle: 32, listening: 44, thinking: 24, speaking: 44, error: 22 }[state]!;
+  const auraBase = { idle: 0, listening: 80, thinking: 50, speaking: 90, error: 50 }[state]!;
   const coreColor = isError ? color.danger[300] : theme.iris;
   const auraColor = isError ? 'rgba(249,176,138,0.12)' : theme.irisSoft;
 
+  const coreScale = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: state === 'listening' ? [0.9, 1.12]
+      : state === 'speaking' ? [0.94, 1.06]
+      : state === 'thinking' ? [0.96, 1.04]
+      : [0.92, 1.08],
+  });
+
+  const coreOpacity = isError
+    ? anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] })
+    : 1;
+
+  const auraScale = isError ? 1 : anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: state === 'listening' ? [0.85, 1.15]
+      : state === 'speaking' ? [0.9, 1.1]
+      : [0.95, 1.05],
+  });
+
+  const auraOpacity = isError ? errorAura : 1;
+
+  const orbitRotate = orbit.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <View style={{ alignItems: 'center' }}>
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      {/* Aura — only visible for listening, speaking, thinking, error */}
-      {auraBase > 0 && (
-        <Animated.View style={[{
-          position: 'absolute',
-          width: auraBase, height: auraBase, borderRadius: auraBase / 2,
-          backgroundColor: auraColor,
-        }, auraAnimStyle]} />
-      )}
+      <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+        {auraBase > 0 && (
+          <Animated.View style={{
+            position: 'absolute',
+            width: auraBase, height: auraBase, borderRadius: auraBase / 2,
+            backgroundColor: auraColor,
+            transform: [{ scale: auraScale as any }],
+            opacity: auraOpacity as any,
+          }} />
+        )}
 
-      {/* Thinking: orbiting dots */}
-      {state === 'thinking' && (
-        <Animated.View style={[{ position: 'absolute', width: 70, height: 70 }, orbitAnimStyle]}>
-          <View style={{ position: 'absolute', top: 0, left: 32, width: 5, height: 5, borderRadius: 2.5, backgroundColor: theme.irisDot }} />
-          <View style={{ position: 'absolute', bottom: 0, left: 32, width: 4, height: 4, borderRadius: 2, backgroundColor: theme.irisBorder }} />
-          <View style={{ position: 'absolute', top: 32, right: 0, width: 3, height: 3, borderRadius: 1.5, backgroundColor: theme.irisBorder }} />
-        </Animated.View>
-      )}
+        {state === 'thinking' && (
+          <Animated.View style={{ position: 'absolute', width: 70, height: 70, transform: [{ rotate: orbitRotate }] }}>
+            <View style={{ position: 'absolute', top: 0, left: 32, width: 5, height: 5, borderRadius: 2.5, backgroundColor: theme.irisDot }} />
+            <View style={{ position: 'absolute', bottom: 0, left: 32, width: 4, height: 4, borderRadius: 2, backgroundColor: theme.irisBorder }} />
+            <View style={{ position: 'absolute', top: 32, right: 0, width: 3, height: 3, borderRadius: 1.5, backgroundColor: theme.irisBorder }} />
+          </Animated.View>
+        )}
 
-      {/* Core */}
-      <Animated.View style={[{
-        width: core, height: core, borderRadius: core / 2,
-        backgroundColor: coreColor,
-        shadowColor: coreColor,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: state === 'speaking' ? 0.6 : state === 'listening' ? 0.4 : 0.2,
-        shadowRadius: state === 'speaking' ? 30 : state === 'listening' ? 20 : 12,
-        elevation: 6,
-      }, coreAnimStyle]} />
+        <Animated.View style={{
+          width: core, height: core, borderRadius: core / 2,
+          backgroundColor: coreColor,
+          shadowColor: coreColor,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: state === 'speaking' ? 0.6 : state === 'listening' ? 0.4 : 0.2,
+          shadowRadius: state === 'speaking' ? 30 : state === 'listening' ? 20 : 12,
+          elevation: 6,
+          transform: [{ scale: coreScale }],
+          opacity: coreOpacity as any,
+        }} />
+      </View>
 
-    </View>
-      {/* State label — outside the aura container */}
       <Text style={{
         marginTop: sp[3],
         fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600],

@@ -51,7 +51,7 @@ export function Leaderboard({ entries, label = 'Rank', unit = 'jugs' }: Leaderbo
           minWidth: 20,
           textAlign: 'center',
         }}>{rank}</Text>
-        <Avatar initials={item.initials} size="sm" color={item.avatarColor} star={isTop3 && rank === 1} />
+        <Avatar initials={item.initials} size="sm" color={item.avatarColor} />
         <Text style={{
           fontFamily: font.sans,
           fontSize: fs[14],

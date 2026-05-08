@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Celestial Atlas — a particle study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Noon — Surfaces */
+    --bg:           #0a0f1a;
+    --bg-sunken:    #060913;
+    --bg-raised:    #10172a;
+    --bg-overlay:   #1a2236;
+
+    /* Foreground */
+    --fg:           rgba(232,228,220,1);
+    --fg-muted:     rgba(232,228,220,0.70);
+    --fg-subtle:    rgba(232,228,220,0.55);
+    --fg-faint:     rgba(232,228,220,0.35);
+
+    /* Borders */
+    --border:        rgba(232,228,220,0.10);
+    --border-strong: rgba(232,228,220,0.22);
+    --divider:       rgba(232,228,220,0.06);
+
+    /* Accent / Signal / Terra */
+    --accent:        #64D8AE;
+    --accent-soft:   rgba(100,216,174,0.14);
+    --accent-border: rgba(100,216,174,0.35);
+    --signal:        #c9a227;
+    --signal-bright: #e0b83a;
+    --terra:         #8A4E2A;
+    --terra-soft:    rgba(138,78,42,0.10);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+  body { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--fg); }
+  canvas { display: block; position: fixed; inset: 0; }
+
+  /* Sky depth — top dips deeper into bg-sunken (zenith) */
+
+  /* Editorial masthead */
+
+  /* Plate / signature mark, bottom right */
+
+  /* Controls — bg-overlay surface */
+  .controls {
+    position: fixed; bottom: 28px; left: 32px; z-index: 3;
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 18px 22px;
+    border: 1px solid var(--border);
+    background: rgba(26, 34, 54, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 2px;
+    min-width: 230px;
+  }
+  .controls .label-bar {
+    font: 500 9px/1 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .ctrl {
+    display: grid;
+    grid-template-columns: 70px 1fr 36px;
+    align-items: center;
+    gap: 10px;
+    font: 400 10px/1 'JetBrains Mono', monospace;
+    color: var(--fg);
+  }
+  .ctrl label {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+  }
+  .ctrl .val {
+    text-align: right;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+  .ctrl input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 1px;
+    background: var(--border-strong);
+    outline: none;
+    cursor: pointer;
+  }
+  .ctrl input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .ctrl input[type=range]::-moz-range-thumb {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border: none; border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .toggle {
+    margin-top: 4px;
+    font: 500 9px/1 'JetBrains Mono', monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: color 200ms, border-color 200ms, background 200ms;
+  }
+  .toggle:hover {
+    color: var(--accent);
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+  }
+
+  .controls.minimised .label-bar,
+  .controls.minimised .ctrl { display: none; }
+  .controls.minimised { min-width: 0; padding: 10px 14px; }
+
+  /* Plate navigation — top right, atlas-style flip */
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+
+
+
+<aside class="controls" id="controls">
+  <div class="label-bar">Sky</div>
+  <div class="ctrl">
+    <label>Twinkle</label>
+    <input type="range" id="twinkle" min="0" max="2" step="0.05" value="1">
+    <span class="val" id="twinkle-v">1.00</span>
+  </div>
+  <div class="ctrl">
+    <label>Density</label>
+    <input type="range" id="density" min="0.4" max="2" step="0.05" value="1">
+    <span class="val" id="density-v">1.00</span>
+  </div>
+  <div class="ctrl">
+    <label>Halo</label>
+    <input type="range" id="halo" min="0" max="2" step="0.05" value="1">
+    <span class="val" id="halo-v">1.00</span>
+  </div>
+  <div class="ctrl">
+    <label>Lines</label>
+    <input type="range" id="lines" min="0" max="2" step="0.05" value="1">
+    <span class="val" id="lines-v">1.00</span>
+  </div>
+  <button class="toggle" id="hide">Hide&nbsp;Panel</button>
+</aside>
+
+<script>
+/* ============================================================
+   CELESTIAL ATLAS — a particle study
+   ------------------------------------------------------------
+   Same architecture as dunes.html (Plate I) for the core field:
+   bucketed alpha rendering, per-particle independent twinkle.
+
+   Differences from a literal star map:
+   - No named constellations. Every regen, the field's brightest
+     stars are grouped procedurally — the canvas is split into a
+     3×2 region grid, each region donates its brightest as a seed,
+     and 3–5 nearest bright neighbours are connected by a Minimum
+     Spanning Tree. Yields organic, asymmetric clusters that read
+     as graphic groupings, not "Orion".
+   - Cluster lines use tapered linear gradients: 0 alpha at each
+     endpoint, peak in the middle, with longer edges fading toward
+     invisible. So lines never touch the stars they connect — the
+     geometry feels implied, not labelled.
+   - The brightest 8 stars get diffraction-spike crosses (vertical
+     + horizontal axes, gradient-faded at the tips). A subtle,
+     classic photographic detail.
+   - Halos under cluster stars use radial gradients (centre →
+     transparent), smoother than solid concentric discs.
+   - Twinkle modulates radius rather than alpha, so bucketed-alpha
+     rendering stays valid (particles never change buckets).
+   ============================================================ */
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const TAU = Math.PI * 2;
+
+let W = 0, H = 0, DPR = 1;
+
+const config = {
+  // Pure chalk for stars — no warming since stars want to feel cool/cosmic
+  ink: { r: 232, g: 228, b: 220 },
+
+  // Sliders
+  twinkle: 1.0,
+  density: 1.0,
+  halo:    1.0,
+  lines:   1.0,
+};
+
+// Star size & brightness from magnitude
+function sizeFromMag(mag) {
+  return 0.30 + 2.30 * Math.exp(-mag * 0.50);
+}
+function alphaFromMag(mag) {
+  return Math.min(0.95, 0.18 + 0.78 * Math.exp(-mag * 0.55));
+}
+
+/* ----- Particle field ----- */
+let particles = [];   // every star, background and bright alike
+let buckets = [];     // grouped by alpha for batched draw
+let halos = [];       // pre-computed glow rings under bright stars
+let clusters = [];    // procedural groupings: { stars: [...], edges: [[a,b], ...] }
+let spikes = [];      // brightest stars that get diffraction crosses
+const ALPHA_BUCKETS = 12;
+
+function generateStars() {
+  particles = [];
+  halos = [];
+  clusters = [];
+  spikes = [];
+  buckets = Array.from({ length: ALPHA_BUCKETS }, () => []);
+
+  // Background star field — power-law magnitude distribution gives
+  // the natural "few bright, many faint" character of the real sky.
+  const baseCount = Math.floor((W * H) / 380);
+  const total = Math.floor(baseCount * config.density);
+
+  for (let i = 0; i < total; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    const u = Math.random();
+    const mag = Math.pow(u, 0.45) * 7.5;
+    addStar(x, y, mag);
+  }
+
+  // Build clusters from the brightest stars in the field
+  generateClusters();
+
+  // Diffraction spikes on the very brightest stars only — too many
+  // would overwhelm the composition. Top 8 across the whole field.
+  const sorted = [...particles].sort((a, b) => a.mag - b.mag);
+  spikes = sorted.slice(0, 8);
+}
+
+function addStar(x, y, mag) {
+  const r = sizeFromMag(mag);
+  const a = alphaFromMag(mag);
+  // Brighter stars twinkle more slowly and gently — feels weighty.
+  // Faint stars twinkle faster, more lively. Threshold around mag 2.5.
+  const isBright = mag < 2.5;
+
+  const star = {
+    x, y, r,
+    alpha: a,
+    mag,
+    freq: isBright
+      ? 0.00020 + Math.random() * 0.00040
+      : 0.00050 + Math.random() * 0.00200,
+    phase: Math.random() * TAU,
+    twinkleAmt: isBright
+      ? 0.06 + Math.random() * 0.10
+      : 0.12 + Math.random() * 0.28,
+  };
+
+  particles.push(star);
+  const bi = Math.min(ALPHA_BUCKETS - 1, Math.floor(a * ALPHA_BUCKETS));
+  buckets[bi].push(star);
+  return star;
+}
+
+/* ----- Procedural clusters ----- *
+ * Replace named constellations with proximity-based groupings.
+ * Algorithm:
+ *   1. Filter the field to bright stars (mag < 2.2) — natural anchors
+ *   2. Subdivide the canvas into a regional grid; pick the brightest
+ *      star per region as the cluster seed (avoids all clusters
+ *      bunching in one corner)
+ *   3. For each seed, find its k nearest bright neighbours (with
+ *      randomised drop-out so the result varies between regenerations)
+ *   4. Build a Minimum Spanning Tree across [seed + neighbours] using
+ *      Prim's algorithm — gives organic, asymmetric tree shapes with
+ *      no crossings, never reads as a "shape we recognise"
+ *   5. Register a soft halo under each cluster star
+ */
+function generateClusters() {
+  const bright = particles.filter(p => p.mag < 2.2);
+  if (bright.length < 8) return;
+
+  // 3 × 2 region grid → up to 6 cluster seeds
+  const cols = 3, rows = 2;
+  const seeds = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const xMin = (c    ) / cols * W;
+      const xMax = (c + 1) / cols * W;
+      const yMin = (r    ) / rows * H;
+      const yMax = (r + 1) / rows * H;
+      const inRegion = bright.filter(s =>
+        s.x >= xMin && s.x < xMax && s.y >= yMin && s.y < yMax
+      );
+      if (inRegion.length === 0) continue;
+      inRegion.sort((a, b) => a.mag - b.mag);
+      seeds.push(inRegion[0]);
+    }
+  }
+
+  for (const seed of seeds) {
+    // 3–5 neighbours → 4–6 stars per cluster
+    const k = 3 + Math.floor(Math.random() * 3);
+
+    // Sort by distance, take a slightly larger candidate pool, then
+    // randomly drop ~30% so each regen produces a different shape
+    const pool = bright
+      .filter(s => s !== seed)
+      .map(s => ({ s, d: Math.hypot(s.x - seed.x, s.y - seed.y) }))
+      .sort((a, b) => a.d - b.d)
+      .slice(0, k * 2)
+      .filter(() => Math.random() > 0.30)
+      .slice(0, k)
+      .map(o => o.s);
+
+    if (pool.length === 0) continue;
+
+    const stars = [seed, ...pool];
+    const edges = mst(stars);
+    clusters.push({ stars, edges });
+
+    // Pre-compute halos for this cluster's stars
+    for (const s of stars) {
+      halos.push({ x: s.x, y: s.y, r: s.r * 4.5, baseA: 0.07 });
+      halos.push({ x: s.x, y: s.y, r: s.r * 10,  baseA: 0.025 });
+    }
+  }
+}
+
+// Prim's MST — connects all stars with no crossings, shortest total
+// edge length. Output is array of [starA, starB] pairs.
+function mst(stars) {
+  if (stars.length < 2) return [];
+  const inTree = new Set([0]);
+  const edges = [];
+  while (inTree.size < stars.length) {
+    let bi = -1, bj = -1, bd = Infinity;
+    for (const i of inTree) {
+      const a = stars[i];
+      for (let j = 0; j < stars.length; j++) {
+        if (inTree.has(j)) continue;
+        const b = stars[j];
+        const d = Math.hypot(b.x - a.x, b.y - a.y);
+        if (d < bd) { bd = d; bi = i; bj = j; }
+      }
+    }
+    if (bj === -1) break;
+    edges.push([stars[bi], stars[bj]]);
+    inTree.add(bj);
+  }
+  return edges;
+}
+
+/* ----- Rendering passes ----- */
+
+// 1. Cluster edges — gradient lines that fade out before touching
+//    either endpoint, so stars sit free of any drawn line. Long edges
+//    fade more (proximity = stronger visible connection).
+function drawLines() {
+  const op = config.lines;
+  if (op <= 0.001) return;
+
+  ctx.lineWidth = 0.7;
+  ctx.lineCap = 'round';
+  const ink = config.ink;
+
+  for (const cluster of clusters) {
+    for (const [a, b] of cluster.edges) {
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy);
+      // 320px characteristic length: lines longer than this fade fast
+      const distAlpha = Math.exp(-dist / 320);
+      const peak = 0.34 * op * distAlpha;
+      if (peak < 0.005) continue;
+
+      // Tapered gradient: 0 alpha at endpoints, peak alpha mid-line.
+      // The 0→0.18 and 0.82→1 ramps are short so the line still
+      // reads as a connected segment, not just a smudge.
+      const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+      grad.addColorStop(0,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+      grad.addColorStop(0.18, `rgba(${ink.r},${ink.g},${ink.b},${(peak * 0.85).toFixed(3)})`);
+      grad.addColorStop(0.50, `rgba(${ink.r},${ink.g},${ink.b},${peak.toFixed(3)})`);
+      grad.addColorStop(0.82, `rgba(${ink.r},${ink.g},${ink.b},${(peak * 0.85).toFixed(3)})`);
+      grad.addColorStop(1,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+      ctx.strokeStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+  }
+}
+
+// 2. Halos — radial gradients (centre → transparent) under the
+//    bright cluster stars. Smoother than solid discs.
+function drawHalos() {
+  const intensity = config.halo;
+  if (intensity <= 0.001) return;
+  const ink = config.ink;
+
+  for (let i = 0, n = halos.length; i < n; i++) {
+    const h = halos[i];
+    const a = h.baseA * intensity;
+    if (a < 0.002) continue;
+    const grad = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, h.r);
+    grad.addColorStop(0,    `rgba(${ink.r},${ink.g},${ink.b},${a.toFixed(3)})`);
+    grad.addColorStop(0.55, `rgba(${ink.r},${ink.g},${ink.b},${(a * 0.35).toFixed(3)})`);
+    grad.addColorStop(1,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, h.r, 0, TAU);
+    ctx.fill();
+  }
+}
+
+// 3. Diffraction spikes — vertical + horizontal cross under the very
+//    brightest stars only. A subtle, classic photographic detail.
+//    Each axis is a gradient that peaks at the star and fades to nothing
+//    at the tip, so the cross dissolves rather than terminates abruptly.
+function drawSpikes() {
+  const intensity = config.halo;          // bound to halo slider — same family
+  if (intensity <= 0.001) return;
+  const ink = config.ink;
+
+  ctx.lineWidth = 0.5;
+  ctx.lineCap = 'round';
+
+  for (let i = 0, n = spikes.length; i < n; i++) {
+    const p = spikes[i];
+    const len = p.r * 9;
+    const peak = 0.22 * intensity;
+
+    // Vertical
+    let grad = ctx.createLinearGradient(p.x, p.y - len, p.x, p.y + len);
+    grad.addColorStop(0,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+    grad.addColorStop(0.5,  `rgba(${ink.r},${ink.g},${ink.b},${peak.toFixed(3)})`);
+    grad.addColorStop(1,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+    ctx.strokeStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y - len);
+    ctx.lineTo(p.x, p.y + len);
+    ctx.stroke();
+
+    // Horizontal
+    grad = ctx.createLinearGradient(p.x - len, p.y, p.x + len, p.y);
+    grad.addColorStop(0,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+    grad.addColorStop(0.5,  `rgba(${ink.r},${ink.g},${ink.b},${peak.toFixed(3)})`);
+    grad.addColorStop(1,    `rgba(${ink.r},${ink.g},${ink.b},0)`);
+    ctx.strokeStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(p.x - len, p.y);
+    ctx.lineTo(p.x + len, p.y);
+    ctx.stroke();
+  }
+}
+
+// 4. Stars — bucketed by alpha for batched fills.
+function drawStars(t) {
+  const tw = config.twinkle;
+  const ink = config.ink;
+
+  for (let bi = 0; bi < ALPHA_BUCKETS; bi++) {
+    const bucket = buckets[bi];
+    if (!bucket.length) continue;
+
+    const a = (bi + 0.5) / ALPHA_BUCKETS;
+    ctx.fillStyle = `rgba(${ink.r},${ink.g},${ink.b},${a.toFixed(3)})`;
+    ctx.beginPath();
+
+    for (let i = 0, n = bucket.length; i < n; i++) {
+      const p = bucket[i];
+      // Twinkle modulates radius (not alpha), so bucketing stays valid
+      const pulse = 1 + Math.sin(t * p.freq + p.phase) * p.twinkleAmt * tw;
+      const r = p.r * pulse;
+      ctx.moveTo(p.x + r, p.y);
+      ctx.arc(p.x, p.y, r, 0, TAU);
+    }
+    ctx.fill();
+  }
+}
+
+/* ----- Main draw ----- */
+function draw(t) {
+  ctx.fillStyle = '#0a0f1a';                     // Deep Void
+  ctx.fillRect(0, 0, W, H);
+
+  // Order matters: lines and halos go down first as the substrate;
+  // diffraction spikes overlay, anchored to bright stars; star points
+  // sit on top so the cluster anchors read as crisp pinpoints.
+  drawLines();
+  drawHalos();
+  drawSpikes();
+  drawStars(t);
+}
+
+/* ----- Loop ----- */
+let raf = null;
+function loop(t) {
+  draw(t);
+  raf = requestAnimationFrame(loop);
+}
+
+/* ----- Resize ----- */
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  generateStars();
+}
+
+/* ----- Controls ----- */
+function bind(id, key, regen = false) {
+  const el = document.getElementById(id);
+  const out = document.getElementById(id + '-v');
+  el.addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    config[key] = v;
+    out.textContent = v.toFixed(2);
+    if (regen) generateStars();
+  });
+}
+bind('twinkle', 'twinkle');
+bind('density', 'density', true);
+bind('halo',    'halo');
+bind('lines',   'lines');
+
+document.getElementById('hide').addEventListener('click', e => {
+  const c = document.getElementById('controls');
+  c.classList.toggle('minimised');
+  e.target.textContent = c.classList.contains('minimised') ? 'Show Panel' : 'Hide Panel';
+});
+
+window.addEventListener('resize', () => {
+  if (raf) cancelAnimationFrame(raf);
+  resize();
+  raf = requestAnimationFrame(loop);
+});
+
+// Wait for fonts before first paint so labels render in Fraunces, not fallback
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => { resize(); loop(0); });
+} else {
+  resize(); loop(0);
+}
+</script>
+</body>
+</html>

@@ -4,20 +4,22 @@
  * Each exports a function component: Import → Props → Live examples.
  */
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, Animated, Easing, Image, useWindowDimensions, I18nManager } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { View, Text, Pressable, ScrollView, Animated, Easing, Image, Modal, Platform, useWindowDimensions, I18nManager } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path, Circle, Defs, LinearGradient, RadialGradient, Stop, Rect, Ellipse } from 'react-native-svg';
 import {
   useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
   SessionCard, HomeworkCard, SessionBar, QuizOption, Tooltip,
   Input, Textarea, Switch, Checkbox, Radio, Stepper, Segmented,
-  Tabs, BottomNav, BottomAction, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table,
+  Tabs, BottomNav, BottomAction, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table, type TableColumn, Pagination, Breadcrumbs,
   LinearProgress, CircularProgress, Toast, Dialog, BottomSheet, FullSheet, Interstitial,
   RadioGroup, CheckboxGroup,
   Icon, iconNames,
-  GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, VoiceTutor, Calendar,
+  GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, ConstellationPattern, VoiceTutor, Calendar,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, TypingIndicator, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
   Oasis, RouteMap, type RouteChapter, type RouteMarker,
+  DuneDynamic, StarsDynamic, TerrainDynamic, Slider,
   MatchQuestion, CategorizeQuestion, OrderQuestion, FillBlanksQuestion, HotspotQuestion,
   sp, fs, fw, font, color, r, h, icon, lh, dur,
 } from '../../rn';
@@ -100,6 +102,14 @@ function KnobText({ label, value, onChange }: { label: string; value: string; on
     <View style={{ marginBottom: sp[5] }}>
       <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.fgMuted, marginBottom: sp[2] }}>{label}</Text>
       <Input value={value} onChangeText={onChange} placeholder={label} />
+    </View>
+  );
+}
+
+function KnobSlider({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step?: number; onChange: (v: number) => void }) {
+  return (
+    <View style={{ marginBottom: sp[3] }}>
+      <Slider label={label} value={value} min={min} max={max} step={step} onValueChange={onChange} />
     </View>
   );
 }
@@ -643,7 +653,7 @@ export function MotionPage() {
         {(anim) => <Animated.View style={{ width: '100%', backgroundColor: theme.bgOverlay, borderRadius: r[3], padding: sp[5], borderWidth: 1, borderColor: theme.border, transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) }], opacity: anim }}><Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[600], color: theme.fg, marginBottom: sp[1] }}>Are you sure?</Text><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>This action cannot be undone.</Text></Animated.View>}
       </MotionDemo>
       <MotionDemo label="Toast" spec="Ease · 200ms" desc="Slide down from top, auto-dismiss with Ease-In">
-        {(anim) => <Animated.View style={{ backgroundColor: theme.accentSoft, borderRadius: r[2], padding: sp[3], borderWidth: 1, borderColor: theme.accentBorder, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-20, 0] }) }], opacity: anim }}><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Session saved</Text></Animated.View>}
+        {(anim) => <Animated.View style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], padding: sp[3], borderWidth: 1, borderColor: theme.accentBorder, flexDirection: 'row', alignItems: 'center', gap: sp[2], transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-20, 0] }) }], opacity: anim }}><Icon name="check" size={icon.lg} color={color.noon[400]} /><Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>Session saved</Text></Animated.View>}
       </MotionDemo>
       <MotionDemo label="Menu" spec="Ease · 200ms" desc="Scale from 0.9 + fade, anchored to trigger">
         {(anim) => <Animated.View style={{ backgroundColor: theme.bgOverlay, borderRadius: r[2], padding: sp[2], borderWidth: 1, borderColor: theme.border, minWidth: 160, transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] }) }], opacity: anim }}>{['Edit', 'Duplicate', 'Delete'].map(item => <Text key={item} style={{ fontFamily: font.sans, fontSize: fs[13], color: item === 'Delete' ? theme.danger : theme.fg, paddingVertical: sp[2], paddingHorizontal: sp[3] }}>{item}</Text>)}</Animated.View>}
@@ -1136,6 +1146,44 @@ export function SegmentedPage() {
   </>;
 }
 
+export function SliderPage() {
+  const [val, setVal] = useState(50);
+  const [showLabel, setShowLabel] = useState(true);
+  const [showValue, setShowValue] = useState(true);
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="Label" value={showLabel} onChange={setShowLabel} />
+      <KnobToggle label="Show value" value={showValue} onChange={setShowValue} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        <Slider label={showLabel ? 'Volume' : undefined} value={val} min={0} max={100} step={1} showValue={showValue} onValueChange={setVal} />
+      </View>
+    </Playground>
+    <Import>{"import { Slider } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="value" type="number" desc="Current value" />
+      <Prop name="min" type="number" desc="Minimum value" />
+      <Prop name="max" type="number" desc="Maximum value" />
+      <Prop name="step" type="number" def="0.01" desc="Step increment" />
+      <Prop name="label" type="string" desc="Label text above the track" />
+      <Prop name="showValue" type="boolean" def="true" desc="Show current value number" />
+      <Prop name="onValueChange" type="(value: number) => void" />
+    </Props>
+    <S title="Examples">
+      <View style={{ gap: sp[5] }}>
+        <Slider label="Opacity" value={75} min={0} max={100} step={1} onValueChange={() => {}} />
+        <Slider label="Speed" value={1.5} min={0} max={3} step={0.1} onValueChange={() => {}} />
+        <Slider value={30} min={0} max={100} step={1} showValue={false} onValueChange={() => {}} />
+      </View>
+    </S>
+    <S title="When to use">
+      <Rl>Continuous ranges — volume, opacity, speed, density. Not for discrete choices (use Segmented or Stepper).</Rl>
+      <Rl>Web: renders native input[type=range] for best accessibility and UX.</Rl>
+      <Rl>Native: custom track with pressable regions. For drag support, wrap with GestureHandler PanGesture.</Rl>
+    </S>
+  </>;
+}
+
 // ═══════════════════════════════════════════════
 // SELECTION
 // ═══════════════════════════════════════════════
@@ -1597,55 +1645,129 @@ export function CardsPage() {
 export function AvatarsPage() {
   const [size, setSize] = useState('md');
   const [clr, setClr] = useState('default');
-  const [star, setStar] = useState(false);
+  const [useImage, setUseImage] = useState(false);
   const [status, setStatus] = useState('none');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="Size" value={size} options={['xs','sm','md','lg','xl']} onChange={setSize} />
         <KnobSelect label="Color" value={clr} options={['default','noon','blue']} onChange={setClr} />
-        <KnobToggle label="Star" value={star} onChange={setStar} />
+        <KnobToggle label="Image (SSO)" value={useImage} onChange={setUseImage} />
         <KnobSelect label="Status" value={status} options={['none','online','busy']} onChange={setStatus} />
       </>}
     >
-      <Avatar initials="S" size={size as any} color={clr as any} star={star} status={status === 'none' ? undefined : status as any} />
+      <Avatar initials="SA" imageUri={useImage ? 'https://i.pravatar.cc/150?u=sarah' : undefined} size={size as any} color={clr as any} status={status === 'none' ? undefined : status as any} />
     </Playground>
 
     <Import>{"import { Avatar } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="initials" type="string" />
+      <Prop name="initials" type="string" desc="Fallback when no image" />
+      <Prop name="imageUri" type="string" desc="Profile photo URL (e.g. from Google SSO). Falls back to initials." />
       <Prop name="size" type="'xs' | 'sm' | 'md' | 'lg' | 'xl'" def="'sm'" desc="24 / 32 / 40 / 56 / 72" />
       <Prop name="color" type="'default' | 'noon' | 'blue'" def="'default'" />
-      <Prop name="star" type="boolean" desc="Gold diamond indicator" />
-      <Prop name="status" type="'online' | 'busy'" />
+      <Prop name="status" type="'online' | 'busy'" desc="Status dot — scales with avatar size." />
     </Props>
-    <S title="All Sizes"><R><Avatar initials="S" size="xs" /><Avatar initials="S" size="sm" /><Avatar initials="S" size="md" /><Avatar initials="S" size="lg" /><Avatar initials="S" size="xl" /></R></S>
+    <S title="All Sizes"><R><Avatar initials="S" size="xs" /><Avatar initials="SA" size="sm" /><Avatar initials="SA" size="md" /><Avatar initials="SA" size="lg" /><Avatar initials="SA" size="xl" /></R></S>
+    <S title="With image"><R><Avatar initials="SA" imageUri="https://i.pravatar.cc/150?u=sarah" size="sm" /><Avatar initials="SA" imageUri="https://i.pravatar.cc/150?u=sarah" size="md" /><Avatar initials="SA" imageUri="https://i.pravatar.cc/150?u=sarah" size="lg" status="online" /><Avatar initials="SA" imageUri="https://i.pravatar.cc/150?u=sarah" size="xl" status="busy" /></R></S>
+    <S title="Status scaling"><R><Avatar initials="S" size="xs" status="online" /><Avatar initials="SA" size="sm" status="online" /><Avatar initials="SA" size="md" status="busy" /><Avatar initials="SA" size="lg" status="online" /><Avatar initials="SA" size="xl" status="busy" /></R></S>
   </>;
 }
 
 export function BadgesPage() {
+  const [variant, setVariant] = useState('default');
+  const [text, setText] = useState('3');
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Variant" value={variant} options={['default', 'accent', 'danger', 'dot']} onChange={setVariant} />
+      <KnobText label="Text" value={text} onChange={setText} />
+    </>}>
+      <Badge variant={variant as any}>{variant === 'dot' ? undefined : text}</Badge>
+    </Playground>
     <Import>{"import { Badge } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="children" type="string" desc="Badge text (number or symbol)" />
       <Prop name="variant" type="'default' | 'accent' | 'danger' | 'dot'" def="'default'" />
     </Props>
     <S title="Variants"><R><Badge>3</Badge><Badge variant="accent">12</Badge><Badge variant="danger">!</Badge><Badge variant="dot" /></R></S>
+    <S title="With avatars"><R>
+      <View style={{ position: 'relative' }}><Avatar initials="SA" size="md" /><View style={{ position: 'absolute', top: -2, right: -4 }}><Badge variant="danger">2</Badge></View></View>
+      <View style={{ position: 'relative' }}><Avatar initials="OK" size="md" color="noon" /><View style={{ position: 'absolute', top: -2, right: -4 }}><Badge variant="accent">5</Badge></View></View>
+    </R></S>
   </>;
 }
 
 export function TablePage() {
+  const { theme } = useTheme();
+  const [selectable, setSelectable] = useState(true);
+  const [sortable, setSortable] = useState(true);
+  const [scrollable, setScrollable] = useState(false);
+  const [selected, setSelected] = useState<number[]>([]);
+
+  const columns: TableColumn[] = [
+    { key: 'name', label: 'Student', sortable },
+    { key: 'score', label: 'Score', sortable, align: 'right' as const, width: 70 },
+    { key: 'status', label: 'Status', sortable },
+    { key: 'chapter', label: 'Chapter', sortable },
+    ...(scrollable ? [{ key: 'date', label: 'Date', width: 100 }, { key: 'attempt', label: 'Attempt', width: 80, align: 'right' as const }] as TableColumn[] : []),
+  ];
+
+  const rows = [
+    { name: 'Sarah A.', score: '92', status: 'Mastered', chapter: 'Algebra I', date: '12 Jan', attempt: '3rd' },
+    { name: 'Omar K.', score: '61', status: 'Exploring', chapter: 'Geometry', date: '14 Jan', attempt: '1st' },
+    { name: 'Farida M.', score: '78', status: 'Exploring', chapter: 'Algebra I', date: '11 Jan', attempt: '2nd' },
+    { name: 'Ahmed R.', score: '45', status: 'Uncertain', chapter: 'Ratios', date: '10 Jan', attempt: '2nd' },
+    { name: 'Layla S.', score: '88', status: 'Mastered', chapter: 'Number Sense', date: '8 Jan', attempt: '1st' },
+    { name: 'Yusuf H.', score: '33', status: 'Uncertain', chapter: 'Algebra II', date: '15 Jan', attempt: '1st' },
+    { name: 'Nora T.', score: '95', status: 'Mastered', chapter: 'Statistics', date: '13 Jan', attempt: '2nd' },
+    { name: 'Khalid B.', score: '71', status: 'Exploring', chapter: 'Geometry', date: '9 Jan', attempt: '3rd' },
+  ];
+
   return <>
-    <Import>{"import { Table } from '@noon/design-system';"}</Import>
+    <Playground knobs={<>
+      <KnobToggle label="Selectable" value={selectable} onChange={setSelectable} />
+      <KnobToggle label="Sortable" value={sortable} onChange={setSortable} />
+      <KnobToggle label="Horizontal scroll" value={scrollable} onChange={setScrollable} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        <Table
+          columns={columns}
+          rows={rows}
+          selectable={selectable}
+          selected={selected}
+          onSelectionChange={setSelected}
+          minWidth={scrollable ? 600 : undefined}
+          actionBar={(count) => (
+            <View style={{ flexDirection: 'row', gap: sp[2] }}>
+              <Button size="sm" variant="ghost" onPress={() => setSelected([])}>Clear</Button>
+              <Button size="sm" variant="primary" onPress={() => setSelected([])}>Message {count}</Button>
+            </View>
+          )}
+        />
+      </View>
+    </Playground>
+
+    <Import>{"import { Table, type TableColumn } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="columns" type="string[]" />
-      <Prop name="rows" type="string[][]" />
+      <Prop name="columns" type="TableColumn[] | string[]" desc="Column defs with key, label, width, align, sortable, render" />
+      <Prop name="rows" type="Record<string, string>[] | string[][]" />
+      <Prop name="selectable" type="boolean" desc="Show row checkboxes" />
+      <Prop name="selected" type="number[]" />
+      <Prop name="onSelectionChange" type="(indices: number[]) => void" />
+      <Prop name="sortKey / sortDir / onSort" type="string / 'asc'|'desc' / fn" desc="Controlled sorting" />
+      <Prop name="minWidth" type="number" desc="Enables horizontal scroll" />
+      <Prop name="actionBar" type="(count) => ReactNode" desc="Shown when rows selected" />
     </Props>
-    <S title="Default"><Table columns={['Name', 'Score', 'Status']} rows={[['Sarah A.', '92', 'Mastered'], ['Omar K.', '61', 'In progress'], ['Farida M.', '78', 'Close'], ['Ahmed R.', '55', 'Behind']]} /></S>
+
+    <S title="Simple (string arrays)">
+      <Table columns={['Name', 'Score', 'Status']} rows={[['Sarah A.', '92', 'Mastered'], ['Omar K.', '61', 'Exploring'], ['Farida M.', '78', 'Close']]} />
+    </S>
+
     <S title="Rules">
-      <Rl>Header: mono fs[11], uppercase, fgFaint. Rows: sans fs[13], fgMuted.</Rl>
-      <Rl>Rows separated by divider lines. No zebra striping.</Rl>
-      <Rl>For complex data (sorting, pagination, selection), build a custom list — Table is for static display.</Rl>
+      <Rl>Header: mono fs[10], uppercase, fgFaint. Rows: sans fs[13], fgMuted.</Rl>
+      <Rl>Sortable columns show arrow on tap. Toggle between asc/desc.</Rl>
+      <Rl>Selectable adds a checkbox column. Header checkbox toggles all.</Rl>
+      <Rl>Action bar appears at bottom when rows are selected — use for bulk actions.</Rl>
+      <Rl>Set minWidth to enable horizontal scroll on narrow screens.</Rl>
     </S>
   </>;
 }
@@ -1690,21 +1812,19 @@ export function SessionCardPage() {
 
 // ═══════════════════════════════════════════════
 export function HomeworkCardPage() {
-  const [status, setStatus] = useState('pending');
+  const [status, setStatus] = useState('due-soon');
   const [hwTitle, setHwTitle] = useState('Practice worksheet');
-  const [questionsSel, setQuestionsSel] = useState('8');
-  const [showScore, setShowScore] = useState(false);
+  const [subj, setSubj] = useState('Qudrat Math');
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Status" value={status} options={['pending', 'in-progress', 'submitted', 'overdue', 'graded']} onChange={setStatus} />
+        <KnobSelect label="Status" value={status} options={['due-soon', 'complete', 'overdue']} onChange={setStatus} />
         <KnobText label="title" value={hwTitle} onChange={setHwTitle} />
-        <KnobSelect label="questions" value={questionsSel} options={['4','6','8','10']} onChange={setQuestionsSel} />
-        <KnobToggle label="score" value={showScore} onChange={setShowScore} />
+        <KnobText label="subject" value={subj} onChange={setSubj} />
       </>}
     >
       <View style={{ width: '100%' }}>
-        <HomeworkCard title={hwTitle} subject="Qudrat Math" dueDate="May 1" questions={parseInt(questionsSel)} status={status as any} score={showScore && status === 'graded' ? '7/8' : undefined} />
+        <HomeworkCard title={hwTitle} subject={subj} due={status === 'overdue' ? '2 days overdue' : 'Due in 4h'} status={status as any} />
       </View>
     </Playground>
 
@@ -1712,18 +1832,16 @@ export function HomeworkCardPage() {
     <Props>
       <Prop name="title" type="string" />
       <Prop name="subject" type="string" />
-      <Prop name="dueDate" type="string" />
-      <Prop name="questions" type="number" />
-      <Prop name="status" type="'pending' | 'in-progress' | 'submitted' | 'overdue' | 'graded'" def="'pending'" />
-      <Prop name="score" type="string" desc="Shown when graded, e.g. '7/8'" />
+      <Prop name="due" type="string" desc="Relative time, e.g. 'Due in 4h', '2 days overdue'" />
+      <Prop name="questions" type="number" def="10" />
+      <Prop name="status" type="'due-soon' | 'complete' | 'overdue'" def="'due-soon'" />
       <Prop name="onPress" type="() => void" />
     </Props>
     <S title="All States">
-      <HomeworkCard title="Vocab practice" subject="Qudrat Reading" dueDate="Apr 28" questions={12} status="pending" />
-      <HomeworkCard title="Inference worksheet" subject="Qudrat Reading" dueDate="Apr 27" questions={6} status="in-progress" />
-      <HomeworkCard title="Trig exercises" subject="Qudrat Math" dueDate="Apr 25" questions={10} status="submitted" />
-      <HomeworkCard title="Grammar review" subject="Qudrat Verbal" dueDate="Apr 24" questions={15} status="overdue" />
-      <HomeworkCard title="Reading comprehension" subject="Qudrat Reading" dueDate="Apr 20" questions={8} status="graded" score="6/8" />
+      <HomeworkCard title="Vocab practice" subject="Qudrat Reading" due="Due in 4h" status="due-soon" />
+      <HomeworkCard title="Trig exercises" subject="Qudrat Math" due="Due tomorrow" status="due-soon" />
+      <HomeworkCard title="Inference worksheet" subject="Qudrat Reading" due="" status="complete" />
+      <HomeworkCard title="Grammar review" subject="Qudrat Verbal" due="2 days overdue" status="overdue" />
     </S>
   </>;
 }
@@ -1734,64 +1852,107 @@ export function HomeworkCardPage() {
 
 
 export function SessionBarPage() {
+  const [count, setCount] = useState('10');
+  const [progressPct, setProgressPct] = useState('40');
+  const n = parseInt(count);
+  const p = Math.max(1, Math.min(n, Math.round(n * parseInt(progressPct) / 100)));
+  const segs = Array.from({ length: n }, (_, i) => {
+    if (i < p - 1) return i % 3 === 2 ? 'incorrect' as const : 'correct' as const;
+    if (i === p - 1) return 'current' as const;
+    return 'pending' as const;
+  });
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Questions" value={count} options={['5', '10', '15', '20', '30', '50']} onChange={setCount} />
+      <KnobSelect label="Progress" value={progressPct} options={['10', '25', '40', '50', '75', '90', '100']} onChange={setProgressPct} />
+    </>}>
+      <View style={{ width: '100%' }}><SessionBar segments={segs} /></View>
+    </Playground>
     <Import>{"import { SessionBar } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="segments" type="('correct' | 'incorrect' | 'current' | 'pending')[]" />
       <Prop name="size" type="'sm' | 'md' | 'lg'" def="'md'" />
+      <Prop name="pageSize" type="number" def="10" desc="Segments per page. Pages with dots appear when exceeded." />
     </Props>
     <S title="States">
       <C label="Mixed"><SessionBar segments={['correct','correct','incorrect','correct','pending','pending','pending','pending','pending','pending']} /></C>
-      <C label="All correct (lg)"><SessionBar segments={['correct','correct','correct','correct','correct']} size="lg" /></C>
-      <C label="Small"><SessionBar segments={['correct','incorrect','correct','correct','incorrect','correct','correct','correct']} size="sm" /></C>
+      <C label="All correct"><SessionBar segments={['correct','correct','correct','correct','correct']} size="lg" /></C>
+      <C label="Early"><SessionBar segments={['current','pending','pending','pending','pending','pending','pending','pending']} size="sm" /></C>
     </S>
   </>;
 }
 
-export function ProgressPage() {
+export function LinearProgressPage() {
   const [val, setVal] = useState('76');
-  const [clr, setClr] = useState('default');
+  const [clr, setClr] = useState('green');
+  const num = Math.max(0, Math.min(100, parseInt(val) || 0));
+  const colorMap: Record<string, string> = { green: color.noon[400], blue: color.blue[400], red: color.danger[400] };
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Value" value={val} options={['0','10','25','50','76','90','100']} onChange={setVal} />
+      <KnobSelect label="Color" value={clr} options={['green', 'blue', 'red']} onChange={setClr} />
+    </>}>
+      <View style={{ width: '100%' }}><LinearProgress value={num} color={colorMap[clr]} /></View>
+    </Playground>
+    <Import>{"import { LinearProgress } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="value" type="number" desc="0-100" />
+      <Prop name="color" type="string" desc="Fill color" />
+      <Prop name="height" type="number" desc="Track height. Default sp[1] (4px)." />
+    </Props>
+    <S title="Colors">
+      <C label="Green (mastery)"><LinearProgress value={76} color={color.noon[400]} /></C>
+      <C label="Blue (progress)"><LinearProgress value={50} color={color.blue[400]} /></C>
+      <C label="Red (warning)"><LinearProgress value={25} color={color.danger[400]} /></C>
+    </S>
+    <S title="When to use">
+      <Rl>Upload/download progress, form completion, loading states.</Rl>
+      <Rl>Use for inline, horizontal progress within a content area.</Rl>
+      <Rl>For a single stat or score, use CircularProgress instead.</Rl>
+      <Rl>For question-by-question results, use SessionBar.</Rl>
+    </S>
+  </>;
+}
+
+export function CircularProgressPage() {
+  const [val, setVal] = useState('76');
+  const [clr, setClr] = useState('green');
   const [showVal, setShowVal] = useState(true);
   const [sizeSel, setSizeSel] = useState('120');
   const num = Math.max(0, Math.min(100, parseInt(val) || 0));
-  const progressColor = clr === 'accent' ? color.noon[400] : clr === 'danger' ? color.danger[400] : undefined;
+  const colorMap: Record<string, string> = { green: color.noon[400], blue: color.blue[400], red: color.danger[400] };
   return <>
-    <Playground
-      knobs={<>
-        <KnobSelect label="Value" value={val} options={['0','10','25','50','76','90','100']} onChange={setVal} />
-        <KnobSelect label="Color" value={clr} options={['default', 'accent', 'danger']} onChange={setClr} />
-        <KnobToggle label="Show Value" value={showVal} onChange={setShowVal} />
-        <KnobSelect label="size" value={sizeSel} options={['80','120','160']} onChange={setSizeSel} />
-      </>}
-    >
-      <View style={{ width: '100%', alignItems: 'center', gap: sp[5] }}>
-        <View style={{ width: '100%' }}><LinearProgress value={num} color={progressColor} /></View>
-        <CircularProgress value={num} showValue={showVal} color={progressColor} size={parseInt(sizeSel)} />
-      </View>
+    <Playground knobs={<>
+      <KnobSelect label="Value" value={val} options={['0','10','25','50','76','90','100']} onChange={setVal} />
+      <KnobSelect label="Color" value={clr} options={['green', 'blue', 'red']} onChange={setClr} />
+      <KnobToggle label="Show value" value={showVal} onChange={setShowVal} />
+      <KnobSelect label="Size" value={sizeSel} options={['80','120','160']} onChange={setSizeSel} />
+    </>}>
+      <CircularProgress value={num} showValue={showVal} color={colorMap[clr]} size={parseInt(sizeSel)} />
     </Playground>
-
-    <Import>{"import { LinearProgress, CircularProgress } from '@noon/design-system';"}</Import>
+    <Import>{"import { CircularProgress } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="value" type="number" desc="0-100" />
-      <Prop name="color" type="string" desc="Track fill color" />
-      <Prop name="height" type="number" desc="Linear only, default sp[1]" />
-      <Prop name="size" type="number" desc="Circular only, default sp[9]" />
-      <Prop name="strokeWidth" type="number" def="3" desc="Circular only" />
-      <Prop name="showValue" type="boolean" desc="Circular only, show % text" />
+      <Prop name="color" type="string" desc="Ring color" />
+      <Prop name="size" type="number" desc="Diameter. Default sp[9] (48px)." />
+      <Prop name="strokeWidth" type="number" def="3" />
+      <Prop name="showValue" type="boolean" desc="Show percentage text in centre." />
     </Props>
-    <S title="Linear Examples">
-      <C label="76%"><LinearProgress value={76} /></C>
-      <C label="100% accent"><LinearProgress value={100} color={color.noon[400]} /></C>
-      <C label="25% danger"><LinearProgress value={25} color={color.danger[400]} /></C>
-    </S>
-    <S title="Circular Examples"><R>
-      <CircularProgress value={76} showValue />
-      <CircularProgress value={100} showValue color={color.noon[400]} />
+    <S title="Colors"><R>
+      <CircularProgress value={76} showValue color={color.noon[400]} />
+      <CircularProgress value={50} showValue color={color.blue[400]} />
       <CircularProgress value={25} showValue color={color.danger[400]} />
-      <CircularProgress value={0} showValue />
     </R></S>
+    <S title="When to use">
+      <Rl>Exam readiness, score display, completion percentage — anywhere a single stat is the hero.</Rl>
+      <Rl>Use for standalone metrics in cards or dashboards.</Rl>
+      <Rl>For inline/horizontal progress (loading, uploads), use LinearProgress.</Rl>
+      <Rl>For question-by-question results, use SessionBar.</Rl>
+    </S>
   </>;
 }
+
+export function ProgressPage() { return <LinearProgressPage />; }
 
 // ═══════════════════════════════════════════════
 // NAVIGATION
@@ -1799,88 +1960,99 @@ export function ProgressPage() {
 
 export function TitleBarPage() {
   const { theme } = useTheme();
+  const [showBack, setShowBack] = useState(true);
+  const [showRight, setShowRight] = useState(false);
+  const [tbTitle, setTbTitle] = useState('Session details');
   return <>
+    <Playground knobs={<>
+      <KnobText label="Title" value={tbTitle} onChange={setTbTitle} />
+      <KnobToggle label="Back button" value={showBack} onChange={setShowBack} />
+      <KnobToggle label="Right action" value={showRight} onChange={setShowRight} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        <TitleBar title={tbTitle} onBack={showBack ? () => {} : undefined} rightAction={showRight ? <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent }}>Today</Text> : undefined} />
+      </View>
+    </Playground>
     <Import>{"import { TitleBar } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="title" type="string" />
       <Prop name="subtitle" type="string" />
       <Prop name="variant" type="'default' | 'large' | 'transparent' | 'overlay'" def="'default'" />
-      <Prop name="backIcon" type="ReactNode" desc="Back arrow element" />
-      <Prop name="onBack" type="() => void" />
+      <Prop name="onBack" type="() => void" desc="Shows back arrow when provided" />
       <Prop name="rightAction" type="ReactNode" desc="Right-side content" />
     </Props>
-    <S title="Default"><TitleBar title="Atlas" /></S>
-    <S title="With back"><TitleBar title="Session details" onBack={() => {}} /></S>
-    <S title="With right action"><TitleBar title="Schedule" rightAction={<Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent }}>Today</Text>} /></S>
-    <S title="Safe area">
-      <Rl>TitleBar does not handle safe area insets — the parent screen should wrap it in a SafeAreaView or apply paddingTop from useSafeAreaInsets.</Rl>
+    <S title="Variants">
+      <C label="Default"><TitleBar title="Atlas" /></C>
+      <C label="With back"><TitleBar title="Session" onBack={() => {}} /></C>
+      <C label="With right"><TitleBar title="Schedule" rightAction={<Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent }}>Today</Text>} /></C>
+      <C label="Back + right"><TitleBar title="Quiz" onBack={() => {}} rightAction={<Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted }}>3/10</Text>} /></C>
     </S>
   </>;
 }
 
 export function TabsPage() {
   const [tab, setTab] = useState(0);
-  const [tab2, setTab2] = useState(0);
+  const [countStr, setCountStr] = useState('4');
+  const allTabs = ['Atlas', 'Schedule', 'Crew', 'Water', 'Settings', 'Profile'];
+  const tabs = allTabs.slice(0, parseInt(countStr));
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Tab count" value={countStr} options={['2', '3', '4', '5', '6']} onChange={(v) => { setCountStr(v); setTab(0); }} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        <Tabs tabs={tabs} selected={tab} onSelect={setTab} />
+      </View>
+    </Playground>
     <Import>{"import { Tabs } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="tabs" type="string[]" />
       <Prop name="selected" type="number" />
       <Prop name="onSelect" type="(index: number) => void" />
     </Props>
-    <S title="4 tabs"><Tabs tabs={['Atlas', 'Schedule', 'Crew', 'Water']} selected={tab} onSelect={setTab} /></S>
-    <S title="2 tabs"><Tabs tabs={['Upcoming', 'Past']} selected={tab2} onSelect={setTab2} /></S>
     <S title="Rules">
       <Rl>2-5 tabs. More than 5 should scroll horizontally.</Rl>
-      <Rl>Tabs switch content views on the same screen. For app-level navigation, use BottomNav.</Rl>
-      <Rl>Active tab: accent underline + fg text. Inactive: fgMuted, no underline.</Rl>
+      <Rl>Tabs switch content within the same screen. For app-level nav, use BottomNav.</Rl>
+      <Rl>Active: accent underline + fg text. Inactive: fgMuted.</Rl>
     </S>
   </>;
 }
 
 export function BottomNavPage() {
   const [sel, setSel] = useState(0);
+  const [itemCount, setItemCount] = useState('6');
+  const [showBadge, setShowBadge] = useState(true);
+  const allItems = [
+    { label: 'Atlas', icon: 'search' as const },
+    { label: 'Schedule', icon: 'document' as const },
+    { label: 'Crew', icon: 'menu' as const },
+    { label: 'Water', icon: 'expand' as const },
+    { label: 'Practice', icon: 'play' as const },
+    { label: 'Profile', icon: 'check' as const },
+  ];
+  const items = allItems.slice(0, parseInt(itemCount)).map((item, i) => ({
+    ...item,
+    ...(showBadge && i === 1 ? { badge: 3 } : {}),
+  }));
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Items" value={itemCount} options={['3', '4', '5', '6']} onChange={(v) => { setItemCount(v); setSel(0); }} />
+      <KnobToggle label="Badge on 2nd" value={showBadge} onChange={setShowBadge} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        <BottomNav items={items} selected={sel} onSelect={setSel} />
+      </View>
+    </Playground>
     <Import>{"import { BottomNav } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="items" type="{ label: string; icon: IconName | (color, size) => ReactNode; badge?: number }[]" />
       <Prop name="selected" type="number" />
       <Prop name="onSelect" type="(index: number) => void" />
     </Props>
-    <S title="Default">
-      <BottomNav
-        items={[
-          { label: 'Atlas', icon: 'search' },
-          { label: 'Schedule', icon: 'document' },
-          { label: 'Crew', icon: 'menu' },
-          { label: 'Water', icon: 'expand' },
-        ]}
-        selected={sel}
-        onSelect={setSel}
-      />
-    </S>
-    <S title="With badge">
-      <BottomNav
-        items={[
-          { label: 'Atlas', icon: 'search' },
-          { label: 'Schedule', icon: 'document', badge: 3 },
-          { label: 'Crew', icon: 'menu' },
-          { label: 'Water', icon: 'expand' },
-        ]}
-        selected={1}
-        onSelect={() => {}}
-      />
-    </S>
     <S title="Rules">
       <Rl>3-5 items max. App-level destinations only.</Rl>
-      <Rl>Pass icon as an IconName string — colour and size (icon.tab = 22px) are set automatically.</Rl>
-      <Rl>Active: accent icon + accent label. Inactive: fgSubtle icon + fgSubtle label.</Rl>
-      <Rl>For custom icons, pass a render function: (color, size) => ReactNode — use the provided colour.</Rl>
-      <Rl>Badge count renders as a small number above the icon.</Rl>
+      <Rl>Active: accent icon + label. Inactive: fgSubtle.</Rl>
+      <Rl>Badge renders as a small number above the icon.</Rl>
       <Rl>On tablet/desktop, replace with SideNav.</Rl>
-    </S>
-    <S title="Safe area">
-      <Rl>Bottom inset handled automatically via useSafeAreaInsets. No wrapper needed.</Rl>
     </S>
   </>;
 }
@@ -1918,6 +2090,12 @@ export function AlertsPage() {
       <C label="Warn"><Alert variant="warn">Exam in 2 days.</Alert></C>
       <C label="Danger"><Alert variant="danger" title="Error">Something went wrong.</Alert></C>
     </S>
+    <S title="When to use">
+      <Rl>Alert is inline — it stays on screen as part of the page content.</Rl>
+      <Rl>Use for persistent messages the user needs to read: validation errors, warnings before an exam, info banners.</Rl>
+      <Rl>For temporary notifications that auto-dismiss, use Toast instead.</Rl>
+      <Rl>For actions requiring confirmation, use Dialog.</Rl>
+    </S>
   </>;
 }
 
@@ -1944,26 +2122,38 @@ export function ToastPage() {
       <Prop name="duration" type="number" def="4000" desc="Auto-dismiss ms" />
     </Props>
     <Toast message={variant === 'success' ? 'Practice session saved' : variant === 'danger' ? 'Something went wrong' : variant === 'warn' ? 'Exam in 2 days' : 'Session starts in 10 minutes'} variant={variant as any} visible={vis} onDismiss={() => setVis(false)} duration={parseInt(durationSel)} />
-    <S title="Safe area">
-      <Rl>Top inset handled automatically via useSafeAreaInsets. Toast clears the notch/Dynamic Island.</Rl>
+    <S title="When to use">
+      <Rl>Toast is temporary — it auto-dismisses after a few seconds.</Rl>
+      <Rl>Use for confirmations after an action: "Practice saved", "Homework submitted".</Rl>
+      <Rl>For persistent messages the user needs to read, use Alert instead.</Rl>
+      <Rl>For actions requiring confirmation, use Dialog.</Rl>
+      <Rl>Top inset handled automatically. Toast clears the notch/Dynamic Island.</Rl>
     </S>
   </>;
 }
 
 export function DialogPage() {
   const [vis, setVis] = useState(false);
-  const [danger, setDanger] = useState(false);
-  const [primaryLabel, setPrimaryLabel] = useState('Confirm');
-  const [secondaryLabel, setSecondaryLabel] = useState('Cancel');
+  const [preset, setPreset] = useState('confirm');
+
+  const presets: Record<string, { title: string; body: string; danger: boolean; primary: string; secondary: string }> = {
+    confirm: { title: 'Are you sure?', body: 'This action cannot be undone.', danger: false, primary: 'Confirm', secondary: 'Cancel' },
+    delete: { title: 'Delete topic?', body: 'All practice history will be permanently removed.', danger: true, primary: 'Delete', secondary: 'Keep' },
+    leave: { title: 'Leave session?', body: 'Your progress on this question won\'t be saved.', danger: true, primary: 'Leave', secondary: 'Stay' },
+    discard: { title: 'Discard changes?', body: 'You have unsaved changes that will be lost.', danger: true, primary: 'Discard', secondary: 'Keep editing' },
+    submit: { title: 'Submit homework?', body: 'You answered 8 of 10 questions. Submit now or keep working.', danger: false, primary: 'Submit', secondary: 'Keep working' },
+    logout: { title: 'Log out?', body: 'You\'ll need to sign in again to access your account.', danger: false, primary: 'Log out', secondary: 'Cancel' },
+  };
+
+  const p = presets[preset];
+
   return <>
     <Playground
       knobs={<>
-        <KnobToggle label="Danger" value={danger} onChange={setDanger} />
-        <KnobText label="primaryLabel" value={primaryLabel} onChange={setPrimaryLabel} />
-        <KnobText label="secondaryLabel" value={secondaryLabel} onChange={setSecondaryLabel} />
+        <KnobSelect label="Scenario" value={preset} options={Object.keys(presets)} onChange={setPreset} />
       </>}
     >
-      <Button variant={danger ? 'danger' : 'secondary'} onPress={() => setVis(true)}>{danger ? 'Delete Dialog' : 'Open Dialog'}</Button>
+      <Button variant={p.danger ? 'danger' : 'secondary'} onPress={() => setVis(true)}>{p.primary}</Button>
     </Playground>
 
     <Import>{"import { Dialog } from '@noon/design-system';"}</Import>
@@ -1972,46 +2162,52 @@ export function DialogPage() {
       <Prop name="onClose" type="() => void" />
       <Prop name="title" type="string" />
       <Prop name="body" type="string" />
-      <Prop name="danger" type="boolean" />
+      <Prop name="danger" type="boolean" desc="Red primary button for destructive actions" />
       <Prop name="primaryLabel" type="string" def="'Confirm'" />
       <Prop name="secondaryLabel" type="string" def="'Cancel'" />
       <Prop name="onPrimary" type="() => void" />
       <Prop name="onSecondary" type="() => void" />
     </Props>
     <S title="Rules">
-      <Rl>Confirmation: neutral primary button. "Are you sure?" pattern.</Rl>
-      <Rl>Danger: red primary button. Destructive actions (delete, leave, remove).</Rl>
+      <Rl>Confirmation: neutral primary. "Are you sure?" pattern.</Rl>
+      <Rl>Danger: red primary. Destructive actions (delete, leave, discard).</Rl>
       <Rl>Always provide a cancel/secondary option. Never auto-dismiss.</Rl>
     </S>
-    <S title="Keyboard">
-      <Rl>KeyboardAvoidingView built in. Dialog shifts up when the software keyboard opens on iOS.</Rl>
-    </S>
-    <Dialog visible={vis} onClose={() => setVis(false)} title={danger ? 'Delete topic?' : 'Are you sure?'} body={danger ? 'All practice history will be removed.' : 'This action cannot be undone.'} danger={danger} primaryLabel={primaryLabel} secondaryLabel={secondaryLabel} onPrimary={() => setVis(false)} />
+    <Dialog visible={vis} onClose={() => setVis(false)} title={p.title} body={p.body} danger={p.danger} primaryLabel={p.primary} secondaryLabel={p.secondary} onPrimary={() => setVis(false)} />
   </>;
 }
 
 export function BottomSheetPage() {
   const { theme } = useTheme();
   const [vis, setVis] = useState(false);
+  const [withActions, setWithActions] = useState(false);
   return <>
+    <Playground knobs={<>
+      <KnobToggle label="With actions" value={withActions} onChange={setWithActions} />
+    </>}>
+      <Button variant="secondary" onPress={() => setVis(true)}>Open Sheet</Button>
+    </Playground>
     <Import>{"import { BottomSheet } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="visible" type="boolean" />
       <Prop name="onClose" type="() => void" />
       <Prop name="title" type="string" />
       <Prop name="children" type="ReactNode" />
-      <Prop name="actions" type="ReactNode" desc="Bottom action buttons" />
-      <Prop name="full" type="boolean" desc="Full screen height" />
+      <Prop name="actions" type="ReactNode" desc="Fixed bottom action buttons" />
     </Props>
-    <S title="Default"><C label="Auto-size"><Button variant="secondary" onPress={() => setVis(true)}>Open Sheet</Button></C></S>
-    <BottomSheet visible={vis} onClose={() => setVis(false)} title="Session details">
-      <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted }}>Inference & implied meaning{'\n'}Qudrat Reading — Mr. Hassan{'\n'}10:00 — 10:45</Text>
+    <BottomSheet visible={vis} onClose={() => setVis(false)} title="Session details"
+      actions={withActions ? <Button variant="primary" onPress={() => setVis(false)}>Join session</Button> : undefined}>
+      <View style={{ gap: sp[3] }}>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg, fontWeight: fw[500] }}>Inference & implied meaning</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>Qudrat Reading — Mr. Hassan</Text>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint }}>10:00 — 10:45 · 12 students</Text>
+      </View>
     </BottomSheet>
-    <S title="Safe area">
-      <Rl>Bottom inset handled automatically. Content and actions clear the home indicator.</Rl>
-    </S>
-    <S title="Keyboard">
-      <Rl>KeyboardAvoidingView built in. Sheet shifts up when the software keyboard opens on iOS.</Rl>
+    <S title="When to use">
+      <Rl>Quick actions, short forms, detail previews — anything that doesn't need full screen.</Rl>
+      <Rl>Slides up from bottom, scrim behind. Tap scrim or swipe down to dismiss.</Rl>
+      <Rl>For full-screen content (reading, browsing), use FullSheet instead.</Rl>
+      <Rl>For confirmation prompts, use Dialog instead.</Rl>
     </S>
   </>;
 }
@@ -2020,6 +2216,9 @@ export function FullSheetPage() {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   return <>
+    <Playground knobs={<></>}>
+      <Button variant="secondary" onPress={() => setOpen(true)}>Open Full Sheet</Button>
+    </Playground>
     <Import>{"import { FullSheet } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="visible" type="boolean" />
@@ -2027,35 +2226,41 @@ export function FullSheetPage() {
       <Prop name="title" type="string" />
       <Prop name="children" type="ReactNode" />
     </Props>
-    <S title="Default">
-      <Button variant="secondary" onPress={() => setOpen(true)}>Open Full Sheet</Button>
-      <FullSheet visible={open} onClose={() => setOpen(false)} title="Session details">
-        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted, lineHeight: fs[14] * 1.6 }}>{'Full-screen modal with dark background, title bar, and close button.\n\nUsed for worked examples, slide viewers, resource content, and any deep-dive material that needs the full screen.\n\nContent scrolls automatically. Safe area insets are handled.'}</Text>
-      </FullSheet>
-    </S>
+    <FullSheet visible={open} onClose={() => setOpen(false)} title="Worked example">
+      <View style={{ gap: sp[4] }}>
+        <Text style={{ fontFamily: font.serif, fontSize: fs[18], color: theme.fg }}>Solving quadratic equations</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted, lineHeight: fs[14] * 1.6 }}>Step 1: Write the equation in standard form ax² + bx + c = 0{'\n\n'}Step 2: Identify a, b, and c{'\n\n'}Step 3: Apply the quadratic formula{'\n\n'}Step 4: Simplify</Text>
+      </View>
+    </FullSheet>
     <S title="When to use">
-      <Rl>Deep-dive content — worked examples, slide decks, resources.</Rl>
-      <Rl>Content that needs full screen focus, not a partial overlay.</Rl>
-      <Rl>BottomSheet for quick actions and short content. FullSheet for reading and browsing.</Rl>
-    </S>
-    <S title="Safe area">
-      <Rl>Top and bottom insets handled automatically. Header clears the notch, scroll content clears the home indicator.</Rl>
+      <Rl>Full-screen focus — worked examples, slide decks, resource reading.</Rl>
+      <Rl>Has a title bar with close button. Content scrolls.</Rl>
+      <Rl>For quick actions or short content, use BottomSheet.</Rl>
     </S>
   </>;
 }
 
 export function TooltipPage() {
   return <>
+    <Playground knobs={<></>}>
+      <View style={{ flexDirection: 'row', gap: sp[4] }}>
+        <Tooltip text="This is a tooltip"><Button variant="secondary">Hover or hold</Button></Tooltip>
+        <Tooltip text="Score: 92%"><Button variant="ghost">Result</Button></Tooltip>
+      </View>
+    </Playground>
     <Import>{"import { Tooltip } from '@noon/design-system';"}</Import>
     <Props>
+      <Prop name="text" type="string" desc="Tooltip content" />
       <Prop name="children" type="ReactNode" desc="Trigger element" />
-      <Prop name="text" type="string" />
     </Props>
-    <S title="Default"><C label="Long press to show"><Tooltip text="This is a tooltip"><Button variant="secondary">Hold me</Button></Tooltip></C></S>
-    <S title="Rules">
-      <Rl>Triggered by long-press on mobile (no hover). Shows above the trigger.</Rl>
-      <Rl>Short, plain text only. For rich content, use BottomSheet. For actions, use Menu.</Rl>
-      <Rl>Auto-dismisses after 3s or on tap outside.</Rl>
+    <S title="Behaviour">
+      <Rl>Desktop: hover to show, mouse-leave to hide.</Rl>
+      <Rl>Mobile: long-press to show, auto-dismisses after 3 seconds.</Rl>
+      <Rl>Positions above the trigger with an arrow pointing down.</Rl>
+    </S>
+    <S title="When to use">
+      <Rl>Short helper text — labels, abbreviations, score breakdowns.</Rl>
+      <Rl>For rich content, use BottomSheet. For action lists, use Menu.</Rl>
     </S>
   </>;
 }
@@ -2065,20 +2270,59 @@ export function TooltipPage() {
 // ═══════════════════════════════════════════════
 
 export function InterstitialPage() {
+  const [open, setOpen] = useState(false);
+  const [scenario, setScenario] = useState('mastery');
+  const scenarios: Record<string, { title: string; body: string; btn: string; variant: string }> = {
+    mastery: { title: 'Topic mastered!', body: 'Triangles & angles is now mapped.', btn: 'Back to journey', variant: 'mastery' },
+    exam: { title: 'Chapter complete', body: 'You passed the Algebra I exam with 91%.', btn: 'See results', variant: 'exam' },
+    progress: { title: 'Keep going!', body: 'You\'re 3 of 5 topics through this chapter.', btn: 'Next topic', variant: 'progress' },
+    complete: { title: 'You\'ve arrived!', body: 'All topics mastered. You\'re ready for the assessment.', btn: 'View results', variant: 'complete' },
+  };
+  const s = scenarios[scenario];
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Scenario" value={scenario} options={Object.keys(scenarios)} onChange={setScenario} />
+    </>}>
+      <Button variant="primary" onPress={() => setOpen(true)}>Show Interstitial</Button>
+    </Playground>
+    <Modal visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
+      <Interstitial title={s.title} body={s.body} buttonLabel={s.btn} variant={s.variant as any} onPress={() => setOpen(false)} />
+    </Modal>
     <Import>{"import { Interstitial } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="title" type="string" />
       <Prop name="body" type="string" />
       <Prop name="buttonLabel" type="string" />
       <Prop name="onPress" type="() => void" />
+      <Prop name="variant" type="'mastery' | 'exam' | 'progress' | 'complete'" def="'mastery'" desc="Built-in hero graphic" />
+      <Prop name="score" type="number" desc="Exam score for 'exam' variant" />
+      <Prop name="hero" type="ReactNode" desc="Custom hero — overrides variant. Use for images, Lottie, etc." />
+      <Prop name="confetti" type="boolean" desc="Override confetti. Defaults to true for mastery + complete." />
     </Props>
-    <S title="Default"><Interstitial title="Session complete" body="You answered 8 of 10 correctly." buttonLabel="Continue" onPress={() => {}} /></S>
+    <S title="When to use">
+      <Rl>Full-screen celebration after meaningful achievements.</Rl>
+      <Rl>mastery: spinning gold star + confetti — topic mastered.</Rl>
+      <Rl>exam: Oasis diamond with score — chapter exam result.</Rl>
+      <Rl>progress: Waypoints row partway through — making progress.</Rl>
+      <Rl>complete: Waypoints row all arrived + confetti — journey done.</Rl>
+      <Rl>hero prop: pass any custom element (Image, Lottie, etc.) to override built-in graphics.</Rl>
+      <Rl>Use sparingly — only for moments that deserve a pause.</Rl>
+    </S>
   </>;
 }
 
 export function EmptyStatePage() {
+  const [esTitle, setEsTitle] = useState('No sessions today');
+  const [esBody, setEsBody] = useState('Check back tomorrow for your schedule.');
+  const [hasAction, setHasAction] = useState(true);
   return <>
+    <Playground knobs={<>
+      <KnobText label="Title" value={esTitle} onChange={setEsTitle} />
+      <KnobText label="Body" value={esBody} onChange={setEsBody} />
+      <KnobToggle label="Action button" value={hasAction} onChange={setHasAction} />
+    </>}>
+      <EmptyState title={esTitle} body={esBody} actionLabel={hasAction ? 'Browse topics' : undefined} onAction={hasAction ? () => {} : undefined} />
+    </Playground>
     <Import>{"import { EmptyState } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="icon" type="ReactNode" desc="Optional icon above title" />
@@ -2087,43 +2331,45 @@ export function EmptyStatePage() {
       <Prop name="actionLabel" type="string" />
       <Prop name="onAction" type="() => void" />
     </Props>
-    <S title="States">
-      <C label="With action"><EmptyState title="No sessions today" body="Check back tomorrow for your schedule." actionLabel="Browse topics" onAction={() => {}} /></C>
-      <C label="Without action"><EmptyState title="No results" body="Try adjusting your filters." /></C>
-    </S>
   </>;
 }
 
 export function SkeletonPage() {
+  const [shape, setShape] = useState('text');
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Shape" value={shape} options={['text', 'avatar', 'card']} onChange={setShape} />
+    </>}>
+      {shape === 'text' && <View style={{ width: '100%', gap: sp[2] }}><Skeleton width="60%" height={sp[3]} /><Skeleton width="90%" height={sp[2]} /><Skeleton width="40%" height={sp[2]} /></View>}
+      {shape === 'avatar' && <R><Skeleton circle height={sp[8]} /><View style={{ flex: 1, gap: sp[2] }}><Skeleton width="50%" height={sp[3]} /><Skeleton width="30%" height={sp[2]} /></View></R>}
+      {shape === 'card' && <View style={{ width: '100%', gap: sp[3] }}><Skeleton height={120} /><Skeleton height={sp[3]} /><Skeleton width="70%" height={sp[2]} /></View>}
+    </Playground>
     <Import>{"import { Skeleton } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="width" type="number | string" />
+      <Prop name="width" type="number | string" desc="Default '100%'" />
       <Prop name="height" type="number" />
-      <Prop name="circle" type="boolean" />
+      <Prop name="circle" type="boolean" desc="Makes it round (width = height)" />
     </Props>
-    <S title="Examples">
-      <C label="Avatar + text"><R><Skeleton circle height={sp[8]} /><View style={{ flex: 1, gap: sp[2] }}><Skeleton width="60%" height={sp[3]} /><Skeleton width="90%" height={sp[2]} /><Skeleton width="40%" height={sp[2]} /></View></R></C>
-      <C label="Card skeleton"><View style={{ gap: sp[3] }}><Skeleton height={sp[4]} /><Skeleton height={sp[2]} /><Skeleton width="70%" height={sp[2]} /></View></C>
-    </S>
   </>;
 }
 
 export function DividerPage() {
   const { theme } = useTheme();
   return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%' }}>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[3] }}>Content above</Text>
+        <Divider />
+        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[3] }}>Content below</Text>
+      </View>
+    </Playground>
     <Import>{"import { Divider } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="spacing" type="number" desc="Vertical margin above and below" />
     </Props>
-    <S title="Default">
-      <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[3] }}>Content above</Text>
-      <Divider />
-      <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[3] }}>Content below</Text>
-    </S>
-    <S title="Rules">
-      <Rl>Uses theme.divider color — 6% opacity, not a full border.</Rl>
-      <Rl>Use between content groups, not between every item in a list.</Rl>
+    <S title="Usage">
+      <Rl>Uses theme.divider — 6% opacity, not a full border.</Rl>
+      <Rl>Use between content groups, not between every list item.</Rl>
     </S>
   </>;
 }
@@ -2343,86 +2589,113 @@ export function WaterVesselPage() {
 }
 
 export function ContoursPage() {
+  const [variant, setVariant] = useState('standard');
+  const [opStr, setOpStr] = useState('100');
   return <>
+    <Playground knobs={<>
+      <KnobSelect label="Variant" value={variant} options={['standard', 'dense']} onChange={setVariant} />
+      <KnobSelect label="Opacity %" value={opStr} options={['30', '50', '70', '100']} onChange={setOpStr} />
+    </>}>
+      <View style={{ width: '100%', overflow: 'hidden', borderRadius: r[2] }}>
+        <TerrainPattern width={800} height={240} variant={variant as any} opacity={parseInt(opStr) / 100} />
+      </View>
+    </Playground>
     <Import>{"import { TerrainPattern } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="width" type="number" />
       <Prop name="height" type="number" />
-      <Prop name="variant" type="'standard' | 'dense'" def="'standard'" />
+      <Prop name="variant" type="'standard' | 'dense'" def="'standard'" desc="Standard = wider gaps for background. Dense = tight for hero areas." />
       <Prop name="opacity" type="number" def="1" />
       <Prop name="style" type="ViewStyle" />
     </Props>
-    <S title="Standard" desc="Lines flow together — each follows the one above with slight drift, like real topographic contours. They bunch at elevation changes and spread on flat ground.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><TerrainPattern width={800} height={220} /></View>
+    <S title="What it is">
+      <Rl>Topographic contour lines — the cartographic notation for terrain. Lines flow coherently, bunching at elevation changes and spreading on flat ground.</Rl>
+      <Rl>Think: the lines on a hiking map. This is the map, not the land.</Rl>
     </S>
-    <S title="Dense — hero backgrounds" desc="Tighter spacing for headers and hero sections. More lines, higher contrast, same coherent flow.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><TerrainPattern width={800} height={220} variant="dense" /></View>
+    <S title="When to use">
+      <Rl>Journey backgrounds — route map, chapter areas, behind the spine.</Rl>
+      <Rl>Section headers — dense variant at 50-70% opacity behind text.</Rl>
+      <Rl>Anywhere you want cartographic texture without a specific landscape.</Rl>
     </S>
-    <S title="Low opacity — behind content" desc="When text sits on top, reduce terrain opacity to 50-70% so it stays as texture.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><TerrainPattern width={800} height={160} variant="dense" opacity={0.5} /></View>
-    </S>
-    <S title="How It Works">
-      <Rl>Coherent flow: all lines share a base terrain profile (layered sine waves). Each line adds tiny per-line drift and phase shift.</Rl>
-      <Rl>Density = elevation: tight clusters (3-4px) = steep slopes. Wide gaps (16-24px) = ridges/plateaus. The eye reads this as topography.</Rl>
-      <Rl>Opacity varies: darker lines where gaps are wider (isolated = prominent). Lighter where clustered (many lines fade together).</Rl>
-      <Rl>Smoothing: 20 control points per line, cubic bezier interpolation. 0.8px stroke.</Rl>
-    </S>
-    <S title="When to Use">
-      <Rl>Section headers and hero backgrounds</Rl>
-      <Rl>Marketing and onboarding screens</Rl>
-      <Rl>Atlas overview / route map backgrounds</Rl>
-      <Rl>Interstitial / celebration backgrounds</Rl>
-    </S>
-    <S title="When NOT to Use">
-      <Rl>Behind quiz options or practice content — competes with readability</Rl>
-      <Rl>On cards, buttons, or interactive chrome — terrain is texture, not UI</Rl>
-      <Rl>Schedule / session lists — too busy behind row content</Rl>
-      <Rl>Heatmap / mastery grids — tile colours are the data, don't add noise</Rl>
-    </S>
-    <S title="Rules">
-      <Rl>Abstract symbolism. Represents the journey, not a literal map. Don't make routes follow the contours.</Rl>
-      <Rl>Clip to container. Partial reveals are more powerful than showing the full pattern.</Rl>
-      <Rl>Single colour. Chalk on void, ink on paper. No gradient fills, no coloured lines.</Rl>
+    <S title="How it relates to Dune Pattern">
+      <Rl>Terrain Lines = the map notation (contours). Dune Pattern = the landscape (ridgelines).</Rl>
+      <Rl>Layer terrain lines over dune pattern for the complete picture — map drawn on the land.</Rl>
+      <Rl>Both use the same generation system (sine waves + seeded noise) so they harmonise.</Rl>
     </S>
   </>;
 }
 
 export function DunePatternPage() {
-  const [variant, setVariant] = useState('constellation');
+  const [opStr, setOpStr] = useState('100');
   return <>
-    <Playground
-      knobs={<>
-        <KnobSelect label="Variant" value={variant} options={['constellation', 'horizon']} onChange={setVariant} />
-      </>}
-    >
-      <View style={{ width: '100%', overflow: 'hidden', borderRadius: r[2] }}>
-        <DunePattern width={800} height={300} variant={variant as any} />
+    <Playground knobs={<>
+      <KnobSelect label="Opacity %" value={opStr} options={['30', '50', '70', '100']} onChange={setOpStr} />
+    </>}>
+      <View style={{ overflow: 'hidden', borderRadius: r[2] }}>
+        <DunePattern width={800} height={300} opacity={parseInt(opStr) / 100} />
       </View>
     </Playground>
-
     <Import>{"import { DunePattern } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="width" type="number" />
       <Prop name="height" type="number" />
-      <Prop name="variant" type="'constellation' | 'horizon'" def="'constellation'" />
+      <Prop name="opacity" type="number" def="1" />
       <Prop name="style" type="ViewStyle" />
     </Props>
-    <S title="Constellation" desc="Connected node network with gold dots and thin lines. Geometric triangle planes between nodes.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><DunePattern width={800} height={240} variant="constellation" /></View>
+    <S title="What it is">
+      <Rl>Bold geometric dune ridges layered front to back. Each dune is a large angular form — gold on the sunlit face, terracotta/void on the shadow face. Sharp ridge peaks, flat fills, no soft curves.</Rl>
+      <Rl>Like a low-poly desert mountain range at golden hour. Dramatic, Saudi, grounded.</Rl>
     </S>
-    <S title="Horizon" desc="Converging planes from a central vanishing point. Gold and shadow faces.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><DunePattern width={800} height={240} variant="horizon" /></View>
+    <S title="When to use">
+      <Rl>Journey backgrounds — base camp zone, chapter transitions, lower portions of route map.</Rl>
+      <Rl>Onboarding — the "crossing the desert" metaphor.</Rl>
+      <Rl>Section dividers — a warm break between content zones.</Rl>
     </S>
-    <S title="When to Use">
-      <Rl>Hero sections and onboarding screens</Rl>
-      <Rl>Marketing and landing pages</Rl>
-      <Rl>Achievement and celebration backgrounds</Rl>
-      <Rl>Atlas overview headers</Rl>
+    <S title="How it relates to Terrain Lines">
+      <Rl>Same generation system — sine waves + seeded noise. Same family, different render.</Rl>
+      <Rl>Terrain Lines = the map notation (strokes). Dune Pattern = the landscape (filled planes).</Rl>
+      <Rl>Layer terrain lines over dune pattern for the complete picture.</Rl>
     </S>
     <S title="Rules">
-      <Rl>Always behind content, never competing with it. Reduce opacity if text sits on top.</Rl>
-      <Rl>Gold gradients are journey signal — same rules as gold tokens.</Rl>
-      <Rl>Clip to container. Partial reveals are more powerful than showing the full pattern.</Rl>
+      <Rl>Always behind content. Reduce opacity or ridges if text sits on top.</Rl>
+      <Rl>Gold edges = sunlit. Terracotta fills = shadow. Light comes from the upper right.</Rl>
+      <Rl>Clip to container. Partial reveals at the bottom of screens work best.</Rl>
+    </S>
+  </>;
+}
+
+export function ConstellationPage() {
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%', overflow: 'hidden', borderRadius: r[2] }}>
+        <ConstellationPattern width={800} height={300} />
+      </View>
+    </Playground>
+    <Import>{"import { ConstellationPattern } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="opacity" type="number" def="1" />
+      <Prop name="style" type="ViewStyle" />
+    </Props>
+    <S title="What it is">
+      <Rl>A geometric starfield with connected gold nodes and thin lines forming constellations. Triangular planes in iris purple and terracotta fill between nodes for depth. Small scattered stars in the background.</Rl>
+      <Rl>Represents the night sky above the desert — the celestial canopy you navigate by.</Rl>
+    </S>
+    <S title="When to use">
+      <Rl>Hero sections and headers — achievement screens, welcome back, goal overview.</Rl>
+      <Rl>Celebration backgrounds — behind interstitials, mastery moments.</Rl>
+      <Rl>Marketing — landing pages, feature highlights.</Rl>
+    </S>
+    <S title="How it relates to other surfaces">
+      <Rl>Constellation = sky above. Dune = ground below. They pair naturally on journey screens (sky at top, dunes at bottom).</Rl>
+      <Rl>Terrain Lines = the map between them. Grid Paper = precision/data contexts.</Rl>
+      <Rl>Constellation is the most decorative surface — use it sparingly for high-impact moments.</Rl>
+    </S>
+    <S title="Rules">
+      <Rl>Always behind content. Reduce opacity when text overlays.</Rl>
+      <Rl>Gold nodes are the signal colour — warm, intentional, not decorative.</Rl>
+      <Rl>Iris triangles add depth but should never overpower. Keep fill opacity low.</Rl>
     </S>
   </>;
 }
@@ -2600,7 +2873,7 @@ export function CardGridPage() {
 export function IdentityPage() {
   const [size, setSize] = useState('md');
   const [clr, setClr] = useState('default');
-  const [star, setStar] = useState(false);
+  const [useImage, setUseImage] = useState(false);
   const [status, setStatus] = useState('none');
   const [hasBadge, setHasBadge] = useState(false);
   return <>
@@ -2608,35 +2881,32 @@ export function IdentityPage() {
       knobs={<>
         <KnobSelect label="Size" value={size} options={['sm', 'md', 'lg']} onChange={setSize} />
         <KnobSelect label="Color" value={clr} options={['default', 'noon', 'blue']} onChange={setClr} />
-        <KnobToggle label="Star" value={star} onChange={setStar} />
+        <KnobToggle label="Image (SSO)" value={useImage} onChange={setUseImage} />
         <KnobSelect label="Status" value={status} options={['none', 'online', 'busy']} onChange={setStatus} />
-        <KnobToggle label="badge" value={hasBadge} onChange={setHasBadge} />
+        <KnobToggle label="Badge" value={hasBadge} onChange={setHasBadge} />
       </>}
     >
-      <Identity initials="S" name="Sarah Al-Rashid" role="Crew Alpha" avatarColor={clr as any} star={star} status={status === 'none' ? undefined : status as any} size={size as any} badge={hasBadge ? 3 : undefined} />
+      <Identity initials="SA" imageUri={useImage ? 'https://i.pravatar.cc/150?u=sarah' : undefined} name="Sarah Al-Rashid" role="Crew Alpha" avatarColor={clr as any} status={status === 'none' ? undefined : status as any} size={size as any} badge={hasBadge ? 3 : undefined} />
     </Playground>
 
     <Import>{"import { Identity } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="initials" type="string" />
+      <Prop name="initials" type="string" desc="Fallback when no image" />
+      <Prop name="imageUri" type="string" desc="Profile photo URL (e.g. Google SSO)" />
       <Prop name="name" type="string" />
       <Prop name="role" type="string" desc="Mono text below name" />
       <Prop name="meta" type="string" desc="Faint text below role" />
       <Prop name="avatarColor" type="'default' | 'noon' | 'blue'" />
-      <Prop name="star" type="boolean" />
       <Prop name="status" type="'online' | 'busy'" />
       <Prop name="badge" type="string | number" />
       <Prop name="right" type="ReactNode" desc="Right-side content" />
       <Prop name="size" type="'sm' | 'md' | 'lg'" def="'md'" />
     </Props>
     <S title="Examples">
-      <C label="Student"><Identity initials="S" name="Sarah Al-Rashid" role="Crew Alpha" meta="Joined 3 weeks ago" avatarColor="noon" /></C>
-      <C label="Star teacher"><Identity initials="H" name="Mr. Hassan" role="Star Teacher" avatarColor="blue" star /></C>
-      <C label="With badge + status"><Identity initials="O" name="Omar K." role="Facilitator" status="online" badge={3} /></C>
-    </S>
-    <S title="Rules">
-      <Rl>Used in crew lists, leaderboards, session participant views.</Rl>
-      <Rl>Name truncates with ellipsis. Role in mono. Meta in faint.</Rl>
+      <C label="With photo"><Identity initials="SA" imageUri="https://i.pravatar.cc/150?u=sarah" name="Sarah Al-Rashid" role="Crew Alpha" meta="Joined 3 weeks ago" status="online" /></C>
+      <C label="Initials fallback"><Identity initials="SA" name="Sarah Al-Rashid" role="Crew Alpha" avatarColor="noon" /></C>
+      <C label="Teacher"><Identity initials="H" name="Mr. Hassan" role="Teacher" avatarColor="blue" /></C>
+      <C label="With badge"><Identity initials="O" name="Omar K." role="Facilitator" status="online" badge={3} /></C>
     </S>
   </>;
 }
@@ -2734,41 +3004,103 @@ export function BottomActionPage() {
 
 export function BreadcrumbsPage() {
   return <>
-    <S title="Breadcrumbs" desc="Web/tablet only. Not applicable on mobile.">
-      <Rl>Horizontal path trail with chevron separators.</Rl>
-      <Rl>On mobile, use TitleBar with back navigation instead.</Rl>
-      <Rl>Current page is fg color, ancestors are fgMuted with onPress.</Rl>
+    <Playground knobs={<></>}>
+      <Breadcrumbs items={[{ label: 'Home', onPress: () => {} }, { label: 'Qudrat Math', onPress: () => {} }, { label: 'Geometry' }]} />
+    </Playground>
+    <Import>{"import { Breadcrumbs } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="items" type="{ label: string; onPress?: () => void }[]" desc="Path segments. Last item is current (no onPress)." />
+    </Props>
+    <S title="Deep path">
+      <Breadcrumbs items={[{ label: 'Home', onPress: () => {} }, { label: 'Courses', onPress: () => {} }, { label: 'Qudrat', onPress: () => {} }, { label: 'Math', onPress: () => {} }, { label: 'Geometry & Measurement' }]} />
+    </S>
+    <S title="Two levels">
+      <Breadcrumbs items={[{ label: 'Dashboard', onPress: () => {} }, { label: 'Settings' }]} />
+    </S>
+    <S title="Usage">
+      <Rl>Web and tablet only. On mobile, use TitleBar with back button instead.</Rl>
+      <Rl>Separator is / in mono. Current page (last item) is bold fg, ancestors are fgMuted and tappable.</Rl>
     </S>
   </>;
 }
 
 export function PaginationPage() {
+  const [page, setPage] = useState(4);
+  const [totalStr, setTotalStr] = useState('12');
   return <>
-    <S title="Pagination" desc="Web/tablet only. Not applicable on mobile.">
-      <Rl>Page buttons: sp[7] × sp[7], r[2], mono fs[13].</Rl>
-      <Rl>Active page: accentSoft bg, accent text.</Rl>
-      <Rl>On mobile, use FlatList infinite scroll or load-more pattern instead.</Rl>
+    <Playground knobs={<>
+      <KnobSelect label="Total pages" value={totalStr} options={['3', '5', '8', '12', '20', '50']} onChange={(v) => { setTotalStr(v); setPage(1); }} />
+    </>}>
+      <Pagination total={parseInt(totalStr)} current={page} onPageChange={setPage} />
+    </Playground>
+    <Import>{"import { Pagination } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="total" type="number" desc="Total number of pages" />
+      <Prop name="current" type="number" desc="Currently active page (1-indexed)" />
+      <Prop name="onPageChange" type="(page: number) => void" />
+    </Props>
+    <S title="Examples">
+      <C label="Start"><Pagination total={12} current={1} onPageChange={() => {}} /></C>
+      <C label="Middle"><Pagination total={12} current={6} onPageChange={() => {}} /></C>
+      <C label="End"><Pagination total={12} current={12} onPageChange={() => {}} /></C>
+      <C label="Few pages"><Pagination total={4} current={2} onPageChange={() => {}} /></C>
+    </S>
+    <S title="Usage">
+      <Rl>Web and tablet only. On mobile, use infinite scroll or load-more.</Rl>
+      <Rl>Always 7 page slots — first, last, current + neighbours, ellipsis where needed. No layout shift.</Rl>
+      <Rl>Arrows dim at boundaries.</Rl>
     </S>
   </>;
 }
 
 export function SideNavPage() {
+  const { theme } = useTheme();
+  const [active, setActive] = useState('atlas');
+  const groups = [
+    { title: 'Main', items: [{ id: 'atlas', label: 'Atlas' }, { id: 'schedule', label: 'Schedule' }, { id: 'crew', label: 'Crew' }] },
+    { title: 'Learn', items: [{ id: 'homework', label: 'Homework' }, { id: 'sessions', label: 'Sessions' }] },
+    { title: 'Account', items: [{ id: 'settings', label: 'Settings' }, { id: 'profile', label: 'Profile' }] },
+  ];
   return <>
-    <S title="Side Nav" desc="Desktop/tablet only. Not applicable on mobile.">
-      <Rl>Persistent sidebar with grouped navigation items.</Rl>
-      <Rl>Item: sp[2] sp[3] padding, r[2], fs[14] fw[500].</Rl>
-      <Rl>Active: activeOverlay bg, fg color. Inactive: fgMuted.</Rl>
-      <Rl>On mobile, use BottomNav for primary navigation.</Rl>
+    <S title="Side Nav" desc="Desktop/tablet only. Replaces BottomNav on wider screens.">
+      <View style={{ width: 220, borderWidth: 1, borderColor: theme.border, borderRadius: r[2], overflow: 'hidden', backgroundColor: theme.bgSunken }}>
+        {groups.map(g => (
+          <View key={g.title} style={{ paddingHorizontal: sp[3], paddingVertical: sp[3] }}>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.5, textTransform: 'uppercase', paddingHorizontal: sp[3], marginBottom: sp[2] }}>{g.title}</Text>
+            {g.items.map(item => (
+              <Pressable key={item.id} onPress={() => setActive(item.id)} style={{ paddingVertical: sp[2], paddingHorizontal: sp[3], borderRadius: r[1], backgroundColor: active === item.id ? theme.activeOverlay : 'transparent', marginBottom: 1 }}>
+                <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: active === item.id ? theme.fg : theme.fgMuted }}>{item.label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ))}
+      </View>
+    </S>
+    <S title="Specs">
+      <Rl>Width: 220-280px. Grouped items with uppercase mono headers.</Rl>
+      <Rl>Active item: activeOverlay bg, fg text. Inactive: fgMuted.</Rl>
+      <Rl>Item padding: sp[2] vertical, sp[3] horizontal, r[1] radius.</Rl>
+      <Rl>Desktop/tablet only. On mobile, use BottomNav.</Rl>
     </S>
   </>;
 }
 
 export function ModalPage() {
+  const [vis, setVis] = useState(false);
   return <>
-    <S title="Modal" desc="Full-screen overlay wrapping Dialog.">
-      <Import>{"import { Dialog } from '@noon/design-system';\n// Modal = Dialog with visible/onClose props.\n// For complex content, use BottomSheet instead."}</Import>
-      <Rl>Uses the same Dialog component. No separate Modal component needed.</Rl>
-      <Rl>For rich content (forms, lists, media), prefer BottomSheet — it scrolls and has actions.</Rl>
+    <Playground knobs={<></>}>
+      <Button variant="secondary" onPress={() => setVis(true)}>Open Modal</Button>
+    </Playground>
+    <Dialog visible={vis} onClose={() => setVis(false)} title="Confirm action" body="This is a modal dialog — the same Dialog component with controlled visibility." primaryLabel="OK" onPrimary={() => setVis(false)} />
+    <Import>{"import { Dialog } from '@noon/design-system';"}</Import>
+    <S title="Implementation">
+      <Rl>Modal = Dialog with visible + onClose. No separate component needed.</Rl>
+      <Rl>Centered on screen with scrim behind. Tap scrim to dismiss.</Rl>
+    </S>
+    <S title="When to use">
+      <Rl>Confirmation prompts, destructive actions, simple decisions.</Rl>
+      <Rl>For rich content (forms, lists), use BottomSheet instead.</Rl>
+      <Rl>For full-screen content, use FullSheet.</Rl>
     </S>
   </>;
 }
@@ -2776,10 +3108,16 @@ export function ModalPage() {
 export function PopoversPage() {
   return <>
     <S title="Popovers" desc="Contextual content anchored to a trigger.">
-      <Rl>On mobile, popovers are hard to position reliably. Use alternatives:</Rl>
-      <Rl>Simple text → Tooltip (long-press to show)</Rl>
-      <Rl>Rich content → BottomSheet</Rl>
-      <Rl>Action list → Menu</Rl>
+      <Rl>On mobile, popovers are unreliable to position. Use these alternatives:</Rl>
+    </S>
+    <S title="Alternatives by use case">
+      <Rl>Short helper text → <Text style={{ fontWeight: fw[600] }}>Tooltip</Text> (hover on web, long-press on mobile)</Rl>
+      <Rl>Rich content preview → <Text style={{ fontWeight: fw[600] }}>BottomSheet</Text></Rl>
+      <Rl>Action list → <Text style={{ fontWeight: fw[600] }}>Menu</Text></Rl>
+      <Rl>Confirmation → <Text style={{ fontWeight: fw[600] }}>Dialog</Text></Rl>
+    </S>
+    <S title="On web/tablet">
+      <Rl>If you need a true popover on web, position a View absolutely relative to the trigger using onLayout measurements — same pattern as Tooltip but with custom content.</Rl>
     </S>
   </>;
 }
@@ -2792,10 +3130,7 @@ export function FormStackPage() {
         <Input label="Name" placeholder="Your name" />
         <Input label="Email" placeholder="you@noon.com" />
         <Textarea label="Notes" placeholder="Anything else..." rows={3} />
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
-          <Checkbox checked={ch} onValueChange={setCh} />
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: useTheme().theme.fgMuted }}>I agree to the terms</Text>
-        </View>
+        <Checkbox checked={ch} onValueChange={setCh} label="I agree to the terms" />
         <Button fullWidth>Submit</Button>
       </View>
     </S>
@@ -2808,11 +3143,75 @@ export function FormStackPage() {
 }
 
 export function DropzonePage() {
+  const { theme } = useTheme();
+  const [state, setState] = useState('default');
+  const [acceptText, setAcceptText] = useState('PDF, PNG, JPG');
+
+  const isDisabled = state === 'disabled';
+  const isDragging = state === 'hovering';
+  const hasFile = state === 'uploaded';
+  const isError = state === 'error';
+
+  const borderColor = isDragging ? theme.accent : isError ? theme.danger : hasFile ? theme.accentBorder : theme.borderStrong;
+  const bgColor = isDragging ? theme.accentSoft : hasFile ? theme.accentSoft : 'transparent';
+
   return <>
-    <S title="Dropzone" desc="Web only. Not applicable on mobile.">
-      <Rl>Drag-and-drop file upload area. CSS-only dashed border.</Rl>
-      <Rl>On mobile, use expo-document-picker or expo-image-picker instead.</Rl>
-      <Rl>Trigger via Button ("Upload file") or inline in form flow.</Rl>
+    <Playground knobs={<>
+      <KnobSelect label="State" value={state} options={['default', 'hovering', 'uploaded', 'error', 'disabled']} onChange={setState} />
+      <KnobText label="Accept" value={acceptText} onChange={setAcceptText} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        {hasFile ? (
+          <View style={{
+            borderWidth: 1, borderRadius: r[2], borderColor, backgroundColor: bgColor,
+            paddingVertical: sp[4], paddingHorizontal: sp[4],
+            flexDirection: 'row', alignItems: 'center', gap: sp[3],
+          }}>
+            <View style={{ width: 40, height: 40, borderRadius: r[2], backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="document" size={20} color={theme.accentFg} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg }}>homework_week4.pdf</Text>
+              <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, marginTop: 2 }}>2.4 MB · PDF</Text>
+            </View>
+            <Pressable onPress={() => setState('default')} hitSlop={8}>
+              <Icon name="close" size={16} color={theme.fgMuted} />
+            </Pressable>
+          </View>
+        ) : (
+          <View style={{
+            borderWidth: 2, borderStyle: 'dashed', borderRadius: r[2],
+            borderColor: isError ? theme.danger : borderColor,
+            backgroundColor: isDragging ? bgColor : 'transparent',
+            paddingVertical: sp[7], paddingHorizontal: sp[5], alignItems: 'center', gap: sp[2],
+            opacity: isDisabled ? 0.4 : 1,
+          }}>
+            <Icon name={isError ? 'error' : 'plus'} size={28} color={isDragging ? theme.accent : isError ? theme.danger : theme.fgFaint} />
+            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: isError ? theme.danger : isDragging ? theme.accent : theme.fgMuted, textAlign: 'center' }}>
+              {isError ? 'Upload failed' : isDragging ? 'Drop to upload' : 'Tap or drag to upload'}
+            </Text>
+            {!isError && !isDragging && (
+              <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1, textTransform: 'uppercase' }}>{acceptText}</Text>
+            )}
+          </View>
+        )}
+      </View>
+    </Playground>
+
+    <Props>
+      <Prop name="state" type="'default' | 'hovering' | 'uploaded' | 'error' | 'disabled'" desc="Visual state of the zone" />
+      <Prop name="accept" type="string" desc="Accepted file types hint, e.g. 'PDF, PNG, JPG'" />
+      <Prop name="fileName" type="string" desc="Name of uploaded file" />
+      <Prop name="fileSize" type="string" desc="Size of uploaded file, e.g. '2.4 MB'" />
+      <Prop name="onPress" type="() => void" desc="Tap handler — trigger file picker" />
+      <Prop name="onDrop" type="(file) => void" desc="Web drag-and-drop handler" />
+      <Prop name="onRemove" type="() => void" desc="Clear uploaded file" />
+    </Props>
+
+    <S title="Implementation">
+      <Rl>Composition pattern — not a standalone component. Build with Pressable, Icon, Text.</Rl>
+      <Rl>Web: add onDragOver, onDragLeave, onDrop to the Pressable.</Rl>
+      <Rl>Mobile: onPress triggers expo-document-picker or expo-image-picker.</Rl>
     </S>
   </>;
 }
@@ -3060,7 +3459,7 @@ export function LeaderboardPage() {
     <S title="Rules">
       <Rl>Top 3 highlighted with gold/chalk rank colours.</Rl>
       <Rl>Current user row gets selectedOverlay background.</Rl>
-      <Rl>#1 gets star indicator on avatar.</Rl>
+      <Rl>#1 uses noon avatar color to stand out.</Rl>
       <Rl>Score displayed in mono, right-aligned.</Rl>
     </S>
   </>;
@@ -3071,85 +3470,733 @@ export function LeaderboardPage() {
 // ═══════════════════════════════════════════════
 
 export function OasisPage() {
-  const [level, setLevel] = useState('35');
+  const [level, setLevel] = useState('50');
   const [status, setStatus] = useState('current');
-  const [size, setSize] = useState('md');
+  const [size, setSize] = useState('lg');
+  const [lbl, setLbl] = useState('');
   return <>
     <Playground
       knobs={<>
         <KnobSelect label="level" value={level} options={['0', '25', '35', '50', '75', '90', '100']} onChange={setLevel} />
         <KnobSelect label="status" value={status} options={['complete', 'strong', 'weak', 'current', 'upcoming', 'locked']} onChange={setStatus} />
-        <KnobSelect label="size" value={size} options={['sm', 'md', 'lg']} onChange={setSize} />
+        <KnobSelect label="size" value={size} options={['sm', 'md', 'lg', 'xl']} onChange={setSize} />
+        <KnobText label="label (blank = auto %)" value={lbl} onChange={setLbl} />
       </>}
     >
-      <Oasis level={parseInt(level)} status={status as any} label="5" size={size as any} />
+      <Oasis level={parseInt(level)} status={status as any} label={lbl || undefined} size={size as any} meta="Algebra II" />
     </Playground>
     <Import>{"import { Oasis } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="level" type="number" desc="Water fill 0–100" />
-      <Prop name="status" type="'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked'" def="'upcoming'" />
-      <Prop name="label" type="string" desc="Text inside the pool (chapter number)" />
-      <Prop name="size" type="'sm' | 'md' | 'lg'" def="'md'" />
+      <Prop name="level" type="number" desc="Water fill 0–100. Water rises from bottom of the diamond." />
+      <Prop name="status" type="'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked'" def="'upcoming'" desc="Border colour: green (complete/strong), terra (weak), gold (current), grey (upcoming), faint (locked)." />
+      <Prop name="label" type="string" desc="Text inside the diamond. Auto-generates percentage from level if omitted." />
+      <Prop name="size" type="'sm' | 'md' | 'lg' | 'xl'" def="'md'" desc="sm=28, md=40, lg=56, xl=72" />
+      <Prop name="meta" type="string" desc="Caption text below the diamond." />
     </Props>
     <S title="All statuses">
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[5], alignItems: 'flex-end' }}>
-        <Oasis level={95} status="complete" label="1" size="sm" />
-        <Oasis level={82} status="strong" label="3" />
-        <Oasis level={45} status="weak" label="2" />
-        <Oasis level={35} status="current" label="5" size="lg" />
-        <Oasis level={0} status="upcoming" label="6" />
-        <Oasis level={0} status="locked" label="8" size="sm" />
+        <Oasis level={95} status="complete" size="md" meta="Passed" />
+        <Oasis level={82} status="strong" size="md" meta="Strong" />
+        <Oasis level={45} status="weak" size="md" meta="Weak" />
+        <Oasis level={35} status="current" size="lg" meta="Current" />
+        <Oasis level={0} status="upcoming" size="md" meta="Upcoming" />
+        <Oasis level={0} status="locked" size="sm" meta="Locked" />
       </View>
+    </S>
+    <S title="Sizes">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[5], alignItems: 'flex-end' }}>
+        <Oasis level={60} status="current" size="sm" meta="sm" />
+        <Oasis level={60} status="current" size="md" meta="md" />
+        <Oasis level={60} status="current" size="lg" meta="lg" />
+        <Oasis level={60} status="current" size="xl" meta="xl" />
+      </View>
+    </S>
+    <S title="Water levels">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[4], alignItems: 'flex-end' }}>
+        {[0, 25, 50, 75, 100].map(l => (
+          <Oasis key={l} level={l} status="strong" size="md" meta={`${l}%`} />
+        ))}
+      </View>
+    </S>
+    <S title="Custom labels">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[5], alignItems: 'flex-end' }}>
+        <Oasis level={0} status="upcoming" label="—" size="md" meta="Empty" />
+        <Oasis level={58} status="weak" label="58%" size="lg" meta="Exam score" />
+        <Oasis level={100} status="complete" label="A+" size="lg" meta="Perfect" />
+      </View>
+    </S>
+    <S title="Usage">
+      <Rl>Use Oasis for major milestones — exam checkpoints, end-of-course goals.</Rl>
+      <Rl>Use WaypointMarker (small diamond) for topic-level status indicators.</Rl>
+      <Rl>Border colour signals status: green = passed, orange = weak, gold = active, grey = future.</Rl>
+      <Rl>Water level is independent of status — it represents readiness or score.</Rl>
+      <Rl>Label auto-generates from level (e.g. "50%") if not provided. Pass "—" for empty.</Rl>
+    </S>
+  </>;
+}
+
+function DynamicFullscreen({ children, controls }: { children: (w: number, h: number) => React.ReactNode; controls: React.ReactNode }) {
+  const { theme } = useTheme();
+  const { width: W, height: H } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const [open, setOpen] = useState(false);
+  return <>
+    <Button variant="primary" onPress={() => setOpen(true)}>Launch fullscreen</Button>
+    <Modal visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
+      <View style={{ flex: 1, backgroundColor: color.void[300] }}>
+        {children(W, H)}
+        <View style={{ position: 'absolute', bottom: Math.max(insets.bottom, sp[5]), left: sp[5], padding: sp[4], backgroundColor: theme.bgOverlay, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, minWidth: 220 }}>
+          {controls}
+        </View>
+        <View style={{ position: 'absolute', top: Math.max(insets.top, sp[5]), right: sp[5] }}>
+          <IconButton variant="default" size="sm" onPress={() => setOpen(false)} accessibilityLabel="Close">
+            <Icon name="close" size={16} color={theme.fgMuted} />
+          </IconButton>
+        </View>
+      </View>
+    </Modal>
+  </>;
+}
+
+export function DuneDynamicPage() {
+  const { theme } = useTheme();
+  const [layers, setLayers] = useState(8);
+  const [wind, setWind] = useState(3);
+  const [densityD, setDensityD] = useState(1);
+  const [shimmer, setShimmer] = useState(0.65);
+  const [contrastD, setContrastD] = useState(1.6);
+  return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgSubtle, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[3], paddingBottom: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider }}>Atmosphere</Text>
+          <KnobSlider label="Layers" value={layers} min={3} max={10} step={1} onChange={setLayers} />
+          <KnobSlider label="Wind" value={wind} min={0} max={3} step={0.05} onChange={setWind} />
+          <KnobSlider label="Density" value={densityD} min={0.4} max={1.6} step={0.05} onChange={setDensityD} />
+          <KnobSlider label="Shimmer" value={shimmer} min={0} max={3} step={0.05} onChange={setShimmer} />
+          <KnobSlider label="Contrast" value={contrastD} min={0.4} max={1.8} step={0.05} onChange={setContrastD} />
+        </>}
+      >{(w, h) => <DuneDynamic width={w} height={h} layers={Math.round(layers)} wind={wind} density={densityD} shimmer={shimmer} contrast={contrastD} />}</DynamicFullscreen>
+    </Playground>
+    <View style={{ padding: sp[4], borderRadius: r[2], backgroundColor: 'rgba(224,184,58,0.06)', borderWidth: 1, borderColor: 'rgba(224,184,58,0.25)', marginBottom: sp[4] }}>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: color.gold[300], textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: sp[1] }}>Web Preview</Text>
+      <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>Fullscreen uses HTML Canvas. Native production uses @shopify/react-native-skia. Same math, same output.</Text>
+    </View>
+    <Import>{"import { DuneDynamic } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="layers" type="number" def="4" desc="Dune ridges back to front" />
+      <Prop name="wind" type="number" def="3" desc="Drift intensity" />
+      <Prop name="density" type="number" def="1" desc="Particle density multiplier" />
+      <Prop name="shimmer" type="number" def="1" desc="Perpendicular wobble" />
+      <Prop name="contrast" type="number" def="1" desc="Atmospheric depth bias" />
+    </Props>
+    <S title="What it is">
+      <Rl>Animated particle dune field — thousands of stippled chalk grains forming layered desert ridges.</Rl>
+      <Rl>Each particle drifts on its own clock. Ridge shapes from 3 sine harmonics. Density profile creates shadow under ridges, lit face mid-way, deep valley at base.</Rl>
+    </S>
+    <S title="Brand meaning">
+      <Rl>The desert expanse — vast, patient, shaped by forces larger than you. Learning is the same: knowledge accumulates grain by grain, shaped by practice over time.</Rl>
+      <Rl>Wind and sand form natural structures without instruction. Dunes are self-organising complexity — like the patterns that emerge when a student masters enough connected concepts.</Rl>
+      <Rl>The stippled particles represent individual moments of practice. Alone they're tiny. Together they form something unmistakable.</Rl>
+    </S>
+    <S title="Performance">
+      <Rl>Phone (390×844): 4 layers, density 1 → ~8k particles. Smooth on most devices.</Rl>
+      <Rl>Tablet (1024×768): 5 layers, density 1 → ~15k particles. Fine.</Rl>
+      <Rl>Desktop (1920×1080): 6–8 layers, density 1 → ~30k particles. Smooth.</Rl>
+      <Rl>If frame rate drops, reduce layers first, then density. Fall back to static DunePattern (SVG) on low-end devices.</Rl>
+    </S>
+    <S title="Pairing">
+      <Rl>Dunes = the ground. Stars = the sky. Terrain = the map between them.</Rl>
+      <Rl>Use dunes where the feeling should be grounded, warm, expansive — the journey itself.</Rl>
+      <Rl>Fall back to static DunePattern (SVG) where animation isn't appropriate or performant.</Rl>
+    </S>
+  </>;
+}
+
+export function StarsDynamicPage() {
+  const { theme } = useTheme();
+  const [densityS, setDensityS] = useState(1);
+  const [twinkle, setTwinkle] = useState(1);
+  const [haloS, setHaloS] = useState(1);
+  const [linesS, setLinesS] = useState(1);
+  return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgSubtle, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[3], paddingBottom: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider }}>Sky</Text>
+          <KnobSlider label="Density" value={densityS} min={0.4} max={2} step={0.05} onChange={setDensityS} />
+          <KnobSlider label="Twinkle" value={twinkle} min={0} max={2} step={0.05} onChange={setTwinkle} />
+          <KnobSlider label="Halo" value={haloS} min={0} max={2} step={0.05} onChange={setHaloS} />
+          <KnobSlider label="Lines" value={linesS} min={0} max={2} step={0.05} onChange={setLinesS} />
+        </>}
+      >{(w, h) => <StarsDynamic width={w} height={h} density={densityS} twinkle={twinkle} halo={haloS} lines={linesS} />}</DynamicFullscreen>
+    </Playground>
+    <View style={{ padding: sp[4], borderRadius: r[2], backgroundColor: 'rgba(224,184,58,0.06)', borderWidth: 1, borderColor: 'rgba(224,184,58,0.25)', marginBottom: sp[4] }}>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: color.gold[300], textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: sp[1] }}>Web Preview</Text>
+      <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>Fullscreen uses HTML Canvas. Native production uses @shopify/react-native-skia. Same math, same output.</Text>
+    </View>
+    <Import>{"import { StarsDynamic } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="density" type="number" def="1" />
+      <Prop name="twinkle" type="number" def="1" desc="Radius twinkle intensity" />
+      <Prop name="halo" type="number" def="1" desc="Glow halos + diffraction spikes" />
+      <Prop name="lines" type="number" def="1" desc="Constellation connection lines" />
+    </Props>
+    <S title="What it is">
+      <Rl>Animated starfield with procedural constellations. Power-law magnitude distribution. Brightest stars get diffraction spikes and radial halos.</Rl>
+      <Rl>Constellations via MST on regional brightest stars. Tapered gradient lines fade at endpoints.</Rl>
+    </S>
+    <S title="Brand meaning">
+      <Rl>Connected learning — the constellation lines represent neural pathways forming between concepts. Stars are individual ideas. Lines are the connections your brain builds when you study.</Rl>
+      <Rl>No fixed constellations — every regeneration creates new groupings. Like learning itself: the connections you make are unique to you, not prescribed.</Rl>
+      <Rl>Brighter stars are anchor concepts. Fainter ones are supporting details. The brightest get halos — mastery glows.</Rl>
+    </S>
+    <S title="Performance">
+      <Rl>Phone: density 0.6–0.8 → ~2k stars. Twinkle is cheap (radius only, no regen).</Rl>
+      <Rl>Tablet: density 1 → ~4k stars. Halos and spikes are the expensive passes — reduce halo first.</Rl>
+      <Rl>Desktop: density 1–1.5. No issues.</Rl>
+      <Rl>Fall back to static ConstellationPattern (SVG) on low-end devices.</Rl>
+    </S>
+    <S title="Pairing">
+      <Rl>Stars = the sky, aspiration, what you're reaching for. Dunes = the ground beneath you.</Rl>
+      <Rl>Use stars where the feeling should be expansive, aspirational, cerebral — the destination, not the journey.</Rl>
+      <Rl>Fall back to static ConstellationPattern (SVG) where animation isn't appropriate.</Rl>
+    </S>
+  </>;
+}
+
+export function TerrainDynamicPage() {
+  const { theme } = useTheme();
+  const [scaleT, setScaleT] = useState(1.5);
+  const [detailT, setDetailT] = useState(1.55);
+  const [reliefT, setReliefT] = useState(1.2);
+  const [contrastT, setContrastT] = useState(0.7);
+  const [tiltT, setTiltT] = useState(0.22);
+  const [routeT, setRouteT] = useState(true);
+  return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgSubtle, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[3], paddingBottom: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider }}>Survey</Text>
+          <KnobSlider label="Scale" value={scaleT} min={0.2} max={1.5} step={0.02} onChange={setScaleT} />
+          <KnobSlider label="Detail" value={detailT} min={0.5} max={2} step={0.05} onChange={setDetailT} />
+          <KnobSlider label="Relief" value={reliefT} min={0.4} max={1.8} step={0.05} onChange={setReliefT} />
+          <KnobSlider label="Contrast" value={contrastT} min={0.4} max={2} step={0.05} onChange={setContrastT} />
+          <KnobSlider label="Tilt" value={tiltT} min={0} max={0.7} step={0.02} onChange={setTiltT} />
+          <KnobToggle label="Route" value={routeT} onChange={setRouteT} />
+        </>}
+      >{(w, h) => <TerrainDynamic width={w} height={h} scale={scaleT} detail={detailT} relief={reliefT} contrast={contrastT} tilt={tiltT} showRoute={routeT} />}</DynamicFullscreen>
+    </Playground>
+    <View style={{ padding: sp[4], borderRadius: r[2], backgroundColor: 'rgba(224,184,58,0.06)', borderWidth: 1, borderColor: 'rgba(224,184,58,0.25)', marginBottom: sp[4] }}>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: color.gold[300], textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: sp[1] }}>Web Preview</Text>
+      <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>Fullscreen uses HTML Canvas. Native production uses @shopify/react-native-skia. Same math, same output.</Text>
+    </View>
+    <Import>{"import { TerrainDynamic } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="scale" type="number" def="0.7" desc="Heightmap spatial frequency" />
+      <Prop name="detail" type="number" def="1" desc="Contour density" />
+      <Prop name="relief" type="number" def="1" desc="Heightmap amplitude" />
+      <Prop name="contrast" type="number" def="1" desc="Major/minor alpha contrast" />
+      <Prop name="tilt" type="number" def="0" desc="Oblique projection (0=top-down, 0.7=max)" />
+    </Props>
+    <S title="What it is">
+      <Rl>Topographic contour map via marching squares on a sine-noise heightmap. Major contours every 5th are bolder. Elevation-based alpha.</Rl>
+      <Rl>Optional tilt for oblique projection with per-contour elevation lift.</Rl>
+    </S>
+    <S title="Brand meaning">
+      <Rl>The route through difficulty — contour lines crowd where the terrain is steep, spread where it's easy. Density IS difficulty. A student sees at a glance where the hard parts are.</Rl>
+      <Rl>The route overlay traces the path of least resistance through valleys — the proven route a tutor would recommend. Not the shortest path, the smartest one.</Rl>
+      <Rl>Major contours (every 5th, bolder) are milestones. Minor contours are the incremental steps between them. Progress is visible in the spacing.</Rl>
+    </S>
+    <S title="Performance">
+      <Rl>Terrain uses marching squares on a grid — cost scales with canvas area ÷ grid size (11px cells).</Rl>
+      <Rl>Phone: detail 0.8, scale 0.7 → ~30 contours, ~5k segments. Smooth.</Rl>
+      <Rl>Desktop: detail 1.5, scale 1.5 → ~60 contours. Fine.</Rl>
+      <Rl>Tilt adds per-contour projection — marginally more expensive but negligible.</Rl>
+      <Rl>Fall back to static TerrainPattern (SVG) on low-end devices.</Rl>
+    </S>
+    <S title="Pairing">
+      <Rl>Terrain = the map. Dunes = the land. Stars = the sky. Terrain sits between them — the notation layer.</Rl>
+      <Rl>Use terrain where the feeling should be navigational, structured, purposeful — you know where you're going.</Rl>
+      <Rl>Fall back to static TerrainPattern (SVG) where animation isn't appropriate.</Rl>
     </S>
   </>;
 }
 
 export function RouteMapPage({ onClose }: { onClose?: () => void }) {
   const { theme } = useTheme();
+  const { width: SCREEN_W } = useWindowDimensions();
+  const CANVAS_W = Math.min(SCREEN_W, 480);
+
   const sampleChapters: RouteChapter[] = [
-    { id: 'ch8', label: '8', title: 'Advanced Inference', date: 'in 32 days', status: 'locked', level: 0, markers: [
-      { id: 'implied', label: 'Implied meaning', status: 'unmapped' },
-      { id: 'intent', label: 'Author intent', status: 'unmapped' },
+    { id: 'ch8', label: '8', title: 'Mock & Review', eyebrow: 'Chapter 8 · in 7 weeks', status: 'locked', level: 0, markers: [
+      { id: 'mock', label: 'Full mock paper', sublabel: 'Locked', status: 'unmapped' },
+      { id: 'weakreview', label: 'Weak-area review', sublabel: 'Locked', status: 'unmapped' },
     ]},
-    { id: 'ch7', label: '7', title: 'Comparative Analysis', date: 'in 25 days', status: 'upcoming', level: 0, markers: [
-      { id: 'comparison', label: 'Passage comparison', status: 'unmapped' },
-      { id: 'evidence', label: 'Evidence weighing', status: 'unmapped' },
+    { id: 'ch7', label: '7', title: 'Probability & Combinatorics', eyebrow: 'Chapter 7 · in 5 weeks', status: 'upcoming', level: 0, markers: [
+      { id: 'counting', label: 'Counting principles', status: 'unmapped' },
+      { id: 'perms', label: 'Permutations', status: 'unmapped' },
+      { id: 'prob', label: 'Probability basics', status: 'unmapped' },
     ]},
-    { id: 'ch6', label: '6', title: 'Data Interpretation', date: 'in 18 days', status: 'upcoming', level: 0, markers: [
-      { id: 'charts', label: 'Charts & tables', status: 'unmapped' },
-      { id: 'stats', label: 'Statistical reasoning', status: 'unmapped' },
-      { id: 'datainf', label: 'Data inference', status: 'unmapped' },
+    { id: 'ch6', label: '6', title: 'Statistics & Data', eyebrow: 'Chapter 6 · in 3 weeks', status: 'upcoming', level: 0, markers: [
+      { id: 'mmm', label: 'Mean, median, mode', status: 'unmapped' },
+      { id: 'tables', label: 'Reading data tables', status: 'unmapped' },
+      { id: 'stddev', label: 'Standard deviation', status: 'unmapped' },
     ]},
-    { id: 'ch5', label: '5', title: 'Critical Reading', date: 'in 4 days', status: 'current', level: 35, markers: [
-      { id: 'tone', label: 'Tone analysis', status: 'exploring' },
-      { id: 'mainidea', label: 'Main idea extraction', status: 'exploring' },
-      { id: 'support', label: 'Supporting detail', status: 'not-started' },
+    { id: 'ch5', label: '5', title: 'Geometry & Measurement', eyebrow: 'You are here · in 9 days', status: 'current', level: 35, markers: [
+      { id: 'triangles', label: 'Triangles & angles', sublabel: 'Last practiced today', status: 'exploring' },
+      { id: 'area', label: 'Area & perimeter', sublabel: 'Started', status: 'exploring' },
+      { id: 'volume', label: 'Volume & surface', status: 'exploring' },
+      { id: 'coord', label: 'Coordinate geometry', status: 'not-started' },
     ]},
-    { id: 'ch4', label: '4', title: 'Vocabulary in Context', result: '82%', status: 'strong', level: 82, markers: [
-      { id: 'wordmeaning', label: 'Word meaning', status: 'mapped' },
-      { id: 'contextclues', label: 'Contextual clues', status: 'mapped' },
+    { id: 'ch4', label: '4', title: 'Algebra II', eyebrow: 'Exam · 11 days ago', status: 'weak', level: 58, markers: [
+      { id: 'linear', label: 'Linear equations', status: 'mapped' },
+      { id: 'quadratic', label: 'Quadratic equations', sublabel: 'Still uncertain', status: 'needs-attention' },
+      { id: 'inequalities', label: 'Inequalities', status: 'mapped' },
+      { id: 'functions', label: 'Functions', sublabel: 'Still uncertain', status: 'needs-attention' },
     ]},
-    { id: 'ch3', label: '3', title: 'Sentence Completion', result: '91%', status: 'strong', level: 91, markers: [
-      { id: 'grammar', label: 'Grammar patterns', status: 'mapped' },
-      { id: 'connectors', label: 'Logical connectors', status: 'mapped' },
-      { id: 'transitions', label: 'Transition words', status: 'mapped' },
+    { id: 'ch3', label: '3', title: 'Algebra I', eyebrow: 'Exam · 25 days ago', status: 'strong', level: 91, markers: [
+      { id: 'variables', label: 'Variables & expressions', status: 'mapped' },
+      { id: 'solving', label: 'Solving equations', status: 'mapped' },
+      { id: 'words', label: 'Word problems', status: 'mapped' },
     ]},
-    { id: 'ch2', label: '2', title: 'Reading Comprehension', result: '45%', status: 'weak', level: 45, markers: [
-      { id: 'structure', label: 'Passage structure', status: 'needs-attention' },
-      { id: 'recall', label: 'Detail recall', status: 'needs-attention' },
-      { id: 'infbasics', label: 'Inference basics', status: 'mapped' },
+    { id: 'ch2', label: '2', title: 'Ratios & Proportions', eyebrow: 'Exam · 39 days ago', status: 'strong', level: 95, markers: [
+      { id: 'ratios', label: 'Ratios', status: 'mapped' },
+      { id: 'percent', label: 'Percentages', status: 'mapped' },
+      { id: 'rates', label: 'Rates', status: 'mapped' },
     ]},
-    { id: 'ch1', label: '1', title: 'Foundations', result: '95%', status: 'complete', level: 95, markers: [
-      { id: 'vocab', label: 'Basic vocabulary', status: 'mapped' },
-      { id: 'sentences', label: 'Sentence types', status: 'mapped' },
+    { id: 'ch1', label: '1', title: 'Number Sense', eyebrow: 'Exam · 53 days ago', status: 'complete', level: 95, markers: [
+      { id: 'integers', label: 'Integers & fractions', status: 'mapped' },
+      { id: 'decimals', label: 'Decimals', status: 'mapped' },
+      { id: 'order', label: 'Order of operations', status: 'mapped' },
     ]},
   ];
 
+  // Concept data per topic
+  const concepts: Record<string, { name: string; state: string; from?: string }[]> = {
+    triangles: [{ name: 'Triangle types', state: 'mapped' }, { name: 'Angle sum theorem', state: 'exploring' }, { name: 'Similar triangles', state: 'exploring' }, { name: 'Pythagorean theorem', state: 'unmapped' }],
+    area: [{ name: 'Area of polygons', state: 'mapped' }, { name: 'Area of circles', state: 'needs-attention' }, { name: 'Composite shapes', state: 'needs-attention' }, { name: 'Perimeter from coordinates', state: 'needs-attention', from: 'Coordinate geometry' }],
+    volume: [{ name: 'Volume of prisms', state: 'exploring' }, { name: 'Volume of cylinders & cones', state: 'exploring' }, { name: 'Surface area', state: 'unmapped' }],
+    coord: [{ name: 'Plotting points', state: 'unmapped' }, { name: 'Distance formula', state: 'unmapped', from: 'Also in Algebra II' }, { name: 'Slope of a line', state: 'unmapped' }, { name: 'Perimeter from coords', state: 'unmapped', from: 'Area & perimeter' }],
+    linear: [{ name: 'Slope-intercept form', state: 'mapped' }, { name: 'Solving linear eqs', state: 'mapped' }, { name: 'Graphing lines', state: 'mapped', from: 'Also in Functions' }],
+    quadratic: [{ name: 'Solving by factoring', state: 'mapped' }, { name: 'Quadratic formula', state: 'needs-attention' }, { name: 'Discriminant', state: 'needs-attention' }, { name: 'Distance formula', state: 'needs-attention', from: 'Also in ch 5' }],
+    inequalities: [{ name: 'Linear inequalities', state: 'mapped' }, { name: 'Compound inequalities', state: 'mapped' }, { name: 'Absolute value', state: 'mapped' }],
+    functions: [{ name: 'Function notation', state: 'mapped' }, { name: 'Domain & range', state: 'needs-attention' }, { name: 'Graphing functions', state: 'needs-attention', from: 'Also in Algebra I' }],
+    variables: [{ name: 'Expressions', state: 'mapped' }, { name: 'Substitution', state: 'mapped' }],
+    solving: [{ name: 'One-step equations', state: 'mapped' }, { name: 'Multi-step equations', state: 'mapped' }],
+    words: [{ name: 'Translate to algebra', state: 'mapped' }, { name: 'Multi-step problems', state: 'mapped' }],
+    ratios: [{ name: 'Simplifying ratios', state: 'mapped' }, { name: 'Proportional reasoning', state: 'mapped' }],
+    percent: [{ name: 'Percentage of', state: 'mapped' }, { name: 'Percentage change', state: 'mapped' }],
+    rates: [{ name: 'Unit rates', state: 'mapped' }, { name: 'Speed/distance/time', state: 'mapped' }],
+    integers: [{ name: 'Integer operations', state: 'mapped' }, { name: 'Fraction operations', state: 'mapped' }],
+    decimals: [{ name: 'Decimal arithmetic', state: 'mapped' }, { name: 'Rounding', state: 'mapped' }],
+    order: [{ name: 'BODMAS/PEMDAS', state: 'mapped' }, { name: 'Nested expressions', state: 'mapped' }],
+  };
+
+  const scrollRef = React.useRef<ScrollView>(null);
+  const didScroll = React.useRef(false);
+  const [stream, setStream] = useState(0);
+  const [sheetChapter, setSheetChapter] = useState<RouteChapter | null>(null);
+  const [sheetMarker, setSheetMarker] = useState<{ marker: RouteMarker; chapter: RouteChapter } | null>(null);
+  const [showKey, setShowKey] = useState(false);
+  const examDates = ['23 Shaban · 14 Mar', '15 Ramadan · 28 Mar'];
+  const examNames = ['Kammi', 'Lafthi'];
+  const examDays = [49, 63];
+  const MAX_W = 480;
+
+  const mColor = (s: string) => s === 'mapped' ? color.noon[400] : s === 'exploring' ? color.gold[300] : s === 'needs-attention' ? color.terra[300] : 'rgba(232,228,220,0.35)';
+  const mBg = (s: string) => s === 'mapped' ? color.noon[400] : s === 'needs-attention' ? 'rgba(212,149,110,0.18)' : 'transparent';
+  const mLabel = (s: string) => s === 'mapped' ? 'Mastered' : s === 'exploring' ? 'Exploring' : s === 'not-started' ? 'Not started' : s === 'needs-attention' ? 'Still uncertain' : 'Not started';
+
+  // Estimate total content height for SVG background
+  const SUNRISE_H = 300;
+  const ROUTE_H = sampleChapters.reduce((h, ch) => h + 130 + ch.markers.length * 52 + 40, 0);
+  const HOME_H = 240;
+  const TOTAL_H = SUNRISE_H + ROUTE_H + HOME_H;
+  const W = SCREEN_W;
+
   return (
-    <View style={{ flex: 1, backgroundColor: theme.bg }}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], paddingTop: sp[10], paddingBottom: sp[12] }}>
-        <RouteMap chapters={sampleChapters} currentChapter="ch5" />
+    <View style={{ flex: 1, backgroundColor: color.void[400] }}>
+      {/* ── Fixed header bar ── */}
+      <View style={{
+        position: 'relative', zIndex: 50, backgroundColor: color.void[400],
+        paddingHorizontal: sp[4], paddingVertical: sp[3],
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        borderBottomWidth: 1, borderBottomColor: theme.border,
+      }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
+          <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: color.gold[300], shadowColor: color.gold[300], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.3, shadowRadius: 8 }} />
+          <View>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.6, textTransform: 'uppercase' }}>Final Exam</Text>
+            <Text style={{ fontFamily: font.serif, fontSize: fs[16], fontWeight: fw[500], color: theme.fg }}>{examNames[stream]} Assessment</Text>
+          </View>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={{ fontFamily: font.serif, fontSize: fs[22], fontWeight: fw[500], color: color.gold[300] }}>{examDays[stream]}</Text>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.4, textTransform: 'uppercase', marginTop: 2 }}>days</Text>
+        </View>
+      </View>
+
+      {/* ── Stream tabs ── */}
+      <View style={{ position: 'relative', zIndex: 40, paddingHorizontal: sp[4], paddingVertical: sp[2] }}>
+        <Segmented options={['Kammi', 'Lafthi']} selected={stream} onSelect={setStream} />
+      </View>
+
+      <ScrollView ref={scrollRef} style={{ flex: 1 }} onLayout={() => {
+        if (!didScroll.current) {
+          didScroll.current = true;
+          const currentY = SUNRISE_H + sampleChapters.slice(0, 3).reduce((h, ch) => h + 130 + ch.markers.length * 52 + 40, 0);
+          setTimeout(() => scrollRef.current?.scrollTo({ y: currentY - 80, animated: false }), 100);
+        }
+      }}>
+        <View style={{ position: 'relative', width: W, minHeight: TOTAL_H }}>
+
+        {/* ── SVG atmosphere ── */}
+        <Svg width={W} height={TOTAL_H} style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+          <Defs>
+            {/* Desert journey: warm terra (bottom/city) → dark void (desert night) → hint of green (oasis) */}
+            <LinearGradient id="rmSky" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={color.noon[700]} stopOpacity="0.08" />
+              <Stop offset="0.06" stopColor={color.void[300]} stopOpacity="1" />
+              <Stop offset="0.3" stopColor={color.void[400]} stopOpacity="1" />
+              <Stop offset="0.7" stopColor={color.void[400]} stopOpacity="1" />
+              <Stop offset="0.88" stopColor={color.void[300]} stopOpacity="1" />
+              <Stop offset="0.95" stopColor={color.terra[800]} stopOpacity="0.2" />
+              <Stop offset="1" stopColor={color.terra[700]} stopOpacity="0.12" />
+            </LinearGradient>
+          </Defs>
+
+          <Rect x="0" y="0" width={W} height={TOTAL_H} fill="url(#rmSky)" />
+
+          {/* Stars — concentrated in the middle (desert night), sparse near top/bottom */}
+          {Array.from({ length: 60 }, (_, i) => {
+            const x = (i * 73 + 17) % W;
+            const rawY = (i * 97 + 31) % TOTAL_H;
+            const y = TOTAL_H * 0.15 + (rawY % (TOTAL_H * 0.6));
+            const distFromCenter = Math.abs(y - TOTAL_H * 0.45) / (TOTAL_H * 0.35);
+            const fade = Math.max(0, 1 - distFromCenter);
+            const bright = i % 9 === 0;
+            return (
+              <Circle key={`s${i}`} cx={x} cy={y}
+                r={bright ? 1.5 : i % 4 === 0 ? 1 : 0.6}
+                fill={color.chalk[100]}
+                opacity={(bright ? 0.55 : i % 4 === 0 ? 0.18 : 0.07) * fade} />
+            );
+          })}
+
+          {/* Vertical flow lines — direction of travel, bottom to top */}
+          {[0.15, 0.25, 0.35, 0.5, 0.65, 0.75, 0.85].map((xPct, i) => {
+            const x = W * xPct;
+            const amp = 8 + (i % 3) * 6;
+            const startY = TOTAL_H * 0.9;
+            const endY = TOTAL_H * 0.1;
+            const pts = 8;
+            let d = `M ${x} ${startY}`;
+            for (let p = 1; p <= pts; p++) {
+              const t = p / pts;
+              const py = startY + (endY - startY) * t;
+              const sway = Math.sin(t * Math.PI * 2 + i * 1.3) * amp;
+              const cpY = startY + (endY - startY) * (t - 0.5 / pts);
+              d += ` S ${x + sway} ${cpY}, ${x + sway} ${py}`;
+            }
+            return (
+              <Path key={`vflow${i}`} d={d}
+                stroke={color.chalk[100]} strokeWidth={0.5} strokeOpacity={0.04 + (i % 2) * 0.02} fill="none" />
+            );
+          })}
+
+          {/* Horizontal terrain contours — cross the vertical flow */}
+          {[0.25, 0.4, 0.55, 0.7, 0.82].map((t, i) => {
+            const y = TOTAL_H * t;
+            const amp = 10 + (i % 3) * 6;
+            const off = (i % 2) * W * 0.15;
+            return (
+              <Path key={`hterr${i}`}
+                d={`M 0 ${y} Q ${W * 0.25 + off} ${y - amp} ${W * 0.55 + off * 0.5} ${y - amp * 0.3} T ${W} ${y + amp * 0.3}`}
+                stroke={color.terra[700]} strokeWidth={0.5} strokeOpacity={0.05 + (i % 2) * 0.03} fill="none" />
+            );
+          })}
+
+          {/* Grid — lower portion near Riyadh (cartographic feel) */}
+          {Array.from({ length: Math.floor(W / 24) + 1 }, (_, i) => (
+            <Rect key={`gv${i}`} x={i * 24} y={TOTAL_H * 0.7} width={0.5} height={TOTAL_H * 0.3}
+              fill={color.chalk[100]} opacity={0.02} />
+          ))}
+          {Array.from({ length: Math.floor(TOTAL_H * 0.3 / 24) + 1 }, (_, i) => (
+            <Rect key={`gh${i}`} x={0} y={TOTAL_H * 0.7 + i * 24} width={W} height={0.5}
+              fill={color.chalk[100]} opacity={0.02} />
+          ))}
+
+          {/* Sandy dune fills near base camp */}
+          <Path d={`M 0 ${TOTAL_H - 100} Q ${W * 0.3} ${TOTAL_H - 130} ${W * 0.6} ${TOTAL_H - 105} T ${W} ${TOTAL_H - 80} L ${W} ${TOTAL_H} L 0 ${TOTAL_H} Z`}
+            fill={color.terra[800]} opacity={0.1} />
+          <Path d={`M 0 ${TOTAL_H - 50} Q ${W * 0.45} ${TOTAL_H - 75} ${W * 0.7} ${TOTAL_H - 55} T ${W} ${TOTAL_H - 30} L ${W} ${TOTAL_H} L 0 ${TOTAL_H} Z`}
+            fill={color.terra[700]} opacity={0.07} />
+
+          {/* Riyadh skyline — base camp city */}
+          <Path d={`M 0 ${TOTAL_H - 8} L 0 ${TOTAL_H - 24} L ${W * 0.05} ${TOTAL_H - 24} L ${W * 0.05} ${TOTAL_H - 34} L ${W * 0.1} ${TOTAL_H - 34} L ${W * 0.1} ${TOTAL_H - 28} L ${W * 0.15} ${TOTAL_H - 28} L ${W * 0.15} ${TOTAL_H - 42} L ${W * 0.18} ${TOTAL_H - 42} L ${W * 0.18} ${TOTAL_H - 50} L ${W * 0.19} ${TOTAL_H - 50} L ${W * 0.19} ${TOTAL_H - 42} L ${W * 0.24} ${TOTAL_H - 42} L ${W * 0.24} ${TOTAL_H - 34} L ${W * 0.3} ${TOTAL_H - 34} L ${W * 0.3} ${TOTAL_H - 48} L ${W * 0.33} ${TOTAL_H - 48} L ${W * 0.33} ${TOTAL_H - 56} L ${W * 0.34} ${TOTAL_H - 56} L ${W * 0.34} ${TOTAL_H - 48} L ${W * 0.39} ${TOTAL_H - 48} L ${W * 0.39} ${TOTAL_H - 34} L ${W * 0.45} ${TOTAL_H - 34} L ${W * 0.45} ${TOTAL_H - 40} L ${W * 0.5} ${TOTAL_H - 40} L ${W * 0.5} ${TOTAL_H - 30} L ${W * 0.55} ${TOTAL_H - 30} L ${W * 0.55} ${TOTAL_H - 44} L ${W * 0.58} ${TOTAL_H - 44} L ${W * 0.58} ${TOTAL_H - 52} L ${W * 0.59} ${TOTAL_H - 52} L ${W * 0.59} ${TOTAL_H - 44} L ${W * 0.64} ${TOTAL_H - 44} L ${W * 0.64} ${TOTAL_H - 34} L ${W * 0.7} ${TOTAL_H - 34} L ${W * 0.7} ${TOTAL_H - 28} L ${W * 0.76} ${TOTAL_H - 28} L ${W * 0.76} ${TOTAL_H - 34} L ${W * 0.82} ${TOTAL_H - 34} L ${W * 0.82} ${TOTAL_H - 28} L ${W * 0.88} ${TOTAL_H - 28} L ${W * 0.88} ${TOTAL_H - 24} L ${W * 0.94} ${TOTAL_H - 24} L ${W * 0.94} ${TOTAL_H - 20} L ${W} ${TOTAL_H - 20} L ${W} ${TOTAL_H} L 0 ${TOTAL_H} Z`}
+            fill={color.chalk[100]} opacity={0.1} />
+        </Svg>
+
+        {/* ── Terrain contour lines — visible topographic texture ── */}
+        <View style={{ position: 'absolute', top: TOTAL_H * 0.15, left: 0, right: 0, height: TOTAL_H * 0.7 }} pointerEvents="none">
+          <TerrainPattern width={W} height={TOTAL_H * 0.7} variant="standard" opacity={0.3} />
+        </View>
+
+        {/* ── All content constrained to MAX_W ── */}
+        <View style={{ maxWidth: MAX_W, width: '100%', alignSelf: 'center' }}>
+
+          {/* ── The Oasis — destination ── */}
+          {(() => {
+            const allMarkers = sampleChapters.flatMap(ch => ch.markers);
+            const mapped = allMarkers.filter(m => m.status === 'mapped').length;
+            const total = allMarkers.length;
+            const oasisLevel = Math.round((mapped / total) * 100);
+            const ow = Math.min(W, MAX_W);
+            return (
+              <View style={{ paddingTop: sp[8], paddingBottom: sp[6] }}>
+                <Pressable onPress={() => {}} style={{ alignItems: 'center' }}>
+                  <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.6, textTransform: 'uppercase' }}>{examNames[stream]} Assessment · {examDays[stream]} days</Text>
+
+                  {/* Large diamond matching exam checkpoints — but this is THE exam */}
+                  <View style={{ marginTop: sp[5], alignItems: 'center' }}>
+                    <View style={{
+                      width: 72, height: 72,
+                      transform: [{ rotate: '45deg' }],
+                      borderWidth: 2, borderColor: color.noon[400],
+                      borderStyle: 'dashed',
+                      backgroundColor: color.void[300],
+                      overflow: 'hidden',
+                      shadowColor: color.noon[400],
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.15,
+                      shadowRadius: 12,
+                    }}>
+                      {/* Water fill — bottom to top */}
+                      <View style={{
+                        position: 'absolute', top: -(72 * 0.25), left: -(72 * 0.25),
+                        width: 72 * 1.5, height: 72 * 1.5,
+                        transform: [{ rotate: '-45deg' }], justifyContent: 'flex-end',
+                      }}>
+                        <View style={{ height: `${oasisLevel}%`, backgroundColor: color.blue[400], opacity: 0.3 }} />
+                      </View>
+                      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ transform: [{ rotate: '-45deg' }], fontFamily: font.mono, fontSize: fs[14], fontWeight: fw[600], color: color.noon[400] }}>{oasisLevel}%</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg, marginTop: sp[4], textAlign: 'center', paddingHorizontal: sp[4] }}>
+                    <Text style={{ color: color.noon[400], fontWeight: fw[600] }}>{mapped}</Text> of {total} topics mastered
+                  </Text>
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgSubtle, marginTop: sp[1], textAlign: 'center' }}>Each one fills your oasis. Master them all to be ready.</Text>
+                </Pressable>
+              </View>
+            );
+          })()}
+
+          {/* ── Route Map ── */}
+          <RouteMap
+            chapters={sampleChapters}
+            currentChapter="ch5"
+            onChapterPress={setSheetChapter}
+            onMarkerPress={(marker, chapter) => setSheetMarker({ marker, chapter })}
+          />
+
+          {/* ── Riyadh / Base Camp ── */}
+          <View style={{ paddingTop: sp[10], paddingBottom: sp[12], alignItems: 'center' }}>
+            <View style={{ width: '60%', height: 1, marginBottom: sp[6] }}>
+              <View style={{ flex: 1, backgroundColor: theme.borderStrong }} />
+            </View>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: color.terra[400], letterSpacing: 2, textTransform: 'uppercase' }}>Base Camp</Text>
+            <Text style={{ fontFamily: font.serif, fontSize: fs[22], fontWeight: fw[500], color: theme.fg, marginTop: sp[1] }}>Riyadh</Text>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontStyle: 'italic', color: theme.fgSubtle, marginTop: sp[2] }}>Where you began · Sept 2025</Text>
+          </View>
+
+        </View>
+        </View>
       </ScrollView>
+
+      {/* ── Floating action buttons ── */}
+      <View style={{ position: 'absolute', bottom: sp[5], right: sp[4], gap: sp[2], zIndex: 10 }}>
+        <Pressable
+          onPress={() => {
+            const currentY = SUNRISE_H + sampleChapters.slice(0, 3).reduce((h, ch) => h + 130 + ch.markers.length * 52 + 40, 0);
+            scrollRef.current?.scrollTo({ y: currentY - 80, animated: true });
+          }}
+          style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: theme.bgOverlay, borderWidth: 1, borderColor: theme.border, alignItems: 'center', justifyContent: 'center' }}
+        >
+          {/* Location pin icon */}
+          <Svg width={18} height={18} viewBox="0 0 24 24">
+            <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" fill={color.gold[400]} /></Svg>
+        </Pressable>
+        <Pressable
+          onPress={() => setShowKey(true)}
+          style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: theme.bgOverlay, borderWidth: 1, borderColor: theme.border, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Text style={{ fontFamily: font.mono, fontSize: fs[13], fontWeight: fw[700], color: theme.fgMuted }}>?</Text>
+        </Pressable>
+      </View>
+
+      {/* ── Key sheet ── */}
+      <BottomSheet visible={showKey} onClose={() => setShowKey(false)} title="Key">
+        <View style={{ gap: sp[5] }}>
+          <View style={{ gap: sp[2] }}>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1 }}>The route</Text>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>A proven path from base camp to sunrise. The green line marks where you've been. The faint line shows what's ahead.</Text>
+          </View>
+          <View style={{ gap: sp[2] }}>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1 }}>Exam diamonds</Text>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>Chapter checkpoints. Water level shows your exam result.</Text>
+          </View>
+          <View style={{ gap: sp[3] }}>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1 }}>Topic markers</Text>
+            {[
+              { label: 'Mastered', desc: 'You\'ve got this. Adds water to the oasis.', col: color.noon[400], fill: true },
+              { label: 'Exploring', desc: 'Currently working through this topic.', col: color.gold[300], fill: false },
+              { label: 'Still uncertain', desc: 'Exam passed but concepts here remain weak.', col: color.terra[300], fill: false },
+              { label: 'Unmapped', desc: 'Not visited yet.', col: theme.fgFaint, fill: false, dashed: true },
+            ].map(item => (
+              <View key={item.label} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+                <View style={{ width: 12, height: 12, transform: [{ rotate: '45deg' }], borderWidth: 1.5, borderColor: item.col, borderStyle: item.dashed ? 'dashed' : 'solid', backgroundColor: item.fill ? item.col : 'transparent' }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fg }}>{item.label}</Text>
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgMuted, marginTop: 1 }}>{item.desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </BottomSheet>
+
+      {/* ── Chapter sheet ── */}
+      <BottomSheet visible={!!sheetChapter} onClose={() => setSheetChapter(null)} title={sheetChapter?.title || ''}>
+        {sheetChapter && (() => {
+          const ch = sheetChapter;
+          const lvl = Math.max(0, Math.min(100, ch.level));
+          const mapped = ch.markers.filter(m => m.status === 'mapped').length;
+          const attention = ch.markers.filter(m => m.status === 'needs-attention').length;
+          const exploring = ch.markers.filter(m => m.status === 'exploring').length;
+          const unmapped = ch.markers.filter(m => m.status === 'unmapped' || m.status === 'not-started').length;
+          return (
+            <View style={{ gap: sp[4] }}>
+              <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1.4 }}>{ch.status === 'current' ? 'In progress' : ch.status === 'upcoming' || ch.status === 'locked' ? 'Upcoming' : 'Completed'}</Text>
+              {lvl > 0 && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+                  <Text style={{ fontFamily: font.mono, fontSize: fs[24], fontWeight: fw[700], color: theme.fg }}>{lvl}%</Text>
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, flex: 1 }}>Your exam result.</Text>
+                </View>
+              )}
+              {/* Water earned from this chapter */}
+              {(() => {
+                const chMapped = ch.markers.filter(m => m.status === 'mapped').length;
+                const chTotal = ch.markers.length;
+                return (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[3], backgroundColor: 'rgba(100,216,174,0.06)', borderRadius: r[2], borderWidth: 1, borderColor: 'rgba(100,216,174,0.15)' }}>
+                    <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color.blue[400], opacity: 0.7 }} />
+                    <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgMuted, flex: 1 }}><Text style={{ color: color.noon[400], fontWeight: fw[600] }}>{chMapped}/{chTotal}</Text> topics mapped — water earned for the oasis.</Text>
+                  </View>
+                );
+              })()}
+              <View style={{ flexDirection: 'row', gap: sp[2] }}>
+                {mapped > 0 && <View style={{ flex: 1, padding: sp[2], backgroundColor: theme.bgRaised, borderRadius: r[1], alignItems: 'center' }}><Text style={{ fontFamily: font.serif, fontSize: fs[18], color: color.noon[400] }}>{mapped}</Text><Text style={{ fontFamily: font.mono, fontSize: fs[8], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 }}>Mapped</Text></View>}
+                {exploring > 0 && <View style={{ flex: 1, padding: sp[2], backgroundColor: theme.bgRaised, borderRadius: r[1], alignItems: 'center' }}><Text style={{ fontFamily: font.serif, fontSize: fs[18], color: color.gold[300] }}>{exploring}</Text><Text style={{ fontFamily: font.mono, fontSize: fs[8], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 }}>Exploring</Text></View>}
+                {attention > 0 && <View style={{ flex: 1, padding: sp[2], backgroundColor: theme.bgRaised, borderRadius: r[1], alignItems: 'center' }}><Text style={{ fontFamily: font.serif, fontSize: fs[18], color: color.terra[300] }}>{attention}</Text><Text style={{ fontFamily: font.mono, fontSize: fs[8], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 }}>Attention</Text></View>}
+                {unmapped > 0 && <View style={{ flex: 1, padding: sp[2], backgroundColor: theme.bgRaised, borderRadius: r[1], alignItems: 'center' }}><Text style={{ fontFamily: font.serif, fontSize: fs[18], color: theme.fgFaint }}>{unmapped}</Text><Text style={{ fontFamily: font.mono, fontSize: fs[8], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 }}>Unmapped</Text></View>}
+              </View>
+              <View style={{ gap: sp[2] }}>
+                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: sp[1] }}>Topics</Text>
+                {ch.markers.map(m => (
+                  <View key={m.id} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[2], backgroundColor: theme.bgRaised, borderRadius: r[1], borderWidth: 1, borderColor: theme.border }}>
+                    <View style={{ width: 10, height: 10, transform: [{ rotate: '45deg' }], borderWidth: 1.2, borderColor: mColor(m.status), backgroundColor: mBg(m.status) }} />
+                    <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg, flex: 1 }}>{m.label}</Text>
+                    <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mColor(m.status), textTransform: 'uppercase', letterSpacing: 0.8 }}>{m.sublabel || mLabel(m.status)}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          );
+        })()}
+      </BottomSheet>
+
+      {/* ── Topic sheet — rich like v4 ── */}
+      <BottomSheet visible={!!sheetMarker} onClose={() => setSheetMarker(null)} title={sheetMarker?.marker.label || ''}>
+        {sheetMarker && (() => {
+          const { marker, chapter } = sheetMarker;
+          const mc = mColor(marker.status);
+          const s = marker.status;
+          const pct = s === 'mapped' ? 100 : s === 'exploring' ? 45 : s === 'needs-attention' ? 25 : 0;
+          const currLvl = s === 'mapped' ? 'Mapped' : s === 'exploring' ? 'Exploring' : s === 'needs-attention' ? 'Uncertain' : 'Not started';
+          const nextLvl = s === 'mapped' ? 'Stay sharp' : s === 'exploring' ? 'Mapped' : 'Exploring';
+          const pctColor = s === 'mapped' ? color.noon[400] : s === 'needs-attention' ? color.terra[400] : color.gold[400];
+          const actionBg = s === 'needs-attention' ? 'rgba(212,149,110,0.06)' : s === 'exploring' ? 'rgba(224,184,58,0.06)' : 'rgba(100,216,174,0.06)';
+          const actionBorder = s === 'needs-attention' ? 'rgba(212,149,110,0.25)' : s === 'exploring' ? 'rgba(224,184,58,0.25)' : 'rgba(100,216,174,0.25)';
+          const actionLabel = s === 'mapped' ? 'Quick refresh' : s === 'exploring' ? 'Continue practice' : s === 'needs-attention' ? 'Strengthen now' : 'Begin';
+          const actionDesc = s === 'mapped' ? 'A short refresher keeps it fresh.' : s === 'exploring' ? 'Mixed set covering concepts you\'ve been working on.' : s === 'needs-attention' ? 'Targeted practice on weak concepts — worked examples first.' : 'Start with core ideas, then a few easy questions.';
+          return (
+            <View style={{ gap: sp[4] }}>
+              {/* Status */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
+                <View style={{ width: 12, height: 12, transform: [{ rotate: '45deg' }], borderWidth: 1.5, borderColor: mc, backgroundColor: mBg(marker.status) }} />
+                <Text style={{ fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: mc, textTransform: 'uppercase' }}>{marker.sublabel || mLabel(marker.status)}</Text>
+              </View>
+
+              {/* Progress bar */}
+              <View>
+                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[2] }}>Progress to next level</Text>
+                <View style={{ height: 8, backgroundColor: theme.bgSunken, borderRadius: r.pill, overflow: 'hidden' }}>
+                  <View style={{ height: '100%', width: `${pct}%`, backgroundColor: pctColor, borderRadius: r.pill }} />
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: sp[1] }}>
+                  <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fg }}>{currLvl}</Text>
+                  <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mc }}>{nextLvl} →</Text>
+                </View>
+              </View>
+
+              {/* Water connection — explicit */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[3], backgroundColor: s === 'mapped' ? 'rgba(100,216,174,0.06)' : 'rgba(232,228,220,0.03)', borderRadius: r[2], borderWidth: 1, borderColor: s === 'mapped' ? 'rgba(100,216,174,0.2)' : theme.border }}>
+                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: s === 'mapped' ? color.blue[400] : 'transparent', borderWidth: s === 'mapped' ? 0 : 1, borderColor: theme.fgFaint, opacity: s === 'mapped' ? 0.7 : 0.4 }} />
+                <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: s === 'mapped' ? color.noon[400] : theme.fgMuted, flex: 1 }}>
+                  {s === 'mapped' ? 'Water earned — this topic fills the oasis.' : 'Map this topic to earn water for the oasis.'}
+                </Text>
+              </View>
+
+              {/* Concepts inside this topic */}
+              {concepts[marker.id] && (
+                <View>
+                  <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[2] }}>Concepts inside ({concepts[marker.id].length})</Text>
+                  <View style={{ gap: sp[1] }}>
+                    {concepts[marker.id].map((c, ci) => (
+                      <View key={ci} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], paddingVertical: sp[2], paddingHorizontal: sp[3], backgroundColor: theme.bgRaised, borderRadius: r[1], borderWidth: 1, borderColor: theme.border }}>
+                        <View style={{ width: 9, height: 9, transform: [{ rotate: '45deg' }], borderWidth: 1.2, borderColor: mColor(c.state as MarkerStatus), backgroundColor: mBg(c.state as MarkerStatus) }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: c.state === 'unmapped' ? theme.fgMuted : theme.fg }}>{c.name}</Text>
+                          {c.from && <Text style={{ fontFamily: font.mono, fontSize: fs[8], color: color.iris[400], letterSpacing: 0.8, marginTop: 1 }}>{c.from}</Text>}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Action card */}
+              <View style={{ padding: sp[4], borderRadius: r[2], backgroundColor: actionBg, borderWidth: 1, borderColor: actionBorder }}>
+                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mc, letterSpacing: 1.8, textTransform: 'uppercase', marginBottom: sp[2] }}>What's next</Text>
+                <Text style={{ fontFamily: font.serif, fontSize: fs[16], fontWeight: fw[500], color: theme.fg, marginBottom: sp[1] }}>{actionLabel}</Text>
+                <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>{actionDesc}</Text>
+              </View>
+
+              <Button variant="primary" onPress={() => setSheetMarker(null)}>{s === 'mapped' ? 'Quick refresh' : s === 'exploring' ? 'Continue' : s === 'needs-attention' ? 'Strengthen' : 'Begin'}</Button>
+            </View>
+          );
+        })()}
+      </BottomSheet>
     </View>
   );
 }

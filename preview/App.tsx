@@ -11,11 +11,11 @@ import {
   // Foundation
   OverviewPage, BrandPage, ColorsPage, TypographyPage, SpacingPage, RadiiPage, ElevationPage, MotionPage, GridSystemPage,
   // Graphical
-  IconsPage, GridPaperPage, WaypointsPage, WaterVesselPage, ContoursPage, DunePatternPage, VoiceTutorPage,
+  IconsPage, GridPaperPage, WaypointsPage, WaterVesselPage, ContoursPage, DunePatternPage, ConstellationPage, DuneDynamicPage, StarsDynamicPage, TerrainDynamicPage, VoiceTutorPage,
   // Actions
   ButtonsPage, IconButtonPage,
   // Inputs
-  InputPage, TextareaPage, StepperPage, CheckboxPage, RadioPage, SwitchPage, SegmentedPage,
+  InputPage, TextareaPage, StepperPage, CheckboxPage, RadioPage, SwitchPage, SegmentedPage, SliderPage,
   // Selection
   ChipsPage, QuizPage, FilterBarPage, MenuPage, CalendarPage,
   // Questions
@@ -23,7 +23,7 @@ import {
   // Display
   CardsPage, AvatarsPage, IdentityPage, BadgesPage, TablePage, SessionCardPage, HomeworkCardPage, VideoPage,
   // Progress
-  SessionBarPage, ProgressPage,
+  SessionBarPage, ProgressPage, LinearProgressPage, CircularProgressPage,
   // Navigation
   TitleBarPage, TabsPage, BottomNavPage, BottomActionPage, BreadcrumbsPage, PaginationPage, SideNavPage,
   // Feedback
@@ -36,6 +36,8 @@ import {
 } from './screens/pages';
 import { VoiceTutorSession } from './screens/VoiceTutorSession';
 import { JourneyPage } from './screens/JourneyPage';
+import { RouteRedesignPage } from './screens/RouteRedesign';
+import { RouteHeatmapPage } from './screens/RouteHeatmap';
 
 // ─── Nav structure — mirrors index.html exactly ───
 const NAV = [
@@ -51,10 +53,14 @@ const NAV = [
     { id: 'gridsystem', label: 'Grid System' },
     { id: 'icons', label: 'Icons' },
   ]},
-  { group: 'Surfaces', items: [
+  { group: 'Textures', items: [
     { id: 'gridpaper', label: 'Grid Paper' },
-    { id: 'contours', label: 'Terrain Patterns' },
-    { id: 'dunepattern', label: 'Dune Pattern' },
+    { id: 'contours', label: 'Terrain Lines' },
+  ]},
+  { group: 'Dynamics', items: [
+    { id: 'dunedynamic', label: 'Dune Field' },
+    { id: 'starsdynamic', label: 'Star Field' },
+    { id: 'terraindynamic', label: 'Terrain Field' },
   ]},
   { group: 'Actions', items: [
     { id: 'buttons', label: 'Buttons' },
@@ -68,6 +74,7 @@ const NAV = [
     { id: 'radio', label: 'Radio' },
     { id: 'switch', label: 'Switch' },
     { id: 'segmented', label: 'Segmented' },
+    { id: 'slider', label: 'Slider' },
   ]},
   { group: 'Selection', items: [
     { id: 'chips', label: 'Chips' },
@@ -95,9 +102,11 @@ const NAV = [
   ]},
   { group: 'Progress', items: [
     { id: 'waypoints', label: 'Waypoints' },
+    { id: 'oasis', label: 'Oasis' },
     { id: 'watervessel', label: 'Water Vessel' },
     { id: 'sessionbar', label: 'Session Bar' },
-    { id: 'progress', label: 'Linear & Circular' },
+    { id: 'linearprogress', label: 'Linear Progress' },
+    { id: 'circularprogress', label: 'Circular Progress' },
   ]},
   { group: 'Navigation', items: [
     { id: 'titlebar', label: 'Title Bar' },
@@ -112,11 +121,9 @@ const NAV = [
     { id: 'alerts', label: 'Alerts' },
     { id: 'toasts', label: 'Toasts' },
     { id: 'dialogs', label: 'Dialogs' },
-    { id: 'modal', label: 'Modal' },
     { id: 'bottomsheet', label: 'Bottom Sheet' },
     { id: 'fullsheet', label: 'Full Sheet' },
     { id: 'tooltips', label: 'Tooltips' },
-    { id: 'popovers', label: 'Popovers' },
   ]},
   { group: 'Layout', items: [
     { id: 'interstitial', label: 'Interstitial' },
@@ -140,8 +147,9 @@ const NAV = [
     { id: 'leaderboard', label: 'Leaderboard' },
   ]},
   { group: 'Experimental', items: [
-    { id: 'oasis', label: 'Oasis' },
     { id: 'routemap', label: 'Route Map' },
+    { id: 'routev2', label: 'Route v2' },
+    { id: 'routeheat', label: 'Route Heatmap' },
   ]},
   { group: 'Pages', items: [
     { id: 'journey', label: 'Journey' },
@@ -163,7 +171,9 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   waypoints:    { component: WaypointsPage, desc: 'Diamond-shaped markers for routes, progress, and important events.' },
   watervessel:  { component: WaterVesselPage, desc: 'Visual metaphor for proof-of-work.' },
   contours:     { component: ContoursPage, desc: 'Topographic contour lines for difficulty and mastery.' },
-  dunepattern:  { component: DunePatternPage, desc: 'Geometric desert ridgelines with gold gradients.' },
+  dunedynamic:    { component: DuneDynamicPage, desc: 'Animated particle dune field.' },
+  starsdynamic:   { component: StarsDynamicPage, desc: 'Animated starfield with proximity connections.' },
+  terraindynamic: { component: TerrainDynamicPage, desc: 'Animated topographic contour field.' },
   voicetutor:   { component: VoiceTutorPage, desc: 'Iris presence indicator — breathing, listening, speaking states.' },
   buttons:      { component: ButtonsPage, desc: 'Primary action triggers with six variants.' },
   iconbtn:      { component: IconButtonPage, desc: 'Square icon-only pressable.' },
@@ -174,6 +184,7 @@ const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen
   radio:        { component: RadioPage, desc: 'Single selection from a group.' },
   switch:       { component: SwitchPage, desc: 'On/off toggle.' },
   segmented:    { component: SegmentedPage, desc: 'Mutually exclusive options in a row.' },
+  slider:       { component: SliderPage, desc: 'Continuous range input with label and value.' },
   chips:        { component: ChipsPage, desc: 'Compact labels for filtering and status.' },
   quizoption:   { component: QuizPage, desc: 'Single or multiple answer selection with correct/incorrect feedback.' },
   match:        { component: MatchPage, desc: 'Drag items to their matching targets (1:1).' },
@@ -193,7 +204,8 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   homeworkcard: { component: HomeworkCardPage, desc: 'Homework assignment with due date, status, and question count.' },
   video:        { component: VideoPage, desc: 'Thumbnail card for video content with play button and attribution.' },
   sessionbar:   { component: SessionBarPage, desc: 'Question-by-question results bar.' },
-  progress:     { component: ProgressPage, desc: 'Linear and circular progress indicators.' },
+  linearprogress: { component: LinearProgressPage, desc: 'Horizontal bar for loading, uploads, and inline progress.' },
+  circularprogress: { component: CircularProgressPage, desc: 'Ring for scores, readiness, and standalone metrics.' },
   titlebar:     { component: TitleBarPage, desc: 'Screen header with back and actions.' },
   tabs:         { component: TabsPage, desc: 'Horizontal tab navigation.' },
   bottomnav:    { component: BottomNavPage, desc: 'App-level bottom navigation.' },
@@ -204,11 +216,9 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   alerts:       { component: AlertsPage, desc: 'Inline status messages.' },
   toasts:       { component: ToastPage, desc: 'Temporary notification overlay.' },
   dialogs:      { component: DialogPage, desc: 'Confirmation and destructive action modals.' },
-  modal:        { component: ModalPage, desc: 'Full-screen overlay wrapping Dialog.' },
   bottomsheet:  { component: BottomSheetPage, desc: 'Slide-up content panel.' },
   fullsheet:    { component: FullSheetPage, desc: 'Full-screen modal with close button.' },
   tooltips:     { component: TooltipPage, desc: 'Contextual help on long press.' },
-  popovers:     { component: PopoversPage, desc: 'Contextual content anchored to trigger.' },
   interstitial: { component: InterstitialPage, desc: 'Full-screen transition or celebration.' },
   formstack:    { component: FormStackPage, desc: 'Vertical form field layout pattern.' },
   empty:        { component: EmptyStatePage, desc: 'Placeholder when no content is available.' },
@@ -225,6 +235,8 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   leaderboard:  { component: LeaderboardPage, desc: 'Ranked crew member list.' },
   oasis:        { component: OasisPage, desc: 'Water pool checkpoint — replaces WaterVessel for journey metaphor.' },
   routemap:     { component: RouteMapPage, desc: 'Vertical journey with central spine, oases, and topic markers.', fullscreen: true },
+  routev2:      { component: RouteRedesignPage, desc: 'Clean list-based journey — no spine, just clarity.', fullscreen: true },
+  routeheat:    { component: RouteHeatmapPage, desc: 'Heatmap grid — see everything at once.', fullscreen: true },
   journey:      { component: JourneyPage, desc: 'Qudrat exam journey visualisation.', fullscreen: true },
 };
 

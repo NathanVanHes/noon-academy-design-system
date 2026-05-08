@@ -1,8 +1,8 @@
 /**
- * Avatar — sizes xs-xl, noon/blue variants, star + status indicators.
+ * Avatar — sizes xs-xl, noon/blue variants, status indicators, optional image.
  */
 import React from 'react';
-import { View, Text, type ViewStyle, type TextStyle } from 'react-native';
+import { View, Text, Image, type ViewStyle, type TextStyle } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, r, icon, color as colorTokens } from './tokens';
 
@@ -12,9 +12,9 @@ type StatusType = 'online' | 'busy';
 
 interface AvatarProps {
   initials: string;
+  imageUri?: string;
   size?: Size;
   color?: ColorVariant;
-  star?: boolean;
   status?: StatusType;
 }
 
@@ -22,7 +22,7 @@ interface AvatarProps {
 const sizes: Record<Size, number> = { xs: 24, sm: 32, md: 40, lg: 56, xl: 72 };
 const fontSizes: Record<Size, number> = { xs: fs[11], sm: fs[13], md: fs[16], lg: fs[22], xl: fs[28] };
 
-export function Avatar({ initials, size = 'sm', color = 'default', star, status }: AvatarProps) {
+export function Avatar({ initials, imageUri, size = 'sm', color = 'default', status }: AvatarProps) {
   const { theme } = useTheme();
   const dim = sizes[size];
 
@@ -59,34 +59,28 @@ export function Avatar({ initials, size = 'sm', color = 'default', star, status 
     color: fgMap[color],
   };
 
-  // CSS: .avatar__star — gold diamond at bottom-end
-  const starStyle: ViewStyle = {
-    position: 'absolute',
-    right: -sp[0.5],
-    bottom: -sp[0.5],
-    width: icon.md,
-    height: icon.md,
-    backgroundColor: theme.signalBright,
-    transform: [{ rotate: '45deg' }],
-  };
-
-  // CSS: .avatar__status — dot with bg ring
+  // Status dot — scales with avatar size
+  const statusDim = Math.max(8, Math.round(dim * 0.28));
+  const statusBorder = Math.max(2, Math.round(dim * 0.06));
   const statusStyle: ViewStyle = {
     position: 'absolute',
-    right: -1,
-    bottom: -1,
-    width: icon.sm,
-    height: icon.sm,
-    borderRadius: icon.sm / 2,
+    right: -Math.round(statusBorder / 2),
+    bottom: -Math.round(statusBorder / 2),
+    width: statusDim,
+    height: statusDim,
+    borderRadius: statusDim / 2,
     backgroundColor: status === 'online' ? theme.accent : colorTokens.danger[400],
-    borderWidth: sp[0.5],
+    borderWidth: statusBorder,
     borderColor: theme.bg,
   };
 
   return (
     <View style={containerStyle}>
-      <Text style={textStyle}>{initials}</Text>
-      {star && <View style={starStyle} />}
+      {imageUri ? (
+        <Image source={{ uri: imageUri }} style={{ width: dim - 2, height: dim - 2, borderRadius: (dim - 2) / 2 }} />
+      ) : (
+        <Text style={textStyle}>{initials}</Text>
+      )}
       {status && <View style={statusStyle} />}
     </View>
   );

@@ -11,11 +11,11 @@ import { sp, fs, fw, font } from './tokens';
 
 interface IdentityProps {
   initials: string;
+  imageUri?: string;
   name: string;
   role?: string;
   meta?: string;
   avatarColor?: 'default' | 'noon' | 'blue';
-  star?: boolean;
   status?: 'online' | 'busy';
   badge?: string | number;
   right?: React.ReactNode;
@@ -23,7 +23,7 @@ interface IdentityProps {
 }
 
 export function Identity({
-  initials, name, role, meta, avatarColor, star, status, badge, right, size = 'md',
+  initials, imageUri, name, role, meta, avatarColor, status, badge, right, size = 'md',
 }: IdentityProps) {
   const { theme } = useTheme();
   const avatarSize = size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md';
@@ -31,7 +31,7 @@ export function Identity({
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
-      <Avatar initials={initials} size={avatarSize} color={avatarColor} star={star} status={status} />
+      <Avatar initials={initials} imageUri={imageUri} size={avatarSize} color={avatarColor} status={status} />
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
           <Text style={{ fontFamily: font.sans, fontSize: nameFs, fontWeight: fw[600], color: theme.fg }} numberOfLines={1}>{name}</Text>

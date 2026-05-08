@@ -3,11 +3,12 @@
  * Slides in from top with 200ms ease, fades out with 120ms ease-in.
  */
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Text, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS } from 'react-native-reanimated';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, font, dur } from './tokens';
+import { Icon, type IconName } from './Icon';
+import { sp, r, fs, font, dur, color, icon as iconTokens } from './tokens';
 
 type Variant = 'info' | 'success' | 'warn' | 'danger';
 
@@ -57,12 +58,16 @@ export function Toast({ message, variant = 'info', visible, onDismiss, duration 
 
   if (!visible && !shown.current) return null;
 
-  const bgMap: Record<Variant, string> = {
-    info: theme.bgOverlay,
-    success: theme.accentSoft,
-    warn: theme.signalSoft,
-    danger: theme.dangerSoft,
+  // Solid bg — matches Alert styling exactly
+  const styles: Record<Variant, { bg: string; border: string; iconCol: string }> = {
+    info: { bg: theme.bgRaised, border: theme.borderStrong, iconCol: theme.fgMuted },
+    success: { bg: theme.bgRaised, border: theme.accentBorder, iconCol: color.noon[400] },
+    warn: { bg: theme.bgRaised, border: theme.signalBorder, iconCol: color.gold[300] },
+    danger: { bg: theme.bgRaised, border: theme.dangerBorder, iconCol: color.danger[400] },
   };
+  const s = styles[variant];
+
+  const iconMap: Record<Variant, IconName> = { info: 'info', success: 'check', warn: 'warning', danger: 'error' };
 
   return (
     <Animated.View accessibilityRole="alert" accessibilityLiveRegion="polite" style={[{
@@ -70,11 +75,10 @@ export function Toast({ message, variant = 'info', visible, onDismiss, duration 
       top: insets.top + sp[4],
       left: sp[4],
       right: sp[4],
-      backgroundColor: bgMap[variant],
+      backgroundColor: s.bg,
       borderRadius: r[2],
-      padding: sp[4],
       borderWidth: 1,
-      borderColor: theme.border,
+      borderColor: s.border,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
@@ -82,8 +86,10 @@ export function Toast({ message, variant = 'info', visible, onDismiss, duration 
       elevation: 6,
       zIndex: 999,
     }, animatedStyle]}>
-      <Pressable onPress={dismiss} accessibilityRole="button" accessibilityLabel="Dismiss">
-        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg }}>{message}</Text>
+      <Pressable onPress={dismiss} accessibilityRole="button" accessibilityLabel="Dismiss"
+        style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[4] }}>
+        <Icon name={iconMap[variant]} size={iconTokens.lg} color={s.iconCol} />
+        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg, flex: 1 }}>{message}</Text>
       </Pressable>
     </Animated.View>
   );

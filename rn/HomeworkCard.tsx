@@ -1,71 +1,58 @@
 /**
  * HomeworkCard — list-item for homework assignments.
- * Shows due date, title, subject, question count, and status.
+ * States: due-soon, complete, overdue. No graded variant.
+ * Shows title, subject, question count, and relative due time.
  */
 import React from 'react';
-import { View, Text, Pressable, type ViewStyle, type TextStyle } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { sp, fs, fw, font, r } from './tokens';
 
-type Status = 'pending' | 'in-progress' | 'submitted' | 'overdue' | 'graded';
+type Status = 'due-soon' | 'complete' | 'overdue';
 
 interface HomeworkCardProps {
   title: string;
   subject: string;
-  dueDate: string;
-  questions: number;
+  /** Relative time e.g. "Due in 4h", "Due tomorrow", "2 days overdue" */
+  due: string;
+  /** Number of questions */
+  questions?: number;
   status?: Status;
-  score?: string;
   onPress?: () => void;
 }
 
-export function HomeworkCard({ title, subject, dueDate, questions, status = 'pending', score, onPress }: HomeworkCardProps) {
+export function HomeworkCard({ title, subject, due, questions = 10, status = 'due-soon', onPress }: HomeworkCardProps) {
   const { theme } = useTheme();
 
   const statusColor: Record<Status, string> = {
-    pending: theme.fgFaint,
-    'in-progress': theme.signalBright,
-    submitted: theme.accent,
+    'due-soon': theme.signalBright,
+    complete: theme.accent,
     overdue: theme.danger,
-    graded: theme.accent,
   };
 
   const statusLabel: Record<Status, string> = {
-    pending: 'Pending',
-    'in-progress': 'In progress',
-    submitted: 'Submitted',
-    overdue: 'Overdue',
-    graded: score ? `Graded · ${score}` : 'Graded',
+    'due-soon': due,
+    complete: 'Complete',
+    overdue: due,
   };
 
+  const isDone = status === 'complete';
   const isOverdue = status === 'overdue';
-  const isDone = status === 'submitted' || status === 'graded';
-
-  const containerStyle: ViewStyle = {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: sp[4],
-    paddingVertical: sp[4],
-    paddingHorizontal: sp[5],
-    borderBottomWidth: 1,
-    borderBottomColor: theme.divider,
-  };
 
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [containerStyle, pressed && { backgroundColor: theme.hoverOverlay }]}>
-      {/* Due date */}
-      <View style={{ minWidth: 40 }}>
-        <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: isOverdue ? theme.danger : theme.fgFaint }}>{dueDate}</Text>
-      </View>
-
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [{
+      flexDirection: 'row', alignItems: 'center', gap: sp[4],
+      paddingVertical: sp[4], paddingHorizontal: sp[5],
+      borderBottomWidth: 1, borderBottomColor: theme.divider,
+    }, pressed && { backgroundColor: theme.hoverOverlay }]}>
       {/* Content */}
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: isDone ? theme.fgMuted : theme.fg }}>{title}</Text>
-        <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgFaint, marginTop: sp[0.5] }}>{subject} · {questions} question{questions !== 1 ? 's' : ''}</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: theme.fgFaint, marginTop: sp[0.5] }}>{subject} · {questions} questions</Text>
       </View>
 
-      {/* Status */}
-      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: statusColor[status] }}>{statusLabel[status]}</Text>
+      {/* Status / due */}
+      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: statusColor[status], fontWeight: isOverdue ? fw[600] : fw[500] }}>{statusLabel[status]}</Text>
     </Pressable>
   );
 }
