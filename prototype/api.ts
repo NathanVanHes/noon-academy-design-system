@@ -375,29 +375,33 @@ async function buildCatchupFirstMessage(config: CatchupConfig, lang: Lang): Prom
 }
 
 // Pre-configure catchup — call this early (e.g. on language select screen)
+// Prefetch stores everything needed so startSession can fire immediately from a user gesture
+let prefetchedCatchup: { firstMsg: string; signedUrl: string; lang: string } | null = null;
 let catchupConfigPromise: Promise<void> | null = null;
 
-let prefetchedFirstMsg: string | null = null;
-
 export function prefetchCatchupConfig(config: CatchupConfig, lang: Lang) {
+  prefetchedCatchup = null; // Clear stale prefetch from different language
   const catchupPrompt = buildCatchupContext(config, lang);
   catchupConfigPromise = (async () => {
-    const firstMsg = await buildCatchupFirstMessage(config, lang);
-    await fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
-      body: JSON.stringify({
-        conversation_config: {
-          agent: {
-            prompt: { prompt: catchupPrompt },
-            first_message: '{{first_message}}',
+    const [firstMsg, , signedUrl] = await Promise.all([
+      buildCatchupFirstMessage(config, lang),
+      fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
+        body: JSON.stringify({
+          conversation_config: {
+            agent: {
+              prompt: { prompt: catchupPrompt },
+              first_message: '{{first_message}}',
+            },
+            turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+            vad: { background_voice_detection: true },
           },
-          turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
-          vad: { background_voice_detection: true },
-        },
+        }),
       }),
-    });
-    prefetchedFirstMsg = firstMsg;
+      getSignedUrl(lang),
+    ]);
+    prefetchedCatchup = { firstMsg, signedUrl, lang };
   })().catch(err => console.warn('Failed to prefetch catchup config:', err));
 }
 
@@ -406,30 +410,57 @@ export async function startCatchupSession(
   lang: Lang,
   callbacks: TutorSessionCallbacks,
 ) {
-  let conv: any = null;
+  let signedUrl: string;
+  let catchupFirstMsg: string;
 
-  // Generate first message, PATCH agent prompt, get signed URL — all in parallel
-  const catchupPrompt = buildCatchupContext(config, lang);
-  const [catchupFirstMsg, , signedUrl] = await Promise.all([
-    buildCatchupFirstMessage(config, lang),
-    fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
-      body: JSON.stringify({
-        conversation_config: {
-          agent: {
-            prompt: { prompt: catchupPrompt },
-            first_message: '{{first_message}}',
+  if (prefetchedCatchup && prefetchedCatchup.lang === lang) {
+    // Prefetched for correct language — NO async work
+    console.log('[session] using PREFETCHED data — sync path, lang:', lang);
+    signedUrl = prefetchedCatchup.signedUrl;
+    catchupFirstMsg = prefetchedCatchup.firstMsg;
+    prefetchedCatchup = null;
+  } else {
+    if (prefetchedCatchup) console.log('[session] prefetch lang mismatch:', prefetchedCatchup.lang, '!=', lang);
+    prefetchedCatchup = null;
+    // Wait for in-progress prefetch or fetch fresh
+    if (catchupConfigPromise) {
+      console.log('[session] waiting for prefetch...');
+      await catchupConfigPromise;
+    }
+    if (prefetchedCatchup && prefetchedCatchup.lang === lang) {
+      console.log('[session] prefetch completed — using data, lang:', lang);
+      signedUrl = prefetchedCatchup.signedUrl;
+      catchupFirstMsg = prefetchedCatchup.firstMsg;
+      prefetchedCatchup = null;
+    } else {
+      console.log('[session] FALLBACK — fetching everything now');
+    // Fallback: fetch everything now
+    const catchupPrompt = buildCatchupContext(config, lang);
+    const [fm, , url] = await Promise.all([
+      buildCatchupFirstMessage(config, lang),
+      fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
+        body: JSON.stringify({
+          conversation_config: {
+            agent: {
+              prompt: { prompt: catchupPrompt },
+              first_message: '{{first_message}}',
+            },
+            turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+            vad: { background_voice_detection: true },
           },
-          turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
-          vad: { background_voice_detection: true },
-        },
+        }),
       }),
-    }),
-    getSignedUrl(lang),
-  ]);
+      getSignedUrl(lang),
+    ]);
+    signedUrl = url;
+    catchupFirstMsg = fm;
+    }
+  }
   catchupConfigPromise = null;
 
+  console.log('[session] calling Conversation.startSession NOW');
   const conversation = await Conversation.startSession({
     signedUrl,
     dynamicVariables: { first_message: catchupFirstMsg },

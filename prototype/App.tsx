@@ -67,31 +67,79 @@ function TutorApp() {
   const question = QUESTIONS[questionIdx];
   const { width: screenW, height: screenH } = useWindowDimensions();
 
-  // Unlock audio + warm up mic on mobile browsers — must be called from a user gesture
-  const micStreamRef = useRef<MediaStream | null>(null);
+  // iOS Safari audio fix:
+  // 1) unmute-ios-audio: plays silent <audio> on user interaction → forces "media" channel (bypasses silent switch)
+  // 2) unlockAudio: on button press, creates AudioContext + getUserMedia from gesture context.
+  //    iOS requires BOTH an active AudioContext AND an active mic stream for Web Audio output to work.
+  //    The ElevenLabs SDK creates these in parallel, but too late (after async calls).
+  //    We pre-activate them from the button press so they're ready.
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    // Inline iOS detection + silent audio loop (unmute-ios-audio logic)
+    const isIOS = navigator.maxTouchPoints > 0 && (window.AudioContext || (window as any).webkitAudioContext);
+    if (isIOS) {
+      const handler = () => {
+        if (audioCtxRef.current?.state === 'running') return;
+        // Play silent <audio> to activate media channel
+        const a = document.createElement('audio');
+        a.setAttribute('x-webkit-airplay', 'deny');
+        a.preload = 'auto';
+        a.loop = true;
+        const AC = window.AudioContext || (window as any).webkitAudioContext;
+        const sr = (new AC()).sampleRate;
+        const ab = new ArrayBuffer(10);
+        const dv = new DataView(ab);
+        dv.setUint32(0, sr, true); dv.setUint32(4, sr, true); dv.setUint16(8, 1, true);
+        const mc = btoa(String.fromCharCode(...new Uint8Array(ab))).slice(0, 13);
+        a.src = `data:audio/wav;base64,UklGRisAAABXQVZFZm10IBAAAAABAAEA${mc}AgAZGF0YQcAAACAgICAgICAAAA=`;
+        a.load();
+        a.play().then(() => console.log('[audio] iOS: silent audio playing (media channel active)')).catch(() => {});
+        // Also resume AudioContext
+        if (!audioCtxRef.current) audioCtxRef.current = new AC();
+        audioCtxRef.current.resume();
+        const buf = audioCtxRef.current.createBuffer(1, 1, 22050);
+        const src2 = audioCtxRef.current.createBufferSource();
+        src2.buffer = buf;
+        src2.connect(audioCtxRef.current.destination);
+        src2.start();
+        (window as any).__elevenLabsAudioContext = audioCtxRef.current;
+        // Pre-load AudioWorklet modules so they're cached when the SDK needs them
+        const ctx2 = audioCtxRef.current;
+        if (ctx2?.audioWorklet) {
+          Promise.all([
+            ctx2.audioWorklet.addModule('https://cdn.jsdelivr.net/npm/@alexanderolsen/libsamplerate-js@2.1.2/dist/libsamplerate.worklet.js'),
+            import('@elevenlabs/client/dist/utils/audioConcatProcessor.generated.js').then(m => m.loadAudioConcatProcessor(ctx2.audioWorklet)).catch(() => {}),
+          ]).then(() => console.log('[audio] pre-loaded all worklets')).catch(() => {
+            console.log('[audio] pre-loaded libsamplerate (audioConcatProcessor will load at session start)');
+          });
+        }
+        console.log('[audio] iOS: AudioContext + audio session activated from gesture');
+      };
+      ['click', 'touchend'].forEach(e => window.addEventListener(e, handler, { capture: true, passive: true }));
+      console.log('[audio] iOS audio fix listeners registered');
+    }
+  }, []);
+
   const unlockAudio = useCallback(() => {
     try {
-      // Method 1: AudioContext unlock
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const buf = ctx.createBuffer(1, 1, 22050);
+      // Resume persistent AudioContext from gesture
+      if (audioCtxRef.current) {
+        audioCtxRef.current.resume();
+      } else {
+        const AC = window.AudioContext || (window as any).webkitAudioContext;
+        audioCtxRef.current = new AC();
+        audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const buf = ctx.createBuffer(1, 1, ctx.sampleRate);
       const src = ctx.createBufferSource();
       src.buffer = buf;
       src.connect(ctx.destination);
-      src.start(0);
-      ctx.resume();
-
-      // Method 2: Silent HTML audio element — helps on iOS Safari
-      const audio = document.createElement('audio');
-      audio.setAttribute('playsinline', 'true');
-      audio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-      audio.play().catch(() => {});
-
-      // Method 3: Warm up mic — pre-request permission so audio stream is ready
-      if (!micStreamRef.current && navigator.mediaDevices?.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-          micStreamRef.current = stream;
-        }).catch(() => {});
-      }
+      src.start();
+      // Share this context with the SDK so it reuses our gesture-activated context
+      (window as any).__elevenLabsAudioContext = ctx;
+      console.log('[audio] unlockAudio: AudioContext state:', ctx.state);
     } catch {}
   }, []);
 
@@ -223,10 +271,10 @@ function TutorApp() {
 
   const handleModeForSTT = useCallback((mode: TutorMode) => {
     if (mode === 'listening') {
-      // Cancel any in-progress word reveal (interruption happened)
+      // Pause word reveal — if user is interrupting, it'll be cancelled fully on onMessage:user
+      // If it's just a mode flicker, the reveal state stays (timers paused but text position kept)
       revealTimersRef.current.forEach(t => clearTimeout(t));
       revealTimersRef.current = [];
-      // Start STT for visual feedback
       startSTT();
     } else {
       // Agent started speaking — stop STT but KEEP the placeholder
@@ -300,6 +348,20 @@ function TutorApp() {
   const [typingText, setTypingText] = useState('');
   const typingModeRef = useRef(false);
 
+  // Pre-generate breakdown + prefetch ElevenLabs config on intro screen
+  useEffect(() => {
+    if (screen === 'intro') {
+      setCatchupBreakdown(null); // Clear old breakdown when language changes
+      const topicName = lang === 'ar' ? 'الأعداد الطبيعية' : 'Natural Numbers';
+      const conceptsCovered = lang === 'ar'
+        ? 'الأعداد الطبيعية — تعريف الأعداد الطبيعية، خصائصها الأساسية، والعمليات عليها'
+        : 'Natural number sets — definition of natural numbers, their basic properties, and operations on them';
+      const subjectName = lang === 'ar' ? 'الحساب' : 'Arithmetic';
+      generateBreakdown(topicName, conceptsCovered, lang).then(bd => setCatchupBreakdown(bd)).catch(() => {});
+      prefetchCatchupConfig({ subjectName, topicName, conceptsCovered }, lang);
+    }
+  }, [screen, lang]);
+
   const openCatchup = useCallback(async (overrideLang?: Lang) => {
     unlockAudio();
     const sessionLang = overrideLang || lang;
@@ -307,7 +369,6 @@ function TutorApp() {
     setScreen('catchup');
     setConvo([]);
     setCatchupReady(false);
-    setCatchupBreakdown(null);
     setMicError(false);
     setTutorState('thinking');
 
@@ -316,14 +377,13 @@ function TutorApp() {
         subjectName: sessionLang === 'ar' ? 'الحساب' : 'Arithmetic',
         topicName: sessionLang === 'ar' ? 'الأعداد الطبيعية' : 'Natural Numbers',
         conceptsCovered: sessionLang === 'ar'
-          ? 'الأعداد الطبيعية الطبيعية — تعريف الأعداد الطبيعية، خصائصها الأساسية، والعمليات عليها'
+          ? 'الأعداد الطبيعية — تعريف الأعداد الطبيعية، خصائصها الأساسية، والعمليات عليها'
           : 'Natural number sets — definition of natural numbers, their basic properties, and operations on them',
       };
       setCatchupTopic(catchupConfig.topicName);
-      // Generate breakdown + start session in parallel, but show breakdown before chat
-      const breakdownPromise = generateBreakdown(catchupConfig.topicName, catchupConfig.conceptsCovered, sessionLang);
-      breakdownPromise.then(bd => setCatchupBreakdown(bd));
-      await breakdownPromise.catch(() => {}); // ensure breakdown renders before session connects
+      console.log('[session] openCatchup: about to start session');
+      // Re-resume persistent AudioContext right before session
+      unlockAudio();
 
       const conversation = await startCatchupSession(
         catchupConfig,
@@ -345,19 +405,9 @@ function TutorApp() {
             isSpeakingRef.current = mode === 'speaking';
             handleModeForSTT(mode);
           },
-          onAgentChunk: (text: string) => {
-            // Show/update ghosted preview — skip during interruption transitions
-            setConvo(prev => {
-              if (prev.some(m => m.from === 'student' && !m.confirmed)) return prev;
-              if (Date.now() < chunkSuppressedUntilRef.current) return prev;
-              const last = prev[prev.length - 1];
-              if (last?.from === 'tutor' && (last as any)._chunk) {
-                const next = [...prev];
-                next[next.length - 1] = { from: 'tutor', text, revealedLength: 0, _chunk: true } as any;
-                return next;
-              }
-              return [...prev, { from: 'tutor', text, revealedLength: 0, _chunk: true } as any];
-            });
+          onAgentChunk: () => {
+            // Disabled — word reveal from onMessage provides the visual feedback.
+            // Chunks caused a flash where the tutor response briefly appeared above the student's interruption.
           },
           onMessage: (text: string, role: 'user' | 'agent') => {
             console.log('[catchup] message:', role, text?.substring(0, 40));
@@ -381,6 +431,7 @@ function TutorApp() {
                   setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
                   if (sttDelayRef.current) { clearTimeout(sttDelayRef.current); sttDelayRef.current = null; }
                   stopListening();
+                  // Session ended
                   setTimeout(() => {
                     if (conversationRef.current) {
                       try { conversationRef.current.endSession(); } catch {}
@@ -391,7 +442,11 @@ function TutorApp() {
               } : undefined);
             } else {
               analytics.trackCatchupMessage('user', text, typingModeRef.current ? 'text' : 'voice');
-              chunkSuppressedUntilRef.current = Date.now() + 500; // suppress chunks for 500ms
+              chunkSuppressedUntilRef.current = Date.now() + 500;
+              // Cancel word reveal and fully reveal the interrupted tutor message
+              revealTimersRef.current.forEach(t => clearTimeout(t));
+              revealTimersRef.current = [];
+              setConvo(prev => prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m));
               setConvo(prev => {
                 const next = [...prev];
                 for (let i = next.length - 1; i >= 0; i--) {
@@ -474,6 +529,7 @@ function TutorApp() {
     try {
       const prefetch = prefetchConfigRef.current;
       prefetchConfigRef.current = null;
+      unlockAudio();
 
       const conversation = await startTutorSession(
         question,
@@ -531,6 +587,10 @@ function TutorApp() {
             } else {
               analytics.trackTutorMessage('user', text, typingModeRef.current ? 'text' : 'voice', questionIdx);
               chunkSuppressedUntilRef.current = Date.now() + 500;
+              // Cancel word reveal and fully reveal the interrupted tutor message
+              revealTimersRef.current.forEach(t => clearTimeout(t));
+              revealTimersRef.current = [];
+              setConvo(prev => prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m));
               setConvo(prev => {
                 const next = [...prev];
                 for (let i = next.length - 1; i >= 0; i--) {
@@ -610,6 +670,8 @@ function TutorApp() {
       try { await conversationRef.current.endSession(); } catch {}
       conversationRef.current = null;
     }
+    // Stop silent audio so user can fully control volume
+    // Session ended
     setScreen('quiz');
     setSelectedOption(null);
     setSubmitted(false);
@@ -771,7 +833,8 @@ function TutorApp() {
 
       {/* ── Catchup screen ── */}
       {screen === 'catchup' && (
-        <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], gap: sp[5], paddingBottom: sp[8], maxWidth: 600, width: '100%', alignSelf: 'center' }}>
+        <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], gap: sp[5], paddingBottom: sp[8], maxWidth: 600, width: '100%', alignSelf: 'center' }}
+        >
           {/* Concept breakdown — shown at the top */}
           {catchupBreakdown && (
             <BreakdownCard title={catchupBreakdown.title} points={catchupBreakdown.points} />

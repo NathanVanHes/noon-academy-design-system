@@ -1,0 +1,126 @@
+diff --git a/node_modules/@elevenlabs/client/dist/utils/WebSocketConnection.js b/node_modules/@elevenlabs/client/dist/utils/WebSocketConnection.js
+index 56b6854..d4b0a21 100644
+--- a/node_modules/@elevenlabs/client/dist/utils/WebSocketConnection.js
++++ b/node_modules/@elevenlabs/client/dist/utils/WebSocketConnection.js
+@@ -12,6 +12,7 @@ export class WebSocketConnection extends BaseConnection {
+     inputFormat;
+     outputFormat;
+     outputListeners = new Set();
++    bufferedAudio = []; // Buffer audio chunks until output is attached
+     constructor(socket, conversationId, inputFormat, outputFormat) {
+         super();
+         this.socket = socket;
+@@ -140,6 +141,14 @@ export class WebSocketConnection extends BaseConnection {
+     }
+     addListener(listener) {
+         this.outputListeners.add(listener);
++        // Flush any buffered audio chunks to the new listener
++        if (this.bufferedAudio.length > 0) {
++            console.log('[audio] flushing', this.bufferedAudio.length, 'buffered audio chunks');
++            for (const event of this.bufferedAudio) {
++                listener(event);
++            }
++            this.bufferedAudio = [];
++        }
+     }
+     removeListener(listener) {
+         this.outputListeners.delete(listener);
+@@ -151,7 +160,12 @@ export class WebSocketConnection extends BaseConnection {
+             const audioEvent = {
+                 audio_base_64: parsedEvent.audio_event.audio_base_64,
+             };
+-            this.outputListeners.forEach(listener => listener(audioEvent));
++            if (this.outputListeners.size === 0) {
++                // No output attached yet — buffer for later
++                this.bufferedAudio.push(audioEvent);
++            } else {
++                this.outputListeners.forEach(listener => listener(audioEvent));
++            }
+         }
+     }
+ }
+diff --git a/node_modules/@elevenlabs/client/dist/utils/output.js b/node_modules/@elevenlabs/client/dist/utils/output.js
+index 8999d5c..9d2087a 100644
+--- a/node_modules/@elevenlabs/client/dist/utils/output.js
++++ b/node_modules/@elevenlabs/client/dist/utils/output.js
+@@ -12,32 +12,52 @@ export class MediaDeviceOutput {
+         let audioElement = null;
+         try {
+             const supportsSampleRateConstraint = navigator.mediaDevices.getSupportedConstraints().sampleRate;
+-            context = new AudioContext(supportsSampleRateConstraint ? { sampleRate } : {});
++            // iOS fix: reuse a pre-resumed AudioContext if available (set by unlockAudio from user gesture)
++            if (window.__elevenLabsAudioContext && window.__elevenLabsAudioContext.state !== 'closed') {
++                context = window.__elevenLabsAudioContext;
++                console.log('[audio] iOS: reusing pre-resumed AudioContext, state:', context.state);
++            } else {
++                context = new AudioContext(supportsSampleRateConstraint ? { sampleRate } : {});
++            }
+             const analyser = context.createAnalyser();
+             const gain = context.createGain();
+-            // Always create an audio element for device switching capability
+-            audioElement = new Audio();
+-            audioElement.src = "";
+-            audioElement.load();
+-            audioElement.autoplay = true;
+-            audioElement.style.display = "none";
+-            document.body.appendChild(audioElement);
+-            // Create media stream destination to route audio to the element
+-            const destination = context.createMediaStreamDestination();
+-            audioElement.srcObject = destination.stream;
+-            gain.connect(analyser);
+-            analyser.connect(destination);
++            // iOS Safari fix: skip Audio element + createMediaStreamDestination (broken on iOS).
++            const isIOS = navigator.maxTouchPoints > 0 && /iPad|iPhone|iPod/.test(navigator.userAgent);
++            console.log('[audio] output.create: isIOS=' + isIOS + ', maxTouchPoints=' + navigator.maxTouchPoints + ', ua=' + navigator.userAgent.substring(0, 50));
++            if (!isIOS) {
++                // Desktop/Android: use Audio element for device switching
++                audioElement = new Audio();
++                audioElement.src = "";
++                audioElement.load();
++                audioElement.autoplay = true;
++                audioElement.style.display = "none";
++                document.body.appendChild(audioElement);
++                const destination = context.createMediaStreamDestination();
++                audioElement.srcObject = destination.stream;
++                gain.connect(analyser);
++                analyser.connect(destination);
++            } else {
++                // iOS: connect directly to speakers
++                console.log('[audio] iOS: using direct speaker output (skipping Audio element)');
++                gain.connect(analyser);
++                analyser.connect(context.destination);
++            }
++            const t0 = Date.now();
+             if (!supportsSampleRateConstraint || context.sampleRate !== sampleRate) {
+                 if (context.sampleRate !== sampleRate) {
+                     console.warn(`[ConversationalAI] Sample rate ${sampleRate} not available, resampling to ${context.sampleRate}`);
+                 }
+                 await addLibsamplerateModule(context, libsampleratePath);
++                console.log('[audio] libsamplerate loaded in', Date.now() - t0, 'ms');
+             }
++            const t1 = Date.now();
+             await loadAudioConcatProcessor(context.audioWorklet, workletPaths?.audioConcatProcessor);
++            console.log('[audio] audioConcatProcessor loaded in', Date.now() - t1, 'ms');
+             const worklet = new AudioWorkletNode(context, "audioConcatProcessor");
+             worklet.port.postMessage({ type: "setFormat", format, sampleRate });
+             worklet.connect(gain);
+             await context.resume();
++            console.log('[audio] output pipeline ready, total:', Date.now() - t0, 'ms');
+             // Set initial output device if provided
+             if (outputDeviceId && audioElement.setSinkId) {
+                 await audioElement.setSinkId(outputDeviceId);
+@@ -143,7 +163,12 @@ export class MediaDeviceOutput {
+             this.audioElement.parentNode.removeChild(this.audioElement);
+         }
+         this.audioElement.pause();
+-        await this.context.close();
++        // iOS fix: don't close the shared AudioContext — it's reused across sessions
++        if (this.context !== window.__elevenLabsAudioContext) {
++            await this.context.close();
++        } else {
++            console.log('[audio] iOS: keeping shared AudioContext alive for next session');
++        }
+     }
+ }
+ //# sourceMappingURL=output.js.map
+\ No newline at end of file

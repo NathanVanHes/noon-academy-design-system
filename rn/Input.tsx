@@ -31,7 +31,7 @@ export const Input = forwardRef<TextInput, InputProps>(({ label, error, helper, 
 
   const inputStyle: TextStyle = {
     fontFamily: font.sans,
-    fontSize: fs[14],
+    fontSize: fs[16],
     color: theme.fg,
     backgroundColor: theme.inputBg,
     borderWidth: 1,
