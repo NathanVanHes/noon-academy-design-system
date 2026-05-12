@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, Image } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
@@ -17,9 +17,10 @@ import { QUESTIONS } from './questions';
 import { startTutorSession, startCatchupSession, configureAgentForTutor, prefetchCatchupConfig, generateBreakdown, type TutorMode, type CatchupConfig } from './api';
 import { t, type Lang } from './i18n';
 import { startListening, stopListening } from './stt';
+import * as analytics from './analytics';
 
 type TutorState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
-type Screen = 'lang' | 'catchup' | 'quiz' | 'tutor' | 'results';
+type Screen = 'lang' | 'intro' | 'catchup' | 'quiz' | 'tutor' | 'results';
 
 interface ConvoItem {
   from: 'tutor' | 'student';
@@ -54,18 +55,23 @@ function TutorApp() {
   const [tutorState, setTutorState] = useState<TutorState>('idle');
   const [convo, setConvo] = useState<ConvoItem[]>([]);
   const [canRetry, setCanRetry] = useState(false);
+  const [micError, setMicError] = useState(false);
   const conversationRef = useRef<any>(null);
   const scrollRef = useRef<ScrollView>(null);
   const revealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const isSpeakingRef = useRef(false);
   const liveTranscriptRef = useRef<string>(''); // current interim transcript
+  const speakingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chunkSuppressedUntilRef = useRef(0); // suppress chunks briefly after user message confirmed
 
   const question = QUESTIONS[questionIdx];
   const { width: screenW, height: screenH } = useWindowDimensions();
 
-  // Unlock audio on Safari — must be called from a user gesture
+  // Unlock audio + warm up mic on mobile browsers — must be called from a user gesture
+  const micStreamRef = useRef<MediaStream | null>(null);
   const unlockAudio = useCallback(() => {
     try {
+      // Method 1: AudioContext unlock
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const buf = ctx.createBuffer(1, 1, 22050);
       const src = ctx.createBufferSource();
@@ -73,15 +79,29 @@ function TutorApp() {
       src.connect(ctx.destination);
       src.start(0);
       ctx.resume();
+
+      // Method 2: Silent HTML audio element — helps on iOS Safari
+      const audio = document.createElement('audio');
+      audio.setAttribute('playsinline', 'true');
+      audio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      audio.play().catch(() => {});
+
+      // Method 3: Warm up mic — pre-request permission so audio stream is ready
+      if (!micStreamRef.current && navigator.mediaDevices?.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          micStreamRef.current = stream;
+        }).catch(() => {});
+      }
     } catch {}
   }, []);
 
-  // Prefetch catchup config on mount so it's ready when user picks a language
+  // Init analytics + prefetch catchup config on mount
   useEffect(() => {
+    analytics.initAnalytics();
     prefetchCatchupConfig({
-      subjectName: 'Design',
-      topicName: 'Alignment',
-      conceptsCovered: 'Alignment as a design principle — how placing elements along a shared invisible edge creates visual connection, order, and relationship between otherwise separate elements on a page',
+      subjectName: 'Arithmetic',
+      topicName: 'Natural Numbers',
+      conceptsCovered: 'Natural number sets — definition of natural numbers, their basic properties, and operations on them',
     }, 'en'); // default — will be reconfigured if Arabic is selected
   }, []);
 
@@ -96,20 +116,27 @@ function TutorApp() {
     revealTimersRef.current.forEach(t => clearTimeout(t));
     revealTimersRef.current = [];
 
-    // Remove any chunk preview
-    setConvo(prev => {
-      const last = prev[prev.length - 1];
-      if (last?.from === 'tutor' && (last as any)._chunk) return prev.slice(0, -1);
-      return prev;
-    });
-
     const words = text.split(/\s+/);
     const totalChars = words.reduce((sum, w) => sum + w.length, 0);
     const totalDur = words.length * MS_PER_WORD;
     const msgId = ++msgIdRef.current;
+    const newMsg = { from: 'tutor' as const, text, revealedLength: words[0].length, _id: msgId };
 
-    // Insert full text ghosted, first word revealed
-    setConvo(prev => [...prev, { from: 'tutor', text, revealedLength: words[0].length, _id: msgId } as any]);
+    // Add tutor message — always appended at the very end.
+    // Use requestAnimationFrame to ensure any pending user message state updates are flushed first.
+    requestAnimationFrame(() => {
+      setConvo(prev => {
+        // Remove chunks, fully reveal old tutor messages, confirm any unconfirmed students
+        const cleaned = prev
+          .filter(m => !(m.from === 'tutor' && (m as any)._chunk))
+          .map(m => {
+            if (m.from === 'tutor' && m.revealedLength !== undefined) return { ...m, revealedLength: undefined };
+            if (m.from === 'student' && !m.confirmed) return { ...m, confirmed: true };
+            return m;
+          });
+        return [...cleaned, newMsg as any];
+      });
+    });
 
     const updateMsg = (revealedLength: number | undefined) => {
       setConvo(prev => {
@@ -143,99 +170,74 @@ function TutorApp() {
     }
   }, []);
 
-  // Start/stop live STT when agent mode changes
+  // Safety net: if agent stays in 'speaking' mode too long (audio didn't play on mobile),
+  // force transition to 'listening' so the user isn't stuck.
+  const armSpeakingTimeout = useCallback((text: string) => {
+    if (speakingTimeoutRef.current) clearTimeout(speakingTimeoutRef.current);
+    const words = text.split(/\s+/).length;
+    const estimatedMs = words * MS_PER_WORD + 3000; // generous buffer
+    speakingTimeoutRef.current = setTimeout(() => {
+      if (isSpeakingRef.current) {
+        console.warn('[safety] forcing mode to listening — agent stuck on speaking');
+        setTutorState('listening');
+        isSpeakingRef.current = false;
+        handleModeForSTT('listening' as TutorMode);
+      }
+    }, estimatedMs);
+  }, []);
+
+  const clearSpeakingTimeout = useCallback(() => {
+    if (speakingTimeoutRef.current) { clearTimeout(speakingTimeoutRef.current); speakingTimeoutRef.current = null; }
+  }, []);
+
+  // Agent mic is LIVE — ElevenLabs handles voice input directly.
+  // Browser STT provides visual feedback (grey interim text).
+  // ElevenLabs onMessage provides confirmed transcript (white text).
   const sttDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Agent mic is PERMANENTLY muted. We use sendUserMessage() to send text.
-  // This completely prevents silence reprompts.
+  const startSTT = useCallback(() => {
+    if (typingModeRef.current) return;
+    if (sttDelayRef.current) clearTimeout(sttDelayRef.current);
+    liveTranscriptRef.current = '';
+    let placeholderAdded = false;
+
+    startListening(lang, (transcript) => {
+      if (!transcript) return;
+      if (!placeholderAdded) {
+        placeholderAdded = true;
+        setConvo(prev => [...prev, { from: 'student', text: transcript, confirmed: false }]);
+      }
+      liveTranscriptRef.current = transcript;
+      setConvo(prev => {
+        const next = [...prev];
+        for (let i = next.length - 1; i >= 0; i--) {
+          if (next[i].from === 'student' && !next[i].confirmed) {
+            next[i] = { ...next[i], text: transcript };
+            break;
+          }
+        }
+        return next;
+      });
+    });
+  }, [lang]);
+
   const handleModeForSTT = useCallback((mode: TutorMode) => {
     if (mode === 'listening') {
-      // Don't start STT if in typing mode
-      if (typingModeRef.current) {
-        console.log('[STT] skipped — typing mode active');
-        return;
-      }
-      if (sttDelayRef.current) clearTimeout(sttDelayRef.current);
-      sttDelayRef.current = setTimeout(() => {
-        liveTranscriptRef.current = '';
-        let placeholderAdded = false;
-        let silenceTimer: ReturnType<typeof setTimeout> | null = null;
-
-        startListening(lang, (transcript) => {
-          if (!transcript) return;
-          if (!placeholderAdded) {
-            placeholderAdded = true;
-            setConvo(prev => [...prev, { from: 'student', text: transcript, confirmed: false }]);
-          }
-          liveTranscriptRef.current = transcript;
-          setConvo(prev => {
-            const next = [...prev];
-            for (let i = next.length - 1; i >= 0; i--) {
-              if (next[i].from === 'student' && !next[i].confirmed) {
-                next[i] = { ...next[i], text: transcript };
-                break;
-              }
-            }
-            return next;
-          });
-
-          // After 1.5s silence: confirm message, stop STT, send text to agent
-          if (silenceTimer) clearTimeout(silenceTimer);
-          silenceTimer = setTimeout(() => {
-            const finalText = liveTranscriptRef.current;
-            if (finalText) {
-              // Confirm in UI
-              setConvo(prev => {
-                const next = [...prev];
-                for (let i = next.length - 1; i >= 0; i--) {
-                  if (next[i].from === 'student' && !next[i].confirmed) {
-                    next[i] = { ...next[i], confirmed: true };
-                    break;
-                  }
-                }
-                return next;
-              });
-              // Send to agent as text — mic is muted so this is the only input
-              stopListening();
-              conversationRef.current?.sendUserMessage(finalText);
-              liveTranscriptRef.current = '';
-            }
-          }, 1500);
-        });
-      }, 800);
+      // Cancel any in-progress word reveal (interruption happened)
+      revealTimersRef.current.forEach(t => clearTimeout(t));
+      revealTimersRef.current = [];
+      // Start STT for visual feedback
+      startSTT();
     } else {
-      // Agent started speaking — stop STT
+      // Agent started speaking — stop STT but KEEP the placeholder
+      // (onMessage for user role will replace it with confirmed text)
       if (sttDelayRef.current) { clearTimeout(sttDelayRef.current); sttDelayRef.current = null; }
       stopListening();
-
-      // Confirm or remove any pending student message
-      const finalText = liveTranscriptRef.current;
-      if (finalText) {
-        setConvo(prev => {
-          const next = [...prev];
-          for (let i = next.length - 1; i >= 0; i--) {
-            if (next[i].from === 'student' && !next[i].confirmed) {
-              next[i] = { ...next[i], text: finalText, confirmed: true };
-              break;
-            }
-          }
-          return next;
-        });
-      } else {
-        setConvo(prev => {
-          const next = [...prev];
-          for (let i = next.length - 1; i >= 0; i--) {
-            if (next[i].from === 'student' && !next[i].confirmed) {
-              next.splice(i, 1);
-              break;
-            }
-          }
-          return next;
-        });
-      }
       liveTranscriptRef.current = '';
+      // Suppress chunk previews — they cause flash above student message during interruptions
+      chunkSuppressedUntilRef.current = Date.now() + 1000;
     }
-  }, [lang]);
+  }, [lang, startSTT]);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -251,27 +253,29 @@ function TutorApp() {
     setSubmitted(true);
     const correct = selectedOption === question.correctLabel;
     setIsCorrect(correct);
+    analytics.trackAnswerSubmitted(questionIdx, question.id, selectedOption, question.correctLabel, correct);
     if (correct) {
       setScore(s => s + 1);
       setResults(r => r.map((s, i) => i === questionIdx ? 'correct' : s));
     } else {
       setResults(r => r.map((s, i) => i === questionIdx ? 'incorrect' : s));
-      // Pre-configure agent now so it's ready when student taps "Talk to Tutor"
       prefetchConfigRef.current = configureAgentForTutor(question, selectedOption, lang);
     }
   }, [selectedOption, question, questionIdx, lang]);
 
   const handleNext = useCallback(() => {
     if (questionIdx + 1 >= QUESTIONS.length) {
+      analytics.trackSessionCompleted(score + (isCorrect ? 0 : 0), QUESTIONS.length, results);
       setScreen('results');
     } else {
+      analytics.trackQuestionViewed(questionIdx + 1, QUESTIONS[questionIdx + 1].id);
       setResults(r => r.map((s, i) => i === questionIdx + 1 ? 'current' : s));
       setQuestionIdx(i => i + 1);
       setSelectedOption(null);
       setSubmitted(false);
       setIsCorrect(false);
     }
-  }, [questionIdx]);
+  }, [questionIdx, score, isCorrect, results]);
 
   const handleRestart = useCallback(() => {
     setQuestionIdx(0);
@@ -291,23 +295,29 @@ function TutorApp() {
   const [showSkipWarning, setShowSkipWarning] = useState(false);
   const [showEndTutorWarning, setShowEndTutorWarning] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showExitWarning, setShowExitWarning] = useState(false);
   const [typingMode, setTypingMode] = useState(false);
   const [typingText, setTypingText] = useState('');
   const typingModeRef = useRef(false);
 
   const openCatchup = useCallback(async (overrideLang?: Lang) => {
+    unlockAudio();
     const sessionLang = overrideLang || lang;
+    analytics.trackCatchupStarted(sessionLang, 'Natural Numbers');
     setScreen('catchup');
     setConvo([]);
     setCatchupReady(false);
+    setCatchupBreakdown(null);
+    setMicError(false);
     setTutorState('thinking');
 
     try {
-      // Hardcoded for testing — replace with real data later
       const catchupConfig: CatchupConfig = {
-        subjectName: 'Design',
-        topicName: 'Alignment',
-        conceptsCovered: 'Alignment as a design principle — how placing elements along a shared invisible edge creates visual connection, order, and relationship between otherwise separate elements on a page',
+        subjectName: sessionLang === 'ar' ? 'الحساب' : 'Arithmetic',
+        topicName: sessionLang === 'ar' ? 'الأعداد الطبيعية' : 'Natural Numbers',
+        conceptsCovered: sessionLang === 'ar'
+          ? 'الأعداد الطبيعية الطبيعية — تعريف الأعداد الطبيعية، خصائصها الأساسية، والعمليات عليها'
+          : 'Natural number sets — definition of natural numbers, their basic properties, and operations on them',
       };
       setCatchupTopic(catchupConfig.topicName);
       // Generate breakdown from AI
@@ -321,19 +331,24 @@ function TutorApp() {
           onConnect: (id) => {
             console.log('Catchup connected:', id);
             setTutorState('speaking');
+            startSTT(); // Start STT immediately so user can interrupt first message
           },
           onDisconnect: () => {
             setTutorState('idle');
+            stopListening();
           },
           onModeChange: (mode: TutorMode) => {
             console.log('[catchup] mode:', mode);
+            clearSpeakingTimeout();
             setTutorState(mode === 'speaking' ? 'speaking' : 'listening');
             isSpeakingRef.current = mode === 'speaking';
             handleModeForSTT(mode);
           },
           onAgentChunk: (text: string) => {
-            // Show/update ghosted preview as LLM streams — before speech starts
+            // Show/update ghosted preview — skip during interruption transitions
             setConvo(prev => {
+              if (prev.some(m => m.from === 'student' && !m.confirmed)) return prev;
+              if (Date.now() < chunkSuppressedUntilRef.current) return prev;
               const last = prev[prev.length - 1];
               if (last?.from === 'tutor' && (last as any)._chunk) {
                 const next = [...prev];
@@ -346,10 +361,10 @@ function TutorApp() {
           onMessage: (text: string, role: 'user' | 'agent') => {
             console.log('[catchup] message:', role, text?.substring(0, 40));
             if (!text) return;
-            // Filter out silence artifacts and reprompts
             if (role === 'agent') {
+              armSpeakingTimeout(text);
+              analytics.trackCatchupMessage('agent', text, 'voice');
               const lower = text.toLowerCase();
-              // Skip reprompt messages
               const isTrigger =
                 lower.includes("let's start the quiz") ||
                 lower.includes("let's try a question") ||
@@ -358,38 +373,31 @@ function TutorApp() {
                 lower.includes('جاهز') ||
                 lower.includes('نجرب سؤال');
               startWordReveal(text, isTrigger ? () => {
-                // Wait for the tutor to finish speaking before showing resources
-                // Word reveal finishes before audio — give extra time for audio to complete
-                const words = text.split(/\s+/).length;
-                const audioBuffer = Math.max(3000, words * 100); // at least 3s
                 setTimeout(() => {
                   setCatchupReady(true);
+                  analytics.trackCatchupCompleted(convo.length);
+                  setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
                   if (sttDelayRef.current) { clearTimeout(sttDelayRef.current); sttDelayRef.current = null; }
                   stopListening();
-                  setConvo(prev => {
-                    const last = prev[prev.length - 1];
-                    if (last?.from === 'student' && !last.confirmed && !last.text) return prev.slice(0, -1);
-                    return prev;
-                  });
                   setTimeout(() => {
                     if (conversationRef.current) {
                       try { conversationRef.current.endSession(); } catch {}
                       conversationRef.current = null;
                     }
                   }, 1000);
-                }, audioBuffer);
+                }, 500);
               } : undefined);
             } else {
-              // Update the most recent student message with the agent's final transcript
+              analytics.trackCatchupMessage('user', text, typingModeRef.current ? 'text' : 'voice');
+              chunkSuppressedUntilRef.current = Date.now() + 500; // suppress chunks for 500ms
               setConvo(prev => {
                 const next = [...prev];
                 for (let i = next.length - 1; i >= 0; i--) {
-                  if (next[i].from === 'student') {
+                  if (next[i].from === 'student' && !next[i].confirmed) {
                     next[i] = { ...next[i], text, confirmed: true };
                     return next;
                   }
                 }
-                // No student message at all — add one
                 return [...prev, { from: 'student', text, confirmed: true }];
               });
             }
@@ -441,8 +449,11 @@ function TutorApp() {
         },
       );
       conversationRef.current = conversation;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to start catchup:', err);
+      if (err?.name === 'NotAllowedError' || err?.message?.includes('Permission denied')) {
+        setMicError(true);
+      }
       setTutorState('error');
     }
   }, [lang]);
@@ -450,9 +461,12 @@ function TutorApp() {
   // ─── Tutor session via ElevenLabs Agent ─────────────
 
   const openTutor = useCallback(async () => {
+    unlockAudio();
+    analytics.trackTutorOpened(questionIdx, question.id);
     setScreen('tutor');
     setConvo([]);
     setCanRetry(false);
+    setMicError(false);
     setTutorState('thinking');
 
     try {
@@ -467,32 +481,30 @@ function TutorApp() {
           onConnect: (id) => {
             console.log('Tutor connected:', id);
             setTutorState('speaking');
+            startSTT();
           },
           onDisconnect: () => {
             console.log('Tutor disconnected');
             setTutorState('idle');
+            stopListening();
           },
           onModeChange: (mode: TutorMode) => {
             console.log('[tutor] mode:', mode);
+            clearSpeakingTimeout();
             setTutorState(mode === 'speaking' ? 'speaking' : 'listening');
             isSpeakingRef.current = mode === 'speaking';
             handleModeForSTT(mode);
           },
-          onAgentChunk: (text: string) => {
-            setConvo(prev => {
-              const last = prev[prev.length - 1];
-              if (last?.from === 'tutor' && (last as any)._chunk) {
-                const next = [...prev];
-                next[next.length - 1] = { from: 'tutor', text, revealedLength: 0, _chunk: true } as any;
-                return next;
-              }
-              return [...prev, { from: 'tutor', text, revealedLength: 0, _chunk: true } as any];
-            });
+          onAgentChunk: () => {
+            // Disabled in tutor — word reveal from onMessage provides the visual feedback.
+            // Chunks caused a flash where the tutor response briefly appeared above the student's interruption.
           },
           onMessage: (text: string, role: 'user' | 'agent') => {
             console.log('[tutor] message:', role, text?.substring(0, 40));
             if (!text) return;
             if (role === 'agent') {
+              armSpeakingTimeout(text);
+              analytics.trackTutorMessage('agent', text, 'voice', questionIdx);
               const lower = text.toLowerCase();
               const isTrigger =
                 lower.includes("you've got it") ||
@@ -502,13 +514,9 @@ function TutorApp() {
                 lower.includes('يلا نكمل');
               startWordReveal(text, isTrigger ? () => {
                 setCanRetry(true);
+                analytics.trackTutorCompleted(questionIdx, convo.length);
                 if (sttDelayRef.current) { clearTimeout(sttDelayRef.current); sttDelayRef.current = null; }
                 stopListening();
-                setConvo(prev => {
-                  const last = prev[prev.length - 1];
-                  if (last?.from === 'student' && !last.confirmed && !last.text) return prev.slice(0, -1);
-                  return prev;
-                });
                 setTimeout(() => {
                   if (conversationRef.current) {
                     try { conversationRef.current.endSession(); } catch {}
@@ -517,20 +525,17 @@ function TutorApp() {
                 }, 500);
               } : undefined);
             } else {
+              analytics.trackTutorMessage('user', text, typingModeRef.current ? 'text' : 'voice', questionIdx);
+              chunkSuppressedUntilRef.current = Date.now() + 500;
               setConvo(prev => {
-                const hasIt = prev.some(m => m.from === 'student' && m.text === text);
-                if (hasIt) return prev;
                 const next = [...prev];
-                let found = false;
                 for (let i = next.length - 1; i >= 0; i--) {
                   if (next[i].from === 'student' && !next[i].confirmed) {
                     next[i] = { ...next[i], text, confirmed: true };
-                    found = true;
-                    break;
+                    return next;
                   }
                 }
-                if (!found) return [...prev, { from: 'student', text, confirmed: true }];
-                return next;
+                return [...prev, { from: 'student', text, confirmed: true }];
               });
             }
           },
@@ -584,8 +589,11 @@ function TutorApp() {
       );
 
       conversationRef.current = conversation;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to start tutor session:', err);
+      if (err?.name === 'NotAllowedError' || err?.message?.includes('Permission denied')) {
+        setMicError(true);
+      }
       setTutorState('error');
     }
   }, [question, selectedOption, lang]);
@@ -626,7 +634,7 @@ function TutorApp() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg, paddingTop: insets.top, direction: isRTL ? 'rtl' : 'ltr' } as any}>
       {/* ── Top bar ── */}
-      {screen !== 'lang' && (
+      {screen !== 'lang' && screen !== 'intro' && (
         <View style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -643,21 +651,28 @@ function TutorApp() {
                 ? (lang === 'en' ? `${catchupTopic} Catchup` : `مراجعة ${catchupTopic}`)
               : screen === 'tutor'
                 ? (lang === 'en' ? 'Tutor Session' : 'جلسة المعلم')
-                : (lang === 'en' ? 'Quiz' : 'اختبار')
+                : (lang === 'en' ? 'Natural Numbers' : 'الأعداد الطبيعية')
             }
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+            {screen === 'quiz' && (
+              <Pressable onPress={() => setShowExitWarning(true)}>
+                <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fgSubtle }}>
+                  {lang === 'en' ? 'Exit Session' : 'الخروج من الجلسة'}
+                </Text>
+              </Pressable>
+            )}
             {screen === 'catchup' && (
               <Pressable onPress={() => setShowSkipWarning(true)}>
                 <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fgSubtle }}>
-                  {lang === 'en' ? 'Skip' : 'تخطي'}
+                  {lang === 'en' ? 'Skip Review' : 'تخطي المراجعة'}
                 </Text>
               </Pressable>
             )}
             {screen === 'tutor' && (
-              <Pressable onPress={() => setShowEndTutorWarning(true)}>
+              <Pressable onPress={() => { analytics.trackTutorSkipped(questionIdx); closeTutor(); handleNext(); }}>
                 <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[500], color: theme.fgSubtle }}>
-                  {t.endSession[lang]}
+                  {lang === 'en' ? 'Skip Tutor' : 'تخطي المعلم'}
                 </Text>
               </Pressable>
             )}
@@ -683,15 +698,71 @@ function TutorApp() {
               Choose your language
             </Text>
             <View style={{ flexDirection: 'row', gap: sp[4], marginTop: sp[4] }}>
-              <Button variant="secondary" onPress={() => { unlockAudio(); setLang('en'); openCatchup('en'); }}>
+              <Button variant="secondary" onPress={() => { unlockAudio(); setLang('en'); setScreen('intro'); analytics.trackLangSelected('en'); }}>
                 English
               </Button>
-              <Button variant="secondary" onPress={() => { unlockAudio(); setLang('ar'); openCatchup('ar'); }}>
+              <Button variant="secondary" onPress={() => { unlockAudio(); setLang('ar'); setScreen('intro'); analytics.trackLangSelected('ar'); }}>
                 العربية
               </Button>
             </View>
           </View>
         </View>
+      )}
+
+      {/* ── Intro screen ── */}
+      {screen === 'intro' && (
+        <View style={{ flex: 1, justifyContent: 'center', padding: sp[8], maxWidth: 600, width: '100%', alignSelf: 'center' as any }}>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 1, textTransform: 'uppercase', marginBottom: sp[3] }}>
+            {lang === 'en' ? 'Practice Session' : 'جلسة تدريب'}
+          </Text>
+          <Text style={{ fontFamily: font.serif, fontSize: fs[28], fontWeight: fw[500], color: theme.fg, marginBottom: sp[6] }}>
+            {lang === 'en' ? 'Natural Numbers' : 'الأعداد الطبيعية'}
+          </Text>
+
+          <View style={{ gap: sp[3], marginBottom: sp[6] }}>
+            <View style={{ flexDirection: 'row', gap: sp[3] }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgFaint, width: 70 }}>
+                {lang === 'en' ? 'Chapter' : 'الفصل'}
+              </Text>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>
+                {lang === 'en' ? 'Arithmetic' : 'الحساب'}
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: sp[3] }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgFaint, width: 70 }}>
+                {lang === 'en' ? 'Topic' : 'الموضوع'}
+              </Text>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>
+                {lang === 'en' ? 'Numbers and their properties' : 'الاعداد و خصائصها'}
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: sp[3] }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgFaint, width: 70 }}>
+                {lang === 'en' ? 'Subtopic' : 'الفرعي'}
+              </Text>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fg }}>
+                {lang === 'en' ? 'Natural Numbers' : 'الأعداد الطبيعية'}
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: sp[3] }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgFaint, width: 70 }}>
+                {lang === 'en' ? 'Questions' : 'الأسئلة'}
+              </Text>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[700], color: theme.accent }}>
+                {QUESTIONS.length}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {screen === 'intro' && (
+        <BottomAction
+          icon="tutor"
+          message={lang === 'en' ? "You haven't visited this in a while" : 'لم تزر هذا الموضوع منذ فترة'}
+          submessage={lang === 'en' ? "We'll start with a quick review" : 'سنبدأ بمراجعة سريعة'}
+          primary={{ label: lang === 'en' ? 'Start Practice' : 'ابدأ التدريب', onPress: () => { unlockAudio(); openCatchup(lang); } }}
+        />
       )}
 
       {/* ── Catchup screen ── */}
@@ -719,19 +790,18 @@ function TutorApp() {
           {catchupReady && (
             <View style={{ alignSelf: 'flex-start', width: '80%', gap: sp[3] }}>
               <WorkedExampleCard
-                title={lang === 'en' ? 'Alignment in Practice' : 'المحاذاة في التطبيق'}
+                title={lang === 'en' ? `${catchupTopic} in Practice` : `${catchupTopic} في التطبيق`}
                 steps={[
-                  { title: lang === 'en' ? 'Identify the edges' : 'حدد الحواف', content: lang === 'en' ? 'Look at every element on the page. Which edges could share a common line — left, right, center, or top?' : 'انظر لكل عنصر في الصفحة. أي الحواف يمكن أن تشترك في خط واحد — يسار، يمين، وسط، أو أعلى؟' },
-                  { title: lang === 'en' ? 'Draw invisible lines' : 'ارسم خطوط وهمية', content: lang === 'en' ? 'Imagine vertical and horizontal lines connecting elements. Strong alignment means elements snap to these lines consistently.' : 'تخيل خطوط عمودية وأفقية تربط العناصر. المحاذاة القوية تعني أن العناصر تلتزم بهذه الخطوط باستمرار.' },
-                  { title: lang === 'en' ? 'Check the result' : 'تحقق من النتيجة', content: lang === 'en' ? 'Well-aligned layouts feel organized and intentional. Misaligned elements feel random, even if the content is good.' : 'التخطيطات المحاذاة تبدو منظمة ومقصودة. العناصر غير المحاذاة تبدو عشوائية حتى لو المحتوى جيد.' },
+                  { title: lang === 'en' ? 'Definition' : 'التعريف', content: lang === 'en' ? 'Natural numbers are the counting numbers starting from 1: {1, 2, 3, 4, ...}. They do not include zero or negative numbers.' : 'الأعداد الطبيعية هي أعداد العد بدءاً من ١: {١، ٢، ٣، ٤، ...}. لا تشمل الصفر أو الأعداد السالبة.' },
+                  { title: lang === 'en' ? 'Properties' : 'الخصائص', content: lang === 'en' ? 'Natural numbers are closed under addition and multiplication — adding or multiplying two natural numbers always gives a natural number.' : 'الأعداد الطبيعية مغلقة تحت الجمع والضرب — جمع أو ضرب عددين طبيعيين دائماً يعطي عدد طبيعي.' },
+                  { title: lang === 'en' ? 'Key distinction' : 'التمييز الرئيسي', content: lang === 'en' ? 'Whole numbers include zero {0, 1, 2, 3, ...} while natural numbers start from 1. This is a common exam question.' : 'الأعداد الكلية تشمل الصفر {٠، ١، ٢، ٣، ...} بينما الأعداد الطبيعية تبدأ من ١. هذا سؤال شائع في الاختبارات.' },
                 ]}
               />
               <VideoCard
-                title={lang === 'en' ? 'Understanding Alignment' : 'فهم المحاذاة'}
+                title={lang === 'en' ? `Understanding ${catchupTopic}` : `فهم ${catchupTopic}`}
                 attribution={lang === 'en' ? 'Noon Academy' : 'أكاديمية نون'}
                 duration="3:20"
-                uri=""
-                onPress={() => {}}
+                uri="https://www.youtube.com/watch?v=eVxye1A2wL0"
               />
             </View>
           )}
@@ -748,12 +818,22 @@ function TutorApp() {
       {/* ── Quiz screen ── */}
       {screen === 'quiz' && (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], gap: sp[4], maxWidth: 600, width: '100%', alignSelf: 'center' }}>
-          <Text style={{
-            fontFamily: font.sans, fontSize: fs[18], fontWeight: fw[600],
-            color: theme.fg, lineHeight: fs[18] * 1.5,
-          }}>
-            {question.text[lang]}
-          </Text>
+          {question.text[lang] ? (
+            <Text style={{
+              fontFamily: font.sans, fontSize: fs[18], fontWeight: fw[600],
+              color: theme.fg, lineHeight: fs[18] * 1.5,
+            }}>
+              {question.text[lang]}
+            </Text>
+          ) : null}
+
+          {question.image && (
+            <Image
+              source={{ uri: question.image }}
+              style={{ width: '100%', aspectRatio: 16 / 9, borderRadius: r[2], backgroundColor: theme.hoverOverlay }}
+              resizeMode="contain"
+            />
+          )}
 
           <View style={{ gap: sp[3], marginTop: sp[3] }}>
             {question.options.map(opt => (
@@ -762,7 +842,7 @@ function TutorApp() {
                 label={opt.label}
                 text={opt.text[lang]}
                 state={optionState(opt.label)}
-                onPress={() => !submitted && setSelectedOption(opt.label)}
+                onPress={() => { if (!submitted) { setSelectedOption(opt.label); analytics.trackAnswerSelected(questionIdx, question.id, opt.label); } }}
               />
             ))}
           </View>
@@ -773,23 +853,31 @@ function TutorApp() {
       {/* ── Tutor screen ── */}
       {screen === 'tutor' && (
         <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], gap: sp[5], paddingBottom: sp[8], maxWidth: 600, width: '100%', alignSelf: 'center' }}>
-          {/* Question context card */}
+          {/* Question context card with all options */}
           <View style={{
             padding: sp[4], borderRadius: r[3],
             backgroundColor: theme.inputBg,
             borderWidth: 1, borderColor: theme.border,
             gap: sp[3],
           }}>
-            <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg, lineHeight: fs[14] * 1.5 }}>
-              {question.text[lang]}
-            </Text>
-            {selectedOption && (
-              <QuizOption
-                label={selectedOption}
-                text={question.options.find(o => o.label === selectedOption)?.text[lang]}
-                state="incorrect"
-              />
+            {question.text[lang] ? (
+              <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fg, lineHeight: fs[14] * 1.5 }}>
+                {question.text[lang]}
+              </Text>
+            ) : null}
+            {question.image && (
+              <Image source={{ uri: question.image }} style={{ width: '100%', aspectRatio: 16 / 9, borderRadius: r[2] }} resizeMode="contain" />
             )}
+            <View style={{ gap: sp[2] }}>
+              {question.options.map(opt => (
+                <QuizOption
+                  key={opt.label}
+                  label={opt.label}
+                  text={opt.text[lang]}
+                  state={opt.label === selectedOption ? 'incorrect' : opt.label === question.correctLabel ? 'default' : 'default'}
+                />
+              ))}
+            </View>
           </View>
 
           {convo.map((item, i) => (
@@ -824,6 +912,9 @@ function TutorApp() {
               {Math.round((score / QUESTIONS.length) * 100)}%
             </Text>
           </View>
+          <View style={{ width: '100%', maxWidth: 400, paddingTop: sp[3] }}>
+            <SessionBar segments={results} size="sm" />
+          </View>
         </View>
       )}
 
@@ -849,7 +940,7 @@ function TutorApp() {
           message={t.incorrect[lang]}
           messageVariant="danger"
           primary={{ label: t.talkToTutor[lang], onPress: openTutor, variant: 'tutor' }}
-          secondary={{ label: lang === 'en' ? 'View Explanation' : 'عرض الشرح', onPress: () => setShowExplanation(true) }}
+          secondary={{ label: lang === 'en' ? 'View Explanation' : 'عرض الشرح', onPress: () => { setShowExplanation(true); analytics.trackExplanationOpened(questionIdx, question.id); } }}
         />
       )}
 
@@ -862,17 +953,35 @@ function TutorApp() {
           paddingHorizontal: sp[5],
           maxWidth: 600, width: '100%', alignSelf: 'center' as any,
         }}>
-          {typingMode ? (
+          {micError ? (
+            <View style={{ alignItems: 'center', gap: sp[3], paddingVertical: sp[2] }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, textAlign: 'center' }}>
+                {lang === 'en' ? 'Microphone access is needed for the voice tutor.' : 'يحتاج المعلم الصوتي إذن الميكروفون.'}
+              </Text>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, textAlign: 'center' }}>
+                {lang === 'en' ? 'Allow microphone in your browser settings, then tap retry.' : 'اسمح بالميكروفون في إعدادات المتصفح، ثم اضغط إعادة المحاولة.'}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: sp[3] }}>
+                <Button onPress={() => { setMicError(false); openCatchup(); }}>
+                  {lang === 'en' ? 'Retry' : 'إعادة المحاولة'}
+                </Button>
+                <Button variant="ghost" onPress={() => { setMicError(false); setScreen('quiz'); }}>
+                  {lang === 'en' ? 'Skip to Quiz' : 'تخطي للاختبار'}
+                </Button>
+              </View>
+            </View>
+          ) : typingMode ? (
             <>
               {/* Keyboard mode — tutor button + text input + send */}
               <View style={{ flexDirection: 'row', gap: sp[2], width: '100%', alignItems: 'center' }}>
                 <Pressable
                   onPress={() => {
+                    analytics.trackModeSwitch('voice', screen);
                     console.log('[MODE] switching to voice');
                     setTypingMode(false);
                     typingModeRef.current = false;
                     setTypingText('');
-                    setTutorState('listening');
+                    conversationRef.current?.setMicMuted(false);
                     handleModeForSTT('listening' as TutorMode);
                   }}
                 >
@@ -913,7 +1022,7 @@ function TutorApp() {
               {/* Voice mode (default) — aura + switch to keyboard */}
               <VoiceTutor state={tutorState} size={64} />
               <Pressable
-                onPress={() => { console.log('[MODE] switching to text'); setTypingMode(true); typingModeRef.current = true; stopListening(); conversationRef.current?.setMicMuted(true); }}
+                onPress={() => { analytics.trackModeSwitch('text', screen); console.log('[MODE] switching to text'); setTypingMode(true); typingModeRef.current = true; stopListening(); conversationRef.current?.setMicMuted(true); }}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], marginTop: sp[3] }}
               >
                 <Icon name="keyboard" size={14} color={theme.fgFaint} />
@@ -930,7 +1039,7 @@ function TutorApp() {
       {screen === 'catchup' && catchupReady && (
         <BottomAction
           message={lang === 'en' ? 'Review the resources above if you need a refresher before starting.' : 'راجع المواد أعلاه إذا تحتاج مراجعة قبل البدء.'}
-          primary={{ label: lang === 'en' ? 'Start Quiz' : 'ابدأ الاختبار', onPress: () => { setScreen('quiz'); } }}
+          primary={{ label: lang === 'en' ? 'Start Quiz' : 'ابدأ الاختبار', onPress: () => { analytics.trackSessionStarted(lang, QUESTIONS.length); analytics.trackQuestionViewed(0, QUESTIONS[0].id); setScreen('quiz'); } }}
         />
       )}
 
@@ -943,17 +1052,35 @@ function TutorApp() {
           paddingHorizontal: sp[5],
           maxWidth: 600, width: '100%', alignSelf: 'center' as any,
         }}>
-          {typingMode ? (
+          {micError ? (
+            <View style={{ alignItems: 'center', gap: sp[3], paddingVertical: sp[2] }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, textAlign: 'center' }}>
+                {lang === 'en' ? 'Microphone access is needed for the voice tutor.' : 'يحتاج المعلم الصوتي إذن الميكروفون.'}
+              </Text>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, textAlign: 'center' }}>
+                {lang === 'en' ? 'Allow microphone in your browser settings, then tap retry.' : 'اسمح بالميكروفون في إعدادات المتصفح، ثم اضغط إعادة المحاولة.'}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: sp[3] }}>
+                <Button onPress={() => { setMicError(false); openTutor(); }}>
+                  {lang === 'en' ? 'Retry' : 'إعادة المحاولة'}
+                </Button>
+                <Button variant="ghost" onPress={() => { setMicError(false); handleNext(); }}>
+                  {lang === 'en' ? 'Skip' : 'تخطي'}
+                </Button>
+              </View>
+            </View>
+          ) : typingMode ? (
             <>
               {/* Keyboard mode — tutor button + text input + send */}
               <View style={{ flexDirection: 'row', gap: sp[2], width: '100%', alignItems: 'center' }}>
                 <Pressable
                   onPress={() => {
+                    analytics.trackModeSwitch('voice', screen);
                     console.log('[MODE] switching to voice');
                     setTypingMode(false);
                     typingModeRef.current = false;
                     setTypingText('');
-                    setTutorState('listening');
+                    conversationRef.current?.setMicMuted(false);
                     handleModeForSTT('listening' as TutorMode);
                   }}
                 >
@@ -994,7 +1121,7 @@ function TutorApp() {
               {/* Voice mode (default) — aura + switch to keyboard */}
               <VoiceTutor state={tutorState} size={64} />
               <Pressable
-                onPress={() => { console.log('[MODE] switching to text'); setTypingMode(true); typingModeRef.current = true; stopListening(); conversationRef.current?.setMicMuted(true); }}
+                onPress={() => { analytics.trackModeSwitch('text', screen); console.log('[MODE] switching to text'); setTypingMode(true); typingModeRef.current = true; stopListening(); conversationRef.current?.setMicMuted(true); }}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], marginTop: sp[3] }}
               >
                 <Icon name="keyboard" size={14} color={theme.fgFaint} />
@@ -1016,81 +1143,165 @@ function TutorApp() {
 
       {screen === 'results' && (
         <BottomAction
-          primary={{ label: t.restart[lang], onPress: handleRestart }}
+          primary={{ label: lang === 'en' ? 'Go Home' : 'الرئيسية', onPress: () => {
+            analytics.trackSessionCompleted(score, QUESTIONS.length, results);
+            handleRestart();
+            setScreen('lang');
+          }}}
         />
       )}
       <Dialog
         visible={showSkipWarning}
         onClose={() => setShowSkipWarning(false)}
-        title={lang === 'en' ? 'Skip the review?' : 'تخطي المراجعة؟'}
+        title={lang === 'en' ? 'Skip review?' : 'تخطي المراجعة؟'}
         body={lang === 'en'
-          ? 'This catchup helps you refresh key concepts before the quiz. Skipping means you might find the questions harder. Are you sure?'
-          : 'هالمراجعة تساعدك تسترجع المفاهيم الأساسية قبل الاختبار. إذا تخطيتها ممكن تكون الأسئلة أصعب. متأكد؟'
+          ? 'This review helps you refresh key concepts before the quiz. Skipping means you might find the questions harder.'
+          : 'هالمراجعة تساعدك تسترجع المفاهيم الأساسية قبل الاختبار. إذا تخطيتها ممكن تكون الأسئلة أصعب.'
         }
         primaryLabel={lang === 'en' ? 'Continue Review' : 'كمّل المراجعة'}
-        secondaryLabel={lang === 'en' ? 'Skip Anyway' : 'تخطي'}
+        secondaryLabel={lang === 'en' ? 'Skip Review' : 'تخطي المراجعة'}
         onPrimary={() => setShowSkipWarning(false)}
-        onSecondary={() => { setShowSkipWarning(false); closeTutor(); setScreen('quiz'); }}
+        onSecondary={() => { setShowSkipWarning(false); analytics.trackCatchupSkipped(); closeTutor(); setScreen('quiz'); }}
       />
       <Dialog
         visible={showEndTutorWarning}
         onClose={() => setShowEndTutorWarning(false)}
-        title={lang === 'en' ? 'End tutor session?' : 'إنهاء جلسة المعلم؟'}
+        title={lang === 'en' ? 'Skip tutor?' : 'تخطي المعلم؟'}
         body={lang === 'en'
-          ? 'The tutor is helping you understand this question. Ending now means you\'ll move on without fully working through it.'
-          : 'المعلم يساعدك تفهم هالسؤال. إذا أنهيت الجلسة الحين بتنتقل بدون ما تفهمه بالكامل.'
+          ? 'The tutor is helping you understand this question. Skipping means you\'ll move on without working through it.'
+          : 'المعلم يساعدك تفهم هالسؤال. إذا تخطيته بتنتقل بدون ما تفهمه.'
         }
-        primaryLabel={lang === 'en' ? 'Continue Session' : 'كمّل الجلسة'}
-        secondaryLabel={lang === 'en' ? 'End Anyway' : 'أنهي'}
+        primaryLabel={lang === 'en' ? 'Continue with Tutor' : 'كمّل مع المعلم'}
+        secondaryLabel={lang === 'en' ? 'Skip Tutor' : 'تخطي المعلم'}
         onPrimary={() => setShowEndTutorWarning(false)}
         onSecondary={() => { setShowEndTutorWarning(false); closeTutor(); handleNext(); }}
       />
 
-      {/* Explanation sheet */}
-      <FullSheet
-        visible={showExplanation}
-        onClose={() => setShowExplanation(false)}
-        title={lang === 'en' ? 'Explanation' : 'الشرح'}
-      >
-        <View style={{ padding: sp[5], gap: sp[5], maxWidth: 600, width: '100%', alignSelf: 'center' as any }}>
-          {/* Video explanation if available */}
-          {question.explanationUrl && (
-            <VideoCard
-              title={lang === 'en' ? 'Video Explanation' : 'شرح بالفيديو'}
-              uri={question.explanationUrl}
-            />
-          )}
+      <Dialog
+        visible={showExitWarning}
+        onClose={() => setShowExitWarning(false)}
+        title={lang === 'en' ? 'Exit session?' : 'الخروج من الجلسة؟'}
+        body={lang === 'en'
+          ? 'Your progress won\'t be saved. Are you sure you want to exit?'
+          : 'تقدمك ما بينحفظ. متأكد تبي تطلع؟'
+        }
+        primaryLabel={lang === 'en' ? 'Continue' : 'كمّل'}
+        secondaryLabel={lang === 'en' ? 'Exit Session' : 'الخروج من الجلسة'}
+        onPrimary={() => setShowExitWarning(false)}
+        onSecondary={() => {
+          setShowExitWarning(false);
+          analytics.trackSessionExited('quiz', questionIdx);
+          stopListening();
+          if (conversationRef.current) {
+            try { conversationRef.current.endSession(); } catch {}
+            conversationRef.current = null;
+          }
+          setScreen('lang');
+          setQuestionIdx(0);
+          setSelectedOption(null);
+          setSubmitted(false);
+          setIsCorrect(false);
+          setScore(0);
+          setTutorState('idle');
+          setConvo([]);
+          setTypingMode(false);
+          typingModeRef.current = false;
+          setResults(['current', ...Array(QUESTIONS.length - 1).fill('pending')]);
+        }}
+      />
 
-          {/* Text explanation */}
-          {question.explanation && (
-            <Text style={{
-              fontFamily: font.sans, fontSize: fs[15], color: theme.fg,
-              lineHeight: fs[15] * 1.6,
-            }}>
-              {question.explanation[lang]}
-            </Text>
-          )}
+      {/* Explanation overlay — replaces quiz content */}
+      {showExplanation && (
+        <>
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: theme.bg, zIndex: 50 }}>
+            {/* Header */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: sp[5], paddingVertical: sp[3], paddingTop: Math.max(sp[3], insets.top), borderBottomWidth: 1, borderBottomColor: theme.divider }}>
+              <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg, flex: 1 }}>
+                {lang === 'en' ? 'Explanation' : 'الشرح'}
+              </Text>
+              <Pressable onPress={() => setShowExplanation(false)} hitSlop={8}>
+                <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle }}>
+                  {lang === 'en' ? 'Close' : 'إغلاق'}
+                </Text>
+              </Pressable>
+            </View>
 
-          {/* Correct answer */}
-          <View style={{ gap: sp[2] }}>
-            <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.accent, letterSpacing: 1, textTransform: 'uppercase' }}>
-              {lang === 'en' ? 'Correct answer' : 'الإجابة الصحيحة'}
-            </Text>
-            <QuizOption
-              label={question.correctLabel}
-              text={question.options.find(o => o.label === question.correctLabel)?.text[lang]}
-              state="correct"
+            {/* Scrollable content */}
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: sp[20] }}>
+              <View style={{ padding: sp[5], gap: sp[4], maxWidth: 600, width: '100%', alignSelf: 'center' as any }}>
+                {/* Your answer vs correct answer — at top for context */}
+                <View style={{ gap: sp[2] }}>
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {lang === 'en' ? 'Your answer' : 'إجابتك'}
+                  </Text>
+                  {selectedOption && (
+                    <QuizOption
+                      label={selectedOption}
+                      text={question.options.find(o => o.label === selectedOption)?.text[lang]}
+                      state="incorrect"
+                    />
+                  )}
+                </View>
+                <View style={{ gap: sp[2] }}>
+                  <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {lang === 'en' ? 'Correct answer' : 'الإجابة الصحيحة'}
+                  </Text>
+                  <QuizOption
+                    label={question.correctLabel}
+                    text={question.options.find(o => o.label === question.correctLabel)?.text[lang]}
+                    state="correct"
+                  />
+                </View>
+
+                {/* Divider */}
+                <View style={{ height: 1, backgroundColor: theme.divider }} />
+
+                {/* Text explanation */}
+                {question.explanation && (
+                  <Text style={{
+                    fontFamily: font.sans, fontSize: fs[15], color: theme.fg,
+                    lineHeight: fs[15] * 1.6,
+                  }}>
+                    {question.explanation[lang]}
+                  </Text>
+                )}
+
+                {/* Video explanation if available — embedded */}
+                {question.explanationUrl && (
+                  <View style={{ borderRadius: r[2], overflow: 'hidden', backgroundColor: theme.hoverOverlay }}>
+                    <iframe
+                      src={question.explanationUrl}
+                      style={{ width: '100%', aspectRatio: '16/9', border: 'none' } as any}
+                      allow="autoplay"
+                      allowFullScreen
+                    />
+                  </View>
+                )}
+
+                {/* Explanation image */}
+                {question.explanationImage && (
+                  <Image
+                    source={{ uri: question.explanationImage }}
+                    style={{ width: '100%', aspectRatio: 16 / 9, borderRadius: r[2], backgroundColor: theme.hoverOverlay }}
+                    resizeMode="contain"
+                  />
+                )}
+              </View>
+            </ScrollView>
+          </View>
+          {/* BottomAction pinned at bottom — same z-index layer */}
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 51 }}>
+            <BottomAction
+              primary={{
+                label: questionIdx + 1 >= QUESTIONS.length
+                  ? (lang === 'en' ? 'See Results' : 'عرض النتائج')
+                  : (lang === 'en' ? 'Try one similar' : 'جرب سؤال مشابه'),
+                onPress: () => { setShowExplanation(false); handleNext(); },
+              }}
             />
           </View>
-
-          <Button fullWidth onPress={() => { setShowExplanation(false); handleNext(); }}>
-            {questionIdx + 1 >= QUESTIONS.length
-              ? (lang === 'en' ? 'See Results' : 'عرض النتائج')
-              : (lang === 'en' ? 'Try one similar' : 'جرب سؤال مشابه')
-            }
-          </Button>
-        </View>
-      </FullSheet>
+        </>
+      )}
     </View>
   );
 }

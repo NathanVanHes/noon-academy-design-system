@@ -20,7 +20,8 @@ export type IconName =
   | 'expand' | 'collapse'
   | 'document' | 'link'
   | 'info' | 'warning' | 'error'
-  | 'keyboard';
+  | 'keyboard'
+  | 'tutor';
 
 interface IconProps {
   name: IconName;
@@ -111,6 +112,9 @@ const paths: Record<IconName, (s: number) => React.ReactElement> = {
     <Line x1={s*0.45} y1={s*0.4} x2={s*0.55} y2={s*0.4} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
     <Line x1={s*0.65} y1={s*0.4} x2={s*0.75} y2={s*0.4} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
     <Line x1={s*0.35} y1={s*0.6} x2={s*0.65} y2={s*0.6} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+  </>,
+  'tutor': (s) => <>
+    <Circle cx={s*0.5} cy={s*0.5} r={s*0.38} fill="#B08AF9" />
   </>,
 };
 

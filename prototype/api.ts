@@ -6,9 +6,24 @@ import { Conversation } from '@elevenlabs/client';
 import type { Question } from './questions';
 import type { Lang } from './i18n';
 
-const AGENT_ID = 'agent_0701krb7q27xfnwtvb4rwpwr9m22';
+const AGENT_ID_EN = 'agent_0701krb7q27xfnwtvb4rwpwr9m22';
+const AGENT_ID_AR = 'agent_9501kre9je7nebybhp1z96j3gjv4';
+
+function getAgentId(lang: Lang): string {
+  return lang === 'ar' ? AGENT_ID_AR : AGENT_ID_EN;
+}
 const ELEVENLABS_KEY = process.env.EXPO_PUBLIC_ELEVENLABS_API_KEY || '';
 const ANTHROPIC_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY || '';
+
+async function getSignedUrl(lang: Lang): Promise<string> {
+  const res = await fetch(
+    `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${getAgentId(lang)}`,
+    { headers: { 'xi-api-key': ELEVENLABS_KEY } },
+  );
+  if (!res.ok) throw new Error('Failed to get signed URL');
+  const data = await res.json();
+  return data.signed_url;
+}
 
 // ─── Generate breakdown points from a concept description ──────
 
@@ -55,22 +70,22 @@ export async function generateBreakdown(
 
 export type TutorMode = 'speaking' | 'listening';
 
-// Patch agent turn config once — sets long timeout to prevent reprompts
+// Patch agent turn config once — sets long timeout + eager interruption
 let turnConfigured = false;
-const configureTurnPromise = fetch(`https://api.elevenlabs.io/v1/convai/agents/${AGENT_ID}`, {
-  method: 'PATCH',
-  headers: {
-    'Content-Type': 'application/json',
-    'xi-api-key': ELEVENLABS_KEY,
-  },
-  body: JSON.stringify({
-    conversation_config: {
-      turn: {
-        turn_timeout: 60,
-      },
+const turnPatchBody = JSON.stringify({
+  conversation_config: {
+    turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+    vad: { background_voice_detection: true },
+    conversation: {
+      client_events: ['audio', 'interruption', 'user_transcript', 'agent_response', 'agent_response_correction', 'internal_tentative_agent_response'],
     },
-  }),
-}).then(() => { turnConfigured = true; }).catch(err => console.warn('Failed to configure agent turn:', err));
+  },
+});
+const turnPatchHeaders = { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY };
+const configureTurnPromise = Promise.all([
+  fetch(`https://api.elevenlabs.io/v1/convai/agents/${AGENT_ID_EN}`, { method: 'PATCH', headers: turnPatchHeaders, body: turnPatchBody }),
+  fetch(`https://api.elevenlabs.io/v1/convai/agents/${AGENT_ID_AR}`, { method: 'PATCH', headers: turnPatchHeaders, body: turnPatchBody }),
+]).then(() => { turnConfigured = true; }).catch(err => console.warn('Failed to configure agent turn:', err));
 
 export interface TutorSessionCallbacks {
   onConnect: (conversationId: string) => void;
@@ -91,10 +106,10 @@ function buildTutorPrompt(question: Question, studentAnswer: string, lang: Lang)
 
   return `You are a voice tutor for Noon Academy. You guide students to understanding through conversation — never by giving answers directly.
 
-Respond ONLY in ${langName}.
+ALWAYS respond in ${langName}, even if the student writes or speaks in another language. NEVER switch languages.
 
 ## Session Context
-- Subject: Design
+- Subject: Arithmetic — Natural Numbers
 - Question: ${question.text[lang]}
 - A. ${question.options[0].text[lang]}
 - B. ${question.options[1].text[lang]}
@@ -121,20 +136,20 @@ When the student implies correct reasoning, ask them to explain it back. Only af
 If not progressing, explain directly in 2-3 sentences. End with EXACTLY: "${lang === 'ar' ? 'الحين عرفت. يلا ننتقل للسؤال اللي بعده.' : "Now you know. Let's move on to the next question."}"
 
 ## Rules
-- NEVER say the answer letter until the student reasons it or exhaust triggers.
+- The student can see all four options (A, B, C, D) on screen. Reference them by letter and content when guiding — e.g. "look at option B" or "what about the one that says...".
+- NEVER reveal the correct answer letter until the student reasons it or exhaust triggers.
 - Keep every response to 1-3 sentences. Voice brevity.
 - Never be condescending. Sound like a human tutor.`;
 }
 
-export async function configureAgentForTutor(question: Question, studentAnswer: string, lang: Lang) {
+export async function configureAgentForTutor(question: Question, studentAnswer: string, lang: Lang, firstMessage?: string) {
   const prompt = buildTutorPrompt(question, studentAnswer, lang);
-  const selectedOption = question.options.find(o => o.label === studentAnswer)!;
 
-  const firstMessage = lang === 'ar'
-    ? `اخترت "${selectedOption.text.ar}" — أقدر أفهم ليش فكرت كذا. بس خلني أسألك: وش يعني ${selectedOption.text.ar} فعلاً في التصميم؟`
-    : `You picked "${selectedOption.text.en}" — I can see why you'd think that. But let me ask you: what does ${selectedOption.text.en.toLowerCase()} actually mean in design?`;
+  const fm = firstMessage || (lang === 'ar'
+    ? `اخترت "${question.options.find(o => o.label === studentAnswer)!.text.ar}" — خلنا نشوف ليش هالإجابة مو صحيحة.`
+    : `You picked "${question.options.find(o => o.label === studentAnswer)!.text.en}" — let's figure out why that's not quite right.`);
 
-  await fetch(`https://api.elevenlabs.io/v1/convai/agents/${AGENT_ID}`, {
+  await fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -143,14 +158,11 @@ export async function configureAgentForTutor(question: Question, studentAnswer: 
     body: JSON.stringify({
       conversation_config: {
         agent: {
-          first_message: firstMessage,
-          prompt: {
-            prompt,
-          },
+          prompt: { prompt },
+          first_message: fm,
         },
-        turn: {
-          turn_timeout: 60,
-        },
+        turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+        vad: { background_voice_detection: true },
       },
     }),
   });
@@ -163,21 +175,36 @@ export async function startTutorSession(
   callbacks: TutorSessionCallbacks,
   prefetchConfig?: Promise<void>,
 ) {
-  // Wait for prefetched config or configure now
-  if (prefetchConfig) {
-    await prefetchConfig;
-  } else {
-    await configureAgentForTutor(question, studentAnswer, lang);
-  }
+  const selectedOption = question.options.find(o => o.label === studentAnswer)!;
+  const correctOption = question.options.find(o => o.label === question.correctLabel)!;
+  const langName = lang === 'ar' ? 'Arabic' : 'English';
+
+  // Generate first message + get signed URL in parallel, then PATCH once with everything
+  const [tutorFirstMsg, signedUrl] = await Promise.all([
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 100,
+        messages: [{ role: 'user', content: `You are a voice math tutor speaking in ${langName}. A student answered "${selectedOption.text[lang]}" to this question: "${question.text[lang]}". The correct answer is "${correctOption.text[lang]}". In 2 sentences, acknowledge their thinking and ask ONE Socratic question that guides them toward the correct answer. No greetings, no markdown. Plain spoken text. Respond in ${langName} only.` }],
+      }),
+    }).then(r => r.ok ? r.json() : Promise.reject()).then(d => d.content[0].text).catch(() =>
+      lang === 'ar'
+        ? `اخترت "${selectedOption.text.ar}" — خلنا نشوف ليش. وش تعرف عن الفرق بين "${selectedOption.text.ar}" و "${correctOption.text.ar}"؟`
+        : `You picked "${selectedOption.text.en}" — let's think about this. What do you think makes "${correctOption.text.en}" different from "${selectedOption.text.en}"?`
+    ),
+    getSignedUrl(lang),
+  ]);
+  await configureAgentForTutor(question, studentAnswer, lang, tutorFirstMsg);
 
   const conversation = await Conversation.startSession({
-    agentId: AGENT_ID,
-    connectionType: 'websocket',
-    overrides: {
-      agent: {
-        language: lang === 'ar' ? 'ar' : 'en',
-      },
-    },
+    signedUrl,
     onConnect: ({ conversationId }) => {
       callbacks.onConnect(conversationId);
     },
@@ -210,7 +237,8 @@ export async function startTutorSession(
     },
   });
 
-  conversation.setMicMuted(true);
+  // Lower volume so echo cancellation can distinguish user voice
+  conversation.setVolume({ volume: 0.35 });
   return conversation;
 }
 
@@ -228,76 +256,150 @@ function buildCatchupContext(config: CatchupConfig, lang: Lang): string {
   if (lang === 'ar') {
     return `[وضع مراجعة المفاهيم]
 
-أنت معلم صوتي لأكاديمية نون. أنت في جلسة مراجعة سريعة لمفهوم واحد قبل الاختبار.
+أنت معلم صوتي لأكاديمية نون. أنت في جلسة مراجعة سريعة قبل اختبار عن "${topicName}" في مادة ${subjectName}.
+
+تكلم بالعربي دائماً حتى لو الطالب كتب بالإنجليزي.
 
 ## السياق
 - المادة: ${subjectName}
 - المفهوم: ${topicName}
 - التفاصيل: ${conceptsCovered}
 
-## طريقتك
-1. اسأل الطالب وش يعرف عن "${topicName}". خله يتكلم أول.
-2. إذا يعرف — أكّد واعطه مثال واقعي يعمّق فهمه.
-3. إذا ما يعرف — اشرح المفهوم بشكل بسيط بجملتين مع مثال ملموس.
-4. اسأل سؤال متابعة عشان تتأكد إنه فاهم — لازم يشرح بكلامه، مو بس يقول "أيوا".
-5. بس لما الطالب يشرح المفهوم صح بكلامه، قل بالضبط: "أحس إنك جاهز. يلا نبدأ الاختبار."
-6. إذا بعد ٥-٦ تبادلات ما قدر يشرح، قل بالضبط: "ما عليك — يلا نجرب سؤال ونشوف. يلا نبدأ الاختبار."
+## الإيقاع التعليمي: علّم ← تحقق ← عزّز ← تقدّم
 
-## القواعد
-- ردودك جملتين أو ثلاث بالكثير.
-- ركّز على مفهوم "${topicName}" بس — لا تروح لمواضيع ثانية.
-- كن دافئ ومشجع.
-- لا تقول "جاهز" إلا إذا الطالب فعلاً شرح المفهوم صح.
-- إذا الطالب يعطي إجابات عشوائية، وجّهه بلطف.`;
+اتبع هذا النمط في كل تبادل:
+
+### لما الطالب يجيب صح:
+١) أكّد باختصار ("صح، أحسنت")
+٢) علّمه معلومة جديدة مرتبطة بالمفهوم (جملة واحدة من المعرفة الجديدة)
+٣) اسأله سؤال عن اللي علمته
+
+### لما الطالب يجيب غلط:
+١) لا تقول بس "غلط" — اشرح ليش بطريقة تعليمية (مثلاً: "في الحقيقة، الصفر ما يدخل لأن...")
+٢) أعطه مثال ملموس أو تشبيه
+٣) اسأل نسخة أبسط من نفس السؤال
+
+### التقدم:
+- ابدأ بأسئلة التعريف الأساسية
+- بعد ١-٢ إجابة صحيحة: علّم خاصية ثم تحقق منها
+- بعد ٢-٣ إجابات صحيحة: علّم حالة خاصة أو فرق مهم ثم تحقق منه
+- بعد ما يثبت فهمه (على الأقل ٣-٤ تبادلات فيها تعليم)، قل بالضبط: "أحس إنك جاهز. يلا نبدأ الاختبار."
+- إذا بعد ٥-٦ تبادلات لسا يواجه صعوبة، قل بالضبط: "ما عليك — يلا نجرب سؤال ونشوف. يلا نبدأ الاختبار."
+
+## قواعد الردود
+- كل رد لازم يكون فيه تعليم وسؤال. لا تسأل سؤال بدون ما تضيف معلومة.
+- ردودك جملتين أو ثلاث: وحدة تعليم ووحدة سؤال.
+- خلّ الطالب يحس إنه يتعلم شي جديد كل مرة، مو إنه يُستجوب.
+- لا تبدأ بكلمات مثل "بالتأكيد" أو "طبعاً". ادخل مباشرة.`;
   }
 
   return `[CONCEPT CATCHUP MODE]
 
-You are a voice tutor for Noon Academy. You are running a quick refresher on ONE concept before a quiz.
+You are a voice tutor for Noon Academy. You are running a quick refresher before a quiz on "${topicName}" in ${subjectName}.
+
+ALWAYS respond in English, even if the student writes in another language.
 
 ## Context
 - Subject: ${subjectName}
 - Concept: ${topicName}
 - What it means: ${conceptsCovered}
 
-## Your approach
-1. Ask the student what they know about "${topicName}". Let them talk first.
-2. If they know it — confirm and give a real-world example that deepens their understanding.
-3. If they don't — explain the concept simply in 2 sentences with a concrete example.
-4. Ask a follow-up question to CHECK they actually understand — they must demonstrate understanding in their own words, not just say "yes" or "ok."
-5. ONLY say "I think you're ready. Let's start the quiz." when the student has DEMONSTRATED understanding by explaining the concept correctly or answering a check question correctly.
-6. If after 5-6 exchanges the student still can't explain it, say EXACTLY: "That's okay — let's try a question and see how it goes. Let's start the quiz." Do NOT say they're ready — acknowledge they're still learning.
+## Pedagogical rhythm: TEACH → CHECK → REINFORCE → ADVANCE
 
-## Rules
-- Keep every response to 2-3 sentences max. Voice brevity.
-- Stay focused on "${topicName}" only — don't drift to other topics.
-- Be warm and encouraging. This is a refresher, not a test.
-- If they already know it well, don't drag it out — confirm and move on.
-- NEVER say "you're ready" unless the student has actually explained the concept back correctly.
-- If the student gives nonsense, off-topic, or random answers, gently redirect — do NOT accept it as understanding.
-- If the student says "I don't know" repeatedly, teach them directly, then check ONE more time before moving on with the "let's try a question" exhaust phrase.`;
+Follow this pattern for every exchange:
+
+### When the student answers CORRECTLY:
+1. Confirm briefly ("That's right")
+2. TEACH a new related fact or insight they might not know (1 sentence of new knowledge)
+3. Then ask a question about what you just taught
+
+### When the student answers WRONG:
+1. Don't just say "wrong" — EXPLAIN why in a way that teaches ("Actually, zero isn't included because natural numbers start at 1")
+2. Give them a concrete example or analogy
+3. Then ask a simpler version of the same question
+
+### Progression:
+- Start with basic definition questions (is X a natural number?)
+- After 1-2 correct: teach a property, then check it (closure, smallest number)
+- After 2-3 correct: teach an edge case distinction, then check it (natural vs whole numbers)
+- After the student demonstrates understanding across these areas (minimum 3-4 exchanges with teaching), say EXACTLY: "I think you're ready. Let's start the quiz."
+- If after 5-6 exchanges they're still struggling, say EXACTLY: "That's okay — let's try a question and see how it goes. Let's start the quiz."
+
+## Response rules
+- Every response should contain BOTH teaching AND a question. Never just ask a question without adding knowledge.
+- Keep responses to 2-3 sentences: one teaching, one question.
+- Make the student feel like they're learning something new each exchange, not being interrogated.
+- Never start with "Sure", "Of course", "Absolutely". Jump straight in.`;
 }
 
-function buildCatchupFirstMessage(config: CatchupConfig, lang: Lang): string {
-  if (lang === 'ar') {
-    return `قبل الاختبار، خلنا نراجع "${config.topicName}" بسرعة. وش تعرف عنه؟`;
+async function buildCatchupFirstMessage(config: CatchupConfig, lang: Lang): Promise<string> {
+  const { topicName, conceptsCovered } = config;
+  const langName = lang === 'ar' ? 'Arabic' : 'English';
+
+  const prompt = lang === 'ar'
+    ? `أنت معلم صوتي. اكتب جملة افتتاحية لجلسة مراجعة عن "${topicName}". المفهوم: ${conceptsCovered}. الجملة يجب أن: ١) تبدأ بـ "خلنا نراجع ${topicName}" ٢) تشرح المفهوم بجملة واحدة بسيطة ٣) تنتهي بسؤال بسيط واحد عن المفهوم. إجمالي ٣ جمل فقط. بالعربي. بدون تنسيق. نص عادي فقط.`
+    : `You are a voice tutor. Write an opening line for a review session about "${topicName}". Concept: ${conceptsCovered}. The line must: 1) Start with "Let's review ${topicName}" 2) Explain the concept in one simple sentence 3) End with one simple question about the concept. Total 3 sentences only. Plain text, no formatting.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 150,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    let text = data.content[0].text.trim();
+
+    // Strip any markdown formatting the model might add
+    text = text.replace(/[*_#`]/g, '').trim();
+
+    // Validate: must end with a question mark (complete sentence)
+    if (text.includes('?') || text.includes('؟')) {
+      return text;
+    }
+    throw new Error('Generated message incomplete');
+  } catch (err) {
+    console.warn('First message generation failed, using template:', err);
+    // Template fallback — still dynamic based on topic, not content-specific
+    if (lang === 'ar') {
+      return `خلنا نراجع ${topicName}. قبل ما نبدأ الاختبار، أبي أتأكد إنك فاهم الأساسيات. وش تعرف عن ${topicName}؟`;
+    }
+    return `Let's review ${topicName}. Before we start the quiz, I want to make sure you've got the basics down. What do you know about ${topicName}?`;
   }
-  return `Before the quiz, let's quickly review "${config.topicName}." What do you know about it?`;
 }
 
 // Pre-configure catchup — call this early (e.g. on language select screen)
 let catchupConfigPromise: Promise<void> | null = null;
 
+let prefetchedFirstMsg: string | null = null;
+
 export function prefetchCatchupConfig(config: CatchupConfig, lang: Lang) {
   const catchupPrompt = buildCatchupContext(config, lang);
-  const catchupFirstMsg = buildCatchupFirstMessage(config, lang);
-  catchupConfigPromise = fetch(`https://api.elevenlabs.io/v1/convai/agents/${AGENT_ID}`, {
+  const { topicName } = config;
+  const firstMsg = lang === 'ar'
+    ? `خلنا نراجع ${topicName}. قبل ما نبدأ الاختبار، أبي أتأكد إنك فاهم الأساسيات. وش تعرف عن ${topicName}؟`
+    : `Let's review ${topicName}. Before we start the quiz, I want to make sure you've got the basics down. What do you know about ${topicName}?`;
+  catchupConfigPromise = fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
     body: JSON.stringify({
       conversation_config: {
-        agent: { first_message: catchupFirstMsg, prompt: { prompt: catchupPrompt } },
-        turn: { turn_timeout: 60 },
+        agent: {
+          prompt: { prompt: catchupPrompt },
+          first_message: firstMsg,
+        },
+        turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+        vad: { background_voice_detection: true },
       },
     }),
   }).then(() => {}).catch(err => console.warn('Failed to prefetch catchup config:', err));
@@ -310,35 +412,33 @@ export async function startCatchupSession(
 ) {
   let conv: any = null;
 
-  // Wait for prefetched config or configure now
-  if (catchupConfigPromise) {
-    await catchupConfigPromise;
-    catchupConfigPromise = null;
-  } else {
-    const catchupPrompt = buildCatchupContext(config, lang);
-    const catchupFirstMsg = buildCatchupFirstMessage(config, lang);
-    const p = buildCatchupContext(config, lang);
-    const m = buildCatchupFirstMessage(config, lang);
-    await fetch(`https://api.elevenlabs.io/v1/convai/agents/${AGENT_ID}`, {
+  // PATCH agent + get signed URL in parallel (no Anthropic call = much faster)
+  const catchupPrompt = buildCatchupContext(config, lang);
+  const { topicName } = config;
+  const catchupFirstMsg = lang === 'ar'
+    ? `خلنا نراجع ${topicName}. قبل ما نبدأ الاختبار، أبي أتأكد إنك فاهم الأساسيات. وش تعرف عن ${topicName}؟`
+    : `Let's review ${topicName}. Before we start the quiz, I want to make sure you've got the basics down. What do you know about ${topicName}?`;
+  const [, signedUrl] = await Promise.all([
+    fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
       body: JSON.stringify({
         conversation_config: {
-          agent: { first_message: m, prompt: { prompt: p } },
-          turn: { turn_timeout: 60 },
+          agent: {
+            prompt: { prompt: catchupPrompt },
+            first_message: catchupFirstMsg,
+          },
+          turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+          vad: { background_voice_detection: true },
         },
       }),
-    });
-  }
+    }),
+    getSignedUrl(lang),
+  ]);
+  catchupConfigPromise = null;
 
   const conversation = await Conversation.startSession({
-    agentId: AGENT_ID,
-    connectionType: 'websocket',
-    overrides: {
-      agent: {
-        language: lang === 'ar' ? 'ar' : 'en',
-      },
-    },
+    signedUrl,
     onConnect: ({ conversationId }) => {
       callbacks.onConnect(conversationId);
     },
@@ -365,7 +465,7 @@ export async function startCatchupSession(
     },
   });
 
-  conv = conversation;
-  conversation.setMicMuted(true);
+  // Lower volume so echo cancellation can distinguish user voice from speaker
+  conversation.setVolume({ volume: 0.35 });
   return conversation;
 }

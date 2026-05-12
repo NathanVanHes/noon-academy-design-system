@@ -51,12 +51,27 @@ function createAndStart() {
   rec.continuous = true;
   recognition = rec;
 
+  let resultStart = 0; // Track where new results begin for this session
+
   rec.onresult = (event: any) => {
-    let transcript = '';
-    for (let i = 0; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
+    let interim = '';
+    let final = '';
+    // Only process results from this session (skip old accumulated ones)
+    for (let i = resultStart; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        final += t;
+        resultStart = i + 1; // Skip finalized results on next callback
+      } else {
+        interim += t;
+      }
     }
-    currentCallback?.(transcript.trim(), false);
+    if (final) {
+      currentCallback?.(final.trim(), true);
+    }
+    if (interim) {
+      currentCallback?.((final + interim).trim(), false);
+    }
   };
 
   rec.onerror = () => {
@@ -71,7 +86,7 @@ function createAndStart() {
       if (restartTimer) clearTimeout(restartTimer);
       restartTimer = setTimeout(() => {
         if (shouldBeListening) createAndStart();
-      }, 300);
+      }, 200);
     }
   };
 
