@@ -12,9 +12,10 @@ type VoiceTutorState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
 interface VoiceTutorProps {
   state?: VoiceTutorState;
   size?: number;
+  hideLabel?: boolean;
 }
 
-export function VoiceTutor({ state = 'idle', size = 160 }: VoiceTutorProps) {
+export function VoiceTutor({ state = 'idle', size = 160, hideLabel }: VoiceTutorProps) {
   const { theme } = useTheme();
   const anim = useRef(new Animated.Value(0)).current;
   const orbit = useRef(new Animated.Value(0)).current;
@@ -157,12 +158,12 @@ export function VoiceTutor({ state = 'idle', size = 160 }: VoiceTutorProps) {
         }} />
       </View>
 
-      <Text style={{
-        marginTop: sp[3],
+      {!hideLabel && <Text style={{
+        marginTop: sp[5],
         fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600],
         letterSpacing: 2, textTransform: 'uppercase',
         color: isError ? color.danger[300] : theme.iris,
-      }}>{state}</Text>
+      }}>{state}</Text>}
     </View>
   );
 }

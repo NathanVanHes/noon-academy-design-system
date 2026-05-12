@@ -19,7 +19,8 @@ export type IconName =
   | 'play' | 'pause'
   | 'expand' | 'collapse'
   | 'document' | 'link'
-  | 'info' | 'warning' | 'error';
+  | 'info' | 'warning' | 'error'
+  | 'keyboard';
 
 interface IconProps {
   name: IconName;
@@ -103,6 +104,13 @@ const paths: Record<IconName, (s: number) => React.ReactElement> = {
     <Circle cx={s*0.5} cy={s*0.5} r={s*0.38} fill="none" stroke="currentColor" strokeWidth={1.5} />
     <Line x1={s*0.35} y1={s*0.35} x2={s*0.65} y2={s*0.65} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
     <Line x1={s*0.65} y1={s*0.35} x2={s*0.35} y2={s*0.65} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+  </>,
+  'keyboard': (s) => <>
+    <Rect x={s*0.12} y={s*0.25} width={s*0.76} height={s*0.5} rx={s*0.06} fill="none" stroke="currentColor" strokeWidth={1.5} />
+    <Line x1={s*0.25} y1={s*0.4} x2={s*0.35} y2={s*0.4} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+    <Line x1={s*0.45} y1={s*0.4} x2={s*0.55} y2={s*0.4} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+    <Line x1={s*0.65} y1={s*0.4} x2={s*0.75} y2={s*0.4} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+    <Line x1={s*0.35} y1={s*0.6} x2={s*0.65} y2={s*0.6} stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
   </>,
 };
 

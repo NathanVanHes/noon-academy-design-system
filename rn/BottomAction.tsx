@@ -22,7 +22,7 @@ interface ActionButton {
   label: string;
   onPress: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'tutor';
 }
 
 interface BottomActionProps {
@@ -42,14 +42,14 @@ export function BottomAction({ icon, message, submessage, messageVariant = 'defa
 
   return (
     <View style={{
-      paddingHorizontal: sp[5],
       paddingTop: sp[4],
       paddingBottom: Math.max(sp[4], insets.bottom),
       borderTopWidth: 1,
       borderTopColor: theme.border,
       backgroundColor: theme.bgOverlay,
-      gap: sp[3],
+      alignItems: 'center',
     }}>
+      <View style={{ width: '100%', maxWidth: 600, paddingHorizontal: sp[5], gap: sp[3] }}>
       {message && (
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: sp[3] }}>
           {icon && <Icon name={icon} size={iconTokens.lg} color={messageColor} />}
@@ -59,17 +59,14 @@ export function BottomAction({ icon, message, submessage, messageVariant = 'defa
           </View>
         </View>
       )}
-      <View style={{ flexDirection: 'row', gap: sp[3] }}>
-        {secondary && (
-          <View style={{ flex: 1 }}>
-            <Button variant={secondary.variant || 'secondary'} fullWidth disabled={secondary.disabled} onPress={secondary.onPress}>{secondary.label}</Button>
-          </View>
-        )}
+      <View style={{ gap: sp[3] }}>
         {primary && (
-          <View style={{ flex: 1 }}>
-            <Button variant={primary.variant || 'primary'} fullWidth disabled={primary.disabled} onPress={primary.onPress}>{primary.label}</Button>
-          </View>
+          <Button variant={primary.variant || 'primary'} fullWidth disabled={primary.disabled} onPress={primary.onPress}>{primary.label}</Button>
         )}
+        {secondary && (
+          <Button variant={secondary.variant || 'secondary'} fullWidth disabled={secondary.disabled} onPress={secondary.onPress}>{secondary.label}</Button>
+        )}
+      </View>
       </View>
     </View>
   );

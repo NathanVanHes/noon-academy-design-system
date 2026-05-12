@@ -801,13 +801,13 @@ export function ButtonsPage() {
   const [hasTrailing, setHasTrailing] = useState(false);
   const [label, setLabel] = useState('Label');
 
-  const iconColor = disabled ? theme.fgFaint : { primary: theme.accentFg, secondary: theme.fg, ghost: theme.fgMuted, danger: color.danger[300], 'danger-solid': color.chalk[100], signal: theme.bg }[variant] || theme.fg;
+  const iconColor = disabled ? theme.fgFaint : { primary: theme.accentFg, secondary: theme.fg, ghost: theme.fgMuted, danger: color.danger[300], 'danger-solid': color.chalk[100], signal: theme.bg, tutor: color.iris[800] }[variant] || theme.fg;
   const demoIcon = <Icon name="arrow-right" size={14} color={iconColor} />;
-  const V: Array<'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'> = ['primary','secondary','ghost','danger','danger-solid','signal'];
+  const V: Array<'primary'|'secondary'|'ghost'|'danger'|'danger-solid'|'signal'|'tutor'> = ['primary','secondary','ghost','danger','danger-solid','signal','tutor'];
   return <>
     <Playground
       knobs={<>
-        <KnobSelect label="Variant" value={variant} options={['primary','secondary','ghost','danger','danger-solid','signal']} onChange={setVariant} />
+        <KnobSelect label="Variant" value={variant} options={['primary','secondary','ghost','danger','danger-solid','signal','tutor']} onChange={setVariant} />
         <KnobSelect label="Size" value={size} options={['sm','md','lg']} onChange={setSize} />
         <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
         <KnobToggle label="Loading" value={loading} onChange={setLoading} />
@@ -843,6 +843,7 @@ export function ButtonsPage() {
       <Rl>danger: destructive outline. Red border, red text.</Rl>
       <Rl>danger-solid: irreversible destructive. Red fill, white text.</Rl>
       <Rl>signal: journey milestone / gold moment. Gold fill, dark text. Use sparingly.</Rl>
+      <Rl>tutor: voice tutor actions. Iris purple fill, white text. Exclusively for tutor interactions.</Rl>
     </S>
     <S title="Icon Sizes" desc="Icons are constrained per button size. Pass any ReactNode — the button clips it to fit.">
       <Rl>sm (32px button) → 14×14px icon</Rl>
@@ -2384,7 +2385,17 @@ function Ref({ text }: { text: string }) {
 }
 
 export function GridPaperPage() {
+  const { theme } = useTheme();
+  const [variant, setVariant] = useState<'standard' | 'major' | 'canvas'>('standard');
   return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgSubtle, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[3], paddingBottom: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider }}>Grid</Text>
+          <KnobSelect label="Variant" value={variant} options={['standard', 'major', 'canvas']} onChange={(v: any) => setVariant(v)} />
+        </>}
+      >{(w, h) => <GridPaper variant={variant} width={w} height={h} />}</DynamicFullscreen>
+    </Playground>
     <Import>{"import { GridPaper } from '@noon/design-system';"}</Import>
     <Props>
       <Prop name="variant" type="'standard' | 'major' | 'canvas'" def="'standard'" />
@@ -2392,15 +2403,6 @@ export function GridPaperPage() {
       <Prop name="height" type="number" />
       <Prop name="style" type="ViewStyle" />
     </Props>
-    <S title="Standard — 16px" desc="The graph paper texture. Used on journey screens, in-class slides, atlas views. This is the brand surface.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><GridPaper variant="standard" width={800} height={200} /></View>
-    </S>
-    <S title="Major + Minor — atlas surfaces" desc="64px gold major lines over 8px chalk minor lines. For atlas and terrain views only.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><GridPaper variant="major" width={800} height={200} /></View>
-    </S>
-    <S title="Canvas — 24px faint" desc="Barely visible alignment aid. Not a brand surface — just spatial awareness.">
-      <View style={{ overflow: 'hidden', borderRadius: r[2] }}><GridPaper variant="canvas" width={800} height={200} /></View>
-    </S>
     <S title="Specs">
       <Rl>Standard: 16px × 16px. 0.5px lines. Chalk at 4% on void, ink at 5% on paper.</Rl>
       <Rl>Major + minor: 64px gold at 6% over 8px chalk at 4%. Atlas and terrain views only.</Rl>
@@ -2410,12 +2412,6 @@ export function GridPaperPage() {
       <Rl>Journey / route overview screens</Rl>
       <Rl>In-class slides presented by the teacher</Rl>
       <Rl>Atlas and terrain map backgrounds</Rl>
-    </S>
-    <S title="When NOT to Use">
-      <Rl>Quiz / practice sessions — competes with readability</Rl>
-      <Rl>Cards and raised surfaces — grid is baked into the base, not overlaid</Rl>
-      <Rl>Schedule / session lists — too busy behind row content</Rl>
-      <Rl>Heatmap / mastery grids — tile colours are the data, don't add noise</Rl>
     </S>
     <S title="Rules">
       <Rl>Grid is the material, not decoration. If you wouldn't draw grid lines on graph paper in that context, don't use it.</Rl>

@@ -10,7 +10,7 @@ import { View, Text } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { IconButton } from './IconButton';
 import { Icon } from './Icon';
-import { sp, r, fs, fw, font } from './tokens';
+import { sp, r, fs, fw, font, color } from './tokens';
 
 type SegState = 'correct' | 'incorrect' | 'current' | 'pending';
 
@@ -44,18 +44,22 @@ export function SessionBar({ segments, size = 'md', pageSize = 10 }: SessionBarP
     switch (state) {
       case 'correct': return theme.accent;
       case 'incorrect': return theme.danger;
-      case 'current': return theme.signalBright;
+      case 'current': return color.blue[400];
       default: return theme.border;
     }
   }
 
   const h = heights[size];
 
+  const questionLabel = currentIdx >= 0
+    ? `${currentIdx + 1} of ${segments.length}`
+    : `${segments.length}`;
+
   return (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[1] }}>
-        {needsPaging && (
-          <IconButton variant="ghost" size="sm" disabled={!canPrev} onPress={canPrev ? () => setPage(p => p - 1) : undefined} accessibilityLabel="Previous questions">
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
+        {needsPaging && canPrev && (
+          <IconButton variant="ghost" size="sm" onPress={() => setPage(p => p - 1)} accessibilityLabel="Previous questions">
             <Icon name="chevron-left" size={14} color={theme.fgMuted} />
           </IconButton>
         )}
@@ -67,19 +71,17 @@ export function SessionBar({ segments, size = 'md', pageSize = 10 }: SessionBarP
           ))}
         </View>
 
-        {needsPaging && (
-          <IconButton variant="ghost" size="sm" disabled={!canNext} onPress={canNext ? () => setPage(p => p + 1) : undefined} accessibilityLabel="Next questions">
+        {needsPaging && canNext && (
+          <IconButton variant="ghost" size="sm" onPress={() => setPage(p => p + 1)} accessibilityLabel="Next questions">
             <Icon name="chevron-right" size={14} color={theme.fgMuted} />
           </IconButton>
         )}
-      </View>
 
-      {/* Question label — only when not paginated (arrows handle overflow) */}
-      {!needsPaging && (
-        <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, textAlign: 'center', marginTop: sp[1] }}>
-          {currentIdx >= 0 ? `Question ${currentIdx + 1} of ${segments.length}` : `${segments.length} questions`}
+        {/* Question number */}
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], color: theme.fgFaint, minWidth: 28, textAlign: 'right' }}>
+          {questionLabel}
         </Text>
-      )}
+      </View>
     </View>
   );
 }

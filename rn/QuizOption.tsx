@@ -5,7 +5,7 @@
 import React from 'react';
 import { Pressable, View, Text, Image, type ViewStyle, type TextStyle, type ImageSourcePropType } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { sp, r, fs, fw, font, icon } from './tokens';
+import { sp, r, fs, fw, font, icon, color } from './tokens';
 
 type State = 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled';
 
@@ -22,7 +22,7 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
 
   const borderColorMap: Record<State, string> = {
     default: theme.border,
-    selected: theme.accent,
+    selected: color.blue[400],
     correct: theme.accent,
     incorrect: theme.danger,
     disabled: theme.border,
@@ -30,7 +30,7 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
 
   const bgMap: Record<State, string> = {
     default: 'transparent',
-    selected: theme.accentSoft,
+    selected: 'rgba(107,163,255,0.14)',
     correct: theme.accentSoft,
     incorrect: theme.dangerSoft,
     disabled: 'transparent',

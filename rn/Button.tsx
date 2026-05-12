@@ -1,6 +1,6 @@
 /**
  * Button — production component.
- * Variants: primary, secondary, ghost, danger, danger-solid, signal.
+ * Variants: primary, secondary, ghost, danger, danger-solid, signal, tutor.
  * Sizes: sm (32px), md (40px default), lg (48px).
  * States: disabled (greyed out, opacity 0.4), loading, fullWidth (full width).
  * For icon-only buttons, use IconButton component.
@@ -10,7 +10,7 @@ import { Pressable, View, Text, ActivityIndicator, Platform, type ViewStyle, typ
 import { useTheme } from './ThemeContext';
 import { sp, r, fs, fw, font, h, color } from './tokens';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal' | 'tutor';
 type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
@@ -40,6 +40,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     danger: 'transparent',
     'danger-solid': color.danger[400],
     signal: color.gold[400],
+    tutor: theme.iris,
   };
 
   const fgMap: Record<Variant, string> = {
@@ -49,6 +50,7 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     danger: color.danger[300],
     'danger-solid': color.chalk[100],
     signal: theme.bg,
+    tutor: color.iris[800],
   };
 
   const isOutline = variant === 'secondary' || variant === 'danger';

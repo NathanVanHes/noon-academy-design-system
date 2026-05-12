@@ -53,11 +53,12 @@ const NAV = [
     { id: 'gridsystem', label: 'Grid System' },
     { id: 'icons', label: 'Icons' },
   ]},
-  { group: 'Textures', items: [
+  // { group: 'Textures', items: [
+  //   { id: 'gridpaper', label: 'Grid Paper' },
+  //   { id: 'contours', label: 'Terrain Lines' },
+  // ]},
+  { group: 'Patterns', items: [
     { id: 'gridpaper', label: 'Grid Paper' },
-    { id: 'contours', label: 'Terrain Lines' },
-  ]},
-  { group: 'Dynamics', items: [
     { id: 'dunedynamic', label: 'Dune Field' },
     { id: 'starsdynamic', label: 'Star Field' },
     { id: 'terraindynamic', label: 'Terrain Field' },
@@ -143,17 +144,17 @@ const NAV = [
     { id: 'resourcelist', label: 'Resources' },
     { id: 'vtsession', label: 'Live Demo' },
   ]},
-  { group: 'Patterns', items: [
+  { group: 'Composition', items: [
     { id: 'leaderboard', label: 'Leaderboard' },
   ]},
-  { group: 'Experimental', items: [
-    { id: 'routemap', label: 'Route Map' },
-    { id: 'routev2', label: 'Route v2' },
-    { id: 'routeheat', label: 'Route Heatmap' },
-  ]},
-  { group: 'Pages', items: [
-    { id: 'journey', label: 'Journey' },
-  ]},
+  // { group: 'Experimental', items: [
+  //   { id: 'routemap', label: 'Route Map' },
+  //   { id: 'routev2', label: 'Route v2' },
+  //   { id: 'routeheat', label: 'Route Heatmap' },
+  // ]},
+  // { group: 'Pages', items: [
+  //   { id: 'journey', label: 'Journey' },
+  // ]},
 ];
 
 const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen?: boolean }> = {

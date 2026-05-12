@@ -44,8 +44,8 @@ export function Dialog({ visible, onClose, title, body, primaryLabel = 'Confirm'
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} accessibilityViewIsModal={true}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(6,9,19,0.5)', justifyContent: 'center', alignItems: 'center', padding: sp[7] }} onPress={onClose}>
-        <Animated.View style={[{ width: '100%', maxWidth: 320 }, animatedStyle]}>
+      <Pressable style={{ flex: 1, backgroundColor: 'rgba(6,9,19,0.75)', justifyContent: 'center', alignItems: 'center', padding: sp[7] }} onPress={onClose}>
+        <Animated.View style={[{ width: '100%', maxWidth: 360 }, animatedStyle]}>
           <Pressable
             accessibilityRole="none"
             style={{
@@ -58,13 +58,9 @@ export function Dialog({ visible, onClose, title, body, primaryLabel = 'Confirm'
           >
             <Text style={{ fontFamily: font.serif, fontSize: fs[24], fontWeight: fw[500], color: theme.fg, marginBottom: sp[2] }}>{title}</Text>
             {body && <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted, lineHeight: fs[14] * 1.5, marginBottom: sp[5] }}>{body}</Text>}
-            <View style={{ flexDirection: 'row', gap: sp[3] }}>
-              <View style={{ flex: 1 }}>
-                <Button variant="ghost" onPress={onSecondary || onClose}>{secondaryLabel}</Button>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Button variant={danger ? 'danger' : 'primary'} onPress={onPrimary || onClose}>{primaryLabel}</Button>
-              </View>
+            <View style={{ gap: sp[3] }}>
+              <Button fullWidth variant={danger ? 'danger' : 'primary'} onPress={onPrimary || onClose}>{primaryLabel}</Button>
+              <Button fullWidth variant="ghost" onPress={onSecondary || onClose}>{secondaryLabel}</Button>
             </View>
           </Pressable>
         </Animated.View>
