@@ -35,9 +35,6 @@ import {
   BreakdownPage, ActivityCardPage, WorkedExamplePage, SlidesCardPage, ResourceListPage,
 } from './screens/pages';
 import { VoiceTutorSession } from './screens/VoiceTutorSession';
-import { JourneyPage } from './screens/JourneyPage';
-import { RouteRedesignPage } from './screens/RouteRedesign';
-import { RouteHeatmapPage } from './screens/RouteHeatmap';
 
 // ─── Nav structure — mirrors index.html exactly ───
 const NAV = [
@@ -147,14 +144,6 @@ const NAV = [
   { group: 'Composition', items: [
     { id: 'leaderboard', label: 'Leaderboard' },
   ]},
-  // { group: 'Experimental', items: [
-  //   { id: 'routemap', label: 'Route Map' },
-  //   { id: 'routev2', label: 'Route v2' },
-  //   { id: 'routeheat', label: 'Route Heatmap' },
-  // ]},
-  // { group: 'Pages', items: [
-  //   { id: 'journey', label: 'Journey' },
-  // ]},
 ];
 
 const PAGES: Record<string, { component: React.FC<any>; desc: string; fullscreen?: boolean }> = {
@@ -236,9 +225,6 @@ avatars:      { component: AvatarsPage, desc: 'User identity with initials and i
   leaderboard:  { component: LeaderboardPage, desc: 'Ranked crew member list.' },
   oasis:        { component: OasisPage, desc: 'Water pool checkpoint — replaces WaterVessel for journey metaphor.' },
   routemap:     { component: RouteMapPage, desc: 'Vertical journey with central spine, oases, and topic markers.', fullscreen: true },
-  routev2:      { component: RouteRedesignPage, desc: 'Clean list-based journey — no spine, just clarity.', fullscreen: true },
-  routeheat:    { component: RouteHeatmapPage, desc: 'Heatmap grid — see everything at once.', fullscreen: true },
-  journey:      { component: JourneyPage, desc: 'Qudrat exam journey visualisation.', fullscreen: true },
 };
 
 const allItems = NAV.flatMap(g => g.items);
