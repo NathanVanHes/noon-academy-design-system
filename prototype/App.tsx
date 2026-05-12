@@ -253,7 +253,14 @@ function TutorApp() {
       if (!transcript) return;
       if (!placeholderAdded) {
         placeholderAdded = true;
-        setConvo(prev => [...prev, { from: 'student', text: transcript, confirmed: false }]);
+        // User is speaking — this is an interruption. Pause word reveal and fully reveal tutor text.
+        revealTimersRef.current.forEach(t => clearTimeout(t));
+        revealTimersRef.current = [];
+        setConvo(prev => [
+          ...prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m),
+          { from: 'student', text: transcript, confirmed: false },
+        ]);
+        return; // placeholder + reveal handled in one update
       }
       liveTranscriptRef.current = transcript;
       setConvo(prev => {
@@ -271,10 +278,12 @@ function TutorApp() {
 
   const handleModeForSTT = useCallback((mode: TutorMode) => {
     if (mode === 'listening') {
-      // Pause word reveal — if user is interrupting, it'll be cancelled fully on onMessage:user
-      // If it's just a mode flicker, the reveal state stays (timers paused but text position kept)
-      revealTimersRef.current.forEach(t => clearTimeout(t));
-      revealTimersRef.current = [];
+      // If there are active reveal timers, the user interrupted — cancel and fully reveal
+      if (revealTimersRef.current.length > 0) {
+        revealTimersRef.current.forEach(t => clearTimeout(t));
+        revealTimersRef.current = [];
+        setConvo(prev => prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m));
+      }
       startSTT();
     } else {
       // Agent started speaking — stop STT but KEEP the placeholder
