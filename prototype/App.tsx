@@ -320,9 +320,10 @@ function TutorApp() {
           : 'Natural number sets — definition of natural numbers, their basic properties, and operations on them',
       };
       setCatchupTopic(catchupConfig.topicName);
-      // Generate breakdown from AI
-      generateBreakdown(catchupConfig.topicName, catchupConfig.conceptsCovered, sessionLang)
-        .then(bd => setCatchupBreakdown(bd));
+      // Generate breakdown + start session in parallel, but show breakdown before chat
+      const breakdownPromise = generateBreakdown(catchupConfig.topicName, catchupConfig.conceptsCovered, sessionLang);
+      breakdownPromise.then(bd => setCatchupBreakdown(bd));
+      await breakdownPromise.catch(() => {}); // ensure breakdown renders before session connects
 
       const conversation = await startCatchupSession(
         catchupConfig,
@@ -368,10 +369,11 @@ function TutorApp() {
               const isTrigger =
                 lower.includes("let's start the quiz") ||
                 lower.includes("let's try a question") ||
-                lower.includes('يلا نبدأ الاختبار') ||
                 lower.includes("you're ready") ||
+                lower.includes('يلا نبدأ الاختبار') ||
                 lower.includes('جاهز') ||
-                lower.includes('نجرب سؤال');
+                lower.includes('نجرب سؤال') ||
+                lower.includes('ما عليك');
               startWordReveal(text, isTrigger ? () => {
                 setTimeout(() => {
                   setCatchupReady(true);
@@ -508,10 +510,12 @@ function TutorApp() {
               const lower = text.toLowerCase();
               const isTrigger =
                 lower.includes("you've got it") ||
-                lower.includes('أحسنت، فهمتها') ||
+                lower.includes("let's move on") ||
                 lower.includes('now you know') ||
+                lower.includes('أحسنت، فهمتها') ||
+                lower.includes('أحسنت') ||
                 lower.includes('الحين عرفت') ||
-                lower.includes('يلا نكمل');
+                lower.includes('يلا ننتقل');
               startWordReveal(text, isTrigger ? () => {
                 setCanRetry(true);
                 analytics.trackTutorCompleted(questionIdx, convo.length);

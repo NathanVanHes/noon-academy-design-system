@@ -142,12 +142,8 @@ If not progressing, explain directly in 2-3 sentences. End with EXACTLY: "${lang
 - Never be condescending. Sound like a human tutor.`;
 }
 
-export async function configureAgentForTutor(question: Question, studentAnswer: string, lang: Lang, firstMessage?: string) {
+export async function configureAgentForTutor(question: Question, studentAnswer: string, lang: Lang) {
   const prompt = buildTutorPrompt(question, studentAnswer, lang);
-
-  const fm = firstMessage || (lang === 'ar'
-    ? `اخترت "${question.options.find(o => o.label === studentAnswer)!.text.ar}" — خلنا نشوف ليش هالإجابة مو صحيحة.`
-    : `You picked "${question.options.find(o => o.label === studentAnswer)!.text.en}" — let's figure out why that's not quite right.`);
 
   await fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
     method: 'PATCH',
@@ -159,7 +155,7 @@ export async function configureAgentForTutor(question: Question, studentAnswer: 
       conversation_config: {
         agent: {
           prompt: { prompt },
-          first_message: fm,
+          first_message: '{{first_message}}',
         },
         turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
         vad: { background_voice_detection: true },
@@ -179,8 +175,8 @@ export async function startTutorSession(
   const correctOption = question.options.find(o => o.label === question.correctLabel)!;
   const langName = lang === 'ar' ? 'Arabic' : 'English';
 
-  // Generate first message + get signed URL in parallel, then PATCH once with everything
-  const [tutorFirstMsg, signedUrl] = await Promise.all([
+  // Generate first message, PATCH agent prompt, get signed URL — all in parallel
+  const [tutorFirstMsg, , signedUrl] = await Promise.all([
     fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -199,12 +195,13 @@ export async function startTutorSession(
         ? `اخترت "${selectedOption.text.ar}" — خلنا نشوف ليش. وش تعرف عن الفرق بين "${selectedOption.text.ar}" و "${correctOption.text.ar}"؟`
         : `You picked "${selectedOption.text.en}" — let's think about this. What do you think makes "${correctOption.text.en}" different from "${selectedOption.text.en}"?`
     ),
+    configureAgentForTutor(question, studentAnswer, lang),
     getSignedUrl(lang),
   ]);
-  await configureAgentForTutor(question, studentAnswer, lang, tutorFirstMsg);
 
   const conversation = await Conversation.startSession({
     signedUrl,
+    dynamicVariables: { first_message: tutorFirstMsg },
     onConnect: ({ conversationId }) => {
       callbacks.onConnect(conversationId);
     },
@@ -363,18 +360,17 @@ async function buildCatchupFirstMessage(config: CatchupConfig, lang: Lang): Prom
     // Strip any markdown formatting the model might add
     text = text.replace(/[*_#`]/g, '').trim();
 
-    // Validate: must end with a question mark (complete sentence)
-    if (text.includes('?') || text.includes('؟')) {
+    // Accept any non-empty response — the system prompt guides the agent's behavior
+    if (text.length > 10) {
       return text;
     }
-    throw new Error('Generated message incomplete');
+    throw new Error('Generated message too short');
   } catch (err) {
     console.warn('First message generation failed, using template:', err);
-    // Template fallback — still dynamic based on topic, not content-specific
     if (lang === 'ar') {
-      return `خلنا نراجع ${topicName}. قبل ما نبدأ الاختبار، أبي أتأكد إنك فاهم الأساسيات. وش تعرف عن ${topicName}؟`;
+      return `خلنا نراجع ${topicName}. ${conceptsCovered}. هل تقدر تعطيني مثال على ${topicName}؟`;
     }
-    return `Let's review ${topicName}. Before we start the quiz, I want to make sure you've got the basics down. What do you know about ${topicName}?`;
+    return `Let's review ${topicName}. ${conceptsCovered}. Can you give me an example of ${topicName}?`;
   }
 }
 
@@ -385,24 +381,24 @@ let prefetchedFirstMsg: string | null = null;
 
 export function prefetchCatchupConfig(config: CatchupConfig, lang: Lang) {
   const catchupPrompt = buildCatchupContext(config, lang);
-  const { topicName } = config;
-  const firstMsg = lang === 'ar'
-    ? `خلنا نراجع ${topicName}. قبل ما نبدأ الاختبار، أبي أتأكد إنك فاهم الأساسيات. وش تعرف عن ${topicName}؟`
-    : `Let's review ${topicName}. Before we start the quiz, I want to make sure you've got the basics down. What do you know about ${topicName}?`;
-  catchupConfigPromise = fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
-    body: JSON.stringify({
-      conversation_config: {
-        agent: {
-          prompt: { prompt: catchupPrompt },
-          first_message: firstMsg,
+  catchupConfigPromise = (async () => {
+    const firstMsg = await buildCatchupFirstMessage(config, lang);
+    await fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
+      body: JSON.stringify({
+        conversation_config: {
+          agent: {
+            prompt: { prompt: catchupPrompt },
+            first_message: '{{first_message}}',
+          },
+          turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
+          vad: { background_voice_detection: true },
         },
-        turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
-        vad: { background_voice_detection: true },
-      },
-    }),
-  }).then(() => {}).catch(err => console.warn('Failed to prefetch catchup config:', err));
+      }),
+    });
+    prefetchedFirstMsg = firstMsg;
+  })().catch(err => console.warn('Failed to prefetch catchup config:', err));
 }
 
 export async function startCatchupSession(
@@ -412,13 +408,10 @@ export async function startCatchupSession(
 ) {
   let conv: any = null;
 
-  // PATCH agent + get signed URL in parallel (no Anthropic call = much faster)
+  // Generate first message, PATCH agent prompt, get signed URL — all in parallel
   const catchupPrompt = buildCatchupContext(config, lang);
-  const { topicName } = config;
-  const catchupFirstMsg = lang === 'ar'
-    ? `خلنا نراجع ${topicName}. قبل ما نبدأ الاختبار، أبي أتأكد إنك فاهم الأساسيات. وش تعرف عن ${topicName}؟`
-    : `Let's review ${topicName}. Before we start the quiz, I want to make sure you've got the basics down. What do you know about ${topicName}?`;
-  const [, signedUrl] = await Promise.all([
+  const [catchupFirstMsg, , signedUrl] = await Promise.all([
+    buildCatchupFirstMessage(config, lang),
     fetch(`https://api.elevenlabs.io/v1/convai/agents/${getAgentId(lang)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'xi-api-key': ELEVENLABS_KEY },
@@ -426,7 +419,7 @@ export async function startCatchupSession(
         conversation_config: {
           agent: {
             prompt: { prompt: catchupPrompt },
-            first_message: catchupFirstMsg,
+            first_message: '{{first_message}}',
           },
           turn: { turn_timeout: 30, mode: 'turn', turn_eagerness: 'eager' },
           vad: { background_voice_detection: true },
@@ -439,6 +432,7 @@ export async function startCatchupSession(
 
   const conversation = await Conversation.startSession({
     signedUrl,
+    dynamicVariables: { first_message: catchupFirstMsg },
     onConnect: ({ conversationId }) => {
       callbacks.onConnect(conversationId);
     },
