@@ -253,14 +253,19 @@ function TutorApp() {
       if (!transcript) return;
       if (!placeholderAdded) {
         placeholderAdded = true;
-        // User is speaking — this is an interruption. Pause word reveal and fully reveal tutor text.
+        // User is speaking — pause word reveal and fully reveal tutor text
         revealTimersRef.current.forEach(t => clearTimeout(t));
         revealTimersRef.current = [];
-        setConvo(prev => [
-          ...prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m),
-          { from: 'student', text: transcript, confirmed: false },
-        ]);
-        return; // placeholder + reveal handled in one update
+        setConvo(prev => {
+          const revealed = prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m);
+          // Replace iOS "..." placeholder if present, otherwise add new
+          const hasUnconfirmed = revealed.some(m => m.from === 'student' && !m.confirmed);
+          if (hasUnconfirmed) {
+            return revealed.map(m => m.from === 'student' && !m.confirmed ? { ...m, text: transcript } : m);
+          }
+          return [...revealed, { from: 'student', text: transcript, confirmed: false }];
+        });
+        return;
       }
       liveTranscriptRef.current = transcript;
       setConvo(prev => {
@@ -278,13 +283,22 @@ function TutorApp() {
 
   const handleModeForSTT = useCallback((mode: TutorMode) => {
     if (mode === 'listening') {
-      // If there are active reveal timers, the user interrupted — cancel and fully reveal
-      if (revealTimersRef.current.length > 0) {
+      startSTT();
+      const isIOS = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0 && /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS && revealTimersRef.current.length > 0) {
+        // iOS: STT can't detect speech, so cancel reveal on mode change instead
         revealTimersRef.current.forEach(t => clearTimeout(t));
         revealTimersRef.current = [];
         setConvo(prev => prev.map(m => m.from === 'tutor' && m.revealedLength !== undefined ? { ...m, revealedLength: undefined } : m));
       }
-      startSTT();
+      if (isIOS) {
+        setTimeout(() => {
+          setConvo(prev => {
+            if (prev.some(m => m.from === 'student' && !m.confirmed)) return prev;
+            return [...prev, { from: 'student', text: '...', confirmed: false }];
+          });
+        }, 300);
+      }
     } else {
       // Agent started speaking — stop STT but KEEP the placeholder
       // (onMessage for user role will replace it with confirmed text)
