@@ -800,15 +800,15 @@ function TutorApp() {
 
       {/* ── Intro screen ── */}
       {screen === 'intro' && (
-        <View style={{ flex: 1, justifyContent: 'center', padding: sp[8], maxWidth: 600, width: '100%', alignSelf: 'center' as any }}>
-          <Text style={{ fontFamily: font.sans, fontSize: fs[13], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 1, textTransform: 'uppercase', marginBottom: sp[3] }}>
+        <View style={{ flex: 1, paddingHorizontal: sp[5], paddingTop: sp[5], maxWidth: 600, width: '100%', alignSelf: 'center' as any }}>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[11], fontWeight: fw[600], color: theme.fgFaint, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: sp[2] }}>
             {lang === 'en' ? 'Practice Session' : 'جلسة تدريب'}
           </Text>
-          <Text style={{ fontFamily: font.serif, fontSize: fs[28], fontWeight: fw[500], color: theme.fg, marginBottom: sp[6] }}>
+          <Text style={{ fontFamily: font.serif, fontSize: fs[28], fontWeight: fw[500], color: theme.fg, marginBottom: sp[8] }}>
             {lang === 'en' ? 'Natural Numbers' : 'الأعداد الطبيعية'}
           </Text>
 
-          <View style={{ gap: sp[3], marginBottom: sp[6] }}>
+          <View style={{ gap: sp[3] }}>
             <View style={{ flexDirection: 'row', gap: sp[3] }}>
               <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgFaint, width: 70 }}>
                 {lang === 'en' ? 'Chapter' : 'الفصل'}
@@ -858,11 +858,6 @@ function TutorApp() {
       {screen === 'catchup' && (
         <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: sp[5], gap: sp[5], paddingBottom: sp[8], maxWidth: 600, width: '100%', alignSelf: 'center' }}
         >
-          {/* Concept breakdown — shown at the top */}
-          {catchupBreakdown && (
-            <BreakdownCard title={catchupBreakdown.title} points={catchupBreakdown.points} />
-          )}
-
           {convo.map((item, i) => (
             <ChatMessage
               key={i}
@@ -879,14 +874,9 @@ function TutorApp() {
           {/* Resources appear once catchup is complete */}
           {catchupReady && (
             <View style={{ alignSelf: 'flex-start', width: '80%', gap: sp[3] }}>
-              <WorkedExampleCard
-                title={lang === 'en' ? `${catchupTopic} in Practice` : `${catchupTopic} في التطبيق`}
-                steps={[
-                  { title: lang === 'en' ? 'Definition' : 'التعريف', content: lang === 'en' ? 'Natural numbers are the counting numbers starting from 1: {1, 2, 3, 4, ...}. They do not include zero or negative numbers.' : 'الأعداد الطبيعية هي أعداد العد بدءاً من ١: {١، ٢، ٣، ٤، ...}. لا تشمل الصفر أو الأعداد السالبة.' },
-                  { title: lang === 'en' ? 'Properties' : 'الخصائص', content: lang === 'en' ? 'Natural numbers are closed under addition and multiplication — adding or multiplying two natural numbers always gives a natural number.' : 'الأعداد الطبيعية مغلقة تحت الجمع والضرب — جمع أو ضرب عددين طبيعيين دائماً يعطي عدد طبيعي.' },
-                  { title: lang === 'en' ? 'Key distinction' : 'التمييز الرئيسي', content: lang === 'en' ? 'Whole numbers include zero {0, 1, 2, 3, ...} while natural numbers start from 1. This is a common exam question.' : 'الأعداد الكلية تشمل الصفر {٠، ١، ٢، ٣، ...} بينما الأعداد الطبيعية تبدأ من ١. هذا سؤال شائع في الاختبارات.' },
-                ]}
-              />
+              {catchupBreakdown && (
+                <BreakdownCard title={catchupBreakdown.title} points={catchupBreakdown.points} />
+              )}
               <VideoCard
                 title={lang === 'en' ? `Understanding ${catchupTopic}` : `فهم ${catchupTopic}`}
                 attribution={lang === 'en' ? 'Noon Academy' : 'أكاديمية نون'}
