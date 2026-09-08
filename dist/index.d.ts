@@ -1,7 +1,7 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import React from 'react';
 import { Theme } from './tokens.js';
-export { color, dur, font, fs, fw, h, icon, lh, paperElevation, paperTheme, r, sp, voidElevation, voidTheme } from './tokens.js';
+export { bp, color, dur, font, fs, fw, h, icon, layout, lh, paperElevation, paperTheme, r, sp, voidElevation, voidTheme } from './tokens.js';
 import { TextInputProps, TextInput, ImageSourcePropType, ViewStyle } from 'react-native';
 
 type ThemeMode = 'void' | 'paper';
@@ -17,7 +17,7 @@ declare function ThemeProvider({ children, initial }: {
 }): react_jsx_runtime.JSX.Element;
 declare function useTheme(): ThemeCtx;
 
-type IconName = 'chevron-left' | 'chevron-right' | 'chevron-down' | 'chevron-up' | 'arrow-left' | 'arrow-right' | 'close' | 'plus' | 'minus' | 'check' | 'search' | 'menu' | 'more' | 'more-vertical' | 'play' | 'pause' | 'expand' | 'collapse' | 'document' | 'link' | 'info' | 'warning' | 'error';
+type IconName = 'chevron-left' | 'chevron-right' | 'chevron-down' | 'chevron-up' | 'arrow-left' | 'arrow-right' | 'close' | 'plus' | 'minus' | 'check' | 'search' | 'menu' | 'more' | 'more-vertical' | 'play' | 'pause' | 'expand' | 'collapse' | 'document' | 'link' | 'info' | 'warning' | 'error' | 'keyboard' | 'bell' | 'mic' | 'mic-off' | 'camera' | 'camera-off' | 'hand' | 'send' | 'chat' | 'leave' | 'home' | 'user' | 'book' | 'globe' | 'volume' | 'map' | 'video' | 'tutor';
 interface IconProps {
     name: IconName;
     size?: number;
@@ -27,7 +27,7 @@ declare function Icon({ name, size, color: colorProp }: IconProps): react_jsx_ru
 /** All available icon names */
 declare const iconNames: IconName[];
 
-type Variant$8 = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal';
+type Variant$8 = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-solid' | 'signal' | 'tutor';
 type Size$2 = 'sm' | 'md' | 'lg';
 interface ButtonProps {
     children: string;
@@ -65,6 +65,24 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
     disabled?: boolean;
 }
 declare const Input: React.ForwardRefExoticComponent<InputProps & React.RefAttributes<TextInput>>;
+
+interface SelectOption {
+    label: string;
+    value: string;
+}
+interface SelectProps {
+    options: SelectOption[];
+    value?: string;
+    onChange: (value: string) => void;
+    label?: string;
+    placeholder?: string;
+    error?: string;
+    helper?: string;
+    disabled?: boolean;
+    /** BottomSheet title; defaults to label. */
+    sheetTitle?: string;
+}
+declare function Select({ options, value, onChange, label, placeholder, error, helper, disabled, sheetTitle }: SelectProps): react_jsx_runtime.JSX.Element;
 
 /**
  * Textarea — multi-line text input.
@@ -147,6 +165,98 @@ interface SegmentedProps {
 }
 declare function Segmented({ options, selected, onSelect, size }: SegmentedProps): react_jsx_runtime.JSX.Element;
 
+/**
+ * SearchInput — a pill field that means "find", not "fill in".
+ *
+ * Search icon leads, clear button appears once there's text.
+ * For forms, use Input; this is for filtering and lookup.
+ */
+
+interface SearchInputProps extends Omit<TextInputProps, 'style'> {
+    value: string;
+    onChangeText: (text: string) => void;
+    disabled?: boolean;
+}
+declare const SearchInput: React.ForwardRefExoticComponent<SearchInputProps & React.RefAttributes<TextInput>>;
+
+interface PinInputProps {
+    length?: number;
+    value: string;
+    onChange: (value: string) => void;
+    /** Fires once when all boxes are filled */
+    onComplete?: (value: string) => void;
+    error?: boolean;
+    disabled?: boolean;
+    autoFocus?: boolean;
+}
+declare function PinInput({ length, value, onChange, onComplete, error, disabled, autoFocus }: PinInputProps): react_jsx_runtime.JSX.Element;
+
+/**
+ * PhoneInput — phone number field with a fixed country code prefix.
+ *
+ * Saudi-first: defaults to +966. Digits are always LTR, even in RTL layouts.
+ */
+
+interface PhoneInputProps extends Omit<TextInputProps, 'style' | 'value' | 'onChangeText' | 'keyboardType'> {
+    value: string;
+    onChangeText: (digits: string) => void;
+    label?: string;
+    error?: string;
+    helper?: string;
+    disabled?: boolean;
+    /** Fixed dialing prefix shown before the number */
+    countryCode?: string;
+}
+declare const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps & React.RefAttributes<TextInput>>;
+
+interface ListRowProps {
+    label: string;
+    /** Leading icon */
+    icon?: IconName;
+    /** Trailing value text, e.g. "Grade 11" */
+    value?: string;
+    /** Trailing custom node (e.g. a Switch). Replaces value + chevron. */
+    right?: React.ReactNode;
+    /** Danger rows (log out, delete) — terra-free, uses theme.danger */
+    danger?: boolean;
+    /** Hide the chevron on pressable rows */
+    chevron?: boolean;
+    /** Hide the bottom divider (use on the last row) */
+    divider?: boolean;
+    disabled?: boolean;
+    onPress?: () => void;
+}
+declare function ListRow({ label, icon, value, right, danger, chevron, divider, disabled, onPress }: ListRowProps): react_jsx_runtime.JSX.Element;
+
+type UploadTileState = 'idle' | 'uploading' | 'uploaded' | 'error';
+interface UploadTileProps {
+    state?: UploadTileState;
+    /** e.g. "Add your homework" */
+    label?: string;
+    /** e.g. "PDF or photo, up to 10 MB" */
+    hint?: string;
+    fileName?: string;
+    /** e.g. "2.4 MB" */
+    fileMeta?: string;
+    /** 0–100, for uploading state */
+    progress?: number;
+    errorMessage?: string;
+    onPress?: () => void;
+    onRemove?: () => void;
+    onRetry?: () => void;
+    disabled?: boolean;
+}
+declare function UploadTile({ state, label, hint, fileName, fileMeta, progress, errorMessage, onPress, onRemove, onRetry, disabled, }: UploadTileProps): react_jsx_runtime.JSX.Element;
+
+interface RatingProps {
+    /** 0..max */
+    value: number;
+    onChange?: (value: number) => void;
+    max?: number;
+    size?: 'sm' | 'md' | 'lg';
+}
+declare function Rating({ value, onChange, max, size }: RatingProps): react_jsx_runtime.JSX.Element;
+
 interface CardAction {
     label: string;
     danger?: boolean;
@@ -157,14 +267,33 @@ interface CardProps {
     subtitle?: string;
     meta?: string;
     thumbnail?: ImageSourcePropType;
+    /** Thumbnail crop — only these two, keeps grids tidy */
+    thumbnailRatio?: '16:9' | '1:1';
     actions?: CardAction[];
     selectable?: boolean;
     selected?: boolean;
     loading?: boolean;
+    spotlight?: 'terra' | 'teal';
+    pattern?: boolean;
+    /** 'auto' = full width of parent (default), 'fill' = share row space equally, 'hug' = shrink to content */
+    sizing?: 'auto' | 'fill' | 'hug';
     onPress?: () => void;
     style?: ViewStyle;
 }
-declare function Card({ title, subtitle, meta, thumbnail, actions, selectable, selected: selectedProp, loading, onPress, style }: CardProps): react_jsx_runtime.JSX.Element;
+declare function Card({ title, subtitle, meta, thumbnail, thumbnailRatio, actions, selectable, selected: selectedProp, loading, spotlight, pattern, sizing, onPress, style }: CardProps): react_jsx_runtime.JSX.Element;
+
+interface HeroCardProps {
+    title: string;
+    kicker?: string;
+    subtitle?: string;
+    meta?: string;
+    tone?: 'terra' | 'teal' | 'raised' | 'sunken';
+    /** 'auto' = full width of parent (default), 'fill' = share row space equally, 'hug' = shrink to content */
+    sizing?: 'auto' | 'fill' | 'hug';
+    onPress?: () => void;
+    style?: ViewStyle;
+}
+declare function HeroCard({ title, kicker, subtitle, meta, tone, sizing, onPress, style }: HeroCardProps): react_jsx_runtime.JSX.Element;
 
 type Variant$6 = 'default' | 'accent';
 interface ChipProps {
@@ -189,6 +318,36 @@ interface AvatarProps {
     status?: StatusType;
 }
 declare function Avatar({ initials, imageUri, size, color, status }: AvatarProps): react_jsx_runtime.JSX.Element;
+
+interface AvatarGroupItem {
+    initials: string;
+    imageUri?: string;
+}
+interface AvatarGroupProps {
+    items: AvatarGroupItem[];
+    /** Faces shown before collapsing to "+N" (default 4) */
+    max?: number;
+    size?: 'xs' | 'sm' | 'md';
+    /** True headcount when `items` is a sample (e.g. 3 faces of 128 in class) */
+    total?: number;
+}
+declare function AvatarGroup({ items, max, size, total }: AvatarGroupProps): react_jsx_runtime.JSX.Element;
+
+interface StatCardProps {
+    label: string;
+    value: string;
+    /** Small unit after the value, e.g. "%", "min" */
+    unit?: string;
+    /** e.g. "+4% this week" */
+    delta?: string;
+    deltaDirection?: 'up' | 'down' | 'flat';
+    meta?: string;
+    /** 'auto' = full width of parent (default), 'fill' = share row space equally, 'hug' = shrink to content */
+    sizing?: 'auto' | 'fill' | 'hug';
+    onPress?: () => void;
+    style?: ViewStyle;
+}
+declare function StatCard({ label, value, unit, delta, deltaDirection, meta, sizing, onPress, style }: StatCardProps): react_jsx_runtime.JSX.Element;
 
 type Variant$5 = 'default' | 'accent' | 'danger' | 'dot';
 interface BadgeProps {
@@ -264,6 +423,17 @@ interface EmptyStateProps {
 }
 declare function EmptyState({ icon, title, body, actionLabel, onAction }: EmptyStateProps): react_jsx_runtime.JSX.Element;
 
+type StreakDay = 'done' | 'missed' | 'today' | 'upcoming';
+interface StreakTrackerProps {
+    /** Days in a row */
+    count: number;
+    /** The week, oldest first */
+    days: StreakDay[];
+    /** One letter per day, same order as days */
+    labels?: string[];
+}
+declare function StreakTracker({ count, days, labels }: StreakTrackerProps): react_jsx_runtime.JSX.Element;
+
 interface CalendarLocale {
     dayNames: string[];
     months: string[];
@@ -284,8 +454,10 @@ interface CalendarProps {
     onBack?: () => void;
     rightAction?: React.ReactNode;
     locale?: CalendarLocale | 'ar';
+    /** Hide the built-in title/controls row — when the page owns the title (e.g. date as page title). */
+    hideHeader?: boolean;
 }
-declare function Calendar({ selected: selectedProp, onSelect, events, expanded: expandedProp, onToggle, backIcon, onBack, rightAction, locale: localeProp }: CalendarProps): react_jsx_runtime.JSX.Element;
+declare function Calendar({ selected: selectedProp, onSelect, events, expanded: expandedProp, onToggle, backIcon, onBack, rightAction, locale: localeProp, hideHeader }: CalendarProps): react_jsx_runtime.JSX.Element;
 
 interface TabsProps {
     tabs: string[];
@@ -298,7 +470,7 @@ interface ActionButton {
     label: string;
     onPress: () => void;
     disabled?: boolean;
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+    variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'tutor';
 }
 interface BottomActionProps {
     icon?: IconName;
@@ -322,6 +494,35 @@ interface BottomNavProps {
     maxVisible?: number;
 }
 declare function BottomNav({ items, selected, onSelect, maxVisible }: BottomNavProps): react_jsx_runtime.JSX.Element;
+
+interface NavRailItem {
+    label: string;
+    icon: IconName | ((color: string, size: number) => React.ReactNode);
+}
+interface NavRailProps {
+    items: NavRailItem[];
+    selected: number;
+    onSelect: (index: number) => void;
+    labels?: boolean;
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+}
+declare function NavRail({ items, selected, onSelect, labels, header, footer }: NavRailProps): react_jsx_runtime.JSX.Element;
+
+interface NotificationBellProps {
+    count?: number;
+    onPress: () => void;
+}
+declare function NotificationBell({ count, onPress }: NotificationBellProps): react_jsx_runtime.JSX.Element;
+
+interface BackButtonProps {
+    onPress: () => void;
+}
+declare function BackButton({ onPress }: BackButtonProps): react_jsx_runtime.JSX.Element;
+
+declare function NoonMark({ size }: {
+    size?: number;
+}): react_jsx_runtime.JSX.Element;
 
 type Variant$4 = 'default' | 'large' | 'transparent' | 'overlay';
 interface TitleBarProps {
@@ -404,9 +605,11 @@ interface FullSheetProps {
     visible: boolean;
     onClose: () => void;
     title?: string;
+    closeLabel?: string;
     children: React.ReactNode;
+    footer?: React.ReactNode;
 }
-declare function FullSheet({ visible, onClose, title, children }: FullSheetProps): react_jsx_runtime.JSX.Element | null;
+declare function FullSheet({ visible, onClose, title, closeLabel, children, footer }: FullSheetProps): react_jsx_runtime.JSX.Element | null;
 
 interface TooltipProps {
     text: string;
@@ -437,6 +640,20 @@ interface CircularProps {
     color?: string;
 }
 declare function CircularProgress({ value, size, strokeWidth, showValue, color }: CircularProps): react_jsx_runtime.JSX.Element;
+
+interface TimerProps {
+    /** Starting value in seconds */
+    seconds: number;
+    /** Ticks while true (default true) */
+    running?: boolean;
+    /** Switch to warn colour at this many seconds left (default 10) */
+    warnAt?: number;
+    onComplete?: () => void;
+    size?: 'sm' | 'md' | 'lg';
+    /** 'pill' wraps the digits in a soft capsule */
+    variant?: 'plain' | 'pill';
+}
+declare function Timer({ seconds, running, warnAt, onComplete, size, variant }: TimerProps): react_jsx_runtime.JSX.Element;
 
 type State$1 = 'upcoming' | 'soon' | 'live' | 'done' | 'cancelled';
 interface SessionCardProps {
@@ -762,6 +979,72 @@ interface InterstitialProps {
 }
 declare function Interstitial({ title, body, buttonLabel, onPress, variant, score, hero, confetti: confettiProp }: InterstitialProps): react_jsx_runtime.JSX.Element;
 
+interface ResultReviewItem {
+    question: string;
+    correct: boolean;
+    /** e.g. "You said 14 · correct is 12" */
+    meta?: string;
+}
+interface ResultReviewProps {
+    items: ResultReviewItem[];
+    onPressItem?: (index: number) => void;
+}
+declare function ResultReview({ items, onPressItem }: ResultReviewProps): react_jsx_runtime.JSX.Element;
+
+type VideoTileState = 'live' | 'muted' | 'reconnecting' | 'audio-only';
+interface VideoTileProps {
+    name: string;
+    /** e.g. "Teacher" */
+    role?: string;
+    state?: VideoTileState;
+    /** Fallback face for audio-only */
+    initials?: string;
+    /** The actual video surface (RTC view, Image, …) — fills the tile */
+    children?: React.ReactNode;
+    /** Default 16/9 */
+    aspectRatio?: number;
+    style?: ViewStyle;
+}
+declare function VideoTile({ name, role, state, initials, children, aspectRatio, style }: VideoTileProps): react_jsx_runtime.JSX.Element;
+
+interface ClassToolbarItem {
+    id: string;
+    icon: IconName;
+    /** Accessibility label — required, there is no visible text */
+    label: string;
+    active?: boolean;
+    variant?: 'default' | 'danger';
+    /** Unread dot (e.g. chat) */
+    badge?: boolean;
+}
+interface ClassToolbarProps {
+    items: ClassToolbarItem[];
+    onPress: (id: string) => void;
+}
+declare function ClassToolbar({ items, onPress }: ClassToolbarProps): react_jsx_runtime.JSX.Element;
+
+interface LivePromptProps {
+    question: string;
+    /** Countdown — omit for untimed prompts */
+    seconds?: number;
+    onExpire?: () => void;
+    /** Default "Live question" */
+    kicker?: string;
+    /** Answer options — QuizOption, Slider, … */
+    children: React.ReactNode;
+}
+declare function LivePrompt({ question, seconds, onExpire, kicker, children }: LivePromptProps): react_jsx_runtime.JSX.Element;
+
+interface ChatComposerProps {
+    value: string;
+    onChangeText: (v: string) => void;
+    onSend: (v: string) => void;
+    /** Default "Message…" */
+    placeholder?: string;
+    disabled?: boolean;
+}
+declare function ChatComposer({ value, onChangeText, onSend, placeholder, disabled }: ChatComposerProps): react_jsx_runtime.JSX.Element;
+
 type OasisStatus = 'complete' | 'strong' | 'weak' | 'current' | 'upcoming' | 'locked';
 interface OasisProps {
     /** Water level 0–100 */
@@ -823,14 +1106,6 @@ interface WaypointsProps {
 }
 declare function Waypoints({ steps: stepsProp, labels, layout }: WaypointsProps): react_jsx_runtime.JSX.Element | null;
 
-interface WaterVesselProps {
-    fill: number;
-    capacity?: number;
-    minimum?: number;
-    size?: 'sm' | 'md' | 'lg';
-}
-declare function WaterVessel({ fill, capacity, minimum, size }: WaterVesselProps): react_jsx_runtime.JSX.Element;
-
 interface TerrainPatternProps {
     width: number;
     height: number;
@@ -847,6 +1122,36 @@ interface DunePatternProps {
     style?: ViewStyle;
 }
 declare function DunePattern({ width: w, height: h, opacity, style }: DunePatternProps): react_jsx_runtime.JSX.Element;
+
+interface FacetProps {
+    width: number;
+    height: number;
+    voice?: 'dunes' | 'plaster';
+    scale?: 'sm' | 'md' | 'lg';
+    seed?: number;
+    animated?: boolean;
+    style?: ViewStyle;
+}
+declare function Facet({ width: w, height: h, voice, scale, seed, animated, style, }: FacetProps): react_jsx_runtime.JSX.Element;
+
+interface KhatamProps {
+    width: number;
+    height: number;
+    scale?: 'sm' | 'md' | 'lg';
+    style?: ViewStyle;
+}
+declare function Khatam({ width: w, height: h, scale, style, }: KhatamProps): react_jsx_runtime.JSX.Element;
+
+interface PinboardProps {
+    width: number;
+    height: number;
+    scale?: 'xs' | 'sm' | 'md' | 'lg';
+    active?: Array<[number, number]>;
+    seed?: number;
+    animated?: boolean;
+    style?: ViewStyle;
+}
+declare function Pinboard({ width: w, height: h, scale, active, seed, animated, style, }: PinboardProps): react_jsx_runtime.JSX.Element;
 
 interface ConstellationPatternProps {
     width: number;
@@ -907,8 +1212,9 @@ type VoiceTutorState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
 interface VoiceTutorProps {
     state?: VoiceTutorState;
     size?: number;
+    hideLabel?: boolean;
 }
-declare function VoiceTutor({ state, size }: VoiceTutorProps): react_jsx_runtime.JSX.Element;
+declare function VoiceTutor({ state, size, hideLabel }: VoiceTutorProps): react_jsx_runtime.JSX.Element;
 
 interface VideoCardProps {
     title: string;
@@ -928,8 +1234,10 @@ interface ChatMessageProps {
     thinking?: boolean;
     /** Tutor only — characters revealed so far. Unrevealed text shows in fgFaint. Omit for fully revealed. */
     revealedLength?: number;
+    /** Override RTL direction — useful when not using I18nManager */
+    rtl?: boolean;
 }
-declare function ChatMessage({ children, from, confirmed, thinking, revealedLength }: ChatMessageProps): react_jsx_runtime.JSX.Element;
+declare function ChatMessage({ children, from, confirmed, thinking, revealedLength, rtl }: ChatMessageProps): react_jsx_runtime.JSX.Element;
 
 declare function TypingIndicator(): react_jsx_runtime.JSX.Element;
 
@@ -1030,4 +1338,4 @@ interface LeaderboardProps {
 }
 declare function Leaderboard({ entries, label, unit }: LeaderboardProps): react_jsx_runtime.JSX.Element;
 
-export { ActivityCard, Alert, Avatar, Badge, BottomAction, BottomNav, BottomSheet, Breadcrumbs, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, ConstellationPattern, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DuneDynamic, DunePattern, EmptyState, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Leaderboard, LinearProgress, MatchQuestion, Menu, Oasis, OrderQuestion, Pagination, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, ResourceList, type RouteChapter, RouteMap, type RouteMarker, Segmented, SessionBar, SessionCard, Skeleton, Slider, SlidesCard, StarsDynamic, Stepper, Switch, Table, type TableColumn, Tabs, TerrainDynamic, TerrainPattern, Textarea, Theme, ThemeProvider, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, VideoCard, VoiceTutor, WaterVessel, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };
+export { ActivityCard, Alert, Avatar, AvatarGroup, BackButton, Badge, BottomAction, BottomNav, BottomSheet, Breadcrumbs, BreakdownCard, Button, Calendar, type CalendarLocale, Card, CardGrid, CategorizeQuestion, ChatComposer, ChatMessage, Checkbox, CheckboxGroup, Chip, CircularProgress, ClassToolbar, type ClassToolbarItem, ConstellationPattern, Dialog, Divider, DragItem, DragItemContent, type DragItemData, type DragItemState, DropZone, type DropZoneBounds, type DropZoneState, DuneDynamic, DunePattern, EmptyState, Facet, FillBlanksQuestion, FilterBar, FullSheet, GridPaper, HeroCard, HomeworkCard, HotspotQuestion, Icon, IconButton, type IconName, Identity, Input, Interstitial, Khatam, Leaderboard, LinearProgress, ListRow, LivePrompt, MatchQuestion, Menu, NavRail, NoonMark, NotificationBell, Oasis, OrderQuestion, Pagination, PhoneInput, PinInput, Pinboard, PlacedItem, Question, QuestionFrame, QuizOption, Radio, RadioGroup, Rating, ResourceList, ResultReview, type ResultReviewItem, type RouteChapter, RouteMap, type RouteMarker, SearchInput, Segmented, Select, type SelectOption, SessionBar, SessionCard, Skeleton, Slider, SlidesCard, StarsDynamic, StatCard, Stepper, type StreakDay, StreakTracker, Switch, Table, type TableColumn, Tabs, TerrainDynamic, TerrainPattern, Textarea, Theme, ThemeProvider, Timer, TitleBar, Toast, ToastProvider, Tooltip, TypingIndicator, UploadTile, type UploadTileState, VideoCard, VideoTile, VoiceTutor, WaypointMarker, Waypoints, WorkedExampleCard, iconNames, useDragDrop, useTheme, useToast };

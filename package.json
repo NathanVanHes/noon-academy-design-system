@@ -26,7 +26,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "explorer": "cd preview && npx expo start"
+    "explorer": "cd preview && npx expo start",
+    "deploy": "cd preview && npx expo export --platform web && cd dist && cp -R assets/node_modules assets/vendor && echo '{\"rewrites\":[{\"source\":\"/assets/node_modules/:path*\",\"destination\":\"/assets/vendor/:path*\"}]}' > vercel.json && npx vercel link --yes --scope nathan-noonacademys-projects --project noon-design-system && npx vercel deploy --prod --yes"
   },
   "peerDependencies": {
     "react": ">=18",
