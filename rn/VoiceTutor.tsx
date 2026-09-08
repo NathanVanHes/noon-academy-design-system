@@ -95,8 +95,8 @@ export function VoiceTutor({ state = 'idle', size = 160, hideLabel }: VoiceTutor
   const isError = state === 'error';
   const core = { idle: 32, listening: 44, thinking: 24, speaking: 44, error: 22 }[state]!;
   const auraBase = { idle: 0, listening: 80, thinking: 50, speaking: 90, error: 50 }[state]!;
-  const coreColor = isError ? color.danger[300] : theme.iris;
-  const auraColor = isError ? 'rgba(249,176,138,0.12)' : theme.irisSoft;
+  const coreColor = isError ? color.danger[300] : theme.irisBright;
+  const auraColor = isError ? 'rgba(249,176,138,0.12)' : theme.irisGlow;
 
   const coreScale = anim.interpolate({
     inputRange: [0, 1],

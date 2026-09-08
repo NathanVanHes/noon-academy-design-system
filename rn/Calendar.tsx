@@ -48,6 +48,8 @@ interface CalendarProps {
   onBack?: () => void;
   rightAction?: React.ReactNode;
   locale?: CalendarLocale | 'ar';
+  /** Hide the built-in title/controls row — when the page owns the title (e.g. date as page title). */
+  hideHeader?: boolean;
 }
 
 function buildGrid(year: number, month: number, weekStart: number = 0) {
@@ -66,7 +68,7 @@ function buildGrid(year: number, month: number, weekStart: number = 0) {
 
 function dateKey(d: number, m: number, y: number) { return `${y}-${m}-${d}`; }
 
-export function Calendar({ selected: selectedProp, onSelect, events, expanded: expandedProp, onToggle, backIcon, onBack, rightAction, locale: localeProp }: CalendarProps) {
+export function Calendar({ selected: selectedProp, onSelect, events, expanded: expandedProp, onToggle, backIcon, onBack, rightAction, locale: localeProp, hideHeader }: CalendarProps) {
   const { theme } = useTheme();
   const isRTL = I18nManager.isRTL;
   const loc: CalendarLocale = localeProp === 'ar' ? AR_LOCALE : localeProp || (isRTL ? AR_LOCALE : EN_LOCALE);
@@ -83,6 +85,14 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
 
   const sel = selectedProp || internalSelected;
   const isExpanded = expandedProp !== undefined ? expandedProp : internalExpanded;
+
+  // Keep the visible month in sync when the selected date is driven externally
+  React.useEffect(() => {
+    if (selectedProp) {
+      setViewMonth(selectedProp.getMonth());
+      setViewYear(selectedProp.getFullYear());
+    }
+  }, [selectedProp && selectedProp.getMonth(), selectedProp && selectedProp.getFullYear()]);
 
   const weeks = useMemo(() => buildGrid(viewYear, viewMonth, loc.weekStart), [viewYear, viewMonth, loc.weekStart]);
 
@@ -226,7 +236,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
   return (
     <View style={{ borderBottomWidth: 1, borderBottomColor: theme.border }}>
       {/* Header — matches TitleBar: sp[5] horizontal, sp[3] vertical, minHeight 56, font.sans fs[16] fw[600] */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: sp[5], paddingVertical: sp[3], minHeight: 56, gap: sp[3] }}>
+      {!hideHeader && <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: sp[5], paddingVertical: sp[3], minHeight: 56, gap: sp[3] }}>
         {onBack && (
           <Pressable onPress={onBack} hitSlop={8} accessibilityRole="button" accessibilityLabel="Back">
             {backIcon || <Icon name={isRTL ? 'chevron-right' : 'chevron-left'} size={icon.lg} color={theme.fgMuted} />}
@@ -245,7 +255,7 @@ export function Calendar({ selected: selectedProp, onSelect, events, expanded: e
           </IconButton>
           {rightAction}
         </View>
-      </View>
+      </View>}
 
       {/* Weekday headers */}
       <View style={{ flexDirection: 'row', paddingHorizontal: sp[4] }}>

@@ -136,7 +136,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
             {steps.map((step, i) => {
               const prevDone = i > 0 && (steps[i - 1] === 'done' || steps[i - 1] === 'passed' || steps[i - 1] === 'arrived');
               const { isDone, isCurrent, isArrived } = stepState(step);
-              const col = isArrived ? theme.accent : isCurrent ? theme.signalBright : isDone ? theme.signalDim : theme.fgFaint;
+              const col = isArrived ? theme.accentText : (isCurrent || isDone) ? theme.signalText : theme.fgSubtle;
               return (
                 <React.Fragment key={i}>
                   {i > 0 && (() => {
@@ -156,7 +156,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
             const label = labels[idx >= 0 ? idx : 0] || '';
             return (
               <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, marginTop: sp[3] }}>
-                Step {pos} of {n} · <Text style={{ color: theme.signalBright }}>{label}</Text>
+                Step {pos} of {n} · <Text style={{ color: theme.signalText }}>{label}</Text>
               </Text>
             );
           })()}
@@ -172,7 +172,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
           {steps.map((step, i) => {
             const prevDone = i > 0 && (steps[i - 1] === 'done' || steps[i - 1] === 'passed' || steps[i - 1] === 'arrived');
             const { isDone, isCurrent, isArrived } = stepState(step);
-            const col = isArrived ? theme.accent : isCurrent ? theme.signalBright : isDone ? theme.signalDim : theme.fgFaint;
+            const col = isArrived ? theme.accentText : (isCurrent || isDone) ? theme.signalText : theme.fgSubtle;
             return (
               <React.Fragment key={i}>
                 {i > 0 && (() => {
@@ -229,7 +229,7 @@ export function Waypoints({ steps: stepsProp, labels, layout = 'horizontal' }: W
           ))}
           {labels && pts.map(([x, y], i) => {
             const { isDone, isCurrent, isArrived } = stepState(steps[i]);
-            const col = isArrived ? theme.accent : isCurrent ? theme.signalBright : isDone ? theme.signalDim : theme.fgFaint;
+            const col = isArrived ? theme.accentText : (isCurrent || isDone) ? theme.signalText : theme.fgSubtle;
             const onLeft = x > w / 2;
             return (
               <View key={`l${i}`} style={{

@@ -46,7 +46,7 @@ export function BottomNav({ items, selected, onSelect, maxVisible = 4 }: BottomN
       <Pressable key={index} onPress={() => onSelect(index)} style={{ alignItems: 'center', gap: sp[1], minWidth: 56, position: 'relative' }} accessibilityRole="tab" accessibilityState={{ selected: isOn }}>
         {isOn && <View style={{ position: 'absolute', top: -sp[3] - sp[1], width: sp[6], height: sp[0.5], backgroundColor: theme.accent, borderBottomLeftRadius: r[1], borderBottomRightRadius: r[1], alignSelf: 'center' }} />}
         {renderIcon(item, iconColor)}
-        <Text style={{ fontFamily: font.sans, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 0.8, textTransform: 'uppercase', color: isOn ? theme.accent : theme.fgSubtle }}>{item.label}</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[11], fontWeight: fw[500], color: isOn ? theme.accent : theme.fgSubtle }}>{item.label}</Text>
         {item.badge != null && item.badge > 0 && (
           <View style={{ position: 'absolute', top: 0, right: sp[1], minWidth: 16, height: 16, borderRadius: 8, backgroundColor: theme.danger, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 }}>
             <Text style={{ fontFamily: font.mono, fontSize: fs[9], fontWeight: fw[500], color: color.chalk[100] }}>{item.badge}</Text>
@@ -109,7 +109,7 @@ export function BottomNav({ items, selected, onSelect, maxVisible = 4 }: BottomN
           <Pressable onPress={() => setMoreOpen(!moreOpen)} style={{ alignItems: 'center', gap: sp[1], minWidth: 56, position: 'relative' }}>
             {isOverflowSelected && <View style={{ position: 'absolute', top: -sp[3] - sp[1], width: sp[6], height: sp[0.5], backgroundColor: theme.accent, borderBottomLeftRadius: r[1], borderBottomRightRadius: r[1], alignSelf: 'center' }} />}
             <Icon name="more" size={iconTokens.tab} color={isOverflowSelected ? theme.accent : theme.fgSubtle} />
-            <Text style={{ fontFamily: font.sans, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 0.8, textTransform: 'uppercase', color: isOverflowSelected ? theme.accent : theme.fgSubtle }}>More</Text>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[11], fontWeight: fw[500], color: isOverflowSelected ? theme.accent : theme.fgSubtle }}>More</Text>
             {overflowItems.some(it => it.badge && it.badge > 0) && !moreOpen && (
               <View style={{ position: 'absolute', top: 0, right: sp[1], width: 8, height: 8, borderRadius: 4, backgroundColor: theme.danger }} />
             )}

@@ -135,7 +135,7 @@ function StarsCanvasWeb({ width: W, height: H, density, twinkle, halo: haloI, li
     spikes = sorted.slice(0, 8);
 
     function draw(t: number) {
-      ctx.fillStyle = '#0a0f1a';
+      ctx.fillStyle = '#161A21';
       ctx.fillRect(0, 0, W, H);
 
       if (ctrlRef.current.linesI > 0.001) {
@@ -273,7 +273,7 @@ function StarsCanvasNative({ width: W, height: H, density, twinkle, style }: Req
   return (
     <View style={[{ width: W, height: H, backgroundColor: color.void[300] }, style]}>
       <SK.Canvas style={{ width: W, height: H }}>
-        <SK.Fill color="#0a0f1a" />
+        <SK.Fill color="#161A21" />
         {paths.map((p, i) => (
           <SK.Path key={i} path={p.path} color={p.color} />
         ))}

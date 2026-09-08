@@ -33,9 +33,9 @@ const FONT_SIZES: Record<string, number> = { sm: fs[9], md: fs[11], lg: fs[14], 
 
 function borderCol(status: OasisStatus, theme: any): string {
   switch (status) {
-    case 'complete': case 'strong': return color.noon[400];
-    case 'weak': return color.terra[400];
-    case 'current': return color.gold[300];
+    case 'complete': case 'strong': return theme.accent;
+    case 'weak': return theme.terra;
+    case 'current': return theme.signalBright;
     case 'upcoming': return theme.fgFaint;
     case 'locked': return theme.border;
   }
@@ -53,8 +53,11 @@ export function Oasis({ level, status = 'upcoming', label, size = 'md', meta }: 
   // Auto-label: show percentage if level > 0, otherwise dash
   const displayLabel = label ?? (clampedLevel > 0 ? `${clampedLevel}%` : '—');
 
-  // Label color follows border
-  const labelColor = isCurrent ? color.gold[300] : isPast ? border : theme.fgFaint;
+  // Label color follows border intent, but uses text-safe roles
+  const labelColor = isCurrent ? theme.signalText
+    : status === 'complete' || status === 'strong' ? theme.accentText
+    : status === 'weak' ? theme.terra
+    : theme.fgFaint;
 
   return (
     <View style={{ alignItems: 'center' }}>
@@ -65,10 +68,10 @@ export function Oasis({ level, status = 'upcoming', label, size = 'md', meta }: 
         borderWidth: isCurrent ? 2.5 : 1.5,
         borderColor: border,
         borderStyle: isDashed ? 'dashed' : 'solid',
-        backgroundColor: color.void[300],
+        backgroundColor: theme.bg,
         overflow: 'hidden',
         ...(isCurrent ? {
-          shadowColor: color.gold[300],
+          shadowColor: theme.signalBright,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.35,
           shadowRadius: 12,
@@ -85,7 +88,7 @@ export function Oasis({ level, status = 'upcoming', label, size = 'md', meta }: 
             transform: [{ rotate: '-45deg' }],
             justifyContent: 'flex-end',
           }}>
-            <View style={{ height: `${clampedLevel}%`, backgroundColor: color.blue[400], opacity: 0.3 }} />
+            <View style={{ height: `${clampedLevel}%`, backgroundColor: theme.water, opacity: 0.3 }} />
           </View>
         )}
 
@@ -105,7 +108,7 @@ export function Oasis({ level, status = 'upcoming', label, size = 'md', meta }: 
       {meta && (
         <Text style={{
           fontFamily: font.mono, fontSize: fs[9],
-          color: isCurrent ? color.gold[300] : isPast ? theme.fgMuted : theme.fgFaint,
+          color: isCurrent ? theme.signalText : isPast ? theme.fgMuted : theme.fgFaint,
           marginTop: dim * 0.2 + sp[2], textAlign: 'center',
         }}>{meta}</Text>
       )}

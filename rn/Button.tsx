@@ -31,7 +31,7 @@ const fontSizes: Record<Size, number> = { sm: fs[13], md: fs[14], lg: fs[15] };
 const iconSizes: Record<Size, number> = { sm: 14, md: 16, lg: 18 };
 
 export function Button({ children, variant = 'primary', size = 'md', disabled, loading, fullWidth, leadingIcon, trailingIcon, onPress }: ButtonProps) {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
 
   const bgMap: Record<Variant, string> = {
     primary: theme.accent,
@@ -50,7 +50,8 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
     danger: color.danger[300],
     'danger-solid': color.chalk[100],
     signal: theme.bg,
-    tutor: color.iris[800],
+    // Void iris is light purple → deep purple text; paper iris is deep plum → cream text.
+    tutor: mode === 'void' ? color.iris[800] : theme.fgInverse,
   };
 
   const isOutline = variant === 'secondary' || variant === 'danger';

@@ -5,6 +5,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Button } from './Button';
+import { useTheme } from './ThemeContext';
 import { sp, fs, font } from './tokens';
 
 interface QuestionFrameProps {
@@ -20,10 +21,11 @@ interface QuestionFrameProps {
 }
 
 export function QuestionFrame({ instruction, children, options, optionsPosition = 'bottom', showButtons = true, submitted, allPlaced, onSubmit, onReset }: QuestionFrameProps) {
+  const { theme } = useTheme();
   return (
     <View style={{ gap: sp[4], overflow: 'visible' }}>
       {instruction && (
-        <Text style={{ fontFamily: font.sans, fontSize: fs[13] }}>{instruction}</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>{instruction}</Text>
       )}
       {optionsPosition === 'top' && options}
       {children}

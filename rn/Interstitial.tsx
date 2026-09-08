@@ -68,6 +68,7 @@ function ConfettiParticle({ delay, color: c }: { delay: number; color: string })
 
 /** Mastery — gold star, eases in with subtle rotation */
 function MasteryHero() {
+  const { theme } = useTheme();
   const rotation = useSharedValue(0);
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
@@ -92,13 +93,14 @@ function MasteryHero() {
 
   return (
     <Animated.View style={[{ marginBottom: sp[6], zIndex: 2 }, style]}>
-      <Text style={{ fontSize: 72, color: color.gold[300] }}>{'★'}</Text>
+      <Text style={{ fontSize: 72, color: theme.signalBright }}>{'★'}</Text>
     </Animated.View>
   );
 }
 
 /** Exam — diamond with water that fills up to the score */
 function ExamHero({ score }: { score: number }) {
+  const { theme } = useTheme();
   const dim = 72; // xl size
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
@@ -119,16 +121,16 @@ function ExamHero({ score }: { score: number }) {
     <Animated.View style={[{ marginBottom: sp[6], zIndex: 2, alignItems: 'center' }, containerStyle]}>
       <View style={{
         width: dim, height: dim, transform: [{ rotate: '45deg' }],
-        borderWidth: 2, borderColor: color.noon[400], borderRadius: r[2],
-        backgroundColor: color.void[300], overflow: 'hidden',
-        shadowColor: color.noon[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.25, shadowRadius: 12,
+        borderWidth: 2, borderColor: theme.accent, borderRadius: r[2],
+        backgroundColor: theme.bg, overflow: 'hidden',
+        shadowColor: theme.accent, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.25, shadowRadius: 12,
       }}>
         {/* Water — counter-rotated, animates up */}
         <View style={{ position: 'absolute', top: -(dim * 0.25), left: -(dim * 0.25), width: dim * 1.5, height: dim * 1.5, transform: [{ rotate: '-45deg' }], justifyContent: 'flex-end' }}>
-          <Animated.View style={[{ backgroundColor: color.blue[400], opacity: 0.3 }, waterStyle]} />
+          <Animated.View style={[{ backgroundColor: theme.water, opacity: 0.3 }, waterStyle]} />
         </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ transform: [{ rotate: '-45deg' }], fontFamily: font.mono, fontSize: fs[18], fontWeight: fw[700], color: color.noon[400] }}>{score}%</Text>
+          <Text style={{ transform: [{ rotate: '-45deg' }], fontFamily: font.mono, fontSize: fs[18], fontWeight: fw[700], color: theme.accentText }}>{score}%</Text>
         </View>
       </View>
     </Animated.View>

@@ -22,7 +22,7 @@ export function QuizOption({ label, text, image, state = 'default', onPress }: Q
 
   const borderColorMap: Record<State, string> = {
     default: theme.border,
-    selected: color.blue[400],
+    selected: theme.water,
     correct: theme.accent,
     incorrect: theme.danger,
     disabled: theme.border,

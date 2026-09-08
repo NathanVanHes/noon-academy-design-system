@@ -42,11 +42,13 @@ Browse all components, tokens, and documentation:
 cd preview && npx expo start
 ```
 
-Toggle Void/Paper theme and RTL from the top bar.
+Toggle Void/Paper theme and RTL from the top bar. Pages are deep-linkable on web via URL hash (e.g. `#aiprompt`, `#templates`).
+
+Start with **Build with AI** (`#aiprompt`) — a copy-paste system prompt for AI builders (also mirrored in `AGENTS.md` at the repo root) — and **Templates** (`#templates`) — full screens (Login, Home, Quiz, Profile) assembled from system components.
 
 ## What's included
 
-**40+ components** across inputs, display, navigation, feedback, progress, and graphical categories. Two themes (Void and Paper). Full token system for colour, spacing, typography, radii, elevation, and motion.
+**80+ components** across inputs, display, navigation, feedback, progress, learning, in-class, voice-tutor, and graphical categories. Two themes (Void and Paper). Full token system for colour, spacing, typography, radii, elevation, and motion.
 
 **RTL-aware.** Calendar, TitleBar, and Menu respond to `I18nManager.isRTL`. Calendar accepts a `locale` prop with built-in Arabic support.
 
@@ -72,10 +74,14 @@ preview/      Expo explorer app
 ## Colour roles
 
 - **Green (accent)** — action, CTA, confirmations
-- **Gold (signal)** — journey, progress, waypoints
-- **Iris (purple)** — voice tutor exclusively
-- **Terra (terracotta)** — warmth, place, classroom
+- **Gold (signal)** — earned things only (streaks, milestones)
+- **Iris (purple)** — AI tutor exclusively
+- **Terra (terracotta)** — heat and urgency, never failure
 - **Danger (red)** — errors, destructive actions
+- **Teal (intel)** — Future teal, intelligence
+- **Blue (water)** — selection and "current"
+
+Green or gold **text** uses `theme.accentText` / `theme.signalText`; plain `accent`/`signal` are fills and borders only.
 
 ## Typography
 

@@ -165,7 +165,7 @@ function DuneCanvasWeb({ width: W, height: H, layers, wind, density, shimmer, co
       if (!dataRef.current) return;
       const { dunes: dd, buckets: bb } = dataRef.current;
 
-      ctx.fillStyle = '#0a0f1a';
+      ctx.fillStyle = '#161A21';
       ctx.fillRect(0, 0, W, H);
 
       const { wind: w2, shimmer: sh2, contrast: c2 } = ctrlRef.current;
@@ -277,7 +277,7 @@ function DuneCanvasNative({ width: W, height: H, layers, wind, density, shimmer,
   return (
     <View style={[{ width: W, height: H, backgroundColor: color.void[300] }, style]}>
       <S.Canvas style={{ width: W, height: H }}>
-        <S.Fill color="#0a0f1a" />
+        <S.Fill color="#161A21" />
         {paths.map((p, i) => (
           <S.Path key={i} path={p.path} color={p.color} />
         ))}

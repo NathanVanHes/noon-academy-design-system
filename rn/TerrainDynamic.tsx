@@ -221,7 +221,7 @@ function TerrainCanvasWeb({ width: W, height: H, scale, detail, relief, contrast
     }
 
     function draw(t: number) {
-      ctx.fillStyle = '#0a0f1a';
+      ctx.fillStyle = '#161A21';
       ctx.fillRect(0, 0, W, H);
 
       const breath = 0.93 + Math.sin(t * 0.0001) * 0.07;
@@ -415,7 +415,7 @@ function TerrainCanvasNative({ width: W, height: H, scale, detail, relief, contr
   return (
     <View style={[{ width: W, height: H, backgroundColor: color.void[300] }, style]}>
       <S.Canvas style={{ width: W, height: H }}>
-        <S.Fill color="#0a0f1a" />
+        <S.Fill color="#161A21" />
         {lines.map((l, i) => (
           <S.Line key={i} p1={{ x: l.p1x, y: l.p1y }} p2={{ x: l.p2x, y: l.p2y }} color={l.color} strokeWidth={l.width} />
         ))}

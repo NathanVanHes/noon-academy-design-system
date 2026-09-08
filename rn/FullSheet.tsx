@@ -29,7 +29,7 @@ function FullSheetContent({ onClose, title, closeLabel, children, footer }: Omit
           <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle }}>{closeLabel || 'Close'}</Text>
         </Pressable>
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: footer ? sp[10] : (sp[5] + insets.bottom) }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: sp[5], paddingTop: sp[5], paddingBottom: footer ? sp[10] : (sp[5] + insets.bottom) }}>
         {children}
       </ScrollView>
       {footer}

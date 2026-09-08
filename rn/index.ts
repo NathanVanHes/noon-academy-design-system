@@ -13,7 +13,7 @@
 export { ThemeProvider, useTheme } from './ThemeContext';
 
 // Tokens
-export { color, voidTheme, paperTheme, voidElevation, paperElevation, sp, icon, r, h, fs, fw, lh, font, dur } from './tokens';
+export { color, voidTheme, paperTheme, voidElevation, paperElevation, sp, icon, r, h, fs, fw, lh, font, dur, bp, layout } from './tokens';
 export type { Theme } from './tokens';
 
 // Inputs
@@ -22,6 +22,8 @@ export type { IconName } from './Icon';
 export { Button } from './Button';
 export { IconButton } from './IconButton';
 export { Input } from './Input';
+export { Select } from './Select';
+export type { SelectOption } from './Select';
 export { Textarea } from './Textarea';
 export { Switch } from './Switch';
 export { Checkbox } from './Checkbox';
@@ -30,11 +32,21 @@ export { Radio } from './Radio';
 export { RadioGroup } from './RadioGroup';
 export { Stepper } from './Stepper';
 export { Segmented } from './Segmented';
+export { SearchInput } from './SearchInput';
+export { PinInput } from './PinInput';
+export { PhoneInput } from './PhoneInput';
+export { ListRow } from './ListRow';
+export { UploadTile } from './UploadTile';
+export type { UploadTileState } from './UploadTile';
+export { Rating } from './Rating';
 
 // Display
 export { Card } from './Card';
+export { HeroCard } from './HeroCard';
 export { Chip } from './Chip';
 export { Avatar } from './Avatar';
+export { AvatarGroup } from './AvatarGroup';
+export { StatCard } from './StatCard';
 export { Badge } from './Badge';
 export { Table, type TableColumn } from './Table';
 export { Pagination } from './Pagination';
@@ -42,6 +54,8 @@ export { Breadcrumbs } from './Breadcrumbs';
 export { Divider } from './Divider';
 export { Skeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
+export { StreakTracker } from './StreakTracker';
+export type { StreakDay } from './StreakTracker';
 
 // Navigation
 export { Calendar } from './Calendar';
@@ -49,6 +63,10 @@ export type { CalendarLocale } from './Calendar';
 export { Tabs } from './Tabs';
 export { BottomAction } from './BottomAction';
 export { BottomNav } from './BottomNav';
+export { NavRail } from './NavRail';
+export { NotificationBell } from './NotificationBell';
+export { BackButton } from './BackButton';
+export { NoonMark } from './NoonMark';
 export { TitleBar } from './TitleBar';
 export { FilterBar } from './FilterBar';
 
@@ -64,6 +82,7 @@ export { Tooltip } from './Tooltip';
 // Progress
 export { SessionBar } from './SessionBar';
 export { LinearProgress, CircularProgress } from './Progress';
+export { Timer } from './Timer';
 
 // Patterns
 export { SessionCard } from './SessionCard';
@@ -83,6 +102,15 @@ export { FillBlanksQuestion } from './FillBlanksQuestion';
 export { HotspotQuestion } from './HotspotQuestion';
 export { PlacedItem } from './PlacedItem';
 export { Interstitial } from './Interstitial';
+export { ResultReview } from './ResultReview';
+export type { ResultReviewItem } from './ResultReview';
+
+// In class
+export { VideoTile } from './VideoTile';
+export { ClassToolbar } from './ClassToolbar';
+export type { ClassToolbarItem } from './ClassToolbar';
+export { LivePrompt } from './LivePrompt';
+export { ChatComposer } from './ChatComposer';
 
 // Experimental
 export { Oasis } from './Oasis';
@@ -92,9 +120,11 @@ export type { RouteChapter, RouteMarker } from './RouteMap';
 // Graphical
 export { GridPaper } from './GridPaper';
 export { Waypoints, WaypointMarker } from './Waypoints';
-export { WaterVessel } from './WaterVessel';
 export { TerrainPattern } from './TerrainPattern';
 export { DunePattern } from './DunePattern';
+export { Facet } from './Facet';
+export { Khatam } from './Khatam';
+export { Pinboard } from './Pinboard';
 export { ConstellationPattern } from './ConstellationPattern';
 export { Slider } from './Slider';
 export { DuneDynamic } from './DuneDynamic';

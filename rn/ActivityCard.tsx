@@ -27,8 +27,8 @@ export function ActivityCard({ title, description, buttonLabel = 'Start', comple
       {description && <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgSubtle, marginBottom: sp[3] }}>{description}</Text>}
       {complete ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], marginTop: description ? 0 : sp[2] }}>
-          <Text style={{ fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.accent }}>Complete</Text>
-          {score && <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent }}>{score}</Text>}
+          <Text style={{ fontFamily: font.mono, fontSize: fs[11], fontWeight: fw[600], color: theme.accentText }}>Complete</Text>
+          {score && <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accentText }}>{score}</Text>}
         </View>
       ) : (
         <Button variant="primary" size="sm" onPress={onPress}>{buttonLabel}</Button>

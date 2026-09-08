@@ -3,25 +3,29 @@
  * Mirrors the information architecture of index.html exactly.
  * Each exports a function component: Import → Props → Live examples.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, Pressable, ScrollView, Animated, Easing, Image, Modal, Platform, useWindowDimensions, I18nManager } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Circle, Defs, LinearGradient, RadialGradient, Stop, Rect, Ellipse } from 'react-native-svg';
 import {
-  useTheme, Button, IconButton, Card, Chip, Avatar, Badge, Alert,
+  useTheme, Button, IconButton, Card, HeroCard, Chip, Avatar, AvatarGroup, StatCard, Badge, Alert,
+  Timer, SearchInput, PinInput, PhoneInput, ListRow, UploadTile, Rating, StreakTracker, ResultReview,
+  VideoTile, ClassToolbar, LivePrompt, ChatComposer,
   SessionCard, HomeworkCard, SessionBar, QuizOption, Tooltip,
-  Input, Textarea, Switch, Checkbox, Radio, Stepper, Segmented,
+  Input, Select, Textarea, Switch, Checkbox, Radio, Stepper, Segmented,
   Tabs, BottomNav, BottomAction, TitleBar, FilterBar, Divider, Skeleton, EmptyState, Table, type TableColumn, Pagination, Breadcrumbs,
+  NavRail, NotificationBell, NoonMark, BackButton,
   LinearProgress, CircularProgress, Toast, Dialog, BottomSheet, FullSheet, Interstitial,
   RadioGroup, CheckboxGroup,
   Icon, iconNames,
-  GridPaper, Waypoints, WaypointMarker, WaterVessel, TerrainPattern, DunePattern, ConstellationPattern, VoiceTutor, Calendar,
+  GridPaper, Waypoints, WaypointMarker, TerrainPattern, DunePattern, ConstellationPattern, VoiceTutor, Calendar,
+  Facet, Khatam, Pinboard,
   Identity, Menu, CardGrid, Leaderboard, VideoCard,
   ChatMessage, TypingIndicator, BreakdownCard, ActivityCard, ResourceList, SlidesCard, WorkedExampleCard,
   Oasis, RouteMap, type RouteChapter, type RouteMarker,
   DuneDynamic, StarsDynamic, TerrainDynamic, Slider,
   MatchQuestion, CategorizeQuestion, OrderQuestion, FillBlanksQuestion, HotspotQuestion,
-  sp, fs, fw, font, color, r, h, icon, lh, dur,
+  sp, fs, fw, font, color, r, h, icon, lh, dur, bp, layout,
 } from '../../rn';
 
 // ─── Playground — live preview + knobs, mirrors index.html .play ───
@@ -148,7 +152,7 @@ function Import({ children }: { children: string }) {
   const { theme } = useTheme();
   return (
     <View {...{ dataSet: { ltr: '' } }} style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[3], marginBottom: sp[5] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent }}>{children}</Text>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accentText }}>{children}</Text>
     </View>
   );
 }
@@ -156,7 +160,7 @@ function Prop({ name, type, def, desc }: { name: string; type: string; def?: str
   const { theme } = useTheme();
   return (
     <View {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', paddingVertical: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider, gap: sp[2] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.accent, minWidth: 80 }}>{name}</Text>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.accentText, minWidth: 80 }}>{name}</Text>
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted }}>{type}{def ? `  = ${def}` : ''}</Text>
         {desc ? <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgFaint, marginTop: sp[0.5] }}>{desc}</Text> : null}
@@ -217,7 +221,7 @@ export function BrandPage() {
   const { theme } = useTheme();
   const rule = (label: string, text: string) => (
     <View key={label} style={{ marginBottom: sp[4] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent, marginBottom: sp[1] }}>{label}</Text>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accentText, marginBottom: sp[1] }}>{label}</Text>
       <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, lineHeight: fs[13] * 1.5 }}>{text}</Text>
     </View>
   );
@@ -231,7 +235,7 @@ export function BrandPage() {
     </S>
     <S title="Examples">
       <View style={{ borderStartWidth: 3, borderStartColor: theme.accent, borderRadius: r[1], paddingStart: sp[4], marginBottom: sp[4] } as any}>
-        <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.accent, marginBottom: sp[2] }}>Do</Text>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.accentText, marginBottom: sp[2] }}>Do</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[1] }}>"You're on pace for 92."</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginBottom: sp[1] }}>"Sarah cleared this last Thursday — she can walk you through it."</Text>
         <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted }}>"18 jugs filled. Minimum 12 — you've done your part, and more."</Text>
@@ -322,8 +326,14 @@ export function ColorsPage() {
     <S title="Semantic — Iris" desc="Voice tutor exclusively. Regal and authoritative — the respected guide. Reserved for the AI presence.">
       {swatch(theme.iris, 'iris')}{swatch(theme.irisSoft, 'irisSoft')}{swatch(theme.irisBorder, 'irisBorder')}{swatch(theme.irisLabel, 'irisLabel')}{swatch(theme.irisDot, 'irisDot')}
     </S>
-    <S title="Semantic — Terra" desc="Warmth and place. Saudi dunes after rain. Classroom content, physical space, secondary highlights.">
+    <S title="Semantic — Terra" desc="Heat and signal. Weak zones and urgency, split out of terracotta so the surface stays calm. Not a button, not a field.">
       {swatch(theme.terra, 'terra')}{swatch(theme.terraSoft, 'terraSoft')}{swatch(theme.terraBorder, 'terraBorder')}
+    </S>
+    <S title="Semantic — Intelligence" desc="Future teal anchors the intelligent layer — scores, analysis, readiness. المستقبل">
+      {swatch(theme.intel, 'intel')}{swatch(theme.intelSoft, 'intelSoft')}{swatch(theme.intelBorder, 'intelBorder')}
+    </S>
+    <S title="Semantic — Water" desc="Selection and progression only: the path travelled, the current position, a chosen answer.">
+      {swatch(theme.water, 'water')}{swatch(theme.waterSoft, 'waterSoft')}{swatch(theme.waterBorder, 'waterBorder')}
     </S>
     <S title="Semantic — Overlays" desc="Interactive state layers. Hover for mouseover, active for pressed, selected for chosen items.">
       {swatch(theme.hoverOverlay, 'hoverOverlay')}{swatch(theme.activeOverlay, 'activeOverlay')}{swatch(theme.selectedOverlay, 'selectedOverlay')}{swatch(theme.accentGlow, 'accentGlow')}
@@ -331,7 +341,9 @@ export function ColorsPage() {
     <S title="Primitive Scales" desc="Raw colour values. Use semantic tokens above — primitives are for reference only.">
       {scaleRow('void', color.void)}{scaleRow('chalk', color.chalk)}{scaleRow('paper', color.paper)}
       {scaleRow('noon', color.noon)}{scaleRow('gold', color.gold)}{scaleRow('iris', color.iris)}
-      {scaleRow('blue', color.blue)}{scaleRow('danger', color.danger)}{scaleRow('warn', color.warn)}{scaleRow('terra', color.terra)}
+      {scaleRow('teal — Future teal', color.teal)}{scaleRow('water', color.water)}{scaleRow('clay', color.clay)}{scaleRow('oak — material only', color.oak)}
+      {scaleRow('danger', color.danger)}{scaleRow('warn', color.warn)}{scaleRow('terra', color.terra)}
+      {scaleRow('sky', color.sky)}{scaleRow('saffron', color.saffron)}{scaleRow('rose', color.rose)}{scaleRow('sage', color.sage)}{scaleRow('plum', color.plum)}
     </S>
     <S title="Physical to Digital" desc="The digital system mirrors the physical classroom palette.">
       <Image source={require('../../reference/classroom-palette.png')} style={{ width: 340, height: 340 * (1196 / 1686), borderRadius: r[2], marginBottom: sp[4] }} resizeMode="cover" />
@@ -531,7 +543,7 @@ function MotionDemo({ label, spec, desc, children }: { label: string; spec: stri
     <Pressable onPress={play}>
       <View style={{ backgroundColor: theme.bgRaised, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, padding: sp[4], marginBottom: sp[3] }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: sp[3] }}>
-          <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent }}>{label}</Text>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accentText }}>{label}</Text>
           <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>{spec}</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center', minHeight: 48, marginBottom: sp[2] }}>
@@ -598,7 +610,7 @@ function EasingDemo({ label, code, desc, easing, duration }: { label: string; co
   const width = anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
   return (
     <View style={{ marginBottom: sp[5] }}>
-      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accent, marginBottom: sp[1] }}>{label}</Text>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.accentText, marginBottom: sp[1] }}>{label}</Text>
       <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, marginBottom: sp[3] }}>{code}</Text>
       <View style={{ height: 4, backgroundColor: theme.accentSoft, borderRadius: 999, overflow: 'hidden' }}>
         <Animated.View style={{ width, height: '100%', backgroundColor: theme.accent, borderRadius: 999 }} />
@@ -782,6 +794,372 @@ export function GridSystemPage() {
       <Rl>Always use sp tokens for gap, padding, margin. Never hardcode pixel values.</Rl>
       <Rl>Use flexDirection: 'row' for horizontal, default (column) for vertical.</Rl>
       <Rl>Screen edge padding: sp[5] (20px) on phone, sp[7] (32px) on tablet.</Rl>
+    </S>
+  </>;
+}
+
+/** Live cross-device shell — real nav placement driven by actual window width. */
+function LayoutLiveDemo() {
+  const { theme } = useTheme();
+  const { width: W } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState(0);
+  const [page, setPage] = useState<null | 'notifications' | 'schedule'>(null);
+  const [notifCount, setNotifCount] = useState(3);
+  const [schedDate, setSchedDate] = useState(new Date());
+  const device = W >= bp.desktop ? 'desktop' : W >= bp.tablet ? 'tablet' : 'mobile';
+  const gutter = layout.gutter[device];
+  const isRTL = I18nManager.isRTL;
+
+  const railTabs: React.ComponentProps<typeof NavRail>['items'] = [
+    { label: 'Today', icon: (c, s) => <View style={{ width: s * 0.5, height: s * 0.5, borderRadius: 999, backgroundColor: c }} /> },
+    { label: 'Mastery', icon: (c, s) => <Icon name="check" size={s * 0.8} color={c} /> },
+    { label: 'Journey', icon: (c, s) => <View style={{ width: s * 0.45, height: s * 0.45, backgroundColor: c, transform: [{ rotate: '45deg' }] }} /> },
+  ];
+  const pageTitles = ['Today', 'Mastery', 'Journey', 'Profile'];
+  const goTab = (i: number) => { setTab(i); setPage(null); };
+
+  // Pushed-page transition — shell stays mounted, takeover slides in from the trailing edge
+  const slide = useRef(new Animated.Value(0)).current;
+  const openPage = (p: 'notifications' | 'schedule') => {
+    setPage(p);
+    if (p === 'notifications') setNotifCount(0);
+    Animated.timing(slide, { toValue: 1, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+  };
+  const closePage = () => {
+    Animated.timing(slide, { toValue: 0, duration: 240, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start(({ finished }) => { if (finished) setPage(null); });
+  };
+
+  const schedIsToday = schedDate.toDateString() === new Date().toDateString();
+  const shiftSchedDay = (n: number) => setSchedDate(d => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n));
+
+  const notifications = [
+    { title: 'Physics Live starts in 30 minutes', time: '2m', unread: true },
+    { title: 'Homework graded — Algebra Set 2', time: '1h', unread: true },
+    { title: 'New resource added to Qudrat Reading', time: '3h', unread: true },
+    { title: 'Journey milestone reached — Chapter 3', time: 'Yesterday', unread: false },
+    { title: 'Weekly mastery report is ready', time: '2d', unread: false },
+  ];
+
+  const cardW = device === 'desktop' ? '31%' as const : device === 'tablet' ? '47%' as const : '100%' as const;
+  const content = (
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ alignItems: 'center', paddingHorizontal: gutter, paddingTop: Math.max(insets.top, sp[7]), paddingBottom: sp[8] }}>
+      <View style={{ width: '100%', maxWidth: layout.containerMax, gap: sp[5] }}>
+        <>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontFamily: font.serif, fontSize: fs[32], color: theme.fg }}>{pageTitles[tab]}</Text>
+              <NotificationBell count={notifCount} onPress={() => openPage('notifications')} />
+            </View>
+            {tab === 0 && (() => {
+              const nextUp = <HeroCard style={{ flex: 1 }} kicker="Next up" title="Physics Live" subtitle="Mr. Omar · Starts 4:00 PM" meta="Room 2 · 45 min" tone="terra" onPress={() => {}} />;
+              const homework = <HeroCard style={{ flex: 1 }} kicker="Homework" title="Algebra Set 3" subtitle="Due tomorrow · 12 questions" tone="teal" onPress={() => {}} />;
+              const restOfToday = <HeroCard style={{ flex: 1 }} kicker="Today" title="Rest of today" subtitle="2 more sessions — tap for the full schedule" meta="Qudrat Reading 5:30 · Algebra 7:00" tone="raised" onPress={() => openPage('schedule')} />;
+              const readiness = <HeroCard style={{ flex: 1 }} kicker="Readiness" title="Verbal 72% · Quant 58%" subtitle="Your Qudrat readiness" meta="Based on your last 20 sessions" tone="sunken" onPress={() => {}} />;
+              return device === 'mobile' ? (
+                <View style={{ gap: sp[4] }}>{nextUp}{homework}{restOfToday}{readiness}</View>
+              ) : (
+                <View style={{ gap: sp[4] }}>
+                  <View style={{ flexDirection: 'row', gap: sp[4] }}>
+                    <View style={{ flex: 2 }}>{nextUp}</View>
+                    <View style={{ flex: 1 }}>{homework}</View>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: sp[4] }}>
+                    <View style={{ flex: 2 }}>{restOfToday}</View>
+                    <View style={{ flex: 1 }}>{readiness}</View>
+                  </View>
+                </View>
+              );
+            })()}
+            {tab === 3 ? (
+              <Identity initials="SA" name="Sarah Al-Amoudi" role="Grade 11 · Qudrat track" meta="Riyadh, KSA" size="lg" />
+            ) : tab !== 0 && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[4] }}>
+                {['Qudrat Reading', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'].map(t => (
+                  <View key={t} style={{ width: cardW, flexGrow: 1 }}>
+                    <Card title={t} subtitle="Continue where you left off" meta="3 of 8 sessions" onPress={() => {}} />
+                  </View>
+                ))}
+              </View>
+            )}
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>
+              {W}dp · {device} · {layout.cols[device]} col{layout.cols[device] > 1 ? 's' : ''} · gutter {gutter} — resize the window to switch device class
+            </Text>
+          </>
+      </View>
+    </ScrollView>
+  );
+
+  return <>
+    <Button variant="primary" onPress={() => setOpen(true)}>Launch live shell</Button>
+    <Modal visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
+      <View style={{ flex: 1, backgroundColor: theme.bg }}>
+        {device === 'mobile' ? (
+          <View style={{ flex: 1 }}>
+            {content}
+            <BottomNav
+              items={[
+                ...railTabs.map(t => ({ label: t.label, icon: t.icon })),
+                {
+                  label: 'Profile',
+                  // Avatar sized to the icon slot so all tabs line up
+                  icon: (c, s) => (
+                    <View style={{ width: s, height: s, alignItems: 'center', justifyContent: 'center' }}>
+                      <View style={{ transform: [{ scale: s / 24 }] }}>
+                        <Avatar initials="SA" size="xs" />
+                      </View>
+                    </View>
+                  ),
+                },
+              ]}
+              selected={tab}
+              onSelect={goTab}
+            />
+          </View>
+        ) : (
+          <View style={{ flex: 1, flexDirection: 'row' }}>
+            <NavRail
+              items={railTabs}
+              selected={tab}
+              onSelect={goTab}
+              labels={device === 'desktop'}
+              header={<NoonMark size={device === 'desktop' ? 40 : 32} />}
+              footer={
+                <Pressable onPress={() => goTab(3)} accessibilityRole="tab" accessibilityLabel="Profile" accessibilityState={{ selected: tab === 3 }}
+                  style={{ padding: 2, borderRadius: 999, borderWidth: 2, borderColor: tab === 3 ? theme.accent : 'transparent' }}>
+                  <Avatar initials="SA" size="sm" />
+                </Pressable>
+              }
+            />
+            {content}
+          </View>
+        )}
+
+        {/* Pushed page — full takeover over the shell; primary nav hidden, BackButton where nav was */}
+        {page && (
+          <Animated.View style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: theme.bg,
+            transform: [{ translateX: slide.interpolate({ inputRange: [0, 1], outputRange: [isRTL ? -W : W, 0] }) }],
+          }}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ alignItems: 'center', paddingHorizontal: gutter, paddingTop: Math.max(insets.top, sp[5]), paddingBottom: sp[8] }}>
+              <View style={{ width: '100%', maxWidth: layout.containerMax, gap: sp[5] }}>
+                {/* Standard pushed-page header: BackButton · title · page actions */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
+                  <BackButton onPress={closePage} />
+                  <Text style={{ fontFamily: font.serif, fontSize: fs[24], color: theme.fg, flex: 1 }} numberOfLines={1}>
+                    {page === 'schedule'
+                      ? schedDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+                      : 'Notifications'}
+                  </Text>
+                  {page === 'schedule' && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
+                      {!schedIsToday && <Button variant="ghost" size="sm" onPress={() => setSchedDate(new Date())}>Today</Button>}
+                      <IconButton variant="ghost" size="sm" onPress={() => shiftSchedDay(-1)} accessibilityLabel="Previous day">
+                        <Icon name={isRTL ? 'chevron-right' : 'chevron-left'} size={icon.md} color={theme.fgMuted} />
+                      </IconButton>
+                      <IconButton variant="ghost" size="sm" onPress={() => shiftSchedDay(1)} accessibilityLabel="Next day">
+                        <Icon name={isRTL ? 'chevron-left' : 'chevron-right'} size={icon.md} color={theme.fgMuted} />
+                      </IconButton>
+                    </View>
+                  )}
+                </View>
+
+                {page === 'schedule' ? (
+                  <>
+                    {/* Calendar header hidden — the page title is the date */}
+                    <Calendar
+                      hideHeader
+                      selected={schedDate}
+                      onSelect={setSchedDate}
+                      events={{ [schedDate.toISOString().slice(0, 10)]: { count: 3 } }}
+                    />
+                    <View style={{ gap: sp[3] }}>
+                      <SessionCard time="4:00 PM" title="Physics Live" meta="Mr. Omar · Room 2 · 45 min" state="soon" onPress={() => {}} />
+                      <SessionCard time="5:30 PM" title="Qudrat Reading" meta="Ms. Layla · 40 min" onPress={() => {}} />
+                      <SessionCard time="7:00 PM" title="Algebra Review" meta="Mr. Fahad · 45 min" assessment onPress={() => {}} />
+                    </View>
+                  </>
+                ) : (
+                  <View style={{ backgroundColor: theme.bgRaised, borderWidth: 1, borderColor: theme.border, borderRadius: r[3] }}>
+                    {notifications.map((n, i) => (
+                      <View key={n.title} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[4], borderBottomWidth: i < notifications.length - 1 ? 1 : 0, borderBottomColor: theme.divider }}>
+                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: n.unread ? theme.accent : 'transparent' }} />
+                        <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: n.unread ? fw[600] : fw[400], color: n.unread ? theme.fg : theme.fgMuted, flex: 1 }}>{n.title}</Text>
+                        <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgFaint }}>{n.time}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+          </Animated.View>
+        )}
+        <View style={{ position: 'absolute', top: Math.max(insets.top, sp[5]), [I18nManager.isRTL ? 'left' : 'right']: sp[5], backgroundColor: theme.bgOverlay, borderRadius: r[2], borderWidth: 1, borderColor: theme.borderStrong }}>
+          <IconButton variant="default" size="sm" onPress={() => setOpen(false)} accessibilityLabel="Close">
+            <Icon name="close" size={16} color={theme.fg} />
+          </IconButton>
+        </View>
+      </View>
+    </Modal>
+  </>;
+}
+
+export function ScreenLayoutPage() {
+  const { theme } = useTheme();
+  const { width } = useWindowDimensions();
+  const device = width >= bp.desktop ? 'desktop' : width >= bp.tablet ? 'tablet' : 'mobile';
+
+  const frame = { borderWidth: 1, borderColor: theme.borderStrong, borderRadius: r[3], backgroundColor: theme.bgSunken, overflow: 'hidden' as const };
+  const chrome = { backgroundColor: theme.bgRaised, borderColor: theme.border };
+  const colBox = { backgroundColor: theme.accentSoft, borderWidth: 1, borderColor: theme.accentBorder, borderRadius: r[1] };
+  const cap = (t: string) => <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, marginTop: sp[2], textAlign: 'center' }}>{t}</Text>;
+
+  return <>
+    <S title="Screen Layout" desc="This system is the reference for every build. Screens adapt across three device classes — same components, different frame.">
+      <View {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], marginBottom: sp[5] }}>
+        <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: theme.accent }} />
+        <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted }}>This window: {width}dp → <Text style={{ color: theme.accentText, fontWeight: fw[600] }}>{device}</Text></Text>
+      </View>
+      <View style={{ marginBottom: sp[5], alignSelf: 'flex-start' }}>
+        <LayoutLiveDemo />
+      </View>
+      <View {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: sp[6], alignItems: 'flex-end' }}>
+        {/* Mobile — bottom nav, single column */}
+        <View>
+          <View style={[frame, { width: 132, height: 236 }]}>
+            <View style={[chrome, { height: 22, borderBottomWidth: 1, justifyContent: 'center', paddingHorizontal: sp[2] }]}>
+              <View style={{ width: 44, height: 4, borderRadius: 2, backgroundColor: theme.fgFaint }} />
+            </View>
+            <View style={{ flex: 1, padding: sp[2], gap: sp[2] }}>
+              <View style={[colBox, { height: 44 }]} />
+              <View style={[colBox, { height: 44 }]} />
+              <View style={[colBox, { height: 44 }]} />
+            </View>
+            <View style={[chrome, { height: 26, borderTopWidth: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: sp[3] }]}>
+              {[0, 1, 2, 3].map(i => <View key={i} style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: i === 0 ? theme.accent : theme.fgFaint }} />)}
+            </View>
+          </View>
+          {cap('mobile · bottom nav · 1 col')}
+        </View>
+        {/* Tablet — left rail, columns begin */}
+        <View>
+          <View style={[frame, { width: 244, height: 176, flexDirection: 'row' }]}>
+            <View style={[chrome, { width: 30, borderRightWidth: 1, alignItems: 'center', paddingTop: sp[3], gap: sp[3] }]}>
+              {[0, 1, 2, 3].map(i => <View key={i} style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: i === 0 ? theme.accent : theme.fgFaint }} />)}
+            </View>
+            <View style={{ flex: 1, padding: sp[3], gap: sp[2] }}>
+              <View style={{ flexDirection: 'row', gap: sp[2] }}>
+                <View style={[colBox, { flex: 1, height: 52 }]} />
+                <View style={[colBox, { flex: 1, height: 52 }]} />
+              </View>
+              <View style={{ flexDirection: 'row', gap: sp[2] }}>
+                <View style={[colBox, { flex: 1, height: 52 }]} />
+                <View style={[colBox, { flex: 1, height: 52 }]} />
+              </View>
+            </View>
+          </View>
+          {cap('tablet · left rail · 8 cols')}
+        </View>
+        {/* Desktop — left sidebar, centered container */}
+        <View>
+          <View style={[frame, { width: 320, height: 196, flexDirection: 'row' }]}>
+            <View style={[chrome, { width: 64, borderRightWidth: 1, paddingTop: sp[3], paddingHorizontal: sp[2], gap: sp[2] }]}>
+              {[0, 1, 2, 3, 4].map(i => <View key={i} style={{ height: 5, borderRadius: 2, backgroundColor: i === 0 ? theme.accent : theme.fgFaint, opacity: i === 0 ? 1 : 0.6, width: i === 0 ? '100%' : `${85 - i * 12}%` }} />)}
+            </View>
+            <View style={{ flex: 1, alignItems: 'center', paddingVertical: sp[3] }}>
+              <View style={{ width: '78%', flex: 1, gap: sp[2] }}>
+                <View style={{ flexDirection: 'row', gap: sp[2] }}>
+                  <View style={[colBox, { flex: 1, height: 44 }]} />
+                  <View style={[colBox, { flex: 1, height: 44 }]} />
+                  <View style={[colBox, { flex: 1, height: 44 }]} />
+                </View>
+                <View style={{ flexDirection: 'row', gap: sp[2], flex: 1 }}>
+                  <View style={[colBox, { flex: 2 }]} />
+                  <View style={[colBox, { flex: 1 }]} />
+                </View>
+              </View>
+            </View>
+          </View>
+          {cap('desktop · sidebar · max container · 12 cols')}
+        </View>
+      </View>
+    </S>
+
+    <Import>{"import { bp, layout } from '@noon/design-system/tokens';\n\nconst { width } = useWindowDimensions();\nconst device = width >= bp.desktop ? 'desktop'\n  : width >= bp.tablet ? 'tablet' : 'mobile';"}</Import>
+
+    <S title="Breakpoints">
+      {([
+        ['mobile', `< ${bp.tablet}`, 'bottom nav', '1 column', `sp[5] · ${layout.gutter.mobile}px`],
+        ['tablet', `${bp.tablet} – ${bp.desktop - 1}`, 'left rail', '8 columns', `sp[7] · ${layout.gutter.tablet}px`],
+        ['desktop', `≥ ${bp.desktop}`, 'left sidebar', '12 columns', `sp[8] · ${layout.gutter.desktop}px`],
+      ] as const).map(([name, range, nav, cols, gutter]) => (
+        <View key={name} {...{ dataSet: { ltr: '' } }} style={{ flexDirection: 'row', paddingVertical: sp[2], borderBottomWidth: 1, borderBottomColor: theme.divider, gap: sp[2], flexWrap: 'wrap' }}>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: device === name ? theme.accentText : theme.fg, fontWeight: fw[600], minWidth: 72 }}>{name}</Text>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted, minWidth: 88 }}>{range}dp</Text>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgMuted, minWidth: 88 }}>{nav}</Text>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[11], color: theme.fgMuted, minWidth: 88 }}>{cols}</Text>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgSubtle }}>{gutter}</Text>
+        </View>
+      ))}
+    </S>
+
+    <S title="Container" desc={`Content sits in a centered container capped at ${layout.containerMax}dp. Below the cap the container is fluid with edge gutters. Long-form text caps at ${layout.readingMax}dp.`}>
+      <View style={{ backgroundColor: theme.bgSunken, borderWidth: 1, borderColor: theme.border, borderRadius: r[2], paddingVertical: sp[3], alignItems: 'center' }}>
+        <View style={{ width: '72%', gap: sp[1] }}>
+          <View style={[colBox, { height: 28 }]} />
+          <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, textAlign: 'center' }}>container · max {layout.containerMax}</Text>
+        </View>
+      </View>
+    </S>
+
+    <S title="Columns" desc="Columns live inside the container. Components span columns — they never define their own outer widths.">
+      {([
+        ['desktop · 12', 12],
+        ['tablet · 8', 8],
+        ['mobile · 1', 1],
+      ] as const).map(([label, n]) => (
+        <View key={label} style={{ marginBottom: sp[3] }}>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint, marginBottom: sp[1] }}>{label}</Text>
+          <View style={{ flexDirection: 'row', gap: sp[1] }}>
+            {Array.from({ length: n }).map((_, i) => <View key={i} style={[colBox, { flex: 1, height: 24 }]} />)}
+          </View>
+        </View>
+      ))}
+    </S>
+
+    <S title="Navigation Placement">
+      <Rl>Mobile: BottomNav, 3–5 destinations. TitleBar on every screen. No sidebar, ever.</Rl>
+      <Rl>Tablet: left rail (icon-first SideNav, ~72dp). BottomNav disappears — never show both.</Rl>
+      <Rl>Desktop: full left sidebar (SideNav with labels, ~256dp). Content container centers in the remaining width.</Rl>
+      <Rl>Navigation swaps at the breakpoint — it does not animate between placements.</Rl>
+    </S>
+
+    <S title="Safe Areas">
+      <Rl>Every screen respects device insets — use SafeAreaProvider + useSafeAreaInsets, never hardcoded status/home-bar heights.</Rl>
+      <Rl>Fixed top chrome (TitleBar) adds insets.top to its own padding; fixed bottom chrome (BottomNav, BottomAction) adds insets.bottom. Content never does both.</Rl>
+      <Rl>Scrollable content extends under the home indicator; add insets.bottom to contentContainerStyle padding so the last item clears it.</Rl>
+      <Rl>Full-bleed surfaces (Interstitial, fullscreen patterns) paint edge-to-edge behind the insets; their content stays inside them.</Rl>
+      <Rl>Landscape/tablet: horizontal insets (notch side) are added to layout.gutter, not replaced by it.</Rl>
+    </S>
+
+    <S title="Fixed Chrome" desc="How fixed navs, bars, and trays stack — content scrolls between them.">
+      <Rl>Vertical order, top to bottom: TitleBar (fixed) → scrollable content → BottomAction (fixed) → BottomNav (fixed).</Rl>
+      <Rl>Only the content scrolls. TitleBar and bottom chrome are outside the ScrollView, never position: 'absolute' inside it.</Rl>
+      <Rl>BottomAction sits directly above BottomNav when both are present; only one BottomAction per screen.</Rl>
+      <Rl>Scrolled content must clear fixed chrome: pad the scroll container by the chrome height + insets, so nothing hides behind bars.</Rl>
+      <Rl>On tablet/desktop the left rail/sidebar is fixed full-height; TitleBar spans only the content area, not the rail.</Rl>
+      <Rl>Toasts stack above all chrome, anchored to the top on desktop and above bottom chrome on mobile.</Rl>
+      <Rl>Sheets and dialogs overlay everything including fixed chrome; they manage their own safe-area padding.</Rl>
+    </S>
+
+    <S title="Column Rules">
+      <Rl>Mobile is always a single column. Cards stack full-width; no side-by-side content.</Rl>
+      <Rl>Card grids: 1 col mobile, 2 cols tablet, 3 cols desktop (CardGrid handles this).</Rl>
+      <Rl>Detail layouts on desktop: content spans 8 cols, supporting rail spans 4.</Rl>
+      <Rl>Gutters come from layout.gutter — sp[5] / sp[7] / sp[8]. Column gap is layout.colGap (sp[4]).</Rl>
+      <Rl>Never introduce horizontal scroll. If it doesn't fit the columns, stack it.</Rl>
+      <Rl>Prototypes must be built against all three classes — check every screen at 390, 834, and 1280.</Rl>
     </S>
   </>;
 }
@@ -1559,38 +1937,52 @@ export function FilterBarPage() {
 
 export function CardsPage() {
   const { theme } = useTheme();
-  const [hasSubtitle, setHasSubtitle] = useState(true);
+  const [title, setTitle] = useState('Qudrat Reading');
+  const [subtitle, setSubtitle] = useState('Mr. Hassan · Comprehension');
+  const [meta, setMeta] = useState('4 of 8 sessions');
   const [hasActions, setHasActions] = useState(true);
-  const [hasMeta, setHasMeta] = useState(true);
   const [pressable, setPressable] = useState(true);
   const [selectable, setSelectable] = useState(false);
   const [selected, setSelected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasThumbnail, setHasThumbnail] = useState(false);
+  const [ratio, setRatio] = useState('16:9');
+  const [spotlight, setSpotlight] = useState('none');
+  const [spotPattern, setSpotPattern] = useState(false);
+  const [sizing, setSizing] = useState('auto');
   const demoActions = [{ label: 'Edit', onPress: () => {} }, { label: 'Remove', danger: true, onPress: () => {} }];
   return <>
     <Playground
       knobs={<>
-        <KnobToggle label="Subtitle" value={hasSubtitle} onChange={setHasSubtitle} />
+        <KnobText label="Title" value={title} onChange={setTitle} />
+        <KnobText label="Subtitle" value={subtitle} onChange={setSubtitle} />
+        <KnobText label="Meta" value={meta} onChange={setMeta} />
         <KnobToggle label="Actions menu" value={hasActions} onChange={setHasActions} />
-        <KnobToggle label="Meta" value={hasMeta} onChange={setHasMeta} />
         <KnobToggle label="Pressable" value={pressable} onChange={setPressable} />
         <KnobToggle label="Selectable" value={selectable} onChange={setSelectable} />
         {selectable && <KnobToggle label="Selected" value={selected} onChange={setSelected} />}
         <KnobToggle label="Loading" value={loading} onChange={setLoading} />
         <KnobToggle label="thumbnail" value={hasThumbnail} onChange={setHasThumbnail} />
+        {hasThumbnail && <KnobSelect label="Ratio" value={ratio} options={['16:9','1:1']} onChange={setRatio} />}
+        <KnobSelect label="Spotlight" value={spotlight} options={['none','terra','teal']} onChange={setSpotlight} />
+        {spotlight !== 'none' && <KnobToggle label="Pattern" value={spotPattern} onChange={setSpotPattern} />}
+        <KnobSelect label="Sizing" value={sizing} options={['auto','fill','hug']} onChange={setSizing} />
       </>}
     >
       <View style={{ width: '100%' }}>
         <Card
-          title="Qudrat Reading"
-          subtitle={hasSubtitle ? 'Mr. Hassan · Comprehension' : undefined}
+          title={title}
+          subtitle={subtitle || undefined}
           actions={hasActions ? demoActions : undefined}
-          meta={hasMeta ? '4 of 8 sessions' : undefined}
+          meta={meta || undefined}
           thumbnail={hasThumbnail ? require('../../reference/Tester.png') : undefined}
+          thumbnailRatio={ratio as any}
           selectable={selectable}
           selected={selected}
           loading={loading}
+          spotlight={spotlight === 'none' ? undefined : spotlight as any}
+          pattern={spotPattern}
+          sizing={sizing as any}
           onPress={pressable || selectable ? () => {} : undefined}
         />
       </View>
@@ -1603,9 +1995,13 @@ export function CardsPage() {
       <Prop name="actions" type="{ label: string; danger?: boolean; onPress }[]" desc="Ellipsis menu items" />
       <Prop name="meta" type="string" desc="Tertiary info — count, progress" />
       <Prop name="thumbnail" type="ImageSource" desc="Full-width image above content" />
+      <Prop name="thumbnailRatio" type="'16:9' | '1:1'" def="'16:9'" desc="Thumbnail crop — only these two" />
       <Prop name="selectable" type="boolean" desc="Shows checkbox, accent border when selected" />
       <Prop name="selected" type="boolean" desc="Checked state (requires selectable)" />
       <Prop name="loading" type="boolean" desc="0.6 opacity, disabled" />
+      <Prop name="spotlight" type="'terra' | 'teal'" desc="Solid emphasis fill — terracotta or teal surface with adapted text" />
+      <Prop name="pattern" type="boolean" desc="Spotlight only — subtle diamond trellis, gradient-faded away from the text" />
+      <Prop name="sizing" type="'auto' | 'fill' | 'hug'" def="'auto'" desc="auto = full parent width, fill = share row space (flex 1), hug = shrink to content" />
       <Prop name="onPress" type="() => void" desc="Makes card pressable" />
     </Props>
 
@@ -1624,6 +2020,13 @@ export function CardsPage() {
       </View>
     </S>
 
+    <S title="Spotlight">
+      <View style={{ gap: sp[3] }}>
+        <Card title="Next up — Physics Live" subtitle="Mr. Omar · Starts 4:00 PM" meta="Room 2 · 45 min" spotlight="terra" pattern onPress={() => {}} />
+        <Card title="Homework — Algebra Set 3" subtitle="Due tomorrow · 12 questions" spotlight="teal" pattern onPress={() => {}} />
+      </View>
+    </S>
+
     <S title="Card grid">
       <CardGrid>
         <Card title="Qudrat Reading" subtitle="Mr. Hassan" onPress={() => {}} />
@@ -1639,6 +2042,59 @@ export function CardsPage() {
       <Rl>actions renders an ellipsis icon that opens a Menu with the given items.</Rl>
       <Rl>selectable adds a checkbox and accent border when selected.</Rl>
       <Rl>Wrap in CardGrid for responsive 2-column layout.</Rl>
+      <Rl>Spotlight cards are for the screen's key emphasis — e.g. next-up class (terra), homework due (teal). One or two per screen max.</Rl>
+      <Rl>Don't combine spotlight with selectable — spotlight surfaces are calls to action, not list items.</Rl>
+      <Rl>pattern adds a diamond trellis on the trailing side, faded to nothing under the text. Spotlight cards only.</Rl>
+    </S>
+  </>;
+}
+
+export function HeroCardPage() {
+  const [tone, setTone] = useState('terra');
+  const [kicker, setKicker] = useState('Next up');
+  const [title, setTitle] = useState('Physics Live');
+  const [subtitle, setSubtitle] = useState('Mr. Omar · Starts 4:00 PM');
+  const [meta, setMeta] = useState('Room 2 · 45 min');
+  const [sizing, setSizing] = useState('auto');
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Tone" value={tone} options={['terra','teal','raised','sunken']} onChange={setTone} />
+      <KnobText label="Kicker" value={kicker} onChange={setKicker} />
+      <KnobText label="Title" value={title} onChange={setTitle} />
+      <KnobText label="Subtitle" value={subtitle} onChange={setSubtitle} />
+      <KnobText label="Meta" value={meta} onChange={setMeta} />
+      <KnobSelect label="Sizing" value={sizing} options={['auto','fill','hug']} onChange={setSizing} />
+    </>}>
+      <View style={{ width: '100%' }}>
+        <HeroCard
+          tone={tone as any}
+          kicker={kicker || undefined}
+          title={title}
+          subtitle={subtitle || undefined}
+          meta={meta || undefined}
+          sizing={sizing as any}
+          onPress={() => {}}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { HeroCard } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="title" type="string" desc="Serif headline." />
+      <Prop name="kicker" type="string" desc="Mono uppercase overline — names the block (Next up, Homework)." />
+      <Prop name="subtitle" type="string" />
+      <Prop name="meta" type="string" desc="Mono footer line, pinned to the bottom." />
+      <Prop name="tone" type="'terra' | 'teal' | 'raised' | 'sunken'" desc="Default raised. terra/teal are the spotlight surfaces; sunken for quiet stats." />
+      <Prop name="sizing" type="'auto' | 'fill' | 'hug'" def="'auto'" desc="auto = full parent width, fill = share row space (flex 1), hug = shrink to content" />
+      <Prop name="onPress" type="() => void" />
+      <Prop name="style" type="ViewStyle" />
+    </Props>
+    <S title="Layout">
+      <Rl>Landing pages compose these as a block grid — e.g. 2/3 + 1/3 rows on tablet/desktop, stacked on mobile.</Rl>
+    </S>
+    <S title="Rules">
+      <Rl>Landing/dashboard emphasis only — lists and grids keep using Card.</Rl>
+      <Rl>One terra hero per screen; it marks the single most important action.</Rl>
+      <Rl>Tone order of loudness: terra → teal → raised → sunken.</Rl>
     </S>
   </>;
 }
@@ -1971,7 +2427,7 @@ export function TitleBarPage() {
       <KnobToggle label="Right action" value={showRight} onChange={setShowRight} />
     </>}>
       <View style={{ width: '100%' }}>
-        <TitleBar title={tbTitle} onBack={showBack ? () => {} : undefined} rightAction={showRight ? <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent }}>Today</Text> : undefined} />
+        <TitleBar title={tbTitle} onBack={showBack ? () => {} : undefined} rightAction={showRight ? <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accentText }}>Today</Text> : undefined} />
       </View>
     </Playground>
     <Import>{"import { TitleBar } from '@noon/design-system';"}</Import>
@@ -1985,7 +2441,7 @@ export function TitleBarPage() {
     <S title="Variants">
       <C label="Default"><TitleBar title="Atlas" /></C>
       <C label="With back"><TitleBar title="Session" onBack={() => {}} /></C>
-      <C label="With right"><TitleBar title="Schedule" rightAction={<Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent }}>Today</Text>} /></C>
+      <C label="With right"><TitleBar title="Schedule" rightAction={<Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accentText }}>Today</Text>} /></C>
       <C label="Back + right"><TitleBar title="Quiz" onBack={() => {}} rightAction={<Text style={{ fontFamily: font.mono, fontSize: fs[11], color: theme.fgMuted }}>3/10</Text>} /></C>
     </S>
   </>;
@@ -2054,6 +2510,229 @@ export function BottomNavPage() {
       <Rl>Active: accent icon + label. Inactive: fgSubtle.</Rl>
       <Rl>Badge renders as a small number above the icon.</Rl>
       <Rl>On tablet/desktop, replace with SideNav.</Rl>
+    </S>
+  </>;
+}
+
+export function NavRailPage() {
+  const { theme } = useTheme();
+  const [sel, setSel] = useState(0);
+  const [labels, setLabels] = useState(true);
+  const items = [
+    { label: 'Today', icon: 'document' as const },
+    { label: 'Mastery', icon: 'check' as const },
+    { label: 'Journey', icon: 'search' as const },
+  ];
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="Labels" value={labels} onChange={setLabels} />
+    </>}>
+      <View style={{ height: 360 }}>
+        <NavRail
+          items={items}
+          selected={sel}
+          onSelect={setSel}
+          labels={labels}
+          header={<NoonMark size={labels ? 40 : 32} />}
+          footer={<Avatar initials="SA" size="sm" />}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { NavRail, NoonMark } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="items" type="{ label: string; icon: IconName | (color, size) => ReactNode }[]" />
+      <Prop name="selected" type="number" desc="Pass -1 to deselect all (e.g. on a notifications page)." />
+      <Prop name="onSelect" type="(index: number) => void" />
+      <Prop name="labels" type="boolean" desc="Default true. false collapses to icon-only for the tablet rail." />
+      <Prop name="header" type="ReactNode" desc="Top slot — the NoonMark brand mark." />
+      <Prop name="footer" type="ReactNode" desc="Pinned bottom slot — the Avatar as the entrance to Profile." />
+    </Props>
+    <S title="By breakpoint">
+      <View style={{ flexDirection: 'row', gap: sp[6], flexWrap: 'wrap' }}>
+        <View style={{ alignItems: 'center', gap: sp[2] }}>
+          <View style={{ height: 300 }}>
+            <NavRail items={items} selected={sel} onSelect={setSel} labels header={<NoonMark size={40} />} footer={<Avatar initials="SA" size="sm" />} />
+          </View>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>desktop ≥1024</Text>
+        </View>
+        <View style={{ alignItems: 'center', gap: sp[2] }}>
+          <View style={{ height: 300 }}>
+            <NavRail items={items} selected={sel} onSelect={setSel} labels={false} header={<NoonMark size={32} />} footer={<Avatar initials="SA" size="sm" />} />
+          </View>
+          <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.fgFaint }}>tablet 768–1023</Text>
+        </View>
+      </View>
+    </S>
+    <S title="Rules">
+      <Rl>Tablet and desktop shells only. On mobile, use BottomNav.</Rl>
+      <Rl>Items are icon with the page title below, like a button — no side labels.</Rl>
+      <Rl>Header holds the NoonMark; footer pins the Avatar (Profile entrance).</Rl>
+      <Rl>{'Desktop shows labels; tablet collapses to icon-only (labels={false}).'}</Rl>
+      <Rl>See Screen Layout for the full shell across breakpoints — bottom nav on mobile, rail on tablet, labelled rail on desktop.</Rl>
+    </S>
+  </>;
+}
+
+export function NotificationBellPage() {
+  const [count, setCount] = useState('3');
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Count" value={count} options={['0', '3', '12']} onChange={setCount} />
+    </>}>
+      <NotificationBell count={parseInt(count)} onPress={() => {}} />
+    </Playground>
+    <Import>{"import { NotificationBell } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="count" type="number" desc="Unread count. 0 renders just the bell; caps at 9+." />
+      <Prop name="onPress" type="() => void" desc="Opens the notifications page." />
+    </Props>
+    <S title="Rules">
+      <Rl>Sits right-aligned on the page title row of the shell.</Rl>
+      <Rl>Badge is danger red with mono count — it means unread, nothing else.</Rl>
+      <Rl>Opening notifications clears the count.</Rl>
+      <Rl>One bell per shell. Never in cards or content.</Rl>
+    </S>
+  </>;
+}
+
+export function BackButtonPage() {
+  const { theme } = useTheme();
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2] }}>
+        <BackButton onPress={() => {}} />
+        <Text style={{ fontFamily: font.serif, fontSize: fs[24], color: theme.fg }}>Page title</Text>
+      </View>
+    </Playground>
+    <Import>{"import { BackButton } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="onPress" type="() => void" desc="Pops the pushed page." />
+    </Props>
+    <S title="Rules">
+      <Rl>Pushed pages hide primary nav — BackButton sits where the nav was, at the start of the title row.</Rl>
+      <Rl>One BackButton per pushed page, always first in the header row. RTL flips the chevron.</Rl>
+      <Rl>Chevron, never arrow — matches Calendar and TitleBar.</Rl>
+      <Rl>Never use it inside sheets or dialogs — those close, they don't go back.</Rl>
+    </S>
+  </>;
+}
+
+export function TimerPage() {
+  const [size, setSize] = useState('md');
+  const [variant, setVariant] = useState('pill');
+  const [running, setRunning] = useState(true);
+  const [seconds, setSeconds] = useState('90');
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Seconds" value={seconds} options={['12', '90', '600']} onChange={setSeconds} />
+      <KnobSelect label="Size" value={size} options={['sm', 'md', 'lg']} onChange={setSize} />
+      <KnobSelect label="Variant" value={variant} options={['plain', 'pill']} onChange={setVariant} />
+      <KnobToggle label="Running" value={running} onChange={setRunning} />
+    </>}>
+      <Timer key={seconds} seconds={parseInt(seconds)} running={running} size={size as any} variant={variant as any} />
+    </Playground>
+    <Import>{"import { Timer } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="seconds" type="number" desc="Starting value. Changing it resets the countdown." />
+      <Prop name="running" type="boolean" desc="Ticks while true. Default true." />
+      <Prop name="warnAt" type="number" desc="Goes terra at this many seconds left. Default 10." />
+      <Prop name="onComplete" type="() => void" desc="Fires once at zero." />
+      <Prop name="size" type="'sm' | 'md' | 'lg'" desc="Digit size. Default md." />
+      <Prop name="variant" type="'plain' | 'pill'" desc="Bare digits or soft capsule. Default plain." />
+    </Props>
+    <S title="Rules">
+      <Rl>One timer per screen — the countdown that matters right now.</Rl>
+      <Rl>Warn state is terra (heat), never danger red — time pressure is not an error.</Rl>
+      <Rl>Mono tabular digits so the layout never jitters.</Rl>
+      <Rl>Quiz and live-poll timers sit in the header row, next to SessionBar.</Rl>
+    </S>
+  </>;
+}
+
+export function AvatarGroupPage() {
+  const [size, setSize] = useState('sm');
+  const [crowd, setCrowd] = useState(true);
+  const people = [
+    { initials: 'SA' }, { initials: 'MO' }, { initials: 'LK' },
+    { initials: 'FA' }, { initials: 'NR' }, { initials: 'JH' },
+  ];
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Size" value={size} options={['xs', 'sm', 'md']} onChange={setSize} />
+      <KnobToggle label="Crowd (total=128)" value={crowd} onChange={setCrowd} />
+    </>}>
+      <AvatarGroup items={people} size={size as any} total={crowd ? 128 : undefined} />
+    </Playground>
+    <Import>{"import { AvatarGroup } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="items" type="{ initials, imageUri? }[]" desc="Faces, in display order." />
+      <Prop name="max" type="number" desc="Faces before collapsing to +N. Default 4." />
+      <Prop name="size" type="'xs' | 'sm' | 'md'" desc="Default sm." />
+      <Prop name="total" type="number" desc="True headcount when items is a sample — drives the +N." />
+    </Props>
+    <S title="Rules">
+      <Rl>Presence, not identity — for one known person use Avatar or Identity.</Rl>
+      <Rl>Max 4 faces then +N. Never a long strip of faces.</Rl>
+      <Rl>The ring colour matches the surface behind it, so faces read as separate.</Rl>
+      <Rl>RTL mirrors the stack automatically — no extra work.</Rl>
+    </S>
+  </>;
+}
+
+export function StatCardPage() {
+  const { theme } = useTheme();
+  const [label, setLabel] = useState('Quant readiness');
+  const [value, setValue] = useState('58');
+  const [unit, setUnit] = useState('%');
+  const [delta, setDelta] = useState('4% this week');
+  const [dir, setDir] = useState('up');
+  const [meta, setMeta] = useState('Last 20 sessions');
+  const [sizing, setSizing] = useState('auto');
+  return <>
+    <Playground knobs={<>
+      <KnobText label="Label" value={label} onChange={setLabel} />
+      <KnobText label="Value" value={value} onChange={setValue} />
+      <KnobText label="Unit" value={unit} onChange={setUnit} />
+      <KnobText label="Delta" value={delta} onChange={setDelta} />
+      <KnobSelect label="Direction" value={dir} options={['up', 'down', 'flat']} onChange={setDir} />
+      <KnobText label="Meta" value={meta} onChange={setMeta} />
+      <KnobSelect label="Sizing" value={sizing} options={['auto', 'fill', 'hug']} onChange={setSizing} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 360, flexDirection: sizing === 'fill' ? 'row' : 'column' }}>
+        <StatCard
+          label={label}
+          value={value}
+          unit={unit || undefined}
+          delta={delta || undefined}
+          deltaDirection={dir as any}
+          meta={meta || undefined}
+          sizing={sizing as any}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { StatCard } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="label" type="string" desc="Mono uppercase label." />
+      <Prop name="value" type="string" desc="The number — serif, big." />
+      <Prop name="unit" type="string" desc="Small unit after the value ('%', 'min')." />
+      <Prop name="delta" type="string" desc="Change text, e.g. '4% this week'." />
+      <Prop name="deltaDirection" type="'up' | 'down' | 'flat'" desc="up = accent, down = terra, flat = muted." />
+      <Prop name="meta" type="string" desc="Faint caption at the bottom." />
+      <Prop name="sizing" type="'auto' | 'fill' | 'hug'" def="'auto'" desc="auto = full parent width, fill = share row space (flex 1), hug = shrink to content" />
+      <Prop name="onPress" type="() => void" desc="Makes the tile pressable." />
+    </Props>
+    <S title="Row of three">
+      <View style={{ flexDirection: 'row', gap: sp[3], flexWrap: 'wrap' }}>
+        <StatCard sizing="fill" style={{ minWidth: 140 }} label="Verbal" value="72" unit="%" delta="3% this week" deltaDirection="up" />
+        <StatCard sizing="fill" style={{ minWidth: 140 }} label="Quant" value="58" unit="%" delta="2% this week" deltaDirection="down" />
+        <StatCard sizing="fill" style={{ minWidth: 140 }} label="Streak" value="14" unit="days" deltaDirection="flat" />
+      </View>
+    </S>
+    <S title="Rules">
+      <Rl>One number per card. Composite stats get one card each.</Rl>
+      <Rl>Dense dashboard tile — for big landing moments use HeroCard.</Rl>
+      <Rl>Delta colours: up accent, down terra. Terra is heat, not failure.</Rl>
+      <Rl>Rows of 2–3 on mobile; never more than 4 across on desktop.</Rl>
     </S>
   </>;
 }
@@ -2528,62 +3207,6 @@ export function WaypointsPage() {
   </>;
 }
 
-export function WaterVesselPage() {
-  const [fill, setFill] = useState('14');
-  const [size, setSize] = useState('lg');
-  const fillNum = Math.max(0, Math.min(18, parseInt(fill) || 0));
-  return <>
-    <Playground
-      knobs={<>
-        <KnobSelect label="Fill" value={fill} options={['0','3','6','9','12','14','16','18']} onChange={setFill} />
-        <KnobSelect label="Size" value={size} options={['sm', 'md', 'lg']} onChange={setSize} />
-      </>}
-    >
-      <WaterVessel fill={fillNum} size={size as any} />
-    </Playground>
-
-    <Import>{"import { WaterVessel } from '@noon/design-system';"}</Import>
-    <Props>
-      <Prop name="fill" type="number" desc="Jugs filled" />
-      <Prop name="capacity" type="number" def="18" />
-      <Prop name="minimum" type="number" def="12" />
-      <Prop name="size" type="'sm' | 'md' | 'lg'" def="'lg'" />
-    </Props>
-    <S title="States" desc="The vessel fills as students complete passages and help teammates.">
-      <C label="Empty"><WaterVessel fill={0} size="md" /></C>
-      <C label="Below minimum (red)"><WaterVessel fill={6} size="md" /></C>
-      <C label="Above minimum (blue)"><WaterVessel fill={14} size="md" /></C>
-      <C label="Full / overflow"><WaterVessel fill={18} size="md" /></C>
-    </S>
-    <S title="Sizes" desc="sm for crew lists, md for cards, lg for profile/hero."><R>
-      <WaterVessel fill={14} size="sm" />
-      <WaterVessel fill={14} size="md" />
-      <WaterVessel fill={14} size="lg" />
-    </R></S>
-    <S title="What Fills It">
-      <Rl>Completing passages (proof of work)</Rl>
-      <Rl>Helping teammates (proof of helping)</Rl>
-      <Rl>Overflow excess goes to crew pool</Rl>
-    </S>
-    <S title="Water Color">
-      <Rl>Blue (#6BA3FF) when above minimum threshold</Rl>
-      <Rl>Red (#c55a4e) when below minimum</Rl>
-      <Rl>Color transitions instantly when fill crosses the minimum</Rl>
-    </S>
-    <S title="Animation">
-      <Rl>Fill rise: water level climbs with 320ms ease. Surface line appears at the new level.</Rl>
-      <Rl>Overflow: drip circles appear outside the vessel.</Rl>
-      <Rl>Contribution: brief pulse of brightness at the water surface, then settle.</Rl>
-    </S>
-    <S title="Rules">
-      <Rl>One continuous outline path. Cap, neck, and body. No inner detail.</Rl>
-      <Rl>Same shape at every size.</Rl>
-      <Rl>Show as fraction (14/18) not percentage.</Rl>
-      <Rl>No sparkles or trophies. The fill is the reward.</Rl>
-    </S>
-  </>;
-}
-
 export function ContoursPage() {
   const [variant, setVariant] = useState('standard');
   const [opStr, setOpStr] = useState('100');
@@ -2656,6 +3279,126 @@ export function DunePatternPage() {
       <Rl>Always behind content. Reduce opacity or ridges if text sits on top.</Rl>
       <Rl>Gold edges = sunlit. Terracotta fills = shadow. Light comes from the upper right.</Rl>
       <Rl>Clip to container. Partial reveals at the bottom of screens work best.</Rl>
+    </S>
+  </>;
+}
+
+export function FacetPage() {
+  const [voice, setVoice] = useState('dunes');
+  const [scale, setScale] = useState('md');
+  const [animated, setAnimated] = useState(true);
+  return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <KnobSelect label="Voice" value={voice} options={['dunes', 'plaster']} onChange={setVoice} />
+          <KnobSelect label="Scale" value={scale} options={['sm', 'md', 'lg']} onChange={setScale} />
+          <KnobToggle label="Animated" value={animated} onChange={setAnimated} />
+        </>}
+      >{(w, h) => <Facet width={w} height={h} voice={voice as any} scale={scale as any} animated={animated} />}</DynamicFullscreen>
+    </Playground>
+    <Import>{"import { Facet } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="voice" type="'dunes' | 'plaster'" def="'dunes'" desc="Dunes = terracotta depth. Plaster = quiet cream relief." />
+      <Prop name="scale" type="'sm' | 'md' | 'lg'" def="'md'" desc="Cell size 26 / 44 / 72." />
+      <Prop name="seed" type="number" def="7" desc="Deterministic mesh — same seed, same wall." />
+      <Prop name="animated" type="boolean" def="true" desc="Slow lighting drift. Honours reduce-motion." />
+      <Prop name="style" type="ViewStyle" />
+    </Props>
+    <S title="What it is">
+      <Rl>A faceted wall — a noise-jittered triangular mesh, each facet cut from a four-step ramp. Terracotta reads as carved clay; plaster reads as quiet relief.</Rl>
+      <Rl>Mode-agnostic — the two voices are the material itself and render identically in void and paper. There is no dark variant.</Rl>
+      <Rl>The most assertive surface in the system. It announces a place, it does not decorate one.</Rl>
+    </S>
+    <S title="Rules">
+      <Rl>Arrival moments and heroes only — the top of a journey, a chapter opening, a welcome.</Rl>
+      <Rl>Max one Facet surface per screen.</Rl>
+      <Rl>Never mix pattern languages on one surface — no Khatam, Pinboard, or Dunes layered over it.</Rl>
+      <Rl>Never set text directly on the pattern. Put a plain panel or band above it.</Rl>
+    </S>
+  </>;
+}
+
+export function KhatamPage() {
+  const { theme } = useTheme();
+  const [scale, setScale] = useState('md');
+  return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <KnobSelect label="Scale" value={scale} options={['sm', 'md', 'lg']} onChange={setScale} />
+        </>}
+      >{(w, h) => (
+        <View style={{ width: w, height: h, backgroundColor: theme.bg }}>
+          <Khatam width={w} height={h} scale={scale as any} />
+        </View>
+      )}</DynamicFullscreen>
+    </Playground>
+    <Import>{"import { Khatam } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="scale" type="'sm' | 'md' | 'lg'" def="'md'" desc="Tile 48 / 88 / 132, stroke 0.8 / 1.0 / 1.2." />
+      <Prop name="style" type="ViewStyle" />
+    </Props>
+    <S title="What it is">
+      <Rl>The eight-point star lattice — a square rotated over a diamond, tiled. Khatam is the geometry of completion in Islamic ornament.</Rl>
+      <Rl>Stroke only: ink .22 in light, cream .18 in dark. There is no fill prop, by design.</Rl>
+    </S>
+    <S title="Rules">
+      <Rl>Earned moments only — certificates, milestones, finals. It must feel rare.</Rl>
+      <Rl>Line only, never filled. If you want fills, you want Facet.</Rl>
+      <Rl>Never everyday wallpaper. If it appears on every screen it means nothing.</Rl>
+      <Rl>Never mix pattern languages on one surface, and never set text directly on the pattern.</Rl>
+    </S>
+  </>;
+}
+
+export function PinboardPage() {
+  const { theme } = useTheme();
+  const [scale, setScale] = useState('md');
+  const [animated, setAnimated] = useState(true);
+  const [showActive, setShowActive] = useState(true);
+  return <>
+    <Playground knobs={<></>}>
+      <DynamicFullscreen
+        controls={<>
+          <KnobSelect label="Scale" value={scale} options={['xs', 'sm', 'md', 'lg']} onChange={setScale} />
+          <KnobToggle label="Animated" value={animated} onChange={setAnimated} />
+          <KnobToggle label="Show active" value={showActive} onChange={setShowActive} />
+        </>}
+      >{(w, h) => (
+        <View style={{ width: w, height: h, backgroundColor: theme.bg }}>
+          <Pinboard
+            width={w} height={h}
+            scale={scale as any}
+            animated={animated}
+            active={showActive ? [[6, 4], [13, 9], [21, 6], [30, 12]] : []}
+          />
+        </View>
+      )}</DynamicFullscreen>
+    </Playground>
+    <Import>{"import { Pinboard } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="width" type="number" />
+      <Prop name="height" type="number" />
+      <Prop name="scale" type="'xs' | 'sm' | 'md' | 'lg'" def="'md'" desc="Dot radius / gap: 1.1/9, 1.9/15, 2.2/17, 3.2/26." />
+      <Prop name="active" type="Array<[col, row]>" def="[]" desc="Grid coordinates lit green — presence, not decoration." />
+      <Prop name="seed" type="number" def="3" desc="Picks which dots blink and their rhythm." />
+      <Prop name="animated" type="boolean" def="true" desc="Green pins light up over the grid, hold, then vanish and light elsewhere — presence moving around the map. Honours reduce-motion." />
+      <Prop name="style" type="ViewStyle" />
+    </Props>
+    <S title="What it is">
+      <Rl>A pinboard dot grid — terracotta pins in light, cream in dark. A map waiting for markers.</Rl>
+      <Rl>Active pins are green (#6BAE93) and mean something is there, now.</Rl>
+    </S>
+    <S title="Rules">
+      <Rl>Maps and presence only — locations, live sessions, cohort activity.</Rl>
+      <Rl>Dots are binary — full strength or absent, never faded. There is no fade prop.</Rl>
+      <Rl>Active means active. Never light a pin green for decoration.</Rl>
+      <Rl>Never mix pattern languages on one surface, and never set text directly on the pattern.</Rl>
     </S>
   </>;
 }
@@ -3049,38 +3792,6 @@ export function PaginationPage() {
   </>;
 }
 
-export function SideNavPage() {
-  const { theme } = useTheme();
-  const [active, setActive] = useState('atlas');
-  const groups = [
-    { title: 'Main', items: [{ id: 'atlas', label: 'Atlas' }, { id: 'schedule', label: 'Schedule' }, { id: 'crew', label: 'Crew' }] },
-    { title: 'Learn', items: [{ id: 'homework', label: 'Homework' }, { id: 'sessions', label: 'Sessions' }] },
-    { title: 'Account', items: [{ id: 'settings', label: 'Settings' }, { id: 'profile', label: 'Profile' }] },
-  ];
-  return <>
-    <S title="Side Nav" desc="Desktop/tablet only. Replaces BottomNav on wider screens.">
-      <View style={{ width: 220, borderWidth: 1, borderColor: theme.border, borderRadius: r[2], overflow: 'hidden', backgroundColor: theme.bgSunken }}>
-        {groups.map(g => (
-          <View key={g.title} style={{ paddingHorizontal: sp[3], paddingVertical: sp[3] }}>
-            <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1.5, textTransform: 'uppercase', paddingHorizontal: sp[3], marginBottom: sp[2] }}>{g.title}</Text>
-            {g.items.map(item => (
-              <Pressable key={item.id} onPress={() => setActive(item.id)} style={{ paddingVertical: sp[2], paddingHorizontal: sp[3], borderRadius: r[1], backgroundColor: active === item.id ? theme.activeOverlay : 'transparent', marginBottom: 1 }}>
-                <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: active === item.id ? theme.fg : theme.fgMuted }}>{item.label}</Text>
-              </Pressable>
-            ))}
-          </View>
-        ))}
-      </View>
-    </S>
-    <S title="Specs">
-      <Rl>Width: 220-280px. Grouped items with uppercase mono headers.</Rl>
-      <Rl>Active item: activeOverlay bg, fg text. Inactive: fgMuted.</Rl>
-      <Rl>Item padding: sp[2] vertical, sp[3] horizontal, r[1] radius.</Rl>
-      <Rl>Desktop/tablet only. On mobile, use BottomNav.</Rl>
-    </S>
-  </>;
-}
-
 export function ModalPage() {
   const [vis, setVis] = useState(false);
   return <>
@@ -3139,75 +3850,46 @@ export function FormStackPage() {
 }
 
 export function DropzonePage() {
-  const { theme } = useTheme();
-  const [state, setState] = useState('default');
-  const [acceptText, setAcceptText] = useState('PDF, PNG, JPG');
-
-  const isDisabled = state === 'disabled';
-  const isDragging = state === 'hovering';
-  const hasFile = state === 'uploaded';
-  const isError = state === 'error';
-
-  const borderColor = isDragging ? theme.accent : isError ? theme.danger : hasFile ? theme.accentBorder : theme.borderStrong;
-  const bgColor = isDragging ? theme.accentSoft : hasFile ? theme.accentSoft : 'transparent';
-
+  const [state, setState] = useState('idle');
+  const [hint, setHint] = useState('PDF or photo, up to 10 MB');
   return <>
     <Playground knobs={<>
-      <KnobSelect label="State" value={state} options={['default', 'hovering', 'uploaded', 'error', 'disabled']} onChange={setState} />
-      <KnobText label="Accept" value={acceptText} onChange={setAcceptText} />
+      <KnobSelect label="State" value={state} options={['idle', 'uploading', 'uploaded', 'error']} onChange={setState} />
+      <KnobText label="Hint" value={hint} onChange={setHint} />
     </>}>
-      <View style={{ width: '100%' }}>
-        {hasFile ? (
-          <View style={{
-            borderWidth: 1, borderRadius: r[2], borderColor, backgroundColor: bgColor,
-            paddingVertical: sp[4], paddingHorizontal: sp[4],
-            flexDirection: 'row', alignItems: 'center', gap: sp[3],
-          }}>
-            <View style={{ width: 40, height: 40, borderRadius: r[2], backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="document" size={20} color={theme.accentFg} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[500], color: theme.fg }}>homework_week4.pdf</Text>
-              <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, marginTop: 2 }}>2.4 MB · PDF</Text>
-            </View>
-            <Pressable onPress={() => setState('default')} hitSlop={8}>
-              <Icon name="close" size={16} color={theme.fgMuted} />
-            </Pressable>
-          </View>
-        ) : (
-          <View style={{
-            borderWidth: 2, borderStyle: 'dashed', borderRadius: r[2],
-            borderColor: isError ? theme.danger : borderColor,
-            backgroundColor: isDragging ? bgColor : 'transparent',
-            paddingVertical: sp[7], paddingHorizontal: sp[5], alignItems: 'center', gap: sp[2],
-            opacity: isDisabled ? 0.4 : 1,
-          }}>
-            <Icon name={isError ? 'error' : 'plus'} size={28} color={isDragging ? theme.accent : isError ? theme.danger : theme.fgFaint} />
-            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: isError ? theme.danger : isDragging ? theme.accent : theme.fgMuted, textAlign: 'center' }}>
-              {isError ? 'Upload failed' : isDragging ? 'Drop to upload' : 'Tap or drag to upload'}
-            </Text>
-            {!isError && !isDragging && (
-              <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.fgFaint, letterSpacing: 1, textTransform: 'uppercase' }}>{acceptText}</Text>
-            )}
-          </View>
-        )}
+      <View style={{ width: '100%', maxWidth: 420 }}>
+        <UploadTile
+          state={state as any}
+          label="Add your homework"
+          hint={hint || undefined}
+          fileName="homework_week4.pdf"
+          fileMeta="2.4 MB · PDF"
+          progress={62}
+          onPress={() => setState('uploading')}
+          onRemove={() => setState('idle')}
+          onRetry={() => setState('uploading')}
+        />
       </View>
     </Playground>
 
+    <Import>{"import { UploadTile } from '@noon/design-system';"}</Import>
     <Props>
-      <Prop name="state" type="'default' | 'hovering' | 'uploaded' | 'error' | 'disabled'" desc="Visual state of the zone" />
-      <Prop name="accept" type="string" desc="Accepted file types hint, e.g. 'PDF, PNG, JPG'" />
-      <Prop name="fileName" type="string" desc="Name of uploaded file" />
-      <Prop name="fileSize" type="string" desc="Size of uploaded file, e.g. '2.4 MB'" />
-      <Prop name="onPress" type="() => void" desc="Tap handler — trigger file picker" />
-      <Prop name="onDrop" type="(file) => void" desc="Web drag-and-drop handler" />
-      <Prop name="onRemove" type="() => void" desc="Clear uploaded file" />
+      <Prop name="state" type="'idle' | 'uploading' | 'uploaded' | 'error'" def="'idle'" desc="Drives the whole tile." />
+      <Prop name="label" type="string" desc="Idle prompt, e.g. 'Add your homework'." />
+      <Prop name="hint" type="string" desc="Accepted types and size, mono caption." />
+      <Prop name="fileName / fileMeta" type="string" desc="Shown once a file exists." />
+      <Prop name="progress" type="number" desc="0–100 while uploading." />
+      <Prop name="onPress" type="() => void" desc="Idle tap — trigger the picker." />
+      <Prop name="onRemove" type="() => void" desc="Clear the file (not shown mid-upload)." />
+      <Prop name="onRetry" type="() => void" desc="Error state 'Try again'." />
+      <Prop name="disabled" type="boolean" />
     </Props>
 
     <S title="Implementation">
-      <Rl>Composition pattern — not a standalone component. Build with Pressable, Icon, Text.</Rl>
-      <Rl>Web: add onDragOver, onDragLeave, onDrop to the Pressable.</Rl>
+      <Rl>Web: wire onDragOver/onDrop on a wrapper around the idle tile.</Rl>
       <Rl>Mobile: onPress triggers expo-document-picker or expo-image-picker.</Rl>
+      <Rl>One file per tile — stack tiles for multiple files.</Rl>
+      <Rl>Errors offer a retry, they don't scold.</Rl>
     </S>
   </>;
 }
@@ -3544,9 +4226,10 @@ function DynamicFullscreen({ children, controls }: { children: (w: number, h: nu
         <View style={{ position: 'absolute', bottom: Math.max(insets.bottom, sp[5]), left: sp[5], padding: sp[4], backgroundColor: theme.bgOverlay, borderRadius: r[2], borderWidth: 1, borderColor: theme.border, minWidth: 220 }}>
           {controls}
         </View>
-        <View style={{ position: 'absolute', top: Math.max(insets.top, sp[5]), right: sp[5] }}>
+        {/* Solid backing so the close button stays visible over any pattern */}
+        <View style={{ position: 'absolute', top: Math.max(insets.top, sp[5]), [I18nManager.isRTL ? 'left' : 'right']: sp[5], backgroundColor: theme.bgOverlay, borderRadius: r[2], borderWidth: 1, borderColor: theme.borderStrong }}>
           <IconButton variant="default" size="sm" onPress={() => setOpen(false)} accessibilityLabel="Close">
-            <Icon name="close" size={16} color={theme.fgMuted} />
+            <Icon name="close" size={16} color={theme.fg} />
           </IconButton>
         </View>
       </View>
@@ -3806,7 +4489,7 @@ export function RouteMapPage({ onClose }: { onClose?: () => void }) {
   const examDays = [49, 63];
   const MAX_W = 480;
 
-  const mColor = (s: string) => s === 'mapped' ? color.noon[400] : s === 'exploring' ? color.gold[300] : s === 'needs-attention' ? color.terra[300] : 'rgba(232,228,220,0.35)';
+  const mColor = (s: string) => s === 'mapped' ? color.noon[400] : s === 'exploring' ? color.gold[300] : s === 'needs-attention' ? color.terra[300] : 'rgba(241,235,221,0.35)';
   const mBg = (s: string) => s === 'mapped' ? color.noon[400] : s === 'needs-attention' ? 'rgba(212,149,110,0.18)' : 'transparent';
   const mLabel = (s: string) => s === 'mapped' ? 'Mastered' : s === 'exploring' ? 'Exploring' : s === 'not-started' ? 'Not started' : s === 'needs-attention' ? 'Still uncertain' : 'Not started';
 
@@ -4156,7 +4839,7 @@ export function RouteMapPage({ onClose }: { onClose?: () => void }) {
               </View>
 
               {/* Water connection — explicit */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[3], backgroundColor: s === 'mapped' ? 'rgba(100,216,174,0.06)' : 'rgba(232,228,220,0.03)', borderRadius: r[2], borderWidth: 1, borderColor: s === 'mapped' ? 'rgba(100,216,174,0.2)' : theme.border }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3], padding: sp[3], backgroundColor: s === 'mapped' ? 'rgba(100,216,174,0.06)' : 'rgba(241,235,221,0.03)', borderRadius: r[2], borderWidth: 1, borderColor: s === 'mapped' ? 'rgba(100,216,174,0.2)' : theme.border }}>
                 <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: s === 'mapped' ? color.blue[400] : 'transparent', borderWidth: s === 'mapped' ? 0 : 1, borderColor: theme.fgFaint, opacity: s === 'mapped' ? 0.7 : 0.4 }} />
                 <Text style={{ fontFamily: font.sans, fontSize: fs[12], color: s === 'mapped' ? color.noon[400] : theme.fgMuted, flex: 1 }}>
                   {s === 'mapped' ? 'Water earned — this topic fills the oasis.' : 'Map this topic to earn water for the oasis.'}
@@ -4195,4 +4878,723 @@ export function RouteMapPage({ onClose }: { onClose?: () => void }) {
       </BottomSheet>
     </View>
   );
+}
+
+// ═══════════════════════════════════════════════
+// NEW COMPONENT PAGES — search, pin, rating, streak, review, in-class
+// ═══════════════════════════════════════════════
+
+export function SearchInputPage() {
+  const [value, setValue] = useState('');
+  const [disabled, setDisabled] = useState(false);
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 420 }}>
+        <SearchInput value={value} onChangeText={setValue} disabled={disabled} />
+      </View>
+    </Playground>
+    <Import>{"import { SearchInput } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="value / onChangeText" type="string / (text) => void" desc="Controlled." />
+      <Prop name="placeholder" type="string" def="'Search'" />
+      <Prop name="disabled" type="boolean" />
+    </Props>
+    <S title="Rules">
+      <Rl>Pill shape means "find", not "fill in" — forms keep using Input.</Rl>
+      <Rl>Clear button appears only when there's text.</Rl>
+      <Rl>Filter as the user types where possible; reserve submit for server search.</Rl>
+    </S>
+  </>;
+}
+
+export function PinInputPage() {
+  const [value, setValue] = useState('');
+  const [length, setLength] = useState('6');
+  const [error, setError] = useState(false);
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Length" value={length} options={['4', '6']} onChange={(v) => { setLength(v); setValue(''); }} />
+      <KnobToggle label="Error" value={error} onChange={setError} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 360 }}>
+        <PinInput length={parseInt(length)} value={value} onChange={setValue} error={error} />
+      </View>
+    </Playground>
+    <Import>{"import { PinInput } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="length" type="number" def="6" desc="Number of digit boxes." />
+      <Prop name="value / onChange" type="string / (value) => void" desc="Controlled. Digits only." />
+      <Prop name="onComplete" type="(value) => void" desc="Fires once when every box is filled." />
+      <Prop name="error" type="boolean" desc="Danger borders — wrong code." />
+      <Prop name="autoFocus" type="boolean" />
+      <Prop name="disabled" type="boolean" />
+    </Props>
+    <S title="Rules">
+      <Rl>OTP codes and class join PINs — not passwords.</Rl>
+      <Rl>Digits always read left-to-right, even in RTL. Codes are numbers, not prose.</Rl>
+      <Rl>Active box gets the water border — same selection language as QuizOption.</Rl>
+      <Rl>Wired to SMS autofill (oneTimeCode) on both platforms.</Rl>
+    </S>
+  </>;
+}
+
+export function RatingPage() {
+  const [value, setValue] = useState(3);
+  const [size, setSize] = useState('md');
+  const [interactive, setInteractive] = useState(true);
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="Size" value={size} options={['sm', 'md', 'lg']} onChange={setSize} />
+      <KnobToggle label="Interactive" value={interactive} onChange={setInteractive} />
+    </>}>
+      <Rating value={value} onChange={interactive ? setValue : undefined} size={size as any} />
+    </Playground>
+    <Import>{"import { Rating } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="value" type="number" desc="0..max, whole stars." />
+      <Prop name="onChange" type="(value) => void" desc="Makes it interactive. Omit for display-only." />
+      <Prop name="max" type="number" def="5" />
+      <Prop name="size" type="'sm' | 'md' | 'lg'" def="'md'" desc="16 / 24 / 32" />
+    </Props>
+    <S title="Rules">
+      <Rl>"How was class?" — session feedback, teacher ratings. Not for scores.</Rl>
+      <Rl>Filled stars are gold (signal) — a rating is a small earned thing.</Rl>
+      <Rl>Whole stars only. No halves, no decimals — show averages as text next to it.</Rl>
+    </S>
+  </>;
+}
+
+export function StreakPage() {
+  const [count, setCount] = useState('14');
+  const days: any[] = ['done', 'done', 'missed', 'done', 'today', 'upcoming', 'upcoming'];
+  return <>
+    <Playground knobs={<>
+      <KnobText label="Count" value={count} onChange={setCount} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 420 }}>
+        <StreakTracker count={parseInt(count) || 0} days={days} labels={['S', 'M', 'T', 'W', 'T', 'F', 'S']} />
+      </View>
+    </Playground>
+    <Import>{"import { StreakTracker, type StreakDay } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="count" type="number" desc="Days in a row — the big serif number." />
+      <Prop name="days" type="StreakDay[]" desc="'done' | 'missed' | 'today' | 'upcoming', oldest first." />
+      <Prop name="labels" type="string[]" desc="One letter per day, same order." />
+    </Props>
+    <S title="Rules">
+      <Rl>Gold diamonds — a streak is earned, same language as Waypoints.</Rl>
+      <Rl>Today-in-progress is water; missed days stay quiet, not shameful.</Rl>
+      <Rl>One per dashboard. It motivates; it never guilt-trips.</Rl>
+    </S>
+  </>;
+}
+
+export function ResultReviewPage() {
+  const [pressable, setPressable] = useState(true);
+  const items = [
+    { question: 'What is the square root of 144?', correct: true },
+    { question: 'Solve for x: 2x + 6 = 20', correct: false, meta: 'You said 8 · correct is 7' },
+    { question: 'Which fraction is largest?', correct: true },
+    { question: 'Simplify 18/24 to lowest terms', correct: false, meta: 'You said 9/12 · correct is 3/4' },
+  ];
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="Pressable rows" value={pressable} onChange={setPressable} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 480 }}>
+        <ResultReview items={items} onPressItem={pressable ? () => {} : undefined} />
+      </View>
+    </Playground>
+    <Import>{"import { ResultReview, type ResultReviewItem } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="items" type="{ question, correct, meta? }[]" desc="Every question, in order." />
+      <Prop name="onPressItem" type="(index) => void" desc="Row tap — reopen that question. Adds chevrons." />
+    </Props>
+    <S title="Rules">
+      <Rl>Interstitial celebrates the score; this shows the work. It comes after.</Rl>
+      <Rl>Same verdict circles as the quiz — accent check, danger cross.</Rl>
+      <Rl>meta is one mono line: what they said vs what was right.</Rl>
+      <Rl>For the compact per-question strip during the quiz, use SessionBar.</Rl>
+    </S>
+  </>;
+}
+
+export function VideoTilePage() {
+  const { theme } = useTheme();
+  const [state, setState] = useState('live');
+  const [role, setRole] = useState(true);
+  return <>
+    <Playground knobs={<>
+      <KnobSelect label="State" value={state} options={['live', 'muted', 'reconnecting', 'audio-only']} onChange={setState} />
+      <KnobToggle label="Role" value={role} onChange={setRole} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 360 }}>
+        <VideoTile name="Mr. Omar" role={role ? 'Teacher' : undefined} state={state as any}>
+          <View style={{ flex: 1, backgroundColor: color.void[200] }} />
+        </VideoTile>
+      </View>
+    </Playground>
+    <Import>{"import { VideoTile } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="name" type="string" desc="Shown on the bottom strap." />
+      <Prop name="role" type="string" desc="Mono uppercase, e.g. 'Teacher'." />
+      <Prop name="state" type="'live' | 'muted' | 'reconnecting' | 'audio-only'" def="'live'" />
+      <Prop name="initials" type="string" desc="Avatar fallback for audio-only." />
+      <Prop name="children" type="ReactNode" desc="The video surface — fills the tile." />
+      <Prop name="aspectRatio" type="number" def="16/9" />
+    </Props>
+    <S title="Rules">
+      <Rl>Always dark, in both themes — video sits on void.</Rl>
+      <Rl>Live dot is accent; muted shows the mic-off in terra. Never red.</Rl>
+      <Rl>Audio-only shows the Avatar, not a black box.</Rl>
+      <Rl>Teacher tile is large; students grid below at equal size.</Rl>
+    </S>
+  </>;
+}
+
+export function ClassToolbarPage() {
+  const [mic, setMic] = useState(true);
+  const [cam, setCam] = useState(false);
+  const [hand, setHand] = useState(false);
+  const items = [
+    { id: 'mic', icon: (mic ? 'mic' : 'mic-off') as any, label: mic ? 'Mute' : 'Unmute', active: mic },
+    { id: 'cam', icon: (cam ? 'camera' : 'camera-off') as any, label: cam ? 'Camera off' : 'Camera on', active: cam },
+    { id: 'hand', icon: 'hand' as any, label: 'Raise hand', active: hand },
+    { id: 'chat', icon: 'chat' as any, label: 'Chat', badge: true },
+    { id: 'leave', icon: 'leave' as any, label: 'Leave class', variant: 'danger' as const },
+  ];
+  return <>
+    <Playground knobs={<></>}>
+      <ClassToolbar
+        items={items}
+        onPress={(id) => {
+          if (id === 'mic') setMic(v => !v);
+          if (id === 'cam') setCam(v => !v);
+          if (id === 'hand') setHand(v => !v);
+        }}
+      />
+    </Playground>
+    <Import>{"import { ClassToolbar, type ClassToolbarItem } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="items" type="ClassToolbarItem[]" desc="{ id, icon, label, active?, variant?, badge? }. label is required — it's the a11y name." />
+      <Prop name="onPress" type="(id) => void" />
+    </Props>
+    <S title="Rules">
+      <Rl>Floating pill, centred at the bottom of the class screen.</Rl>
+      <Rl>Active = accent fill (mic on, hand raised). Danger = leave, and only leave.</Rl>
+      <Rl>Five controls max. Everything else goes behind chat or a sheet.</Rl>
+      <Rl>badge is a dot, not a count — the toolbar is not a notification centre.</Rl>
+    </S>
+  </>;
+}
+
+export function LivePromptPage() {
+  const [timed, setTimed] = useState(true);
+  const [answered, setAnswered] = useState<number | null>(null);
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="Timed" value={timed} onChange={setTimed} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 420 }}>
+        <LivePrompt question="Which fraction is larger?" seconds={timed ? 20 : undefined}>
+          <QuizOption label="3/4" state={answered === 0 ? 'selected' : 'default'} onPress={() => setAnswered(0)} />
+          <QuizOption label="5/8" state={answered === 1 ? 'selected' : 'default'} onPress={() => setAnswered(1)} />
+        </LivePrompt>
+      </View>
+    </Playground>
+    <Import>{"import { LivePrompt } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="question" type="string" desc="Serif question text." />
+      <Prop name="seconds" type="number" desc="Optional countdown — pill Timer in the header." />
+      <Prop name="onExpire" type="() => void" desc="Fires when the timer hits zero." />
+      <Prop name="kicker" type="string" def="'Live question'" />
+      <Prop name="children" type="ReactNode" desc="QuizOptions, usually." />
+    </Props>
+    <S title="Rules">
+      <Rl>Slides over the class screen when the teacher pushes a question.</Rl>
+      <Rl>Reuses QuizOption — answering in class is the same gesture as homework.</Rl>
+      <Rl>Timer is the shared Timer component, pill variant, small.</Rl>
+      <Rl>On expiry, lock the options — don't hide the question.</Rl>
+    </S>
+  </>;
+}
+
+export function ChatComposerPage() {
+  const [value, setValue] = useState('');
+  const [disabled, setDisabled] = useState(false);
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="Disabled" value={disabled} onChange={setDisabled} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 480 }}>
+        <ChatComposer value={value} onChangeText={setValue} onSend={() => setValue('')} disabled={disabled} />
+      </View>
+    </Playground>
+    <Import>{"import { ChatComposer } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="value / onChangeText" type="string / (text) => void" desc="Controlled." />
+      <Prop name="onSend" type="() => void" desc="Send tap. Only enabled with non-empty text." />
+      <Prop name="placeholder" type="string" def="'Message…'" />
+      <Prop name="disabled" type="boolean" desc="e.g. teacher paused the chat." />
+    </Props>
+    <S title="Rules">
+      <Rl>Class chat and tutor text input. Multiline, grows to ~4 lines then scrolls.</Rl>
+      <Rl>Send button lights accent only when there's something to send.</Rl>
+      <Rl>The send glyph mirrors in RTL.</Rl>
+      <Rl>Pairs with ChatMessage for the transcript above.</Rl>
+    </S>
+  </>;
+}
+
+
+// ─────────────────────────────────────────────
+// ListRow
+// ─────────────────────────────────────────────
+export function ListRowPage() {
+  const [notifs, setNotifs] = useState(true);
+  return <>
+    <Playground knobs={<></>}>
+      <View style={{ width: '100%', maxWidth: 420 }}>
+        <ListRow icon="user" label="Name" value="Sara Al-Otaibi" onPress={() => {}} />
+        <ListRow icon="book" label="Grade" value="Grade 11" onPress={() => {}} />
+        <ListRow icon="bell" label="Notifications" right={<Switch value={notifs} onValueChange={setNotifs} />} />
+        <ListRow icon="globe" label="Language" value="العربية" onPress={() => {}} />
+        <ListRow icon="leave" label="Sign out" danger divider={false} onPress={() => {}} />
+      </View>
+    </Playground>
+    <Import>{"import { ListRow } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="label" type="string" desc="Row label. Required." />
+      <Prop name="icon" type="IconName" desc="Leading icon, fgMuted (danger when danger)." />
+      <Prop name="value" type="string" desc="Trailing value text, e.g. 'Grade 11'." />
+      <Prop name="right" type="ReactNode" desc="Trailing custom node (e.g. a Switch). Replaces value + chevron." />
+      <Prop name="danger" type="boolean" desc="Sign out / delete rows." />
+      <Prop name="chevron" type="boolean" def="true" desc="Chevron on pressable rows. RTL-aware." />
+      <Prop name="divider" type="boolean" def="true" desc="Bottom divider — turn off on the last row." />
+      <Prop name="onPress" type="() => void" desc="Makes the row pressable." />
+    </Props>
+    <S title="Rules">
+      <Rl>The workhorse of Settings, Profile, and resource screens — never hand-roll icon + label + chevron rows.</Rl>
+      <Rl>Chevron only appears on pressable rows, and flips in RTL.</Rl>
+      <Rl>Rows with a Switch toggle on the Switch, not the row — keeps the target unambiguous.</Rl>
+      <Rl>{'Last row in a group sets divider={false}.'}</Rl>
+    </S>
+  </>;
+}
+
+// ─────────────────────────────────────────────
+// PhoneInput
+// ─────────────────────────────────────────────
+export function PhoneInputPage() {
+  const [phone, setPhone] = useState('');
+  const [hasError, setHasError] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="error" value={hasError} onChange={setHasError} />
+      <KnobToggle label="disabled" value={disabled} onChange={setDisabled} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 360 }}>
+        <PhoneInput
+          label="Phone number"
+          value={phone}
+          onChangeText={setPhone}
+          placeholder="5X XXX XXXX"
+          error={hasError ? 'That number doesn\u2019t look right' : undefined}
+          helper="We’ll text you a sign-in code"
+          disabled={disabled}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { PhoneInput } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="value / onChangeText" type="string / (digits) => void" desc="Controlled. Non-digits stripped, max 12." />
+      <Prop name="countryCode" type="string" def="'+966'" desc="Fixed dialing prefix." />
+      <Prop name="label / error / helper" type="string" desc="Same anatomy as Input." />
+      <Prop name="disabled" type="boolean" />
+    </Props>
+    <S title="Rules">
+      <Rl>Phone numbers read LTR everywhere — the field forces LTR digits and keeps the prefix leading in RTL.</Rl>
+      <Rl>This is the login field. Pair with PinInput for the OTP step.</Rl>
+      <Rl>Wired for autofill: phone-pad keyboard, telephoneNumber content type.</Rl>
+    </S>
+  </>;
+}
+
+// ─────────────────────────────────────────────
+// Select
+// ─────────────────────────────────────────────
+export function SelectPage() {
+  const [grade, setGrade] = useState<string | undefined>(undefined);
+  const [hasError, setHasError] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const gradeOptions = [
+    { label: 'Grade 9', value: '9' },
+    { label: 'Grade 10', value: '10' },
+    { label: 'Grade 11', value: '11' },
+    { label: 'Grade 12', value: '12' },
+  ];
+  return <>
+    <Playground knobs={<>
+      <KnobToggle label="error" value={hasError} onChange={setHasError} />
+      <KnobToggle label="disabled" value={disabled} onChange={setDisabled} />
+    </>}>
+      <View style={{ width: '100%', maxWidth: 360 }}>
+        <Select
+          label="Grade"
+          placeholder="Select your grade"
+          options={gradeOptions}
+          value={grade}
+          onChange={setGrade}
+          error={hasError ? 'Choose a grade to continue' : undefined}
+          helper="You can change this later in Profile"
+          disabled={disabled}
+        />
+      </View>
+    </Playground>
+    <Import>{"import { Select } from '@noon/design-system';"}</Import>
+    <Props>
+      <Prop name="options" type="SelectOption[]" desc="{ label, value } pairs. Required." />
+      <Prop name="value / onChange" type="string / (value) => void" desc="Controlled single choice." />
+      <Prop name="label / error / helper" type="string" desc="Same anatomy as Input." />
+      <Prop name="placeholder" type="string" def="'Select\u2026'" desc="Shown until a value is chosen." />
+      <Prop name="sheetTitle" type="string" desc="BottomSheet title. Defaults to label." />
+      <Prop name="disabled" type="boolean" />
+    </Props>
+    <S title="Rules">
+      <Rl>Options open in a BottomSheet — same pattern on phone, tablet, and web. No native pickers.</Rl>
+      <Rl>Use Select above roughly 5 options or when space is tight; use RadioGroup when all options should be visible at once.</Rl>
+      <Rl>Single choice only. For multi-select, use CheckboxGroup.</Rl>
+      <Rl>Selected option shows a check in accentText green.</Rl>
+    </S>
+  </>;
+}
+
+// ─────────────────────────────────────────────
+// Templates — one page, every template launches fullscreen from here
+// ─────────────────────────────────────────────
+
+/** Fullscreen template host — phone-width column, floating close. */
+function TemplateFrame({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  if (!open) return null;
+  return (
+    <Modal visible={open} animationType="slide" onRequestClose={onClose}>
+      <View style={{ flex: 1, backgroundColor: theme.bgSunken, alignItems: 'center' }}>
+        <View style={{ flex: 1, width: '100%', maxWidth: 420, backgroundColor: theme.bg }}>
+          {children}
+        </View>
+        <View style={{ position: 'absolute', top: Math.max(insets.top, sp[5]), [I18nManager.isRTL ? 'left' : 'right']: sp[5], backgroundColor: theme.bgOverlay, borderRadius: r[2], borderWidth: 1, borderColor: theme.borderStrong }}>
+          <IconButton variant="default" size="sm" onPress={onClose} accessibilityLabel="Close template">
+            <Icon name="close" size={16} color={theme.fg} />
+          </IconButton>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function LoginTemplate() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [step, setStep] = useState<'phone' | 'pin' | 'done'>('phone');
+  const [phone, setPhone] = useState('');
+  const [pin, setPin] = useState('');
+  return (
+    <View style={{ flex: 1, paddingTop: insets.top + sp[8], paddingHorizontal: sp[6], paddingBottom: Math.max(insets.bottom, sp[6]) }}>
+      {step === 'phone' && <>
+        <NoonMark size={44} />
+        <Text style={{ fontFamily: font.serif, fontSize: fs[28], fontWeight: fw[600], color: theme.fg, marginTop: sp[7] }}>Welcome back</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted, marginTop: sp[2], lineHeight: fs[14] * 1.5 }}>Sign in with your phone number.</Text>
+        <View style={{ marginTop: sp[7] }}>
+          <PhoneInput label="Phone number" value={phone} onChangeText={setPhone} placeholder="5X XXX XXXX" helper="We’ll text you a sign-in code" autoFocus />
+        </View>
+        <View style={{ flex: 1 }} />
+        <Button variant="primary" fullWidth disabled={phone.length < 9} onPress={() => setStep('pin')}>Continue</Button>
+      </>}
+      {step === 'pin' && <>
+        <BackButton onPress={() => { setPin(''); setStep('phone'); }} />
+        <Text style={{ fontFamily: font.serif, fontSize: fs[28], fontWeight: fw[600], color: theme.fg, marginTop: sp[6] }}>Enter the code</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[14], color: theme.fgMuted, marginTop: sp[2] }}>Sent to +966 {phone}</Text>
+        <View style={{ marginTop: sp[7] }}>
+          <PinInput length={6} value={pin} onChange={setPin} onComplete={() => setStep('done')} autoFocus />
+        </View>
+        <Pressable onPress={() => setPin('')} style={{ marginTop: sp[5], alignSelf: 'flex-start' }}>
+          <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accentText }}>Resend code</Text>
+        </Pressable>
+      </>}
+      {step === 'done' && <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: sp[4] }}>
+        <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="check" size={28} color={theme.accentFg} />
+        </View>
+        <Text style={{ fontFamily: font.serif, fontSize: fs[24], fontWeight: fw[600], color: theme.fg }}>You’re in</Text>
+        <Button variant="secondary" onPress={() => { setPhone(''); setPin(''); setStep('phone'); }}>Start over</Button>
+      </View>}
+    </View>
+  );
+}
+
+function HomeTemplate() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [tab, setTab] = useState(0);
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: insets.top + sp[5], paddingHorizontal: sp[5], paddingBottom: sp[8] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1.5, textTransform: 'uppercase', color: theme.fgFaint }}>Sunday 7 Sep</Text>
+            <Text style={{ fontFamily: font.serif, fontSize: fs[24], fontWeight: fw[600], color: theme.fg, marginTop: sp[1] }}>Marhaba, Sara</Text>
+          </View>
+          <NotificationBell count={3} onPress={() => {}} />
+        </View>
+        <View style={{ marginTop: sp[5] }}>
+          <StreakTracker count={14} days={['done','done','done','missed','done','today','upcoming']} labels={['S','M','T','W','T','F','S']} />
+        </View>
+        <View style={{ flexDirection: 'row', gap: sp[3], marginTop: sp[5] }}>
+          <StatCard sizing="fill" label="Quant" value="58" unit="%" delta="4% this week" deltaDirection="up" />
+          <StatCard sizing="fill" label="Verbal" value="72" unit="%" delta="1% this week" deltaDirection="up" />
+        </View>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint, marginTop: sp[7], marginBottom: sp[2] }}>Today</Text>
+        <SessionCard time="16:00" title="Qudrat — Reading comprehension" meta="Mr. Hassan · 60 min" state="live" statusText="Live now" onPress={() => {}} />
+        <SessionCard time="19:30" title="Quant — Ratios review" meta="Ms. Noura · 45 min" state="upcoming" onPress={() => {}} />
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint, marginTop: sp[7], marginBottom: sp[2] }}>Homework</Text>
+        <HomeworkCard title="Ratios problem set" subject="Quant" due="Due in 4h" questions={12} status="due-soon" onPress={() => {}} />
+        <HomeworkCard title="Vocabulary drill" subject="Verbal" due="Done" questions={20} status="complete" onPress={() => {}} />
+      </ScrollView>
+      <BottomNav
+        items={[
+          { label: 'Home', icon: 'home' },
+          { label: 'Journey', icon: 'map' },
+          { label: 'Classes', icon: 'video' },
+          { label: 'Profile', icon: 'user' },
+        ]}
+        selected={tab}
+        onSelect={setTab}
+      />
+    </View>
+  );
+}
+
+const QUIZ_QS = [
+  { q: 'A recipe needs 3 cups of flour for every 2 cups of sugar. How much flour for 8 cups of sugar?', options: ['10 cups', '12 cups', '14 cups', '16 cups'], correct: 1 },
+  { q: 'Simplify the ratio 18 : 24.', options: ['2 : 3', '3 : 4', '4 : 5', '6 : 8'], correct: 1 },
+  { q: 'A map scale is 1 : 50,000. Two towns are 4 cm apart on the map. Real distance?', options: ['0.5 km', '2 km', '5 km', '20 km'], correct: 1 },
+];
+
+function QuizTemplate() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [checked, setChecked] = useState(false);
+  const [answers, setAnswers] = useState<boolean[]>([]);
+  const done = idx >= QUIZ_QS.length;
+  const q = QUIZ_QS[Math.min(idx, QUIZ_QS.length - 1)];
+  const correct = selected === q.correct;
+
+  const segments = QUIZ_QS.map((_, i) =>
+    i < answers.length ? (answers[i] ? 'correct' : 'incorrect') : i === idx ? 'current' : 'pending'
+  ) as ('correct' | 'incorrect' | 'current' | 'pending')[];
+
+  const restart = () => { setIdx(0); setSelected(null); setChecked(false); setAnswers([]); };
+
+  if (done) {
+    const score = answers.filter(Boolean).length;
+    return (
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: insets.top + sp[8], paddingHorizontal: sp[5], paddingBottom: Math.max(insets.bottom, sp[6]) }}>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint }}>Ratios review</Text>
+        <Text style={{ fontFamily: font.serif, fontSize: fs[28], fontWeight: fw[600], color: theme.fg, marginTop: sp[2] }}>{score} of {QUIZ_QS.length} correct</Text>
+        <View style={{ marginTop: sp[5] }}><SessionBar segments={segments} /></View>
+        <View style={{ marginTop: sp[6] }}>
+          <ResultReview items={QUIZ_QS.map((qq, i) => ({ question: qq.q, correct: answers[i], meta: answers[i] ? undefined : `Correct answer: ${qq.options[qq.correct]}` }))} />
+        </View>
+        <View style={{ marginTop: sp[6] }}>
+          <Button variant="primary" fullWidth onPress={restart}>Try again</Button>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, paddingTop: insets.top + sp[5] }}>
+      <View style={{ paddingHorizontal: sp[5] }}>
+        <SessionBar segments={segments} />
+      </View>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: sp[5], paddingTop: sp[6] }}>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1.5, textTransform: 'uppercase', color: theme.fgFaint }}>Question {idx + 1} of {QUIZ_QS.length}</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[16], fontWeight: fw[500], color: theme.fg, lineHeight: fs[16] * 1.5, marginTop: sp[3] }}>{q.q}</Text>
+        <View style={{ gap: sp[3], marginTop: sp[6] }}>
+          {q.options.map((opt, i) => (
+            <QuizOption
+              key={i}
+              label={String.fromCharCode(65 + i)}
+              text={opt}
+              state={checked ? (i === q.correct ? 'correct' : i === selected ? 'incorrect' : 'disabled') : selected === i ? 'selected' : 'default'}
+              onPress={checked ? undefined : () => setSelected(i)}
+            />
+          ))}
+        </View>
+      </ScrollView>
+      <BottomAction
+        icon={checked ? (correct ? 'check' : 'close') : undefined}
+        message={checked ? (correct ? 'Correct!' : 'Not quite') : undefined}
+        submessage={checked && !correct ? `The answer is ${String.fromCharCode(65 + q.correct)} — ${q.options[q.correct]}` : undefined}
+        messageVariant={checked ? (correct ? 'accent' : 'danger') : 'default'}
+        primary={checked
+          ? { label: idx === QUIZ_QS.length - 1 ? 'See results' : 'Next', onPress: () => { setAnswers(a => [...a, correct]); setIdx(i => i + 1); setSelected(null); setChecked(false); } }
+          : { label: 'Check', disabled: selected === null, onPress: () => setChecked(true) }}
+      />
+    </View>
+  );
+}
+
+function ProfileTemplate() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [notifs, setNotifs] = useState(true);
+  const [sounds, setSounds] = useState(false);
+  return (
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: insets.top + sp[6], paddingHorizontal: sp[5], paddingBottom: Math.max(insets.bottom, sp[6]) }}>
+      <Text style={{ fontFamily: font.serif, fontSize: fs[24], fontWeight: fw[600], color: theme.fg }}>Profile</Text>
+      <View style={{ marginTop: sp[5] }}>
+        <Identity size="lg" initials="SA" name="Sara Al-Otaibi" role="GRADE 11 · QUDRAT" meta="Joined Ramadan 1446" />
+      </View>
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint, marginTop: sp[7], marginBottom: sp[1] }}>Account</Text>
+      <ListRow icon="user" label="Name" value="Sara Al-Otaibi" onPress={() => {}} />
+      <ListRow icon="book" label="Grade" value="Grade 11" onPress={() => {}} />
+      <ListRow icon="chat" label="Phone" value="+966 55 123 4567" onPress={() => {}} divider={false} />
+      <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint, marginTop: sp[7], marginBottom: sp[1] }}>Preferences</Text>
+      <ListRow icon="bell" label="Notifications" right={<Switch value={notifs} onValueChange={setNotifs} />} />
+      <ListRow icon="volume" label="Sounds" right={<Switch value={sounds} onValueChange={setSounds} />} />
+      <ListRow icon="globe" label="Language" value="العربية" onPress={() => {}} divider={false} />
+      <View style={{ marginTop: sp[7] }}>
+        <ListRow icon="leave" label="Sign out" danger divider={false} onPress={() => {}} />
+      </View>
+    </ScrollView>
+  );
+}
+
+const TEMPLATES: Array<{ id: string; title: string; desc: string; component: React.FC }> = [
+  { id: 'login', title: 'Login', desc: 'Phone number \u2192 OTP code \u2192 in.', component: LoginTemplate },
+  { id: 'home', title: 'Home dashboard', desc: 'Greeting, streak, stats, today\u2019s sessions, homework.', component: HomeTemplate },
+  { id: 'quiz', title: 'Quiz flow', desc: 'Question \u2192 verdict \u2192 results with review.', component: QuizTemplate },
+  { id: 'profile', title: 'Profile & settings', desc: 'Identity, account rows, preferences, sign out.', component: ProfileTemplate },
+];
+
+export function TemplatesPage() {
+  const { theme } = useTheme();
+  const [open, setOpen] = useState<string | null>(null);
+  const Active = TEMPLATES.find(t => t.id === open)?.component;
+  return <>
+    <S title="Templates" desc="Full screens assembled entirely from system components. Launch one, then copy its source from preview/screens/pages.tsx as your starting point.">
+      <View style={{ backgroundColor: theme.bgRaised, borderWidth: 1, borderColor: theme.border, borderRadius: r[3], paddingHorizontal: sp[4] }}>
+        {TEMPLATES.map((t, i) => (
+          <ListRow key={t.id} label={t.title} value={t.desc} divider={i < TEMPLATES.length - 1} onPress={() => setOpen(t.id)} />
+        ))}
+      </View>
+    </S>
+    <S title="Rules">
+      <Rl>Templates are starting points, not components — copy the source and change it freely.</Rl>
+      <Rl>Every element on these screens is a system component or a token. If a template needs something the system lacks, build the component first.</Rl>
+      <Rl>Templates render phone-width (max 420). For tablet and desktop, add the NavRail shell from Screen Layout.</Rl>
+    </S>
+    <TemplateFrame open={open !== null} onClose={() => setOpen(null)}>
+      {Active ? <Active /> : null}
+    </TemplateFrame>
+  </>;
+}
+
+// ─────────────────────────────────────────────
+// Build with AI — copyable system prompt for AI-assisted builders
+// ─────────────────────────────────────────────
+const AI_PROMPT = `You are building product UI with the Noon Academy "Proven Routes" design system — a Saudi-native React Native design system that runs on iOS, Android, and web (react-native-web).
+
+WHAT IT IS
+- A component library ('rn/' in the repo, imported as '@noon/design-system') plus a token system for colour, spacing, type, radii, and motion.
+- Two themes: 'void' (dark, the default) and 'paper' (light). Components read colours from context — never hardcode a colour.
+- Arabic-first and fully RTL-aware. Type: Vazirmatn (sans, UI), Crimson Pro (serif, headlines and big numbers), JetBrains Mono (mono, labels and meta).
+
+SETUP
+  import { GestureHandlerRootView } from 'react-native-gesture-handler';
+  import { SafeAreaProvider } from 'react-native-safe-area-context';
+  import { ThemeProvider } from '@noon/design-system';
+  // Wrap the app: GestureHandlerRootView > SafeAreaProvider > ThemeProvider initial="void"
+
+HARD RULES
+1. Never hardcode colours, spacing, font sizes, or radii. Tokens: sp (spacing), fs (font size), fw (weight), r (radius), icon (icon sizes), dur (motion), bp/layout (breakpoints). Colours only via useTheme().theme.* (or color.* primitives when a rule explicitly says so).
+
+TOKEN SCALES (exact — do not invent steps)
+- sp: 0, 0.5, 1..12 → 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96 px. Usage: sp[4] = 16.
+- fs: 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 40, 48. Usage: fs[14].
+- fw: 300, 400, 500, 600, 700 (fw[600]). r: 0, 1, 2, 3, 4, pill → 0, 2, 4, 6, 8, 999. dur: 1, 2, 3 → 120, 200, 320 ms.
+- bp: tablet 768, desktop 1024. layout: containerMax 1200, readingMax 720.
+
+THEME ROLES (exact names on useTheme().theme — do not invent others)
+- Surfaces: bg, bgSunken, bgRaised, bgOverlay, inputBg
+- Text: fg, fgMuted, fgSubtle, fgFaint, fgDisabled, fgInverse
+- Lines: border, borderStrong, divider; overlays: hoverOverlay, activeOverlay, selectedOverlay
+- Accent (green): accent, accentHover, accentActive, accentFg, accentSoft, accentBorder, accentText
+- Signal (gold): signal, signalDim, signalBright, signalSoft, signalBorder, signalText
+- Others: danger + dangerSoft/dangerBorder; terra + terraSoft/terraBorder; iris + irisBright/irisSoft/irisBorder/irisGlow; intel (Future teal) + intelSoft/intelBorder; water (blue selection) + waterSoft/waterBorder
+- Typical recipe: bgRaised card, border stroke, fg title, fgMuted body, fgFaint meta.
+2. Green or gold TEXT must use theme.accentText / theme.signalText. Plain theme.accent / theme.signal are for fills and borders only.
+3. Colour meaning: terra (orange) = heat and urgency, never failure. danger (red) = errors and destructive actions. gold/signal = earned things only (streaks, milestones). iris (purple) = the AI tutor. blue/water = selection and "current".
+4. One component per role — never rebuild these: answer verdicts → BottomAction (messageVariant accent/danger); quiz progress → SessionBar; settings rows → ListRow; back navigation → BackButton (icon-only); file upload → UploadTile.
+5. Quiz answer states: selected = blue, correct = green, incorrect = red. QuizOption handles all of it.
+6. Cards: Card = list/grid item, HeroCard = landing emphasis, StatCard = one number. All accept sizing 'auto' | 'fill' | 'hug'. Card thumbnails are 16:9 or 1:1 only.
+7. Graphic patterns: Facet = arrival/hero surfaces, max one per screen. Khatam = earned moments only, line-only, never filled. Pinboard = maps/presence, dots are binary (full strength or absent). Never mix pattern languages on one surface. Never set text directly on a pattern.
+8. RTL: use I18nManager.isRTL. Chevrons, back, and send mirror. Digits (phone numbers, PINs, timers) always read LTR — PhoneInput and PinInput handle this.
+9. Shell: BottomNav on mobile, NavRail on tablet/desktop. Pushed child pages hide the nav; BackButton sits where the nav was. Nav labels are sentence case.
+10. Accessibility: every interactive element gets accessibilityRole and accessibilityLabel; minimum touch target 40px; honour reduced motion.
+
+COMPONENT INVENTORY (import { X } from '@noon/design-system')
+- Inputs: Button (primary/secondary/ghost/danger/danger-solid/signal/tutor), IconButton, Input, Select, Textarea, SearchInput, PinInput, PhoneInput, Switch, Checkbox + CheckboxGroup, Radio + RadioGroup, Stepper, Segmented, Slider, UploadTile, Rating, Calendar
+- Display: Card, HeroCard, StatCard, Chip, Avatar, AvatarGroup, Identity, Badge, Table, Divider, Skeleton, EmptyState, StreakTracker, ListRow, VideoCard
+- Navigation: Tabs, BottomNav, NavRail, TitleBar, FilterBar, BackButton, Breadcrumbs, Pagination, NotificationBell, NoonMark
+- Feedback: Alert, Toast (useToast), Dialog, BottomSheet, FullSheet, Tooltip, BottomAction
+- Progress: SessionBar, LinearProgress, CircularProgress, Timer
+- Learning: QuizOption, MatchQuestion, CategorizeQuestion, OrderQuestion, FillBlanksQuestion, HotspotQuestion, ResultReview, SessionCard, HomeworkCard, Interstitial
+- In class: VideoTile, ClassToolbar, LivePrompt, ChatComposer
+- Voice tutor: VoiceTutor, ChatMessage, TypingIndicator, BreakdownCard, ActivityCard, ResourceList, SlidesCard
+- Patterns: Facet, Khatam, Pinboard, GridPaper, Waypoints, DuneDynamic, StarsDynamic, TerrainDynamic
+
+WHICH COMPONENT WHEN
+- Inline status in the flow → Alert. Transient confirmation → Toast. Blocking decision → Dialog. Partial task over the screen → BottomSheet. Full task → FullSheet.
+- One number that matters → StatCard. Big landing block → HeroCard. Everything else → Card.
+- Status word → Chip. Count on a thing → Badge.
+- Single choice, few visible options → RadioGroup. Single choice, many options or tight space → Select. Multi choice → CheckboxGroup.
+
+SOURCE OF TRUTH
+Component prop signatures live in the component files (rn/*.tsx) — read the file before using a component rather than guessing props. The explorer documents every component with live examples and rules.
+
+START FROM A TEMPLATE
+The explorer's Templates page has full screens (Login, Home dashboard, Quiz flow, Profile & settings) assembled entirely from system components — copy one and adapt it rather than starting blank.`;
+
+export function AIPromptPage() {
+  const { theme } = useTheme();
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(AI_PROMPT).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
+  };
+  return <>
+    <S title="Build with AI" desc="Paste this prompt into Claude, Cursor, or any AI coding tool before asking it to build screens — it carries the whole system: what it is, the rules, the inventory, and where to start. Share this page directly with a link to #aiprompt.">
+      <Button variant="primary" onPress={copy}>{copied ? 'Copied' : 'Copy prompt'}</Button>
+    </S>
+    <View {...{ dataSet: { ltr: '' } }} style={{ backgroundColor: theme.bgRaised, borderWidth: 1, borderColor: theme.border, borderRadius: r[3], padding: sp[5], marginBottom: sp[7] }}>
+      <Text selectable style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.fg, lineHeight: fs[12] * 1.7 }}>{AI_PROMPT}</Text>
+    </View>
+    <S title="Rules">
+      <Rl>Keep this prompt in sync with the system — when a rule or component changes, update it here in the same commit.</Rl>
+      <Rl>For repo-based AI tools, the same content belongs in an AGENTS.md at the repo root so agents pick it up automatically.</Rl>
+    </S>
+  </>;
 }

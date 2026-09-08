@@ -21,7 +21,8 @@ const THUMB_SIZE = 16;
 const THUMB_TRAVEL = TRACK_W - THUMB_SIZE - 4;
 
 export function Switch({ value, onValueChange, disabled, label }: SwitchProps) {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
+  const thumbOn = mode === 'paper' ? '#FFFFFF' : theme.accentFg;
   const thumbX = useSharedValue(value ? THUMB_TRAVEL : 0);
   const trackColor = useSharedValue(value ? 1 : 0);
 
@@ -36,7 +37,7 @@ export function Switch({ value, onValueChange, disabled, label }: SwitchProps) {
   }));
 
   const thumbStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(trackColor.value, [0, 1], [color.chalk[100], theme.accentFg]),
+    backgroundColor: interpolateColor(trackColor.value, [0, 1], [color.chalk[100], thumbOn]),
     transform: [{ translateX: thumbX.value }],
   }));
 

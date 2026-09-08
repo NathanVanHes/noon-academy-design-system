@@ -32,7 +32,7 @@ export function ResourceList({ title = 'Resources', links }: ResourceListProps) 
             if (link.onPress) return link.onPress();
             if (link.content) setOpenIdx(i);
           }}>
-            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accent, marginBottom: sp[2] }}>{link.label}</Text>
+            <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.accentText, marginBottom: sp[2] }}>{link.label}</Text>
           </Pressable>
         ))}
       </View>

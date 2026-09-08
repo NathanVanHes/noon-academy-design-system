@@ -16,7 +16,7 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import { Button } from './Button';
 import { Icon, type IconName } from './Icon';
-import { sp, fs, fw, font, icon as iconTokens } from './tokens';
+import { sp, fs, fw, font, icon as iconTokens, color } from './tokens';
 
 interface ActionButton {
   label: string;
@@ -38,7 +38,9 @@ export function BottomAction({ icon, message, submessage, messageVariant = 'defa
   const { theme } = useTheme();
   const insets = useContext(SafeAreaInsetsContext) || { bottom: 0 };
 
-  const messageColor = messageVariant === 'accent' ? theme.accent : messageVariant === 'danger' ? theme.danger : theme.fg;
+  // Verdict variants get the full treatment: filled icon circle + text-safe colour.
+  const verdict = messageVariant === 'accent' || messageVariant === 'danger';
+  const messageColor = messageVariant === 'accent' ? theme.accentText : messageVariant === 'danger' ? theme.danger : theme.fg;
 
   return (
     <View style={{
@@ -52,10 +54,19 @@ export function BottomAction({ icon, message, submessage, messageVariant = 'defa
       <View style={{ width: '100%', maxWidth: 600, paddingHorizontal: sp[5], gap: sp[3] }}>
       {message && (
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: sp[3] }}>
-          {icon && <Icon name={icon} size={iconTokens.lg} color={messageColor} />}
+          {icon && (verdict ? (
+            <View style={{
+              width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+              backgroundColor: messageVariant === 'accent' ? theme.accent : theme.danger,
+            }}>
+              <Icon name={icon} size={iconTokens.lg} color={messageVariant === 'accent' ? theme.accentFg : color.chalk[100]} />
+            </View>
+          ) : (
+            <Icon name={icon} size={iconTokens.lg} color={messageColor} />
+          ))}
           <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: font.sans, fontSize: fs[14], fontWeight: fw[600], color: messageColor }}>{message}</Text>
-            {submessage && <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[0.5] }}>{submessage}</Text>}
+            <Text style={{ fontFamily: font.sans, fontSize: verdict ? fs[16] : fs[14], fontWeight: fw[600], color: messageColor, marginTop: verdict && icon ? 3 : 0 }}>{message}</Text>
+            {submessage && <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[0.5], lineHeight: fs[13] * 1.5 }}>{submessage}</Text>}
           </View>
         </View>
       )}

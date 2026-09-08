@@ -41,7 +41,7 @@ interface RouteMapProps {
   onMarkerPress?: (marker: RouteMarker, chapter: RouteChapter) => void;
 }
 
-function mc(s: MarkerStatus) { return s === 'mapped' ? color.noon[400] : s === 'exploring' ? color.gold[300] : s === 'needs-attention' ? color.terra[300] : 'rgba(232,228,220,0.35)'; }
+function mc(s: MarkerStatus) { return s === 'mapped' ? color.noon[400] : s === 'exploring' ? color.gold[300] : s === 'needs-attention' ? color.terra[300] : 'rgba(241,235,221,0.35)'; }
 function mb(s: MarkerStatus) { return s === 'mapped' ? color.noon[400] : s === 'needs-attention' ? 'rgba(212,149,110,0.18)' : 'transparent'; }
 function ml(s: MarkerStatus) { return s === 'mapped' ? 'Mastered' : s === 'exploring' ? 'Exploring' : s === 'not-started' ? 'Not started' : s === 'needs-attention' ? 'Still uncertain' : 'Not started'; }
 
@@ -49,7 +49,7 @@ const CW = 24;
 const EP = 16;
 
 export function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPress }: RouteMapProps) {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
   const isPast = (ch: RouteChapter) => ch.status === 'complete' || ch.status === 'strong' || ch.status === 'weak';
   const isCurr = (ch: RouteChapter) => ch.id === currentChapter;
   const currentIdx = chapters.findIndex(ch => ch.id === currentChapter);
@@ -58,7 +58,7 @@ export function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPre
   return (
     <View style={{ position: 'relative' }}>
       {/* Spine */}
-      <View style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1, marginLeft: -0.5, backgroundColor: 'rgba(232,228,220,0.06)' }} />
+      <View style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1, marginLeft: -0.5, backgroundColor: 'rgba(241,235,221,0.06)' }} />
       {progressPct > 0 && (
         <View style={{ position: 'absolute', bottom: 0, left: '50%', marginLeft: -0.5, width: 1, height: `${progressPct}%`, backgroundColor: color.noon[400], opacity: 0.25 }} />
       )}
@@ -106,10 +106,10 @@ export function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPre
                 ...(distant ? { opacity: 0.5 } : {}),
               }}>{ch.title}</Text>
               {past && (
-                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mapped === total ? color.noon[400] : color.terra[300], marginTop: sp[1] }}>{mapped}/{total} mastered</Text>
+                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: mapped === total ? theme.accentText : theme.terra, marginTop: sp[1] }}>{mapped}/{total} mastered</Text>
               )}
               {current && (
-                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: color.gold[300], marginTop: sp[1] }}>Next exam · 9 days</Text>
+                <Text style={{ fontFamily: font.mono, fontSize: fs[9], color: theme.signalText, marginTop: sp[1] }}>Next exam · 9 days</Text>
               )}
             </View>
 
@@ -167,9 +167,9 @@ export function RouteMap({ chapters, currentChapter, onChapterPress, onMarkerPre
             {current && (
               <View style={{ alignItems: 'center', marginTop: sp[4] }}>
                 <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(107,163,255,0.12)', alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: color.blue[400], borderWidth: 2, borderColor: color.chalk[100], shadowColor: color.blue[400], shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 6 }} />
+                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: theme.water, borderWidth: 2, borderColor: color.chalk[100], shadowColor: theme.water, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 6 }} />
                 </View>
-                <Text style={{ fontFamily: font.mono, fontSize: fs[9], fontWeight: fw[600], color: color.blue[400], letterSpacing: 1.5, textTransform: 'uppercase', marginTop: sp[1] }}>You are here</Text>
+                <Text style={{ fontFamily: font.mono, fontSize: fs[9], fontWeight: fw[600], color: theme.water, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: sp[1] }}>You are here</Text>
               </View>
             )}
           </View>

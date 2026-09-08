@@ -64,7 +64,7 @@ export function ChatMessage({ children, from, confirmed = true, thinking, reveal
   }
 
   const accentRGB = isVoid ? 'rgba(100,216,174,' : 'rgba(42,138,106,';
-  const chalkRGB = isVoid ? 'rgba(232,228,220,' : 'rgba(10,15,26,';
+  const chalkRGB = isVoid ? 'rgba(241,235,221,' : 'rgba(38,40,46,';
 
   return (
     <View style={{

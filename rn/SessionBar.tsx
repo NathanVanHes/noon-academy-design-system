@@ -44,7 +44,7 @@ export function SessionBar({ segments, size = 'md', pageSize = 10 }: SessionBarP
     switch (state) {
       case 'correct': return theme.accent;
       case 'incorrect': return theme.danger;
-      case 'current': return color.blue[400];
+      case 'current': return theme.water;
       default: return theme.border;
     }
   }

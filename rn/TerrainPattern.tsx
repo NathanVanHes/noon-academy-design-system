@@ -83,8 +83,8 @@ function generateContours(w: number, h: number, variant: string, isVoid: boolean
     }
 
     const strokeColor = isVoid
-      ? `rgba(232,228,220,${a.toFixed(3)})`
-      : `rgba(10,15,26,${a.toFixed(3)})`;
+      ? `rgba(241,235,221,${a.toFixed(3)})`
+      : `rgba(38,40,46,${a.toFixed(3)})`;
 
     paths.push(`${d}|${strokeColor}`);
     y += extGaps[i];

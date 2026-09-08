@@ -21,9 +21,9 @@ export function GridPaper({ variant = 'standard', width, height, style }: GridPa
   const { theme, mode } = useTheme();
 
   const isVoid = mode === 'void';
-  const lineColor = isVoid ? 'rgba(232,228,220,0.08)' : 'rgba(10,15,26,0.08)';
+  const lineColor = isVoid ? 'rgba(241,235,221,0.08)' : 'rgba(38,40,46,0.08)';
   const goldColor = isVoid ? 'rgba(201,162,39,0.10)' : 'rgba(122,96,20,0.10)';
-  const canvasColor = isVoid ? 'rgba(232,228,220,0.025)' : 'rgba(10,15,26,0.03)';
+  const canvasColor = isVoid ? 'rgba(241,235,221,0.025)' : 'rgba(38,40,46,0.03)';
 
   const lines: React.ReactElement[] = [];
 

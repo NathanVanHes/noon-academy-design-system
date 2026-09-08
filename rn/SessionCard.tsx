@@ -81,10 +81,10 @@ export function SessionCard({ time, title, meta, state = 'upcoming', statusText,
     if (state === 'live') return (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[2], height: 28, paddingHorizontal: sp[3], borderRadius: r[1], backgroundColor: theme.signalSoft, borderWidth: 1, borderColor: theme.signalBorder }}>
         <View style={{ width: icon.xs, height: icon.xs, borderRadius: icon.xs / 2, backgroundColor: theme.signalBright }} />
-        <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.signalBright }}>Live</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[12], fontWeight: fw[500], color: theme.signalText }}>Live</Text>
       </View>
     );
-    if (state === 'soon') return <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.signalBright }}>Soon</Text>;
+    if (state === 'soon') return <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.signalText }}>Soon</Text>;
     if (state === 'done') return <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.fgMuted }}>Ended</Text>;
     if (state === 'cancelled') return <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.danger }}>Cancelled</Text>;
     return <Text style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.fgMuted }}>{statusText || ''}</Text>;
