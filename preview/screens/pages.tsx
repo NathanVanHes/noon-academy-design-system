@@ -5681,15 +5681,16 @@ export function AIPromptPage() {
     }
   };
   return <>
-    <S title="Build with AI" desc="Paste this prompt into Claude, Cursor, or any AI coding tool before asking it to build screens — it carries the whole system: what it is, the rules, the inventory, and where to start. Share this page directly with a link to #aiprompt.">
+    <S title="Build with AI" desc="The workflow: clone the repo, run your AI tool inside it, and ask for screens. The AI builds from the actual component source in rn/ — the instruction file (AGENTS.md, mirrored below) gives it the rules automatically. Share this page with a link to #aiprompt.">
       <Button variant="primary" onPress={copy}>{copied ? 'Copied' : 'Copy prompt'}</Button>
     </S>
-    <S title="How to use it">
-      <Rl>{'1. Clone the repo (github.com/NathanVanHes/noon-academy-design-system) and open it in Claude Code or Cursor — both read AGENTS.md at the root automatically, which mirrors this prompt. In any other tool, copy the prompt below as your system prompt.'}</Rl>
-      <Rl>{'2. Ask for a screen in plain language — e.g. \u201cBuild a leaderboard screen with a podium, my rank pinned, and a weekly/all-time toggle.\u201d The prompt steers the AI to real components and tokens.'}</Rl>
-      <Rl>{'3. When a Template is close to what you want, say so — e.g. \u201cstart from HomeTemplate in preview/screens/pages.tsx and swap the homework section for a leaderboard.\u201d'}</Rl>
-      <Rl>{'4. Every component is one file in rn/ (rn/Button.tsx, rn/Card.tsx\u2026) — that\u2019s where the real props live, for the AI and for you.'}</Rl>
-      <Rl>{'5. Preview your screen: drop it in preview/screens/, register it in preview/App.tsx, then cd preview && npx expo start — press w for web, i for iOS, a for Android.'}</Rl>
+    <S title="The workflow">
+      <Rl>{'1. Clone: git clone github.com/NathanVanHes/noon-academy-design-system, then cd into it.'}</Rl>
+      <Rl>{'2. Run your AI tool in the repo: type claude (Claude Code) or open the folder in Cursor. Both auto-read AGENTS.md at the root — no setup, no pasting.'}</Rl>
+      <Rl>{'3. Ask for a screen in plain language — e.g. \u201cBuild a leaderboard screen with a podium, my rank pinned, and a weekly/all-time toggle. Put it in the explorer so I can preview it.\u201d The AI reads the real component files in rn/ for props — nothing is guessed.'}</Rl>
+      <Rl>{'4. When a Template is close, say so — e.g. \u201cstart from HomeTemplate in preview/screens/pages.tsx and swap the homework section for a leaderboard.\u201d'}</Rl>
+      <Rl>{'5. Preview: screens registered in preview/App.tsx appear in this explorer. cd preview && npx expo start — press w for web, i for iOS, a for Android.'}</Rl>
+      <Rl>{'Using a tool that can\u2019t see your files (claude.ai, ChatGPT)? Copy the prompt below as the system prompt instead — same content as AGENTS.md.'}</Rl>
     </S>
     <View {...{ dataSet: { ltr: '' } }} style={{ backgroundColor: theme.bgRaised, borderWidth: 1, borderColor: theme.border, borderRadius: r[3], padding: sp[5], marginBottom: sp[7] }}>
       <Text selectable style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.fg, lineHeight: fs[12] * 1.7 }}>{AI_PROMPT}</Text>

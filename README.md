@@ -59,13 +59,26 @@ Then, from the Expo dev server:
 
 ## Build layouts with AI
 
-The fastest way to go from idea to screen:
+The workflow: **clone the repo, run your AI tool inside it, and build.** The AI then works against the actual component source in `rn/` — not from memory — and `AGENTS.md` at the repo root gives it the rules automatically.
 
-1. **Clone the repo and open it in Claude Code or Cursor.** Both pick up `AGENTS.md` automatically — no setup. Or, in any other AI tool, paste the prompt from the explorer's Build with AI page (`#aiprompt`) as your system prompt.
-2. **Ask for a screen.** e.g. *"Build a leaderboard screen for Grade 11 Qudrat students with a podium, my rank pinned, and a weekly/all-time toggle."* The instructions steer the AI to real components (`rn/*.tsx`), real tokens, and the system's rules — no invented colours or props.
-3. **Start from a template when one is close.** The full screens on the Templates page live in `preview/screens/pages.tsx` (search `LoginTemplate`, `HomeTemplate`, `QuizTemplate`, `ProfileTemplate`, `SessionDetailTemplate`, `JourneyTemplate`). Tell the AI to copy one and adapt it.
-4. **Check props in the source.** Every component is a single file in `rn/` — e.g. `rn/Button.tsx`, `rn/Card.tsx`. The AI is instructed to read these instead of guessing; you can too.
-5. **Preview your screen.** Drop it into `preview/screens/`, register it in `preview/App.tsx` (import → `NAV` entry → `PAGES` entry), and it appears in the explorer nav on web, iOS, and Android.
+```bash
+git clone https://github.com/NathanVanHes/noon-academy-design-system
+cd noon-academy-design-system
+claude        # Claude Code — or open the folder in Cursor
+```
+
+Then just ask for what you want:
+
+> Build a leaderboard screen for Grade 11 Qudrat students — podium for the top 3, my rank pinned, weekly/all-time toggle. Put it in the explorer so I can preview it.
+
+What makes this work:
+
+- **`AGENTS.md`** is read automatically by Claude Code and Cursor. It carries the rules, token scales, theme roles, and the component inventory — and instructs the AI to open the real component files for props instead of guessing.
+- **Every component is one file in `rn/`** — `rn/Button.tsx`, `rn/Card.tsx`, `rn/QuizOption.tsx`. The AI (and you) read these for the actual props.
+- **Templates are real source to copy.** The six full screens live in `preview/screens/pages.tsx` (`LoginTemplate`, `HomeTemplate`, `QuizTemplate`, `ProfileTemplate`, `SessionDetailTemplate`, `JourneyTemplate`). Say *"start from HomeTemplate and swap the homework section for X"*.
+- **Preview instantly.** A screen registered in `preview/App.tsx` (import → `NAV` → `PAGES`) shows up in the explorer on web, iOS, and Android via `npx expo start`.
+
+Using a tool that can't see your files (claude.ai, ChatGPT)? Paste the prompt from the explorer's Build with AI page (`#aiprompt`) as the system prompt instead — it's the same content as `AGENTS.md`.
 
 ## What's included
 
