@@ -5478,9 +5478,103 @@ function ProfileTemplate() {
   );
 }
 
+function SessionDetailTemplate() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [reminder, setReminder] = useState(true);
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: insets.top + sp[5], paddingHorizontal: sp[5], paddingBottom: sp[8] }}>
+        {/* Full-takeover child page: back sits where the nav was, title is contextual */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: sp[3] }}>
+          <BackButton onPress={() => {}} />
+          <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1.5, textTransform: 'uppercase', color: theme.fgFaint }}>Today · 16:00</Text>
+        </View>
+        <View style={{ marginTop: sp[5], flexDirection: 'row' }}>
+          <Chip variant="accent" dot>Live now</Chip>
+        </View>
+        <Text style={{ fontFamily: font.serif, fontSize: fs[24], fontWeight: fw[600], color: theme.fg, marginTop: sp[3], lineHeight: fs[24] * 1.25 }}>Qudrat — Reading comprehension</Text>
+        <Text style={{ fontFamily: font.sans, fontSize: fs[13], color: theme.fgMuted, marginTop: sp[2], lineHeight: fs[13] * 1.5 }}>Main ideas, inference, and vocabulary in context. Bring your notes from last session.</Text>
+        <View style={{ marginTop: sp[6] }}>
+          <Identity size="md" initials="HA" name="Mr. Hassan" role="TEACHER · QUDRAT VERBAL" />
+        </View>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint, marginTop: sp[7], marginBottom: sp[1] }}>Details</Text>
+        <ListRow icon="video" label="Format" value="Live class" chevron={false} />
+        <ListRow icon="document" label="Length" value="60 min" chevron={false} />
+        <ListRow icon="user" label="Classmates" value="212 joined" chevron={false} />
+        <ListRow icon="bell" label="Remind me" right={<Switch value={reminder} onValueChange={setReminder} />} divider={false} />
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], fontWeight: fw[600], letterSpacing: 2, textTransform: 'uppercase', color: theme.fgFaint, marginTop: sp[7], marginBottom: sp[2] }}>Before class</Text>
+        <HomeworkCard title="Skim: passage pack 4" subject="Verbal" due="10 min" questions={6} status="due-soon" onPress={() => {}} />
+      </ScrollView>
+      <BottomAction primary={{ label: 'Join class', onPress: () => {} }} />
+    </View>
+  );
+}
+
+const JOURNEY_CHAPTERS: RouteChapter[] = [
+  {
+    id: 'ch3', label: 'CH 3', title: 'Ratios & proportion', status: 'current', level: 0,
+    markers: [
+      { id: 'm1', label: 'Simplifying ratios', status: 'mapped' },
+      { id: 'm2', label: 'Map scales', status: 'exploring' },
+      { id: 'm3', label: 'Direct proportion', status: 'not-started' },
+    ],
+  },
+  {
+    id: 'ch2', label: 'CH 2', title: 'Fractions & decimals', status: 'weak', level: 0, result: '64%',
+    markers: [
+      { id: 'm4', label: 'Equivalent fractions', status: 'mapped' },
+      { id: 'm5', label: 'Decimal conversion', status: 'needs-attention' },
+    ],
+  },
+  {
+    id: 'ch1', label: 'CH 1', title: 'Number sense', status: 'strong', level: 0, result: '88%',
+    markers: [
+      { id: 'm6', label: 'Place value', status: 'mapped' },
+      { id: 'm7', label: 'Rounding', status: 'mapped' },
+    ],
+  },
+];
+
+function JourneyTemplate() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [tab, setTab] = useState(1);
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: insets.top + sp[5], paddingHorizontal: sp[5], paddingBottom: sp[8] }}>
+        <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1.5, textTransform: 'uppercase', color: theme.fgFaint }}>Qudrat · Quant</Text>
+        <Text style={{ fontFamily: font.serif, fontSize: fs[24], fontWeight: fw[600], color: theme.fg, marginTop: sp[1] }}>Your journey</Text>
+        <View style={{ marginTop: sp[5] }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: sp[2] }}>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], letterSpacing: 1.5, textTransform: 'uppercase', color: theme.fgFaint }}>Route mapped</Text>
+            <Text style={{ fontFamily: font.mono, fontSize: fs[10], color: theme.accentText }}>38%</Text>
+          </View>
+          <LinearProgress value={38} />
+        </View>
+        <View style={{ marginTop: sp[7] }}>
+          <RouteMap chapters={JOURNEY_CHAPTERS} currentChapter="ch3" onChapterPress={() => {}} onMarkerPress={() => {}} />
+        </View>
+      </ScrollView>
+      <BottomNav
+        items={[
+          { label: 'Home', icon: 'home' },
+          { label: 'Journey', icon: 'map' },
+          { label: 'Classes', icon: 'video' },
+          { label: 'Profile', icon: 'user' },
+        ]}
+        selected={tab}
+        onSelect={setTab}
+      />
+    </View>
+  );
+}
+
 const TEMPLATES: Array<{ id: string; title: string; desc: string; component: React.FC }> = [
   { id: 'login', title: 'Login', desc: 'Phone number \u2192 OTP code \u2192 in.', component: LoginTemplate },
   { id: 'home', title: 'Home dashboard', desc: 'Greeting, streak, stats, today\u2019s sessions, homework.', component: HomeTemplate },
+  { id: 'session', title: 'Session detail', desc: 'Full-takeover child page \u2014 back where nav was, join CTA.', component: SessionDetailTemplate },
+  { id: 'journey', title: 'Journey', desc: 'Route map of chapters with progress and current position.', component: JourneyTemplate },
   { id: 'quiz', title: 'Quiz flow', desc: 'Question \u2192 verdict \u2192 results with review.', component: QuizTemplate },
   { id: 'profile', title: 'Profile & settings', desc: 'Identity, account rows, preferences, sign out.', component: ProfileTemplate },
 ];
