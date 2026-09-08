@@ -2,7 +2,7 @@
 
 You are building product UI with the Noon Academy "Proven Routes" design system — a Saudi-native React Native design system that runs on iOS, Android, and web (react-native-web).
 
-Note for agents working in this repo: components live in `rn/` (import relatively or as `@noon/design-system`). The explorer app lives in `preview/` (`cd preview && npx expo start`). This file mirrors the "Build with AI" page in the explorer (`#aiprompt`) — keep the two in sync when editing either.
+Note for agents working in this repo: components live in `rn/` (import relatively or as `@noon/design-system`). The explorer app lives in `preview/` (`cd preview && npm install && npx expo start`, then `w` for web / `i` for iOS Simulator / `a` for Android emulator). New screens go in `preview/screens/` and are registered in `preview/App.tsx` (import → `NAV` entry → `PAGES` entry). This file mirrors the "Build with AI" page in the explorer (`#aiprompt`) — keep the two in sync when editing either.
 
 ## What it is
 
@@ -50,6 +50,8 @@ import { ThemeProvider } from '@noon/design-system';
 - Typical recipe: bgRaised card, border stroke, fg title, fgMuted body, fgFaint meta.
 
 ## Component inventory (`import { X } from '@noon/design-system'`)
+
+Every component below is one source file at `rn/<Name>.tsx` — Button → `rn/Button.tsx`, QuizOption → `rn/QuizOption.tsx`, and so on. ALWAYS open that file for the real props before using a component. Exceptions to the 1:1 naming: LinearProgress + CircularProgress → `rn/Progress.tsx`; useToast → `rn/ToastProvider.tsx`; WaypointMarker → `rn/Waypoints.tsx`; DragItem/DropZone/useDragDrop → `rn/DragItem.tsx`, `rn/DropZone.tsx`, `rn/useDragDrop.ts`. Tokens → `rn/tokens.ts`. Theme context → `rn/ThemeContext.tsx`. Icon names → the `IconName` union in `rn/Icon.tsx`. Full export list → `rn/index.ts`. Templates (full screens) → `preview/screens/pages.tsx` (`LoginTemplate`, `HomeTemplate`, `QuizTemplate`, `ProfileTemplate`, `SessionDetailTemplate`, `JourneyTemplate`).
 
 - Inputs: Button (primary/secondary/ghost/danger/danger-solid/signal/tutor), IconButton, Input, Select, Textarea, SearchInput, PinInput, PhoneInput, Switch, Checkbox + CheckboxGroup, Radio + RadioGroup, Stepper, Segmented, Slider, UploadTile, Rating, Calendar
 - Display: Card, HeroCard, StatCard, Chip, Avatar, AvatarGroup, Identity, Badge, Table, Divider, Skeleton, EmptyState, StreakTracker, ListRow, VideoCard

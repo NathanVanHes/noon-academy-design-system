@@ -36,15 +36,36 @@ export default function App() {
 
 ## Explorer
 
-Browse all components, tokens, and documentation:
-
-```bash
-cd preview && npx expo start
-```
+Hosted preview (no setup): **https://noon-design-system-nathan-noonacademys-projects.vercel.app**
 
 Toggle Void/Paper theme and RTL from the top bar. Pages are deep-linkable on web via URL hash (e.g. `#aiprompt`, `#templates`).
 
-Start with **Build with AI** (`#aiprompt`) — a copy-paste system prompt for AI builders (also mirrored in `AGENTS.md` at the repo root) — and **Templates** (`#templates`) — full screens (Login, Home, Quiz, Profile) assembled from system components.
+Start with **Build with AI** (`#aiprompt`) — a copy-paste system prompt for AI builders (also mirrored in `AGENTS.md` at the repo root) — and **Templates** (`#templates`) — full screens (Login, Home, Quiz, Profile, Session detail, Journey) assembled from system components.
+
+## Run it locally
+
+```bash
+git clone https://github.com/NathanVanHes/noon-academy-design-system
+cd noon-academy-design-system/preview
+npm install
+npx expo start
+```
+
+Then, from the Expo dev server:
+
+- **Web** — press `w` (opens in your browser)
+- **iOS** — press `i` (needs Xcode + an iOS Simulator installed), or scan the QR code with the Expo Go app on your iPhone
+- **Android** — press `a` (needs Android Studio + an emulator running), or scan the QR code with Expo Go on your device
+
+## Build layouts with AI
+
+The fastest way to go from idea to screen:
+
+1. **Clone the repo and open it in Claude Code or Cursor.** Both pick up `AGENTS.md` automatically — no setup. Or, in any other AI tool, paste the prompt from the explorer's Build with AI page (`#aiprompt`) as your system prompt.
+2. **Ask for a screen.** e.g. *"Build a leaderboard screen for Grade 11 Qudrat students with a podium, my rank pinned, and a weekly/all-time toggle."* The instructions steer the AI to real components (`rn/*.tsx`), real tokens, and the system's rules — no invented colours or props.
+3. **Start from a template when one is close.** The full screens on the Templates page live in `preview/screens/pages.tsx` (search `LoginTemplate`, `HomeTemplate`, `QuizTemplate`, `ProfileTemplate`, `SessionDetailTemplate`, `JourneyTemplate`). Tell the AI to copy one and adapt it.
+4. **Check props in the source.** Every component is a single file in `rn/` — e.g. `rn/Button.tsx`, `rn/Card.tsx`. The AI is instructed to read these instead of guessing; you can too.
+5. **Preview your screen.** Drop it into `preview/screens/`, register it in `preview/App.tsx` (import → `NAV` entry → `PAGES` entry), and it appears in the explorer nav on web, iOS, and Android.
 
 ## What's included
 

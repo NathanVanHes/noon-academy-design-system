@@ -5646,6 +5646,7 @@ THEME ROLES (exact names on useTheme().theme — do not invent others)
 10. Accessibility: every interactive element gets accessibilityRole and accessibilityLabel; minimum touch target 40px; honour reduced motion.
 
 COMPONENT INVENTORY (import { X } from '@noon/design-system')
+Every component below is one source file at rn/<Name>.tsx — Button → rn/Button.tsx, QuizOption → rn/QuizOption.tsx, and so on. ALWAYS open that file for the real props before using a component. Exceptions to the 1:1 naming: LinearProgress + CircularProgress → rn/Progress.tsx; useToast → rn/ToastProvider.tsx; WaypointMarker → rn/Waypoints.tsx; DragItem/DropZone/useDragDrop → rn/DragItem.tsx, rn/DropZone.tsx, rn/useDragDrop.ts. Tokens → rn/tokens.ts. Theme context → rn/ThemeContext.tsx. Icon names → the IconName union in rn/Icon.tsx. Full export list → rn/index.ts. Templates (full screens) → preview/screens/pages.tsx (LoginTemplate, HomeTemplate, QuizTemplate, ProfileTemplate, SessionDetailTemplate, JourneyTemplate).
 - Inputs: Button (primary/secondary/ghost/danger/danger-solid/signal/tutor), IconButton, Input, Select, Textarea, SearchInput, PinInput, PhoneInput, Switch, Checkbox + CheckboxGroup, Radio + RadioGroup, Stepper, Segmented, Slider, UploadTile, Rating, Calendar
 - Display: Card, HeroCard, StatCard, Chip, Avatar, AvatarGroup, Identity, Badge, Table, Divider, Skeleton, EmptyState, StreakTracker, ListRow, VideoCard
 - Navigation: Tabs, BottomNav, NavRail, TitleBar, FilterBar, BackButton, Breadcrumbs, Pagination, NotificationBell, NoonMark
@@ -5682,6 +5683,13 @@ export function AIPromptPage() {
   return <>
     <S title="Build with AI" desc="Paste this prompt into Claude, Cursor, or any AI coding tool before asking it to build screens — it carries the whole system: what it is, the rules, the inventory, and where to start. Share this page directly with a link to #aiprompt.">
       <Button variant="primary" onPress={copy}>{copied ? 'Copied' : 'Copy prompt'}</Button>
+    </S>
+    <S title="How to use it">
+      <Rl>{'1. Clone the repo (github.com/NathanVanHes/noon-academy-design-system) and open it in Claude Code or Cursor — both read AGENTS.md at the root automatically, which mirrors this prompt. In any other tool, copy the prompt below as your system prompt.'}</Rl>
+      <Rl>{'2. Ask for a screen in plain language — e.g. \u201cBuild a leaderboard screen with a podium, my rank pinned, and a weekly/all-time toggle.\u201d The prompt steers the AI to real components and tokens.'}</Rl>
+      <Rl>{'3. When a Template is close to what you want, say so — e.g. \u201cstart from HomeTemplate in preview/screens/pages.tsx and swap the homework section for a leaderboard.\u201d'}</Rl>
+      <Rl>{'4. Every component is one file in rn/ (rn/Button.tsx, rn/Card.tsx\u2026) — that\u2019s where the real props live, for the AI and for you.'}</Rl>
+      <Rl>{'5. Preview your screen: drop it in preview/screens/, register it in preview/App.tsx, then cd preview && npx expo start — press w for web, i for iOS, a for Android.'}</Rl>
     </S>
     <View {...{ dataSet: { ltr: '' } }} style={{ backgroundColor: theme.bgRaised, borderWidth: 1, borderColor: theme.border, borderRadius: r[3], padding: sp[5], marginBottom: sp[7] }}>
       <Text selectable style={{ fontFamily: font.mono, fontSize: fs[12], color: theme.fg, lineHeight: fs[12] * 1.7 }}>{AI_PROMPT}</Text>
